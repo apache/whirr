@@ -1,3 +1,6 @@
 Trunk (unreleased changes)
 
     WHIRR-2. Import initial Java source code. (tomwhite)
+
+    WHIRR-20. Generate RAT report. (phunt via tomwhite)
+
