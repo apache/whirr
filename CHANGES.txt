@@ -4,3 +4,5 @@ Trunk (unreleased changes)
 
     WHIRR-20. Generate RAT report. (phunt via tomwhite)
 
+    WHIRR-32. Update POM to point to Apache RAT 0.8-SNAPSHOT.
+    (Jeff Hammerbacher via tomwhite)
