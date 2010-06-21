@@ -33,10 +33,9 @@ import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.util.Collections;
-import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
-import java.util.Map.Entry;
 
 import org.apache.whirr.service.ClusterSpec;
 import org.apache.whirr.service.ComputeServiceBuilder;
@@ -76,8 +75,8 @@ public class HadoopService extends Service {
     .osFamily(OsFamily.UBUNTU)
     .options(runScript(nnjtBootScript)
         .installPrivateKey(privateKey)
-	      .authorizePublicKey(publicKey)
-	      .inboundPorts(22, 80, 8020, 8021, 50030)) // TODO: restrict further
+        .authorizePublicKey(publicKey)
+        .inboundPorts(22, 80, 8020, 8021, 50030)) // TODO: restrict further
     .build();
     
     InstanceTemplate instanceTemplate = clusterSpec.getInstanceTemplate(MASTER_ROLE);
@@ -98,14 +97,14 @@ public class HadoopService extends Service {
     byte[] slaveBootScript = RunUrlBuilder.runUrls(
       "sun/java/install",
       String.format("apache/hadoop/install dn,tt -n %s -j %s",
-	      namenodePublicAddress.getHostName(),
-	      jobtrackerPublicAddress.getHostName()));
+          namenodePublicAddress.getHostName(),
+          jobtrackerPublicAddress.getHostName()));
 
     template = computeService.templateBuilder()
     .osFamily(OsFamily.UBUNTU)
     .options(runScript(slaveBootScript)
         .installPrivateKey(privateKey)
-	      .authorizePublicKey(publicKey))
+        .authorizePublicKey(publicKey))
     .build();
 
     instanceTemplate = clusterSpec.getInstanceTemplate(WORKER_ROLE);
@@ -114,7 +113,7 @@ public class HadoopService extends Service {
     Set<? extends NodeMetadata> workerNodes;
     try {
       workerNodes = computeService.runNodesWithTag(serviceSpec.getClusterName(),
-	instanceTemplate.getNumberOfInstances(), template);
+        instanceTemplate.getNumberOfInstances(), template);
     } catch (RunNodesException e) {
       // TODO: don't bail out if only a few have failed to start
       throw new IOException(e);
@@ -123,7 +122,7 @@ public class HadoopService extends Service {
     // TODO: wait for TTs to come up (done in test for the moment)
     
     Set<Instance> instances = Sets.union(getInstances(MASTER_ROLE, Collections.singleton(node)),
-	getInstances(WORKER_ROLE, workerNodes));
+      getInstances(WORKER_ROLE, workerNodes));
     
     Properties config = createClientSideProperties(namenodePublicAddress, jobtrackerPublicAddress);
     return new HadoopCluster(instances, config);
@@ -131,12 +130,12 @@ public class HadoopService extends Service {
   
   private Set<Instance> getInstances(final Set<String> roles, Set<? extends NodeMetadata> nodes) {
     return Sets.newHashSet(Collections2.transform(Sets.newHashSet(nodes),
-	new Function<NodeMetadata, Instance>() {
+        new Function<NodeMetadata, Instance>() {
       @Override
       public Instance apply(NodeMetadata node) {
-	return new Instance(roles,
-	    Iterables.get(node.getPublicAddresses(), 0),
-	    Iterables.get(node.getPrivateAddresses(), 0));
+        return new Instance(roles,
+            Iterables.get(node.getPublicAddresses(), 0),
+            Iterables.get(node.getPrivateAddresses(), 0));
       }
     }));
   }

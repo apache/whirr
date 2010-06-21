@@ -24,6 +24,7 @@
   <name>Whirr</name>
 
   <modules>
+    <module>build-tools</module>
     <module>core</module>
     <module>services/hadoop</module>
     <module>services/zookeeper</module>
@@ -56,6 +57,30 @@
           </excludes>
         </configuration>
       </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+        <version>2.5</version>
+        <dependencies>
+          <dependency>
+            <groupId>org.apache.whirr</groupId>
+            <artifactId>whirr-build-tools</artifactId>
+            <version>0.1.0-SNAPSHOT</version>
+          </dependency>
+        </dependencies>
+      </plugin>
     </plugins>
   </build>
+  <reporting>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+        <version>2.5</version>
+        <configuration>
+          <configLocation>checkstyle.xml</configLocation>
+        </configuration>
+      </plugin>
+    </plugins>
+  </reporting>
 </project>

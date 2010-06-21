@@ -31,7 +31,6 @@ import com.google.common.collect.Sets;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.apache.whirr.service.ClusterSpec;
@@ -63,14 +62,14 @@ public class ZooKeeperService extends Service {
     ComputeService computeService = ComputeServiceBuilder.build(serviceSpec);
 
     byte[] bootScript = RunUrlBuilder.runUrls(
-	"sun/java/install",
-	"apache/zookeeper/install");
+      "sun/java/install",
+      "apache/zookeeper/install");
     Template template = computeService.templateBuilder()
       .osFamily(OsFamily.UBUNTU)
       .options(runScript(bootScript)
-	  .installPrivateKey(serviceSpec.readPrivateKey())
-	  .authorizePublicKey(serviceSpec.readPublicKey())
-	  .inboundPorts(22, CLIENT_PORT))
+      .installPrivateKey(serviceSpec.readPrivateKey())
+      .authorizePublicKey(serviceSpec.readPublicKey())
+      .inboundPorts(22, CLIENT_PORT))
       .build();
     
     InstanceTemplate instanceTemplate = clusterSpec.getInstanceTemplate(ZOOKEEPER_ROLE);
@@ -79,7 +78,7 @@ public class ZooKeeperService extends Service {
     Set<? extends NodeMetadata> nodeMap;
     try {
       nodeMap = computeService.runNodesWithTag(serviceSpec.getClusterName(), ensembleSize,
-	  template);
+      template);
     } catch (RunNodesException e) {
       // TODO: can we do better here - proceed if ensemble is big enough?
       throw new IOException(e);
@@ -90,7 +89,7 @@ public class ZooKeeperService extends Service {
     // Position is significant: i-th server has id i.
     String servers = Joiner.on(' ').join(getPrivateIps(nodes));
     byte[] configureScript = RunUrlBuilder.runUrls(
-	"apache/zookeeper/post-configure " + servers);
+      "apache/zookeeper/post-configure " + servers);
     try {
       computeService.runScriptOnNodesWithTag(serviceSpec.getClusterName(), configureScript);
     } catch (RunScriptOnNodesException e) {
@@ -104,34 +103,34 @@ public class ZooKeeperService extends Service {
 
   private List<String> getPrivateIps(List<NodeMetadata> nodes) {
     return Lists.transform(Lists.newArrayList(nodes),
-	new Function<NodeMetadata, String>() {
+        new Function<NodeMetadata, String>() {
       @Override
       public String apply(NodeMetadata node) {
-	return Iterables.get(node.getPrivateAddresses(), 0).getHostAddress();
+        return Iterables.get(node.getPrivateAddresses(), 0).getHostAddress();
       }
     });
   }
   
   private Set<Instance> getInstances(List<NodeMetadata> nodes) {
     return Sets.newHashSet(Collections2.transform(Sets.newHashSet(nodes),
-	new Function<NodeMetadata, Instance>() {
+        new Function<NodeMetadata, Instance>() {
       @Override
       public Instance apply(NodeMetadata node) {
-	return new Instance(Collections.singleton(ZOOKEEPER_ROLE),
-	    Iterables.get(node.getPublicAddresses(), 0),
-	    Iterables.get(node.getPrivateAddresses(), 0));
+        return new Instance(Collections.singleton(ZOOKEEPER_ROLE),
+          Iterables.get(node.getPublicAddresses(), 0),
+          Iterables.get(node.getPrivateAddresses(), 0));
       }
     }));
   }
   
   private List<String> getHosts(List<NodeMetadata> nodes) {
     return Lists.transform(Lists.newArrayList(nodes),
-	new Function<NodeMetadata, String>() {
+        new Function<NodeMetadata, String>() {
       @Override
       public String apply(NodeMetadata node) {
-	String publicIp =  Iterables.get(node.getPublicAddresses(), 0)
-	  .getHostName();
-	return String.format("%s:%d", publicIp, CLIENT_PORT);
+        String publicIp =  Iterables.get(node.getPublicAddresses(), 0)
+         .getHostName();
+        return String.format("%s:%d", publicIp, CLIENT_PORT);
       }
     });
   }

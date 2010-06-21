@@ -1,4 +1,12 @@
+Apache Whirr Change Log
+
 Trunk (unreleased changes)
+
+  INCOMPATIBLE CHANGES
+
+  NEW FEATURES
+
+  IMPROVEMENTS
 
     WHIRR-2. Import initial Java source code. (tomwhite)
 
@@ -6,3 +14,7 @@ Trunk (unreleased changes)
 
     WHIRR-32. Update POM to point to Apache RAT 0.8-SNAPSHOT.
     (Jeff Hammerbacher via tomwhite)
+
+    WHIRR-21. Enforce source code style. (tomwhite)
+
+  BUG FIXES

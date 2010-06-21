@@ -36,7 +36,7 @@ public class HadoopCluster extends Cluster {
     return Iterables.getOnlyElement(Sets.filter(getInstances(), new Predicate<Instance>() {
       @Override
       public boolean apply(Instance instance) {
-	return instance.getRoles().contains("nn");
+        return instance.getRoles().contains("nn");
       }
     })).getPublicAddress();
   }

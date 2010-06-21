@@ -30,7 +30,7 @@ public class Cluster {
     private InetAddress privateAddress;
 
     public Instance(Set<String> roles, InetAddress publicAddress,
-	InetAddress privateAddress) {
+        InetAddress privateAddress) {
       this.roles = roles;
       this.publicAddress = publicAddress;
       this.privateAddress = privateAddress;

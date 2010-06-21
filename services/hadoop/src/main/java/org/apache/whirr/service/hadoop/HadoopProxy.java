@@ -42,13 +42,13 @@ public class HadoopProxy {
     String user = "ubuntu"; // TODO: get from jclouds
     String server = cluster.getNamenodePublicAddress().getHostName();
     String[] command = new String[] { "ssh",
-	"-i", identityFile,
-	"-o", "ConnectTimeout=10",
-	"-o", "ServerAliveInterval=60",
-	"-o", "StrictHostKeyChecking=no",
-	"-N",
-	"-D 6666",
-	String.format("%s@%s", user, server)};
+      "-i", identityFile,
+      "-o", "ConnectTimeout=10",
+      "-o", "ServerAliveInterval=60",
+      "-o", "StrictHostKeyChecking=no",
+      "-N",
+      "-D 6666",
+      String.format("%s@%s", user, server)};
     ProcessBuilder processBuilder = new ProcessBuilder(command);
     process = processBuilder.start();
     
