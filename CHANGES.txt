@@ -17,4 +17,7 @@ Trunk (unreleased changes)
 
     WHIRR-21. Enforce source code style. (tomwhite)
 
+    WHIRR-34. Open up ports 50010 (JobTracker) and 50070 (NameNode) for the
+    Hadoop Service. (Jeff Hammerbacher via tomwhite)
+
   BUG FIXES

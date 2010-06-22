@@ -76,7 +76,7 @@ public class HadoopService extends Service {
     .options(runScript(nnjtBootScript)
         .installPrivateKey(privateKey)
         .authorizePublicKey(publicKey)
-        .inboundPorts(22, 80, 8020, 8021, 50030)) // TODO: restrict further
+        .inboundPorts(22, 80, 8020, 8021, 50010, 50030, 50070)) // TODO: restrict further
     .build();
     
     InstanceTemplate instanceTemplate = clusterSpec.getInstanceTemplate(MASTER_ROLE);
