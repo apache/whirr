@@ -23,4 +23,6 @@ Trunk (unreleased changes)
     WHIRR-26. Allow script locations to be overridden.
     (Jeff Hammerbacher via tomwhite)
 
+    WHIRR-22. Separate unit and integration (system) tests. (tomwhite)
+
   BUG FIXES

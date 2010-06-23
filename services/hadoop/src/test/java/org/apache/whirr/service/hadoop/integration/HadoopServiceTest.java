@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.apache.whirr.service.hadoop;
+package org.apache.whirr.service.hadoop.integration;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static junit.framework.Assert.assertEquals;
@@ -46,6 +46,9 @@ import org.apache.hadoop.mapred.lib.TokenCountMapper;
 import org.apache.whirr.service.ClusterSpec;
 import org.apache.whirr.service.ServiceSpec;
 import org.apache.whirr.service.ClusterSpec.InstanceTemplate;
+import org.apache.whirr.service.hadoop.HadoopCluster;
+import org.apache.whirr.service.hadoop.HadoopProxy;
+import org.apache.whirr.service.hadoop.HadoopService;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

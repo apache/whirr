@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.apache.whirr.service.zookeeper;
+package org.apache.whirr.service.zookeeper.integration;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static junit.framework.Assert.assertEquals;
@@ -26,6 +26,8 @@ import java.util.concurrent.CountDownLatch;
 
 import org.apache.whirr.service.ClusterSpec;
 import org.apache.whirr.service.ClusterSpec.InstanceTemplate;
+import org.apache.whirr.service.zookeeper.ZooKeeperCluster;
+import org.apache.whirr.service.zookeeper.ZooKeeperService;
 import org.apache.whirr.service.ServiceSpec;
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.WatchedEvent;
