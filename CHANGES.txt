@@ -20,4 +20,7 @@ Trunk (unreleased changes)
     WHIRR-34. Open up ports 50010 (JobTracker) and 50070 (NameNode) for the
     Hadoop Service. (Jeff Hammerbacher via tomwhite)
 
+    WHIRR-26. Allow script locations to be overridden.
+    (Jeff Hammerbacher via tomwhite)
+
   BUG FIXES
