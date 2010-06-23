@@ -25,4 +25,7 @@ Trunk (unreleased changes)
 
     WHIRR-22. Separate unit and integration (system) tests. (tomwhite)
 
+    WHIRR-37. Don't require manual installation of Apache RAT to compile.
+    (tomwhite)
+
   BUG FIXES
