@@ -26,6 +26,7 @@
   <modules>
     <module>build-tools</module>
     <module>core</module>
+    <module>services/cassandra</module>
     <module>services/hadoop</module>
     <module>services/zookeeper</module>
   </modules>
