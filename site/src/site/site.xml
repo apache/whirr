@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<project name="Whirr">
+  <bannerLeft>
+    <name>Whirr</name>
+    <src>http://incubator.apache.org/whirr/images/whirr-logo-large.png</src>
+    <href>http://incubator.apache.org/whirr/</href>
+  </bannerLeft>
+  <bannerRight>
+    <src>http://incubator.apache.org/images/apache-incubator-logo.png</src>
+    <href>http://incubator.apache.org/</href>
+  </bannerRight>
+
+  <publishDate position="right"/>
+  <version position="right"/>
+
+  <skin>
+    <groupId>org.apache.maven.skins</groupId>
+    <artifactId>maven-stylus-skin</artifactId>
+    <version>1.2</version>
+  </skin>
+
+  <body>
+    <links position="left">
+      <item name="Wiki" href="https://cwiki.apache.org/confluence/display/WHIRR" />
+      <item name="JIRA" href="https://issues.apache.org/jira/browse/WHIRR" />
+      <item name="SVN" href="https://svn.apache.org/repos/asf/incubator/whirr/" />
+    </links>
+
+    <breadcrumbs position="left">
+      <item name="Apache" href="http://www.apache.org/" />
+      <item name="Apache Incubator" href="http://incubator.apache.org/" />
+      <item name="Whirr" href="http://incubator.apache.org/whirr/"/>
+    </breadcrumbs>
+
+    <menu name="Whirr">
+      <item name="About" href="index.html"/>
+      <item name="Download" href="http://www.apache.org/dyn/closer.cgi/incubator/whirr/"/>
+      <item name="Release Notes" href="release-notes.html" />
+      <item name="Road Map" href="https://cwiki.apache.org/confluence/display/WHIRR/RoadMap" />
+      <item name="Wiki" href="https://cwiki.apache.org/confluence/display/WHIRR" />
+      <item name="FAQ" href="https://cwiki.apache.org/confluence/display/WHIRR/FAQ" />
+    </menu>
+
+    <menu name="Project Information">
+      <item name="Summary" href="project-info.html" />
+      <item name="Mailing Lists" href="mail-lists.html" />
+      <item name="IRC" href="https://cwiki.apache.org/confluence/display/WHIRR/IRC+Channel" />
+      <item name="Team" href="team-list.html" />
+      <item name="Issue Tracking" href="issue-tracking.html" />
+      <item name="License" href="license.html" />
+    </menu>
+
+    <menu name="Documentation">
+      <item name="Overview" href="overview.html"/>
+      <item name="Getting Started" href="getting-started.html"/>
+      <item name="Javadoc" href="api/html/index.html"/>
+      <item name="Whirr-Cassandra" href="whirr-cassandra.html"/>
+      <item name="Whirr-Hadoop" href="whirr-hadoop.html"/>
+      <item name="Whirr-Hbase" href="whirr-hbase.html"/>
+      <item name="Whirr-ZooKeeper" href="whirr-zookeeper.html"/>
+    </menu>
+
+  </body>
+</project>

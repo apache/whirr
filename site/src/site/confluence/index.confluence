@@ -1,0 +1,22 @@
+h1. Apache Whirr
+
+Apache Whirr is a set of libraries for running cloud services. Whirr is currently in the [Apache Incubator|http://incubator.apache.org/]. 
+
+Whirr provides 
+* A cloud-neutral way to run services. You don't have to worry about the idiosyncrasies of each provider. 
+* A common service API. The details of provisioning are particular to the service. 
+* Smart defaults for services. You can get a properly configured system running quickly, while still being able to override settings as needed. 
+
+Find out more about Whirr at our [wiki|https://cwiki.apache.org/confluence/display/WHIRR]
+
+h2. Download
+
+fill, should link to something like [this|http://www.apache.org/dyn/closer.cgi/incubator/whirr/]
+
+h2. Getting Started
+
+fill summary and [link to doc|getting-started.html]
+
+h2. Getting Involved
+
+fill detail for contributors including [link to wiki|https://cwiki.apache.org/confluence/display/WHIRR/How+To+Contribute]
