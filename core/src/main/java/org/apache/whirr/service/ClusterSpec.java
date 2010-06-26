@@ -27,8 +27,16 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+/**
+ * This class represents the specification of a cluster. It is used to describe
+ * the properties of a cluster before it is launched.
+ */
 public class ClusterSpec {
   
+  /**
+   * This class describes the type of instances that should be in the cluster.
+   * This is done by specifying the number of instances in each role.
+   */
   public static class InstanceTemplate {
     private Set<String> roles;
     private int numberOfInstances;
@@ -64,6 +72,10 @@ public class ClusterSpec {
     this(new Properties(), instanceTemplates);
   }
 
+  /**
+   * @param configuration The configuration properties for the service. These
+   * take precedence over service defaults.
+   */
   public ClusterSpec(Properties configuration, List<InstanceTemplate> instanceTemplates) {
     this.configuration = configuration;
     this.instanceTemplates = instanceTemplates;

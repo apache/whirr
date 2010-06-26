@@ -30,6 +30,9 @@ import org.jclouds.compute.ComputeServiceContextFactory;
 import org.jclouds.logging.log4j.config.Log4JLoggingModule;
 import org.jclouds.ssh.jsch.config.JschSshClientModule;
 
+/**
+ * A convenience class for building jclouds {@link ComputeService} objects.
+ */
 public class ComputeServiceBuilder {
 
   public static ComputeService build(ServiceSpec spec) throws IOException {

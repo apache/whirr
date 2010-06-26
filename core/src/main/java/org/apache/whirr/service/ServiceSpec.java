@@ -24,6 +24,10 @@ import com.google.common.io.Files;
 import java.io.File;
 import java.io.IOException;
 
+/**
+ * This class describes characteristics of the provider of a service. For
+ * example, cloud services use this class to encapsulate the cloud credentials.
+ */
 public class ServiceSpec {
   
   private String provider;

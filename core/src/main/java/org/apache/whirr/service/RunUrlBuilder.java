@@ -25,6 +25,9 @@ import static org.jclouds.scriptbuilder.domain.Statements.exec;
 
 import org.jclouds.scriptbuilder.ScriptBuilder;
 
+/**
+ * A convenience class for building scripts to run on nodes.
+ */
 public class RunUrlBuilder {
 
   // Need to be able to specify base URL

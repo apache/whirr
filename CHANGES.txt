@@ -28,4 +28,6 @@ Trunk (unreleased changes)
     WHIRR-37. Don't require manual installation of Apache RAT to compile.
     (tomwhite)
 
+    WHIRR-38. Add core javadoc. (tomwhite)
+
   BUG FIXES
