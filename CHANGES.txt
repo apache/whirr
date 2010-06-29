@@ -30,4 +30,6 @@ Trunk (unreleased changes)
 
     WHIRR-38. Add core javadoc. (tomwhite)
 
+    WHIRR-47. Create a Service factory. (tomwhite)
+
   BUG FIXES

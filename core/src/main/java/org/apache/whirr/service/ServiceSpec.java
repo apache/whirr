@@ -27,9 +27,12 @@ import java.io.IOException;
 /**
  * This class describes characteristics of the provider of a service. For
  * example, cloud services use this class to encapsulate the cloud credentials.
+ * The <code>name</code> is used to determine the Service implementation
+ * to return in {@link ServiceFactory#create(ServiceSpec)}.
  */
 public class ServiceSpec {
   
+  private String name;
   private String provider;
   private String account;
   private String key;
@@ -37,6 +40,9 @@ public class ServiceSpec {
   private String secretKeyFile;
   private String amiOwners;
   
+  public String getName() {
+    return name;
+  }
   public String getProvider() {
     return provider;
   }
@@ -54,6 +60,10 @@ public class ServiceSpec {
   }
   public String getAmiOwners() {
     return amiOwners;
+  }
+  
+  public void setName(String name) {
+    this.name = name;
   }
   public void setProvider(String provider) {
     this.provider = provider;

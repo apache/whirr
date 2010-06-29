@@ -29,6 +29,12 @@ import org.jclouds.compute.ComputeService;
 public abstract class Service {
   protected ServiceSpec serviceSpec;
 
+  /**
+   * Subclasses must provide a single argument constructor that takes a
+   * {@link ServiceSpec} so that they can be constructed by
+   * {@link ServiceFactory}.
+   * @param serviceSpec
+   */
   public Service(ServiceSpec serviceSpec) {
     this.serviceSpec = serviceSpec;
   }
