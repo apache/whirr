@@ -33,3 +33,5 @@ Trunk (unreleased changes)
     WHIRR-47. Create a Service factory. (tomwhite)
 
   BUG FIXES
+
+    WHIRR-50. Cassandra POM should depend on top-level. (tomwhite)
