@@ -66,6 +66,7 @@ public class HadoopService extends Service {
     String privateKey = serviceSpec.readPrivateKey();
     String publicKey = serviceSpec.readPublicKey();
     
+    // Launch Hadoop "master" (NN and JT)
     // deal with user packages and autoshutdown with extra runurls
     byte[] nnjtBootScript = RunUrlBuilder.runUrls(
       "sun/java/install",
@@ -94,6 +95,7 @@ public class HadoopService extends Service {
     InetAddress namenodePublicAddress = Iterables.getOnlyElement(node.getPublicAddresses());
     InetAddress jobtrackerPublicAddress = Iterables.getOnlyElement(node.getPublicAddresses());
     
+    // Launch slaves (DN and TT)
     byte[] slaveBootScript = RunUrlBuilder.runUrls(
       "sun/java/install",
       String.format("apache/hadoop/install dn,tt -n %s -j %s",

@@ -32,6 +32,9 @@ Trunk (unreleased changes)
 
     WHIRR-47. Create a Service factory. (tomwhite)
 
+    WHIRR-51. Allow the Hadoop service to be run on Rackspace Cloud servers.
+    (tomwhite)
+
   BUG FIXES
 
     WHIRR-50. Cassandra POM should depend on top-level. (tomwhite)
