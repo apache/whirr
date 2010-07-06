@@ -54,6 +54,11 @@
             <exclude>.git/**</exclude>
             <exclude>.gitignore</exclude>
             <exclude>**/*.json</exclude>
+            <exclude>**/*.confluence</exclude>
+            <exclude>**/.project</exclude>
+            <exclude>**/META-INF/services/*</exclude>
+            <exclude>**/whirr.properties</exclude>
+            <exclude>**/target/**</exclude>
           </excludes>
         </configuration>
       </plugin>

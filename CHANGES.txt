@@ -38,3 +38,5 @@ Trunk (unreleased changes)
   BUG FIXES
 
     WHIRR-50. Cassandra POM should depend on top-level. (tomwhite)
+
+    WHIRR-48. Fix RAT warnings due to site files. (tomwhite)
