@@ -28,18 +28,15 @@ import org.junit.Test;
 public class ServiceFactoryTest {
   
   public static class TestService extends Service {
-
-    public TestService(ServiceSpec serviceSpec) {
-      super(serviceSpec);
-      // TODO Auto-generated constructor stub
-    }
-
     @Override
-    public Cluster launchCluster(ClusterSpec clusterSpec) throws IOException {
-      // TODO Auto-generated method stub
+    public String getName() {
+      return "test-service";
+    }
+    @Override
+    public Cluster launchCluster(ServiceSpec serviceSpec,
+        ClusterSpec clusterSpec) throws IOException {
       return null;
     }
-    
   }
   
   @Test

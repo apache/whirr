@@ -55,12 +55,13 @@ public class HadoopService extends Service {
   public static final Set<String> MASTER_ROLE = Sets.newHashSet("nn", "jt");
   public static final Set<String> WORKER_ROLE = Sets.newHashSet("dn", "tt");
 
-  public HadoopService(ServiceSpec serviceSpec) {
-    super(serviceSpec);
-  }
-
   @Override
-  public HadoopCluster launchCluster(ClusterSpec clusterSpec) throws IOException {
+  public String getName() {
+    return "hadoop";
+  }
+  
+  @Override
+  public HadoopCluster launchCluster(ServiceSpec serviceSpec, ClusterSpec clusterSpec) throws IOException {
     ComputeService computeService = ComputeServiceBuilder.build(serviceSpec);
 
     String privateKey = serviceSpec.readPrivateKey();

@@ -53,13 +53,14 @@ public class CassandraService extends Service {
 
   public static final String CASSANDRA_ROLE = "cassandra";
   public static final int CLIENT_PORT = 9160;
-
-  public CassandraService(ServiceSpec serviceSpec) {
-    super(serviceSpec);
+  
+  @Override
+  public String getName() {
+    return "cassandra";
   }
 
   @Override
-  public Cluster launchCluster(ClusterSpec clusterSpec)
+  public Cluster launchCluster(ServiceSpec serviceSpec, ClusterSpec clusterSpec)
       throws IOException {
 
     ComputeService computeService = ComputeServiceBuilder.build(serviceSpec);

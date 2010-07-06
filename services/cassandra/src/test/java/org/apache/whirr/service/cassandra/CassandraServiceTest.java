@@ -44,7 +44,7 @@ public class CassandraServiceTest {
     List<NodeMetadata> nodes = new ArrayList<NodeMetadata>();
     nodes.add(getNodeMetadata("1"));
     
-    CassandraService s = new CassandraService(null);
+    CassandraService s = new CassandraService();
     // check that the one node is returned
     List<NodeMetadata> seeds1 = s.getSeeds(nodes);
     assertEquals(1, seeds1.size());

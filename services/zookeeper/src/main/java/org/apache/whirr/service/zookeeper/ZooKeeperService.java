@@ -52,12 +52,13 @@ public class ZooKeeperService extends Service {
   public static final String ZOOKEEPER_ROLE = "zk";
   private static final int CLIENT_PORT = 2181;
   
-  public ZooKeeperService(ServiceSpec serviceSpec) {
-    super(serviceSpec);
-  }
-
   @Override
-  public ZooKeeperCluster launchCluster(ClusterSpec clusterSpec) throws IOException {
+  public String getName() {
+    return "zookeeper";
+  }
+  
+  @Override
+  public ZooKeeperCluster launchCluster(ServiceSpec serviceSpec, ClusterSpec clusterSpec) throws IOException {
       
     ComputeService computeService = ComputeServiceBuilder.build(serviceSpec);
 

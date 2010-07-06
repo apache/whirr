@@ -43,6 +43,7 @@ public class ZooKeeperServiceTest {
   
   private String clusterName = "zkclustertest";
   
+  private ServiceSpec serviceSpec;
   private ZooKeeperService service;
   private ZooKeeperCluster cluster;
   
@@ -54,17 +55,17 @@ public class ZooKeeperServiceTest {
     } catch (NullPointerException e) {
        secretKeyFile = System.getProperty("user.home") + "/.ssh/id_rsa";
     }
-    ServiceSpec serviceSpec = new ServiceSpec();
+    serviceSpec = new ServiceSpec();
     serviceSpec.setProvider(checkNotNull(System.getProperty("whirr.test.provider", "ec2")));
     serviceSpec.setAccount(checkNotNull(System.getProperty("whirr.test.user")));
     serviceSpec.setKey(checkNotNull(System.getProperty("whirr.test.key")));
     serviceSpec.setSecretKeyFile(secretKeyFile);
     serviceSpec.setClusterName(clusterName);
-    service = new ZooKeeperService(serviceSpec);
+    service = new ZooKeeperService();
     
     ClusterSpec clusterSpec = new ClusterSpec(
 	new InstanceTemplate(2, ZooKeeperService.ZOOKEEPER_ROLE));
-    cluster = service.launchCluster(clusterSpec);
+    cluster = service.launchCluster(serviceSpec, clusterSpec);
     System.out.println(cluster.getHosts());
   }
   
@@ -116,7 +117,7 @@ public class ZooKeeperServiceTest {
   
   @After
   public void tearDown() throws IOException {
-    service.destroyCluster();
+    service.destroyCluster(serviceSpec);
   }
   
 }

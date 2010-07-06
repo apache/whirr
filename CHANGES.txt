@@ -35,6 +35,8 @@ Trunk (unreleased changes)
     WHIRR-51. Allow the Hadoop service to be run on Rackspace Cloud servers.
     (tomwhite)
 
+    WHIRR-53. Adopt the standard Java SPI interface. (tomwhite)
+
   BUG FIXES
 
     WHIRR-50. Cassandra POM should depend on top-level. (tomwhite)

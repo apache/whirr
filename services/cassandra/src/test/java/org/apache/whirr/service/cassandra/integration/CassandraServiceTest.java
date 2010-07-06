@@ -22,9 +22,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
-import java.net.InetAddress;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -40,9 +37,6 @@ import org.apache.whirr.service.ServiceSpec;
 import org.apache.whirr.service.Cluster.Instance;
 import org.apache.whirr.service.ClusterSpec.InstanceTemplate;
 import org.apache.whirr.service.cassandra.CassandraService;
-import org.jclouds.compute.domain.NodeMetadata;
-import org.jclouds.compute.domain.NodeState;
-import org.jclouds.compute.domain.internal.NodeMetadataImpl;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -52,6 +46,7 @@ public class CassandraServiceTest {
   private String clusterName = "cassandraclustertest";
   private static final String KEYSPACE = "Keyspace1";
 
+  private ServiceSpec serviceSpec;
   private CassandraService service;
   private Cluster cluster;
 
@@ -63,18 +58,18 @@ public class CassandraServiceTest {
     } catch (NullPointerException e) {
       secretKeyFile = System.getProperty("user.home") + "/.ssh/id_rsa";
     }
-    ServiceSpec serviceSpec = new ServiceSpec();
+    serviceSpec = new ServiceSpec();
     serviceSpec.setProvider(checkNotNull(System.getProperty(
         "whirr.test.provider", "ec2")));
     serviceSpec.setAccount(checkNotNull(System.getProperty("whirr.test.user")));
     serviceSpec.setKey(checkNotNull(System.getProperty("whirr.test.key")));
     serviceSpec.setSecretKeyFile(secretKeyFile);
     serviceSpec.setClusterName(clusterName);
-    service = new CassandraService(serviceSpec);
+    service = new CassandraService();
 
     ClusterSpec clusterSpec = new ClusterSpec(new InstanceTemplate(2,
         CassandraService.CASSANDRA_ROLE));
-    cluster = service.launchCluster(clusterSpec);
+    cluster = service.launchCluster(serviceSpec, clusterSpec);
 
     // give it a sec to boot up the cluster
     waitForCassandra();
@@ -130,7 +125,7 @@ public class CassandraServiceTest {
   @After
   public void tearDown() throws IOException {
     if (service != null) {
-      service.destroyCluster();      
+      service.destroyCluster(serviceSpec);      
     }
   }
 

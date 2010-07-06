@@ -57,6 +57,7 @@ public class HadoopServiceTest {
   
   private String clusterName = "hadoopclustertest";
   
+  private ServiceSpec serviceSpec;
   private HadoopService service;
   private HadoopProxy proxy;
   private HadoopCluster cluster;
@@ -69,19 +70,19 @@ public class HadoopServiceTest {
     } catch (NullPointerException e) {
        secretKeyFile = System.getProperty("user.home") + "/.ssh/id_rsa";
     }
-    ServiceSpec serviceSpec = new ServiceSpec();
+    serviceSpec = new ServiceSpec();
     serviceSpec.setProvider(checkNotNull(System.getProperty("whirr.test.provider", "ec2")));
     serviceSpec.setAccount(checkNotNull(System.getProperty("whirr.test.user")));
     serviceSpec.setKey(checkNotNull(System.getProperty("whirr.test.key")));
     serviceSpec.setSecretKeyFile(secretKeyFile);
     serviceSpec.setClusterName(clusterName);
-    service = new HadoopService(serviceSpec);
+    service = new HadoopService();
     
     ClusterSpec clusterSpec = new ClusterSpec(
 	new InstanceTemplate(1, HadoopService.MASTER_ROLE),
 	new InstanceTemplate(1, HadoopService.WORKER_ROLE));
 
-    cluster = service.launchCluster(clusterSpec);
+    cluster = service.launchCluster(serviceSpec, clusterSpec);
     proxy = new HadoopProxy(serviceSpec, cluster);
     proxy.start();
   }
@@ -146,7 +147,7 @@ public class HadoopServiceTest {
   @After
   public void tearDown() throws IOException {
     proxy.stop();
-    service.destroyCluster();
+    service.destroyCluster(serviceSpec);
   }
 
 }
