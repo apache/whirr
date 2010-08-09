@@ -42,3 +42,6 @@ Trunk (unreleased changes)
     WHIRR-50. Cassandra POM should depend on top-level. (tomwhite)
 
     WHIRR-48. Fix RAT warnings due to site files. (tomwhite)
+
+    WHIRR-65. Workaround bug 331 in jclouds (Some EC2ComputeService operations
+    fail for stopped instances). (tomwhite)
