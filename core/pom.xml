@@ -32,27 +32,27 @@
     <dependency>
       <groupId>org.jclouds</groupId>
       <artifactId>jclouds-aws</artifactId>
-      <version>1.0-beta-5</version>
+      <version>1.0-beta-6</version>
     </dependency>
     <dependency>
       <groupId>org.jclouds</groupId>
       <artifactId>jclouds-compute</artifactId>
-      <version>1.0-beta-5</version>
+      <version>1.0-beta-6</version>
     </dependency>
     <dependency>
       <groupId>org.jclouds</groupId>
       <artifactId>jclouds-enterprise</artifactId>
-      <version>1.0-beta-5</version>
+      <version>1.0-beta-6</version>
     </dependency>
     <dependency>
       <groupId>org.jclouds</groupId>
       <artifactId>jclouds-jsch</artifactId>
-      <version>1.0-beta-5</version>
+      <version>1.0-beta-6</version>
     </dependency>
     <dependency>
       <groupId>org.jclouds</groupId>
       <artifactId>jclouds-log4j</artifactId>
-      <version>1.0-beta-5</version>
+      <version>1.0-beta-6</version>
     </dependency>
     <dependency>
       <groupId>junit</groupId>

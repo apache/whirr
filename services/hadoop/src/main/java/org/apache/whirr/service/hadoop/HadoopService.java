@@ -20,6 +20,7 @@ package org.apache.whirr.service.hadoop;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
+import static org.jclouds.compute.domain.OsFamily.UBUNTU;
 import static org.jclouds.compute.options.TemplateOptions.Builder.runScript;
 
 import com.google.common.base.Charsets;
@@ -32,6 +33,7 @@ import com.google.common.io.Files;
 import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.Collections;
 import java.util.Map.Entry;
 import java.util.Properties;
@@ -46,9 +48,10 @@ import org.apache.whirr.service.Cluster.Instance;
 import org.apache.whirr.service.ClusterSpec.InstanceTemplate;
 import org.jclouds.compute.ComputeService;
 import org.jclouds.compute.RunNodesException;
+import org.jclouds.compute.domain.Architecture;
 import org.jclouds.compute.domain.NodeMetadata;
-import org.jclouds.compute.domain.OsFamily;
 import org.jclouds.compute.domain.Template;
+import org.jclouds.compute.domain.TemplateBuilder;
 
 public class HadoopService extends Service {
   
@@ -63,23 +66,27 @@ public class HadoopService extends Service {
   @Override
   public HadoopCluster launchCluster(ServiceSpec serviceSpec, ClusterSpec clusterSpec) throws IOException {
     ComputeService computeService = ComputeServiceBuilder.build(serviceSpec);
-
-    String privateKey = serviceSpec.readPrivateKey();
-    String publicKey = serviceSpec.readPublicKey();
     
     // Launch Hadoop "master" (NN and JT)
     // deal with user packages and autoshutdown with extra runurls
     byte[] nnjtBootScript = RunUrlBuilder.runUrls(
       "sun/java/install",
       String.format("apache/hadoop/install nn,jt -c %s", serviceSpec.getProvider()));
+
+    TemplateBuilder masterTemplateBuilder = computeService.templateBuilder()
+      .osFamily(UBUNTU)
+      .options(runScript(nnjtBootScript)
+      .installPrivateKey(serviceSpec.readPrivateKey())
+      .authorizePublicKey(serviceSpec.readPublicKey())
+      .inboundPorts(22, 80, 8020, 8021, 50010, 50030, 50070)); // TODO: restrict further
     
-    Template template = computeService.templateBuilder()
-    .osFamily(OsFamily.UBUNTU)
-    .options(runScript(nnjtBootScript)
-        .installPrivateKey(privateKey)
-        .authorizePublicKey(publicKey)
-        .inboundPorts(22, 80, 8020, 8021, 50010, 50030, 50070)) // TODO: restrict further
-    .build();
+    // TODO extract this logic elsewhere
+    if (serviceSpec.getProvider().equals("ec2"))
+      masterTemplateBuilder.imageNameMatches(".*10\\.?04.*")
+      .osDescriptionMatches("^ubuntu-images.*")
+      .architecture(Architecture.X86_32);
+    
+    Template masterTemplate = masterTemplateBuilder.build();
     
     InstanceTemplate instanceTemplate = clusterSpec.getInstanceTemplate(MASTER_ROLE);
     checkNotNull(instanceTemplate);
@@ -87,14 +94,14 @@ public class HadoopService extends Service {
     Set<? extends NodeMetadata> nodes;
     try {
       nodes = computeService.runNodesWithTag(
-      serviceSpec.getClusterName(), 1, template);
+      serviceSpec.getClusterName(), 1, masterTemplate);
     } catch (RunNodesException e) {
       // TODO: can we do better here (retry?)
       throw new IOException(e);
     }
     NodeMetadata node = Iterables.getOnlyElement(nodes);
-    InetAddress namenodePublicAddress = Iterables.getOnlyElement(node.getPublicAddresses());
-    InetAddress jobtrackerPublicAddress = Iterables.getOnlyElement(node.getPublicAddresses());
+    InetAddress namenodePublicAddress = InetAddress.getByName(Iterables.get(node.getPublicAddresses(),0));
+    InetAddress jobtrackerPublicAddress = InetAddress.getByName(Iterables.get(node.getPublicAddresses(),0));
     
     // Launch slaves (DN and TT)
     byte[] slaveBootScript = RunUrlBuilder.runUrls(
@@ -103,20 +110,27 @@ public class HadoopService extends Service {
           namenodePublicAddress.getHostName(),
           jobtrackerPublicAddress.getHostName()));
 
-    template = computeService.templateBuilder()
-    .osFamily(OsFamily.UBUNTU)
-    .options(runScript(slaveBootScript)
-        .installPrivateKey(privateKey)
-        .authorizePublicKey(publicKey))
-    .build();
+    TemplateBuilder slaveTemplateBuilder = computeService.templateBuilder()
+      .osFamily(UBUNTU)
+      .options(runScript(slaveBootScript)
+      .installPrivateKey(serviceSpec.readPrivateKey())
+      .authorizePublicKey(serviceSpec.readPublicKey()));
 
+    // TODO extract this logic elsewhere
+    if (serviceSpec.getProvider().equals("ec2"))
+      slaveTemplateBuilder.imageNameMatches(".*10\\.?04.*")
+      .osDescriptionMatches("^ubuntu-images.*")
+      .architecture(Architecture.X86_32);
+    
+    Template slaveTemplate = slaveTemplateBuilder.build();
+    
     instanceTemplate = clusterSpec.getInstanceTemplate(WORKER_ROLE);
     checkNotNull(instanceTemplate);
 
     Set<? extends NodeMetadata> workerNodes;
     try {
       workerNodes = computeService.runNodesWithTag(serviceSpec.getClusterName(),
-        instanceTemplate.getNumberOfInstances(), template);
+        instanceTemplate.getNumberOfInstances(), slaveTemplate);
     } catch (RunNodesException e) {
       // TODO: don't bail out if only a few have failed to start
       throw new IOException(e);
@@ -136,9 +150,13 @@ public class HadoopService extends Service {
         new Function<NodeMetadata, Instance>() {
       @Override
       public Instance apply(NodeMetadata node) {
-        return new Instance(roles,
-            Iterables.get(node.getPublicAddresses(), 0),
-            Iterables.get(node.getPrivateAddresses(), 0));
+        try {
+        return new Instance(node.getCredentials(), roles,
+            InetAddress.getByName(Iterables.get(node.getPublicAddresses(), 0)),
+            InetAddress.getByName(Iterables.get(node.getPrivateAddresses(), 0)));
+        } catch (UnknownHostException e) {
+            throw new RuntimeException(e);
+        }
       }
     }));
   }

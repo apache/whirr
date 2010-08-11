@@ -20,7 +20,6 @@ package org.apache.whirr.service.cassandra;
 
 import static org.junit.Assert.assertEquals;
 
-import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -33,13 +32,13 @@ import org.junit.Test;
 public class CassandraServiceTest {
 
   private NodeMetadata getNodeMetadata(String id) {
-    return new NodeMetadataImpl("1", null, null, null, 
+    return new NodeMetadataImpl("1", null, "1", null, null, 
         new HashMap<String, String>(), null, null, 
-        NodeState.RUNNING, new ArrayList<InetAddress>(), 
-        new ArrayList<InetAddress>(), new HashMap<String, String>(), null); 
+        NodeState.RUNNING, new ArrayList<String>(), 
+        new ArrayList<String>(), new HashMap<String, String>(), null); 
   }
   
-  @Test
+  @Test()
   public void testGetSeeds() {
     List<NodeMetadata> nodes = new ArrayList<NodeMetadata>();
     nodes.add(getNodeMetadata("1"));
@@ -59,5 +58,4 @@ public class CassandraServiceTest {
     assertEquals(getNodeMetadata("1"), seeds2.get(0));
     assertEquals(getNodeMetadata("2"), seeds2.get(1));
   }
-
 }

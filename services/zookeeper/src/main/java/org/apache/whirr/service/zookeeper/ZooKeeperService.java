@@ -19,16 +19,13 @@
 package org.apache.whirr.service.zookeeper;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static org.jclouds.compute.domain.OsFamily.UBUNTU;
 import static org.jclouds.compute.options.TemplateOptions.Builder.runScript;
-
-import com.google.common.base.Function;
-import com.google.common.base.Joiner;
-import com.google.common.collect.Collections2;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
+import static org.jclouds.compute.predicates.NodePredicates.runningWithTag;
 
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -43,9 +40,18 @@ import org.apache.whirr.service.ClusterSpec.InstanceTemplate;
 import org.jclouds.compute.ComputeService;
 import org.jclouds.compute.RunNodesException;
 import org.jclouds.compute.RunScriptOnNodesException;
+import org.jclouds.compute.domain.Architecture;
 import org.jclouds.compute.domain.NodeMetadata;
-import org.jclouds.compute.domain.OsFamily;
 import org.jclouds.compute.domain.Template;
+import org.jclouds.compute.domain.TemplateBuilder;
+
+import com.google.common.base.Function;
+import com.google.common.base.Joiner;
+import com.google.common.base.Throwables;
+import com.google.common.collect.Collections2;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 public class ZooKeeperService extends Service {
     
@@ -65,13 +71,21 @@ public class ZooKeeperService extends Service {
     byte[] bootScript = RunUrlBuilder.runUrls(
       "sun/java/install",
       "apache/zookeeper/install");
-    Template template = computeService.templateBuilder()
-      .osFamily(OsFamily.UBUNTU)
+    
+    TemplateBuilder templateBuilder = computeService.templateBuilder()
+      .osFamily(UBUNTU)
       .options(runScript(bootScript)
       .installPrivateKey(serviceSpec.readPrivateKey())
       .authorizePublicKey(serviceSpec.readPublicKey())
-      .inboundPorts(22, CLIENT_PORT))
-      .build();
+      .inboundPorts(22, CLIENT_PORT));
+    
+    // TODO extract this logic elsewhere
+    if (serviceSpec.getProvider().equals("ec2"))
+       templateBuilder.imageNameMatches(".*10\\.?04.*")
+       .osDescriptionMatches("^ubuntu-images.*")
+       .architecture(Architecture.X86_32);
+    
+    Template template = templateBuilder.build();
     
     InstanceTemplate instanceTemplate = clusterSpec.getInstanceTemplate(ZOOKEEPER_ROLE);
     checkNotNull(instanceTemplate);
@@ -92,7 +106,7 @@ public class ZooKeeperService extends Service {
     byte[] configureScript = RunUrlBuilder.runUrls(
       "apache/zookeeper/post-configure " + servers);
     try {
-      computeService.runScriptOnNodesWithTag(serviceSpec.getClusterName(), configureScript);
+      computeService.runScriptOnNodesMatching(runningWithTag(serviceSpec.getClusterName()), configureScript);
     } catch (RunScriptOnNodesException e) {
       // TODO: retry
       throw new IOException(e);
@@ -107,7 +121,12 @@ public class ZooKeeperService extends Service {
         new Function<NodeMetadata, String>() {
       @Override
       public String apply(NodeMetadata node) {
-        return Iterables.get(node.getPrivateAddresses(), 0).getHostAddress();
+        try {
+         return InetAddress.getByName(Iterables.get(node.getPrivateAddresses(), 0)).getHostAddress();
+      } catch (UnknownHostException e) {
+         Throwables.propagate(e);
+         return null;
+      }
       }
     });
   }
@@ -117,9 +136,13 @@ public class ZooKeeperService extends Service {
         new Function<NodeMetadata, Instance>() {
       @Override
       public Instance apply(NodeMetadata node) {
-        return new Instance(Collections.singleton(ZOOKEEPER_ROLE),
-          Iterables.get(node.getPublicAddresses(), 0),
-          Iterables.get(node.getPrivateAddresses(), 0));
+        try {
+        return new Instance(node.getCredentials(), Collections.singleton(ZOOKEEPER_ROLE),
+          InetAddress.getByName(Iterables.get(node.getPublicAddresses(), 0)),
+          InetAddress.getByName(Iterables.get(node.getPrivateAddresses(), 0)));
+        } catch (UnknownHostException e) {
+          throw new RuntimeException(e);
+        }
       }
     }));
   }
@@ -129,8 +152,13 @@ public class ZooKeeperService extends Service {
         new Function<NodeMetadata, String>() {
       @Override
       public String apply(NodeMetadata node) {
-        String publicIp =  Iterables.get(node.getPublicAddresses(), 0)
-         .getHostName();
+        String publicIp;
+      try {
+         publicIp = InetAddress.getByName(Iterables.get(node.getPublicAddresses(), 0)).getHostName();
+      } catch (UnknownHostException e) {
+         Throwables.propagate(e);
+         return null;
+      }
         return String.format("%s:%d", publicIp, CLIENT_PORT);
       }
     });

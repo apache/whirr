@@ -18,6 +18,8 @@
 
 package org.apache.whirr.service;
 
+import static org.jclouds.compute.predicates.NodePredicates.withTag;
+
 import java.io.IOException;
 
 import org.jclouds.compute.ComputeService;
@@ -54,7 +56,7 @@ public abstract class Service {
    */
   public void destroyCluster(ServiceSpec serviceSpec) throws IOException {
     ComputeService computeService = ComputeServiceBuilder.build(serviceSpec);
-    computeService.destroyNodesWithTag(serviceSpec.getClusterName());
+    computeService.destroyNodesMatching(withTag(serviceSpec.getClusterName()));
   }
 
 }

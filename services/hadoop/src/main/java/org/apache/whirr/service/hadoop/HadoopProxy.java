@@ -24,6 +24,8 @@ import java.io.InputStreamReader;
 
 import org.apache.whirr.service.ServiceSpec;
 
+import com.google.common.collect.Iterables;
+
 public class HadoopProxy {
 
   private ServiceSpec serviceSpec;
@@ -39,7 +41,7 @@ public class HadoopProxy {
     // jsch doesn't support SOCKS-based dynamic port forwarding, so we need to shell out...
     // TODO: Use static port forwarding instead?
     String identityFile = serviceSpec.getSecretKeyFile();
-    String user = "ubuntu"; // TODO: get from jclouds
+    String user = Iterables.get(cluster.getInstances(), 0).getLoginCredentials().account;
     String server = cluster.getNamenodePublicAddress().getHostName();
     String[] command = new String[] { "ssh",
       "-i", identityFile,

@@ -37,6 +37,8 @@ Trunk (unreleased changes)
 
     WHIRR-53. Adopt the standard Java SPI interface. (tomwhite)
 
+    WHIRR-23. Upgrade to jclouds 1.0-beta-6. (Adrian Cole via tomwhite)
+
   BUG FIXES
 
     WHIRR-50. Cassandra POM should depend on top-level. (tomwhite)

@@ -146,7 +146,9 @@ public class HadoopServiceTest {
   
   @After
   public void tearDown() throws IOException {
-    proxy.stop();
+    if (proxy != null) {
+      proxy.stop();
+    }
     service.destroyCluster(serviceSpec);
   }
 

@@ -54,15 +54,15 @@ public class CassandraServiceTest {
   public void setUp() throws IOException, InterruptedException {
     String secretKeyFile;
     try {
-      secretKeyFile = checkNotNull(System.getProperty("whirr.test.ssh.keyfile"));
+      secretKeyFile = checkNotNull(System.getProperty("whirr.test.ssh.keyfile"), "whirr.test.ssh.keyfile");
     } catch (NullPointerException e) {
       secretKeyFile = System.getProperty("user.home") + "/.ssh/id_rsa";
     }
     serviceSpec = new ServiceSpec();
     serviceSpec.setProvider(checkNotNull(System.getProperty(
         "whirr.test.provider", "ec2")));
-    serviceSpec.setAccount(checkNotNull(System.getProperty("whirr.test.user")));
-    serviceSpec.setKey(checkNotNull(System.getProperty("whirr.test.key")));
+    serviceSpec.setAccount(checkNotNull(System.getProperty("whirr.test.user"), "whirr.test.user"));
+    serviceSpec.setKey(checkNotNull(System.getProperty("whirr.test.key"), "whirr.test.key"));
     serviceSpec.setSecretKeyFile(secretKeyFile);
     serviceSpec.setClusterName(clusterName);
     service = new CassandraService();

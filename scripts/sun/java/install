@@ -26,7 +26,13 @@ set -e
 # TODO: check that it is not already enabled
 sed -i -e 's/universe$/universe multiverse/' /etc/apt/sources.list
 
+cat > /etc/apt/sources.list.d/canonical.com.list <<EOF
+deb http://archive.canonical.com/ubuntu lucid partner
+deb-src http://archive.canonical.com/ubuntu lucid partner
+EOF
+
 apt-get update
+
 echo 'sun-java6-bin   shared/accepted-sun-dlj-v1-1    boolean true
 sun-java6-jdk   shared/accepted-sun-dlj-v1-1    boolean true
 sun-java6-jre   shared/accepted-sun-dlj-v1-1    boolean true

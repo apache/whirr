@@ -17,12 +17,14 @@
  */
 
 package org.apache.whirr.service;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.net.InetAddress;
 import java.util.Properties;
 import java.util.Set;
 
 import org.apache.whirr.service.ClusterSpec.InstanceTemplate;
+import org.jclouds.domain.Credentials;
 
 /**
  * This class represents a real cluster of {@link Instances}.
@@ -36,17 +38,23 @@ public class Cluster {
    * @see InstanceTemplate
    */
   public static class Instance {
-    private Set<String> roles;
-    private InetAddress publicAddress;
-    private InetAddress privateAddress;
+    private final Credentials loginCredentials;
+    private final Set<String> roles;
+    private final InetAddress publicAddress;
+    private final InetAddress privateAddress;
 
-    public Instance(Set<String> roles, InetAddress publicAddress,
+    public Instance(Credentials loginCredentials, Set<String> roles, InetAddress publicAddress,
         InetAddress privateAddress) {
-      this.roles = roles;
-      this.publicAddress = publicAddress;
-      this.privateAddress = privateAddress;
+      this.loginCredentials = checkNotNull(loginCredentials, "loginCredentials");
+      this.roles = checkNotNull(roles, "roles");
+      this.publicAddress = checkNotNull(publicAddress, "publicAddress");
+      this.privateAddress = checkNotNull(privateAddress, "privateAddress");
     }
 
+    public Credentials getLoginCredentials() {
+      return loginCredentials;
+    }
+    
     public Set<String> getRoles() {
       return roles;
     }
