@@ -43,7 +43,6 @@ import org.apache.whirr.service.ClusterSpec;
 import org.apache.whirr.service.ComputeServiceBuilder;
 import org.apache.whirr.service.RunUrlBuilder;
 import org.apache.whirr.service.Service;
-import org.apache.whirr.service.ServiceSpec;
 import org.apache.whirr.service.Cluster.Instance;
 import org.apache.whirr.service.ClusterSpec.InstanceTemplate;
 import org.jclouds.compute.ComputeService;
@@ -64,24 +63,24 @@ public class HadoopService extends Service {
   }
   
   @Override
-  public HadoopCluster launchCluster(ServiceSpec serviceSpec, ClusterSpec clusterSpec) throws IOException {
-    ComputeService computeService = ComputeServiceBuilder.build(serviceSpec);
+  public HadoopCluster launchCluster(ClusterSpec clusterSpec) throws IOException {
+    ComputeService computeService = ComputeServiceBuilder.build(clusterSpec);
     
     // Launch Hadoop "master" (NN and JT)
     // deal with user packages and autoshutdown with extra runurls
     byte[] nnjtBootScript = RunUrlBuilder.runUrls(
       "sun/java/install",
-      String.format("apache/hadoop/install nn,jt -c %s", serviceSpec.getProvider()));
+      String.format("apache/hadoop/install nn,jt -c %s", clusterSpec.getProvider()));
 
     TemplateBuilder masterTemplateBuilder = computeService.templateBuilder()
       .osFamily(UBUNTU)
       .options(runScript(nnjtBootScript)
-      .installPrivateKey(serviceSpec.readPrivateKey())
-      .authorizePublicKey(serviceSpec.readPublicKey())
+      .installPrivateKey(clusterSpec.readPrivateKey())
+      .authorizePublicKey(clusterSpec.readPublicKey())
       .inboundPorts(22, 80, 8020, 8021, 50010, 50030, 50070)); // TODO: restrict further
     
     // TODO extract this logic elsewhere
-    if (serviceSpec.getProvider().equals("ec2"))
+    if (clusterSpec.getProvider().equals("ec2"))
       masterTemplateBuilder.imageNameMatches(".*10\\.?04.*")
       .osDescriptionMatches("^ubuntu-images.*")
       .architecture(Architecture.X86_32);
@@ -94,7 +93,7 @@ public class HadoopService extends Service {
     Set<? extends NodeMetadata> nodes;
     try {
       nodes = computeService.runNodesWithTag(
-      serviceSpec.getClusterName(), 1, masterTemplate);
+          clusterSpec.getClusterName(), 1, masterTemplate);
     } catch (RunNodesException e) {
       // TODO: can we do better here (retry?)
       throw new IOException(e);
@@ -113,11 +112,11 @@ public class HadoopService extends Service {
     TemplateBuilder slaveTemplateBuilder = computeService.templateBuilder()
       .osFamily(UBUNTU)
       .options(runScript(slaveBootScript)
-      .installPrivateKey(serviceSpec.readPrivateKey())
-      .authorizePublicKey(serviceSpec.readPublicKey()));
+      .installPrivateKey(clusterSpec.readPrivateKey())
+      .authorizePublicKey(clusterSpec.readPublicKey()));
 
     // TODO extract this logic elsewhere
-    if (serviceSpec.getProvider().equals("ec2"))
+    if (clusterSpec.getProvider().equals("ec2"))
       slaveTemplateBuilder.imageNameMatches(".*10\\.?04.*")
       .osDescriptionMatches("^ubuntu-images.*")
       .architecture(Architecture.X86_32);
@@ -129,7 +128,7 @@ public class HadoopService extends Service {
 
     Set<? extends NodeMetadata> workerNodes;
     try {
-      workerNodes = computeService.runNodesWithTag(serviceSpec.getClusterName(),
+      workerNodes = computeService.runNodesWithTag(clusterSpec.getClusterName(),
         instanceTemplate.getNumberOfInstances(), slaveTemplate);
     } catch (RunNodesException e) {
       // TODO: don't bail out if only a few have failed to start

@@ -40,13 +40,12 @@ public abstract class Service {
    * cluster is
    * available. It is not guaranteed that the service running on the cluster
    * has started when this method returns.
-   * @param serviceSpec
    * @param clusterSpec
    * @return an object representing the running cluster
    * @throws IOException if there is a problem while starting the cluster. The
    * cluster may or may not have started.
    */
-  public abstract Cluster launchCluster(ServiceSpec serviceSpec, ClusterSpec clusterSpec)
+  public abstract Cluster launchCluster(ClusterSpec clusterSpec)
     throws IOException;
   
   /**
@@ -54,9 +53,9 @@ public abstract class Service {
    * @throws IOException if there is a problem while stopping the cluster. The
    * cluster may or may not have been stopped.
    */
-  public void destroyCluster(ServiceSpec serviceSpec) throws IOException {
-    ComputeService computeService = ComputeServiceBuilder.build(serviceSpec);
-    computeService.destroyNodesMatching(withTag(serviceSpec.getClusterName()));
+  public void destroyCluster(ClusterSpec clusterSpec) throws IOException {
+    ComputeService computeService = ComputeServiceBuilder.build(clusterSpec);
+    computeService.destroyNodesMatching(withTag(clusterSpec.getClusterName()));
   }
 
 }

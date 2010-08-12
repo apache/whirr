@@ -37,7 +37,6 @@ import org.apache.whirr.service.ClusterSpec;
 import org.apache.whirr.service.ComputeServiceBuilder;
 import org.apache.whirr.service.RunUrlBuilder;
 import org.apache.whirr.service.Service;
-import org.apache.whirr.service.ServiceSpec;
 import org.apache.whirr.service.Cluster.Instance;
 import org.apache.whirr.service.ClusterSpec.InstanceTemplate;
 import org.jclouds.compute.ComputeService;
@@ -67,10 +66,9 @@ public class CassandraService extends Service {
   }
 
   @Override
-  public Cluster launchCluster(ServiceSpec serviceSpec, ClusterSpec clusterSpec)
-      throws IOException {
+  public Cluster launchCluster(ClusterSpec clusterSpec) throws IOException {
 
-    ComputeService computeService = ComputeServiceBuilder.build(serviceSpec);
+    ComputeService computeService = ComputeServiceBuilder.build(clusterSpec);
 
     byte[] bootScript = RunUrlBuilder.runUrls("sun/java/install",
         "apache/cassandra/install");
@@ -78,11 +76,11 @@ public class CassandraService extends Service {
     TemplateBuilder templateBuilder = computeService.templateBuilder()
         .osFamily(UBUNTU).options(
             runScript(bootScript).installPrivateKey(
-                serviceSpec.readPrivateKey()).authorizePublicKey(
-                serviceSpec.readPublicKey()).inboundPorts(22, CLIENT_PORT));
+                clusterSpec.readPrivateKey()).authorizePublicKey(
+                clusterSpec.readPublicKey()).inboundPorts(22, CLIENT_PORT));
 
     // TODO extract this logic elsewhere
-    if (serviceSpec.getProvider().equals("ec2"))
+    if (clusterSpec.getProvider().equals("ec2"))
       templateBuilder.imageNameMatches(".*10\\.?04.*").osDescriptionMatches(
           "^ubuntu-images.*").architecture(Architecture.X86_32);
 
@@ -94,7 +92,7 @@ public class CassandraService extends Service {
     int clusterSize = instanceTemplate.getNumberOfInstances();
     Set<? extends NodeMetadata> nodeMap;
     try {
-      nodeMap = computeService.runNodesWithTag(serviceSpec.getClusterName(),
+      nodeMap = computeService.runNodesWithTag(clusterSpec.getClusterName(),
           clusterSize, template);
     } catch (RunNodesException e) {
       // TODO: can we do better here
@@ -111,9 +109,9 @@ public class CassandraService extends Service {
     try {
       Map<? extends NodeMetadata, ExecResponse> responses = computeService
           .runScriptOnNodesMatching(
-              runningWithTag(serviceSpec.getClusterName()), configureScript);
+              runningWithTag(clusterSpec.getClusterName()), configureScript);
       assert responses.size() > 0 : "no nodes matched "
-          + serviceSpec.getClusterName();
+          + clusterSpec.getClusterName();
     } catch (RunScriptOnNodesException e) {
       // TODO: retry
       throw new IOException(e);

@@ -33,18 +33,15 @@ public class ServiceFactoryTest {
       return "test-service";
     }
     @Override
-    public Cluster launchCluster(ServiceSpec serviceSpec,
-        ClusterSpec clusterSpec) throws IOException {
+    public Cluster launchCluster(ClusterSpec clusterSpec) throws IOException {
       return null;
     }
   }
   
   @Test
   public void testServiceFactoryIsCreatedFromWhirrProperties() throws IOException {
-    ServiceSpec serviceSpec = new ServiceSpec();
-    serviceSpec.setName("test-service");
     ServiceFactory factory = new ServiceFactory();
-    Service service = factory.create(serviceSpec);
+    Service service = factory.create("test-service");
     assertThat(service, instanceOf(TestService.class));
   }
 }

@@ -44,7 +44,6 @@ import org.apache.hadoop.mapred.JobConf;
 import org.apache.hadoop.mapred.lib.LongSumReducer;
 import org.apache.hadoop.mapred.lib.TokenCountMapper;
 import org.apache.whirr.service.ClusterSpec;
-import org.apache.whirr.service.ServiceSpec;
 import org.apache.whirr.service.ClusterSpec.InstanceTemplate;
 import org.apache.whirr.service.hadoop.HadoopCluster;
 import org.apache.whirr.service.hadoop.HadoopProxy;
@@ -57,7 +56,7 @@ public class HadoopServiceTest {
   
   private String clusterName = "hadoopclustertest";
   
-  private ServiceSpec serviceSpec;
+  private ClusterSpec clusterSpec;
   private HadoopService service;
   private HadoopProxy proxy;
   private HadoopCluster cluster;
@@ -70,20 +69,18 @@ public class HadoopServiceTest {
     } catch (NullPointerException e) {
        secretKeyFile = System.getProperty("user.home") + "/.ssh/id_rsa";
     }
-    serviceSpec = new ServiceSpec();
-    serviceSpec.setProvider(checkNotNull(System.getProperty("whirr.test.provider", "ec2")));
-    serviceSpec.setAccount(checkNotNull(System.getProperty("whirr.test.user")));
-    serviceSpec.setKey(checkNotNull(System.getProperty("whirr.test.key")));
-    serviceSpec.setSecretKeyFile(secretKeyFile);
-    serviceSpec.setClusterName(clusterName);
+    clusterSpec = new ClusterSpec(
+        new InstanceTemplate(1, HadoopService.MASTER_ROLE),
+        new InstanceTemplate(1, HadoopService.WORKER_ROLE));
+    clusterSpec.setProvider(checkNotNull(System.getProperty("whirr.test.provider", "ec2")));
+    clusterSpec.setAccount(checkNotNull(System.getProperty("whirr.test.user")));
+    clusterSpec.setKey(checkNotNull(System.getProperty("whirr.test.key")));
+    clusterSpec.setSecretKeyFile(secretKeyFile);
+    clusterSpec.setClusterName(clusterName);
     service = new HadoopService();
     
-    ClusterSpec clusterSpec = new ClusterSpec(
-	new InstanceTemplate(1, HadoopService.MASTER_ROLE),
-	new InstanceTemplate(1, HadoopService.WORKER_ROLE));
-
-    cluster = service.launchCluster(serviceSpec, clusterSpec);
-    proxy = new HadoopProxy(serviceSpec, cluster);
+    cluster = service.launchCluster(clusterSpec);
+    proxy = new HadoopProxy(clusterSpec, cluster);
     proxy.start();
   }
   
@@ -149,7 +146,7 @@ public class HadoopServiceTest {
     if (proxy != null) {
       proxy.stop();
     }
-    service.destroyCluster(serviceSpec);
+    service.destroyCluster(clusterSpec);
   }
 
 }

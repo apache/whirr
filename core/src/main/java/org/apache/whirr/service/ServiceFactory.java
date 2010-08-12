@@ -34,11 +34,11 @@ public class ServiceFactory {
 
   /**
    * Create an instance of a {@link Service} according to the given
-   * {@link ServiceSpec}.
+   * name.
    */
-  public Service create(ServiceSpec serviceSpec) {
+  public Service create(String serviceName) {
     for (Service service : serviceLoader) {
-      if (service.getName().equals(serviceSpec.getName())) {
+      if (service.getName().equals(serviceName)) {
         return service;
       }
     }

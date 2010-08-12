@@ -39,6 +39,8 @@ Trunk (unreleased changes)
 
     WHIRR-23. Upgrade to jclouds 1.0-beta-6. (Adrian Cole via tomwhite)
 
+    WHIRR-64. Unify ClusterSpec and ServiceSpec. (tomwhite)
+
   BUG FIXES
 
     WHIRR-50. Cassandra POM should depend on top-level. (tomwhite)

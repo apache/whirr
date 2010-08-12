@@ -35,7 +35,7 @@ import org.jclouds.ssh.jsch.config.JschSshClientModule;
  */
 public class ComputeServiceBuilder {
 
-  public static ComputeService build(ServiceSpec spec) throws IOException {
+  public static ComputeService build(ClusterSpec spec) throws IOException {
     Set<AbstractModule> wiring = ImmutableSet.of(new JschSshClientModule(),
       new Log4JLoggingModule());
 

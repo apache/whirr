@@ -28,7 +28,6 @@ import org.apache.whirr.service.ClusterSpec;
 import org.apache.whirr.service.ClusterSpec.InstanceTemplate;
 import org.apache.whirr.service.zookeeper.ZooKeeperCluster;
 import org.apache.whirr.service.zookeeper.ZooKeeperService;
-import org.apache.whirr.service.ServiceSpec;
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.WatchedEvent;
 import org.apache.zookeeper.Watcher;
@@ -43,7 +42,7 @@ public class ZooKeeperServiceTest {
   
   private String clusterName = "zkclustertest";
   
-  private ServiceSpec serviceSpec;
+  private ClusterSpec clusterSpec;
   private ZooKeeperService service;
   private ZooKeeperCluster cluster;
   
@@ -55,17 +54,16 @@ public class ZooKeeperServiceTest {
     } catch (NullPointerException e) {
        secretKeyFile = System.getProperty("user.home") + "/.ssh/id_rsa";
     }
-    serviceSpec = new ServiceSpec();
-    serviceSpec.setProvider(checkNotNull(System.getProperty("whirr.test.provider", "ec2")));
-    serviceSpec.setAccount(checkNotNull(System.getProperty("whirr.test.user")));
-    serviceSpec.setKey(checkNotNull(System.getProperty("whirr.test.key")));
-    serviceSpec.setSecretKeyFile(secretKeyFile);
-    serviceSpec.setClusterName(clusterName);
+    clusterSpec = new ClusterSpec(
+        new InstanceTemplate(2, ZooKeeperService.ZOOKEEPER_ROLE));
+    clusterSpec.setProvider(checkNotNull(System.getProperty("whirr.test.provider", "ec2")));
+    clusterSpec.setAccount(checkNotNull(System.getProperty("whirr.test.user")));
+    clusterSpec.setKey(checkNotNull(System.getProperty("whirr.test.key")));
+    clusterSpec.setSecretKeyFile(secretKeyFile);
+    clusterSpec.setClusterName(clusterName);
     service = new ZooKeeperService();
     
-    ClusterSpec clusterSpec = new ClusterSpec(
-	new InstanceTemplate(2, ZooKeeperService.ZOOKEEPER_ROLE));
-    cluster = service.launchCluster(serviceSpec, clusterSpec);
+    cluster = service.launchCluster(clusterSpec);
     System.out.println(cluster.getHosts());
   }
   
@@ -117,7 +115,7 @@ public class ZooKeeperServiceTest {
   
   @After
   public void tearDown() throws IOException {
-    service.destroyCluster(serviceSpec);
+    service.destroyCluster(clusterSpec);
   }
   
 }

@@ -23,7 +23,6 @@ import java.net.InetAddress;
 import java.util.Properties;
 import java.util.Set;
 
-import org.apache.whirr.service.ClusterSpec.InstanceTemplate;
 import org.jclouds.domain.Credentials;
 
 /**
@@ -35,7 +34,7 @@ public class Cluster {
   /**
    * This class represents a real node running in a cluster. An instance has
    * one or more roles.
-   * @see InstanceTemplate
+   * @see org.apache.whirr.service.ClusterSpec.InstanceTemplate
    */
   public static class Instance {
     private final Credentials loginCredentials;
