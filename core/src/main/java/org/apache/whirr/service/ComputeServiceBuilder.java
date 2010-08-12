@@ -40,7 +40,7 @@ public class ComputeServiceBuilder {
       new Log4JLoggingModule());
 
     ComputeServiceContext context = new ComputeServiceContextFactory()
-      .createContext(spec.getProvider(), spec.getAccount(), spec.getKey(),
+      .createContext(spec.getProvider(), spec.getIdentity(), spec.getCredential(),
         wiring);
 
     return context.getComputeService();

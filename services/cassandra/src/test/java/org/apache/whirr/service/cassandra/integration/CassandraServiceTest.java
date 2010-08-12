@@ -61,8 +61,8 @@ public class CassandraServiceTest {
         CassandraService.CASSANDRA_ROLE));
     clusterSpec.setProvider(checkNotNull(System.getProperty(
         "whirr.test.provider", "ec2")));
-    clusterSpec.setAccount(checkNotNull(System.getProperty("whirr.test.user"), "whirr.test.user"));
-    clusterSpec.setKey(checkNotNull(System.getProperty("whirr.test.key"), "whirr.test.key"));
+    clusterSpec.setIdentity(checkNotNull(System.getProperty("whirr.test.identity"), "whirr.test.identity"));
+    clusterSpec.setCredential(checkNotNull(System.getProperty("whirr.test.credential"), "whirr.test.credential"));
     clusterSpec.setSecretKeyFile(secretKeyFile);
     clusterSpec.setClusterName(clusterName);
     service = new CassandraService();

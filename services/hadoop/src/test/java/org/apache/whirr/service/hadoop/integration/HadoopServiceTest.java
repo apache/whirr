@@ -73,8 +73,8 @@ public class HadoopServiceTest {
         new InstanceTemplate(1, HadoopService.MASTER_ROLE),
         new InstanceTemplate(1, HadoopService.WORKER_ROLE));
     clusterSpec.setProvider(checkNotNull(System.getProperty("whirr.test.provider", "ec2")));
-    clusterSpec.setAccount(checkNotNull(System.getProperty("whirr.test.user")));
-    clusterSpec.setKey(checkNotNull(System.getProperty("whirr.test.key")));
+    clusterSpec.setIdentity(checkNotNull(System.getProperty("whirr.test.identity")));
+    clusterSpec.setCredential(checkNotNull(System.getProperty("whirr.test.credential")));
     clusterSpec.setSecretKeyFile(secretKeyFile);
     clusterSpec.setClusterName(clusterName);
     service = new HadoopService();

@@ -70,8 +70,8 @@ public class ClusterSpec {
 
   private String serviceName;
   private String provider;
-  private String account;
-  private String key;
+  private String identity;
+  private String credential;
   private String clusterName;
   private String secretKeyFile;
   
@@ -117,11 +117,11 @@ public class ClusterSpec {
   public String getProvider() {
     return provider;
   }
-  public String getAccount() {
-    return account;
+  public String getIdentity() {
+    return identity;
   }
-  public String getKey() {
-    return key;
+  public String getCredential() {
+    return credential;
   }
   public String getClusterName() {
     return clusterName;
@@ -136,11 +136,11 @@ public class ClusterSpec {
   public void setProvider(String provider) {
     this.provider = provider;
   }
-  public void setAccount(String account) {
-    this.account = account;
+  public void setIdentity(String identity) {
+    this.identity = identity;
   }
-  public void setKey(String key) {
-    this.key = key;
+  public void setCredential(String credential) {
+    this.credential = credential;
   }
   public void setClusterName(String clusterName) {
     this.clusterName = clusterName;

@@ -57,8 +57,8 @@ public class ZooKeeperServiceTest {
     clusterSpec = new ClusterSpec(
         new InstanceTemplate(2, ZooKeeperService.ZOOKEEPER_ROLE));
     clusterSpec.setProvider(checkNotNull(System.getProperty("whirr.test.provider", "ec2")));
-    clusterSpec.setAccount(checkNotNull(System.getProperty("whirr.test.user")));
-    clusterSpec.setKey(checkNotNull(System.getProperty("whirr.test.key")));
+    clusterSpec.setIdentity(checkNotNull(System.getProperty("whirr.test.identity")));
+    clusterSpec.setCredential(checkNotNull(System.getProperty("whirr.test.credential")));
     clusterSpec.setSecretKeyFile(secretKeyFile);
     clusterSpec.setClusterName(clusterName);
     service = new ZooKeeperService();

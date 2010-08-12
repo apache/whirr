@@ -41,6 +41,9 @@ Trunk (unreleased changes)
 
     WHIRR-64. Unify ClusterSpec and ServiceSpec. (tomwhite)
 
+    WHIRR-58. Introduce naming consistency for cloud service providers.
+    (Adrian Cole via tomwhite)
+
   BUG FIXES
 
     WHIRR-50. Cassandra POM should depend on top-level. (tomwhite)
