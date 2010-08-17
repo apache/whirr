@@ -54,3 +54,5 @@ Trunk (unreleased changes)
 
     WHIRR-65. Workaround bug 331 in jclouds (Some EC2ComputeService operations
     fail for stopped instances). (tomwhite)
+
+    WHIRR-71. Only allow access to clusters from defined networks. (tomwhite)

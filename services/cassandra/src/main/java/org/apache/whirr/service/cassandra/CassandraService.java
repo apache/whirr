@@ -34,12 +34,14 @@ import java.util.Set;
 
 import org.apache.whirr.service.Cluster;
 import org.apache.whirr.service.ClusterSpec;
-import org.apache.whirr.service.ComputeServiceBuilder;
+import org.apache.whirr.service.ComputeServiceContextBuilder;
 import org.apache.whirr.service.RunUrlBuilder;
 import org.apache.whirr.service.Service;
 import org.apache.whirr.service.Cluster.Instance;
 import org.apache.whirr.service.ClusterSpec.InstanceTemplate;
+import org.apache.whirr.service.jclouds.FirewallSettings;
 import org.jclouds.compute.ComputeService;
+import org.jclouds.compute.ComputeServiceContext;
 import org.jclouds.compute.RunNodesException;
 import org.jclouds.compute.RunScriptOnNodesException;
 import org.jclouds.compute.domain.Architecture;
@@ -67,8 +69,9 @@ public class CassandraService extends Service {
 
   @Override
   public Cluster launchCluster(ClusterSpec clusterSpec) throws IOException {
-
-    ComputeService computeService = ComputeServiceBuilder.build(clusterSpec);
+    ComputeServiceContext computeServiceContext =
+        ComputeServiceContextBuilder.build(clusterSpec);
+    ComputeService computeService = computeServiceContext.getComputeService();
 
     byte[] bootScript = RunUrlBuilder.runUrls("sun/java/install",
         "apache/cassandra/install");
@@ -77,7 +80,7 @@ public class CassandraService extends Service {
         .osFamily(UBUNTU).options(
             runScript(bootScript).installPrivateKey(
                 clusterSpec.readPrivateKey()).authorizePublicKey(
-                clusterSpec.readPublicKey()).inboundPorts(22, CLIENT_PORT));
+                clusterSpec.readPublicKey()));
 
     // TODO extract this logic elsewhere
     if (clusterSpec.getProvider().equals("ec2"))
@@ -98,6 +101,9 @@ public class CassandraService extends Service {
       // TODO: can we do better here
       throw new IOException(e);
     }
+    
+    FirewallSettings.authorizeIngress(computeServiceContext, nodeMap, clusterSpec, CLIENT_PORT);
+
     List<NodeMetadata> nodes = Lists.newArrayList(nodeMap);
     List<NodeMetadata> seeds = getSeeds(nodes);
 

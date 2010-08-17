@@ -40,12 +40,14 @@ import java.util.Properties;
 import java.util.Set;
 
 import org.apache.whirr.service.ClusterSpec;
-import org.apache.whirr.service.ComputeServiceBuilder;
+import org.apache.whirr.service.ComputeServiceContextBuilder;
 import org.apache.whirr.service.RunUrlBuilder;
 import org.apache.whirr.service.Service;
 import org.apache.whirr.service.Cluster.Instance;
 import org.apache.whirr.service.ClusterSpec.InstanceTemplate;
+import org.apache.whirr.service.jclouds.FirewallSettings;
 import org.jclouds.compute.ComputeService;
+import org.jclouds.compute.ComputeServiceContext;
 import org.jclouds.compute.RunNodesException;
 import org.jclouds.compute.domain.Architecture;
 import org.jclouds.compute.domain.NodeMetadata;
@@ -56,6 +58,11 @@ public class HadoopService extends Service {
   
   public static final Set<String> MASTER_ROLE = Sets.newHashSet("nn", "jt");
   public static final Set<String> WORKER_ROLE = Sets.newHashSet("dn", "tt");
+  
+  public static final int NAMENODE_PORT = 8020;
+  public static final int JOBTRACKER_PORT = 8021;
+  public static final int NAMENODE_WEB_UI_PORT = 50070;
+  public static final int JOBTRACKER_WEB_UI_PORT = 50030;
 
   @Override
   public String getName() {
@@ -64,7 +71,9 @@ public class HadoopService extends Service {
   
   @Override
   public HadoopCluster launchCluster(ClusterSpec clusterSpec) throws IOException {
-    ComputeService computeService = ComputeServiceBuilder.build(clusterSpec);
+    ComputeServiceContext computeServiceContext =
+      ComputeServiceContextBuilder.build(clusterSpec);
+    ComputeService computeService = computeServiceContext.getComputeService();
     
     // Launch Hadoop "master" (NN and JT)
     // deal with user packages and autoshutdown with extra runurls
@@ -76,8 +85,7 @@ public class HadoopService extends Service {
       .osFamily(UBUNTU)
       .options(runScript(nnjtBootScript)
       .installPrivateKey(clusterSpec.readPrivateKey())
-      .authorizePublicKey(clusterSpec.readPublicKey())
-      .inboundPorts(22, 80, 8020, 8021, 50010, 50030, 50070)); // TODO: restrict further
+      .authorizePublicKey(clusterSpec.readPublicKey()));
     
     // TODO extract this logic elsewhere
     if (clusterSpec.getProvider().equals("ec2"))
@@ -102,6 +110,21 @@ public class HadoopService extends Service {
     InetAddress namenodePublicAddress = InetAddress.getByName(Iterables.get(node.getPublicAddresses(),0));
     InetAddress jobtrackerPublicAddress = InetAddress.getByName(Iterables.get(node.getPublicAddresses(),0));
     
+    FirewallSettings.authorizeIngress(computeServiceContext, node, clusterSpec,
+        NAMENODE_WEB_UI_PORT);
+    FirewallSettings.authorizeIngress(computeServiceContext, node, clusterSpec,
+        JOBTRACKER_WEB_UI_PORT);
+    FirewallSettings.authorizeIngress(computeServiceContext, node, clusterSpec,
+        namenodePublicAddress.getHostAddress(), NAMENODE_PORT);
+    FirewallSettings.authorizeIngress(computeServiceContext, node, clusterSpec,
+        namenodePublicAddress.getHostAddress(), JOBTRACKER_PORT);
+    if (!namenodePublicAddress.equals(jobtrackerPublicAddress)) {
+      FirewallSettings.authorizeIngress(computeServiceContext, node, clusterSpec,
+          jobtrackerPublicAddress.getHostAddress(), NAMENODE_PORT);
+      FirewallSettings.authorizeIngress(computeServiceContext, node, clusterSpec,
+          jobtrackerPublicAddress.getHostAddress(), JOBTRACKER_PORT);
+    }
+
     // Launch slaves (DN and TT)
     byte[] slaveBootScript = RunUrlBuilder.runUrls(
       "sun/java/install",

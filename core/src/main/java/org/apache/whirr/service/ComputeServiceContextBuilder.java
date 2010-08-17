@@ -24,18 +24,17 @@ import com.google.inject.AbstractModule;
 import java.io.IOException;
 import java.util.Set;
 
-import org.jclouds.compute.ComputeService;
 import org.jclouds.compute.ComputeServiceContext;
 import org.jclouds.compute.ComputeServiceContextFactory;
 import org.jclouds.logging.log4j.config.Log4JLoggingModule;
 import org.jclouds.ssh.jsch.config.JschSshClientModule;
 
 /**
- * A convenience class for building jclouds {@link ComputeService} objects.
+ * A convenience class for building jclouds {@link ComputeServiceContext} objects.
  */
-public class ComputeServiceBuilder {
+public class ComputeServiceContextBuilder {
 
-  public static ComputeService build(ClusterSpec spec) throws IOException {
+  public static ComputeServiceContext build(ClusterSpec spec) throws IOException {
     Set<AbstractModule> wiring = ImmutableSet.of(new JschSshClientModule(),
       new Log4JLoggingModule());
 
@@ -43,6 +42,6 @@ public class ComputeServiceBuilder {
       .createContext(spec.getProvider(), spec.getIdentity(), spec.getCredential(),
         wiring);
 
-    return context.getComputeService();
+    return context;
   }
 }

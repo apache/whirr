@@ -31,12 +31,14 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.whirr.service.ClusterSpec;
-import org.apache.whirr.service.ComputeServiceBuilder;
+import org.apache.whirr.service.ComputeServiceContextBuilder;
 import org.apache.whirr.service.RunUrlBuilder;
 import org.apache.whirr.service.Service;
 import org.apache.whirr.service.Cluster.Instance;
 import org.apache.whirr.service.ClusterSpec.InstanceTemplate;
+import org.apache.whirr.service.jclouds.FirewallSettings;
 import org.jclouds.compute.ComputeService;
+import org.jclouds.compute.ComputeServiceContext;
 import org.jclouds.compute.RunNodesException;
 import org.jclouds.compute.RunScriptOnNodesException;
 import org.jclouds.compute.domain.Architecture;
@@ -64,8 +66,9 @@ public class ZooKeeperService extends Service {
   
   @Override
   public ZooKeeperCluster launchCluster(ClusterSpec clusterSpec) throws IOException {
-      
-    ComputeService computeService = ComputeServiceBuilder.build(clusterSpec);
+    ComputeServiceContext computeServiceContext =
+      ComputeServiceContextBuilder.build(clusterSpec);
+    ComputeService computeService = computeServiceContext.getComputeService();
 
     byte[] bootScript = RunUrlBuilder.runUrls(
       "sun/java/install",
@@ -75,8 +78,7 @@ public class ZooKeeperService extends Service {
       .osFamily(UBUNTU)
       .options(runScript(bootScript)
       .installPrivateKey(clusterSpec.readPrivateKey())
-      .authorizePublicKey(clusterSpec.readPublicKey())
-      .inboundPorts(22, CLIENT_PORT));
+      .authorizePublicKey(clusterSpec.readPublicKey()));
     
     // TODO extract this logic elsewhere
     if (clusterSpec.getProvider().equals("ec2"))
@@ -97,6 +99,9 @@ public class ZooKeeperService extends Service {
       // TODO: can we do better here - proceed if ensemble is big enough?
       throw new IOException(e);
     }
+    
+    FirewallSettings.authorizeIngress(computeServiceContext, nodeMap, clusterSpec, CLIENT_PORT);
+    
     List<NodeMetadata> nodes = Lists.newArrayList(nodeMap);
     
     // Pass list of all servers in ensemble to configure script.

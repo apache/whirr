@@ -95,6 +95,7 @@ public class ClusterSpec {
   private String credential;
   private String clusterName;
   private String secretKeyFile;
+  private String[] clientCidrs;
   
   public ClusterSpec(InstanceTemplate... instanceTemplates) {
     this(Arrays.asList(instanceTemplates));
@@ -150,6 +151,9 @@ public class ClusterSpec {
   public String getSecretKeyFile() {
     return secretKeyFile;
   }
+  public String[] getClientCidrs() {
+    return clientCidrs;
+  }
   
   public void setServiceName(String serviceName) {
     this.serviceName = serviceName;
@@ -168,6 +172,9 @@ public class ClusterSpec {
   }
   public void setSecretKeyFile(String secretKeyFile) {
     this.secretKeyFile = secretKeyFile;
+  }
+  public void setClientCidrs(String[] clientCidrs) {
+    this.clientCidrs = clientCidrs;
   }
   
   //

@@ -54,7 +54,8 @@ public abstract class Service {
    * cluster may or may not have been stopped.
    */
   public void destroyCluster(ClusterSpec clusterSpec) throws IOException {
-    ComputeService computeService = ComputeServiceBuilder.build(clusterSpec);
+    ComputeService computeService =
+      ComputeServiceContextBuilder.build(clusterSpec).getComputeService();
     computeService.destroyNodesMatching(withTag(clusterSpec.getClusterName()));
   }
 

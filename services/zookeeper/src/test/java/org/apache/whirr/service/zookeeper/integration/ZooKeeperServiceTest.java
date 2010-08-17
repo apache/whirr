@@ -59,6 +59,10 @@ public class ZooKeeperServiceTest {
     clusterSpec.setProvider(checkNotNull(System.getProperty("whirr.test.provider", "ec2")));
     clusterSpec.setIdentity(checkNotNull(System.getProperty("whirr.test.identity")));
     clusterSpec.setCredential(checkNotNull(System.getProperty("whirr.test.credential")));
+    String cidrs = System.getProperty("whirr.test.client-cidrs");
+    if (cidrs != null) {
+      clusterSpec.setClientCidrs(cidrs.split(","));
+    }
     clusterSpec.setSecretKeyFile(secretKeyFile);
     clusterSpec.setClusterName(clusterName);
     service = new ZooKeeperService();
