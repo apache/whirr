@@ -6,6 +6,8 @@ Trunk (unreleased changes)
 
   NEW FEATURES
 
+    WHIRR-33. Add a CLI. (tomwhite)
+
   IMPROVEMENTS
 
     WHIRR-2. Import initial Java source code. (tomwhite)

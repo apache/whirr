@@ -25,6 +25,8 @@ import java.util.Set;
 
 import org.jclouds.domain.Credentials;
 
+import com.google.common.base.Objects;
+
 /**
  * This class represents a real cluster of {@link Instances}.
  *
@@ -66,6 +68,14 @@ public class Cluster {
       return privateAddress;
     }
     
+    public String toString() {
+      return Objects.toStringHelper(this)
+        .add("roles", roles)
+        .add("publicAddress", publicAddress)
+        .add("privateAddress", privateAddress)
+        .toString();
+    }
+    
   }
   
   private Set<Instance> instances;
@@ -85,6 +95,13 @@ public class Cluster {
   }  
   public Properties getConfiguration() {
     return configuration;
+  }
+  
+  public String toString() {
+    return Objects.toStringHelper(this)
+      .add("instances", instances)
+      .add("configuration", configuration)
+      .toString();
   }
 
 }

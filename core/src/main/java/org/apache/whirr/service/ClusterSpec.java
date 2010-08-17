@@ -19,6 +19,7 @@
 package org.apache.whirr.service;
 
 import com.google.common.base.Charsets;
+import com.google.common.base.Objects;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.io.Files;
@@ -60,6 +61,26 @@ public class ClusterSpec {
 
     public int getNumberOfInstances() {
       return numberOfInstances;
+    }
+    
+    public boolean equals(Object o) {
+      if (o instanceof InstanceTemplate) {
+        InstanceTemplate that = (InstanceTemplate) o;
+        return Objects.equal(numberOfInstances, that.numberOfInstances)
+          && Objects.equal(roles, that.roles);
+      }
+      return false;
+    }
+    
+    public int hashCode() {
+      return Objects.hashCode(numberOfInstances, roles);
+    }
+    
+    public String toString() {
+      return Objects.toStringHelper(this)
+        .add("numberOfInstances", numberOfInstances)
+        .add("roles", roles)
+        .toString();
     }
     
   }
@@ -156,6 +177,39 @@ public class ClusterSpec {
     
   public String readPublicKey() throws IOException {
     return Files.toString(new File(getSecretKeyFile() + ".pub"), Charsets.UTF_8);
+  }
+  
+  public boolean equals(Object o) {
+    if (o instanceof ClusterSpec) {
+      ClusterSpec that = (ClusterSpec) o;
+      return Objects.equal(configuration, that.configuration)
+        && Objects.equal(instanceTemplates, that.instanceTemplates)
+        && Objects.equal(serviceName, that.serviceName)
+        && Objects.equal(provider, that.provider)
+        && Objects.equal(identity, that.identity)
+        && Objects.equal(credential, that.credential)
+        && Objects.equal(clusterName, that.clusterName)
+        && Objects.equal(secretKeyFile, that.secretKeyFile);
+    }
+    return false;
+  }
+  
+  public int hashCode() {
+    return Objects.hashCode(configuration, instanceTemplates, serviceName,
+        provider, identity, credential, clusterName, secretKeyFile);
+  }
+  
+  public String toString() {
+    return Objects.toStringHelper(this)
+      .add("configuration", configuration)
+      .add("instanceTemplates", instanceTemplates)
+      .add("serviceName", serviceName)
+      .add("provider", provider)
+      .add("identity", identity)
+      .add("credential", credential)
+      .add("clusterName", clusterName)
+      .add("secretKeyFile", secretKeyFile)
+      .toString();
   }
   
 }
