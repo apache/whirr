@@ -46,6 +46,8 @@ Trunk (unreleased changes)
     WHIRR-58. Introduce naming consistency for cloud service providers.
     (Adrian Cole via tomwhite)
 
+    WHIRR-75. Use Commons Configuration to manage cluster specs. (tomwhite)
+
   BUG FIXES
 
     WHIRR-50. Cassandra POM should depend on top-level. (tomwhite)

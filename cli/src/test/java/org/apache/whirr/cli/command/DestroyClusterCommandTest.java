@@ -25,6 +25,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.google.inject.internal.Lists;
+
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.util.Collections;
@@ -36,8 +38,6 @@ import org.hamcrest.Matcher;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.internal.matchers.StringContains;
-
-import com.google.inject.internal.Lists;
 
 public class DestroyClusterCommandTest {
 
@@ -55,7 +55,7 @@ public class DestroyClusterCommandTest {
   }
   
   @Test
-  public void testNoArgs() throws Exception {
+  public void testInsufficientOptions() throws Exception {
     DestroyClusterCommand command = new DestroyClusterCommand();
     int rc = command.run(null, null, err, Collections.<String>emptyList());
     assertThat(rc, is(-1));
@@ -63,8 +63,7 @@ public class DestroyClusterCommandTest {
   }
   
   private Matcher<String> containsUsageString() {
-    return StringContains.containsString("Usage: whirr destroy-cluster " +
-        "[OPTIONS] <service-name> <cluster-name>");
+    return StringContains.containsString("Usage: whirr destroy-cluster [OPTIONS]");
   }
   
   @Test
@@ -77,14 +76,16 @@ public class DestroyClusterCommandTest {
     DestroyClusterCommand command = new DestroyClusterCommand(factory);
     
     int rc = command.run(null, out, null, Lists.newArrayList(
-        "--cloud-provider", "rackspace",
-        "--cloud-identity", "myusername", "--cloud-credential", "mypassword",
-        "--secret-key-file", "secret-key",
-        "test-service", "test-cluster"));
+        "--service-name", "test-service",
+        "--cluster-name", "test-cluster",
+        "--provider", "rackspace",
+        "--identity", "myusername", "--credential", "mypassword",
+        "--secret-key-file", "secret-key"));
     
     assertThat(rc, is(0));
 
     ClusterSpec expectedClusterSpec = new ClusterSpec();
+    expectedClusterSpec.setServiceName("test-service");
     expectedClusterSpec.setProvider("rackspace");
     expectedClusterSpec.setIdentity("myusername");
     expectedClusterSpec.setCredential("mypassword");

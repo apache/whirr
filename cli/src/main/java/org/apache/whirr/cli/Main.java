@@ -18,6 +18,8 @@
 
 package org.apache.whirr.cli;
 
+import com.google.common.collect.Maps;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
@@ -27,8 +29,6 @@ import java.util.Map;
 
 import org.apache.whirr.cli.command.DestroyClusterCommand;
 import org.apache.whirr.cli.command.LaunchClusterCommand;
-
-import com.google.common.collect.Maps;
 
 /**
  * The entry point for the Whirr CLI.

@@ -18,25 +18,60 @@
 
 package org.apache.whirr.service;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.google.common.base.Charsets;
 import com.google.common.base.Objects;
-import com.google.common.collect.Maps;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.common.io.Files;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
+
+import org.apache.commons.configuration.Configuration;
 
 /**
  * This class represents the specification of a cluster. It is used to describe
  * the properties of a cluster before it is launched.
  */
 public class ClusterSpec {
+  
+  public enum Property {
+    SERVICE_NAME(String.class, false),
+    INSTANCE_TEMPLATES(String.class, false),
+    PROVIDER(String.class, false),
+    CREDENTIAL(String.class, false),
+    IDENTITY(String.class, false),
+    CLUSTER_NAME(String.class, false),
+    SECRET_KEY_FILE(String.class, false),
+    CLIENT_CIDRS(String.class, true);
+    
+    private Class<?> type;
+    private boolean multipleArguments;
+    Property(Class<?> type, boolean multipleArguments) {
+      this.type = type;
+      this.multipleArguments = multipleArguments;
+    }
+    
+    public String getSimpleName() {
+      return name().toLowerCase().replace('_', '-');
+    }
+
+    public String getConfigName() {
+      return "whirr." + getSimpleName();
+    }
+    
+    public Class<?> getType() {
+      return type;
+    }
+    
+    public boolean hasMultipleArguments() {
+      return multipleArguments;
+    }
+  }
   
   /**
    * This class describes the type of instances that should be in the cluster.
@@ -83,50 +118,52 @@ public class ClusterSpec {
         .toString();
     }
     
+    public static List<InstanceTemplate> parse(String... strings) {
+      List<InstanceTemplate> templates = Lists.newArrayList();
+      for (String s : strings) {
+        String[] parts = s.split(" ");
+        int num = Integer.parseInt(parts[0]);
+        templates.add(new InstanceTemplate(num, parts[1].split("\\+")));
+      }
+      return templates;
+    }
   }
   
-  private Properties configuration;
-  private List<InstanceTemplate> instanceTemplates;
-  private Map<Set<String>, InstanceTemplate> instanceTemplatesMap = Maps.newHashMap();
-
+  private List<InstanceTemplate> instanceTemplates = Lists.newArrayList();
   private String serviceName;
   private String provider;
   private String identity;
   private String credential;
   private String clusterName;
   private String secretKeyFile;
-  private String[] clientCidrs;
+  private List<String> clientCidrs = Lists.newArrayList();
   
-  public ClusterSpec(InstanceTemplate... instanceTemplates) {
-    this(Arrays.asList(instanceTemplates));
-  }
-
-  public ClusterSpec(List<InstanceTemplate> instanceTemplates) {
-    this(new Properties(), instanceTemplates);
-  }
-
-  /**
-   * @param configuration The configuration properties for the service. These
-   * take precedence over service defaults.
-   */
-  public ClusterSpec(Properties configuration, List<InstanceTemplate> instanceTemplates) {
-    this.configuration = configuration;
-    this.instanceTemplates = instanceTemplates;
-    for (InstanceTemplate template : instanceTemplates) {
-      instanceTemplatesMap.put(template.roles, template);
-    }
-  }
-
-  public Properties getConfiguration() {
-    return configuration;
+  public static ClusterSpec fromConfiguration(Configuration config) {
+    ClusterSpec spec = new ClusterSpec();
+    spec.setServiceName(config.getString(Property.SERVICE_NAME.getConfigName()));
+    spec.setInstanceTemplates(InstanceTemplate.parse(
+        config.getStringArray(Property.INSTANCE_TEMPLATES.getConfigName())));
+    spec.setProvider(config.getString(Property.PROVIDER.getConfigName()));
+    spec.setIdentity(checkNotNull(
+        config.getString(Property.IDENTITY.getConfigName()), Property.IDENTITY));
+    spec.setCredential(config.getString(Property.CREDENTIAL.getConfigName()));
+    spec.setClusterName(config.getString(Property.CLUSTER_NAME.getConfigName()));
+    spec.setSecretKeyFile(config.getString(Property.SECRET_KEY_FILE.getConfigName()));
+    spec.setClientCidrs(config.getList(Property.CLIENT_CIDRS.getConfigName()));
+    return spec;
   }
 
   public List<InstanceTemplate> getInstanceTemplates() {
     return instanceTemplates;
   }
   
-  public InstanceTemplate getInstanceTemplate(Set<String> roles) {
-    return instanceTemplatesMap.get(roles);
+  public InstanceTemplate getInstanceTemplate(final Set<String> roles) {
+    for (InstanceTemplate template : instanceTemplates) {
+      if (roles.equals(template.roles)) {
+        return template;
+      }
+    }
+    return null;
   }
   
   public InstanceTemplate getInstanceTemplate(String... roles) {
@@ -151,32 +188,42 @@ public class ClusterSpec {
   public String getSecretKeyFile() {
     return secretKeyFile;
   }
-  public String[] getClientCidrs() {
+  public List<String> getClientCidrs() {
     return clientCidrs;
   }
   
+  public void setInstanceTemplates(List<InstanceTemplate> instanceTemplates) {
+    this.instanceTemplates = instanceTemplates;
+  }
+
   public void setServiceName(String serviceName) {
     this.serviceName = serviceName;
   }
+
   public void setProvider(String provider) {
     this.provider = provider;
   }
+
   public void setIdentity(String identity) {
     this.identity = identity;
   }
+
   public void setCredential(String credential) {
     this.credential = credential;
   }
+
   public void setClusterName(String clusterName) {
     this.clusterName = clusterName;
   }
+
   public void setSecretKeyFile(String secretKeyFile) {
     this.secretKeyFile = secretKeyFile;
   }
-  public void setClientCidrs(String[] clientCidrs) {
+
+  public void setClientCidrs(List<String> clientCidrs) {
     this.clientCidrs = clientCidrs;
   }
-  
+
   //
   public String readPrivateKey() throws IOException {
     return Files.toString(new File(getSecretKeyFile()), Charsets.UTF_8);
@@ -189,26 +236,26 @@ public class ClusterSpec {
   public boolean equals(Object o) {
     if (o instanceof ClusterSpec) {
       ClusterSpec that = (ClusterSpec) o;
-      return Objects.equal(configuration, that.configuration)
-        && Objects.equal(instanceTemplates, that.instanceTemplates)
+      return Objects.equal(instanceTemplates, that.instanceTemplates)
         && Objects.equal(serviceName, that.serviceName)
         && Objects.equal(provider, that.provider)
         && Objects.equal(identity, that.identity)
         && Objects.equal(credential, that.credential)
         && Objects.equal(clusterName, that.clusterName)
-        && Objects.equal(secretKeyFile, that.secretKeyFile);
+        && Objects.equal(secretKeyFile, that.secretKeyFile)
+        && Objects.equal(clientCidrs, that.clientCidrs);
     }
     return false;
   }
   
   public int hashCode() {
-    return Objects.hashCode(configuration, instanceTemplates, serviceName,
-        provider, identity, credential, clusterName, secretKeyFile);
+    return Objects.hashCode(instanceTemplates, serviceName,
+        provider, identity, credential, clusterName, secretKeyFile,
+        clientCidrs);
   }
   
   public String toString() {
     return Objects.toStringHelper(this)
-      .add("configuration", configuration)
       .add("instanceTemplates", instanceTemplates)
       .add("serviceName", serviceName)
       .add("provider", provider)
@@ -216,6 +263,7 @@ public class ClusterSpec {
       .add("credential", credential)
       .add("clusterName", clusterName)
       .add("secretKeyFile", secretKeyFile)
+      .add("clientCidrs", clientCidrs)
       .toString();
   }
   

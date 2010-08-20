@@ -18,7 +18,8 @@
 
 package org.apache.whirr.service.cassandra.integration;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import static org.hamcrest.Matchers.instanceOf;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
@@ -28,13 +29,18 @@ import java.util.Set;
 
 import org.apache.cassandra.thrift.Cassandra;
 import org.apache.cassandra.thrift.TokenRange;
+import org.apache.commons.configuration.CompositeConfiguration;
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.thrift.TException;
 import org.apache.thrift.protocol.TBinaryProtocol;
 import org.apache.thrift.transport.TSocket;
 import org.apache.whirr.service.Cluster;
 import org.apache.whirr.service.ClusterSpec;
+import org.apache.whirr.service.Service;
+import org.apache.whirr.service.ServiceFactory;
 import org.apache.whirr.service.Cluster.Instance;
-import org.apache.whirr.service.ClusterSpec.InstanceTemplate;
 import org.apache.whirr.service.cassandra.CassandraService;
 import org.junit.After;
 import org.junit.Before;
@@ -42,7 +48,6 @@ import org.junit.Test;
 
 public class CassandraServiceTest {
 
-  private String clusterName = "cassandraclustertest";
   private static final String KEYSPACE = "Keyspace1";
 
   private ClusterSpec clusterSpec;
@@ -50,27 +55,16 @@ public class CassandraServiceTest {
   private Cluster cluster;
 
   @Before
-  public void setUp() throws IOException, InterruptedException {
-    String secretKeyFile;
-    try {
-      secretKeyFile = checkNotNull(System.getProperty("whirr.test.ssh.keyfile"), "whirr.test.ssh.keyfile");
-    } catch (NullPointerException e) {
-      secretKeyFile = System.getProperty("user.home") + "/.ssh/id_rsa";
+  public void setUp() throws ConfigurationException, IOException {
+    CompositeConfiguration config = new CompositeConfiguration();
+    if (System.getProperty("config") != null) {
+      config.addConfiguration(new PropertiesConfiguration(System.getProperty("config")));
     }
-    clusterSpec = new ClusterSpec(new InstanceTemplate(2,
-        CassandraService.CASSANDRA_ROLE));
-    clusterSpec.setProvider(checkNotNull(System.getProperty(
-        "whirr.test.provider", "ec2")));
-    clusterSpec.setIdentity(checkNotNull(System.getProperty("whirr.test.identity"), "whirr.test.identity"));
-    clusterSpec.setCredential(checkNotNull(System.getProperty("whirr.test.credential"), "whirr.test.credential"));
-    String cidrs = System.getProperty("whirr.test.client-cidrs");
-    if (cidrs != null) {
-      clusterSpec.setClientCidrs(cidrs.split(","));
-    }
-    clusterSpec.setSecretKeyFile(secretKeyFile);
-    clusterSpec.setClusterName(clusterName);
-    service = new CassandraService();
-
+    config.addConfiguration(new PropertiesConfiguration("whirr-cassandra-test.properties"));
+    clusterSpec = ClusterSpec.fromConfiguration(config);
+    Service s = new ServiceFactory().create(clusterSpec.getServiceName());
+    assertThat(s, instanceOf(CassandraService.class));
+    service = (CassandraService) s;
     cluster = service.launchCluster(clusterSpec);
 
     // give it a sec to boot up the cluster

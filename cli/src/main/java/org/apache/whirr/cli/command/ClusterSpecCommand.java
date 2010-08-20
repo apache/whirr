@@ -18,19 +18,28 @@
 
 package org.apache.whirr.cli.command;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import static org.apache.whirr.service.ClusterSpec.Property.CLUSTER_NAME;
+import static org.apache.whirr.service.ClusterSpec.Property.IDENTITY;
+import static org.apache.whirr.service.ClusterSpec.Property.SERVICE_NAME;
 
-import java.util.Arrays;
-import java.util.List;
+import com.google.common.collect.Maps;
 
+import java.util.EnumSet;
+import java.util.Map;
+
+import joptsimple.ArgumentAcceptingOptionSpec;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import joptsimple.OptionSpec;
 
+import org.apache.commons.configuration.CompositeConfiguration;
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.whirr.cli.Command;
 import org.apache.whirr.service.ClusterSpec;
 import org.apache.whirr.service.ServiceFactory;
-import org.apache.whirr.service.ClusterSpec.InstanceTemplate;
+import org.apache.whirr.service.ClusterSpec.Property;
 
 /**
  * An abstract command for interacting with clusters.
@@ -40,36 +49,53 @@ public abstract class ClusterSpecCommand extends Command {
   protected ServiceFactory factory;
   
   protected OptionParser parser = new OptionParser();
-  protected OptionSpec<String> cloudProvider = parser.accepts("cloud-provider")
-      .withRequiredArg().defaultsTo("ec2").ofType(String.class);
-  protected OptionSpec<String> cloudIdentity = parser.accepts("cloud-identity")
-      .withRequiredArg().ofType(String.class);
-  protected OptionSpec<String> cloudCredential = parser.accepts("cloud-credential")
-      .withRequiredArg().ofType(String.class);
-  protected OptionSpec<String> secretKeyFile = parser.accepts("secret-key-file")
-      .withRequiredArg()
-      .defaultsTo(System.getProperty("user.home") + "/.ssh/id_rsa")
-      .ofType(String.class);
-  
+  private Map<Property, OptionSpec> optionSpecs;
+  private OptionSpec<String> configOption = parser.accepts("config")
+    .withRequiredArg().ofType(String.class);
+
   public ClusterSpecCommand(String name, String description, ServiceFactory factory) {
     super(name, description);
     this.factory = factory;
+    
+    optionSpecs = Maps.newHashMap();
+    for (Property property : EnumSet.allOf(Property.class)) {
+      ArgumentAcceptingOptionSpec<?> spec = parser.accepts(property.getSimpleName())
+        .withRequiredArg()
+        .ofType(property.getType());
+      if (property.hasMultipleArguments()) {
+        spec.withValuesSeparatedBy(',');
+      }
+      optionSpecs.put(property, spec);
+    }
   }
   
-  protected ClusterSpec getClusterSpec(OptionSet optionSet,
-        InstanceTemplate... instanceTemplates) {
-    return getClusterSpec(optionSet, Arrays.asList(instanceTemplates));
-  }
-  
-  protected ClusterSpec getClusterSpec(OptionSet optionSet,
-        List<InstanceTemplate> instanceTemplates) {
-    ClusterSpec clusterSpec = new ClusterSpec(instanceTemplates);
-    clusterSpec.setProvider(optionSet.valueOf(cloudProvider));
-    clusterSpec.setIdentity(checkNotNull(optionSet.valueOf(cloudIdentity),
-        "cloud-identity"));
-    clusterSpec.setCredential(optionSet.valueOf(cloudCredential));
-    clusterSpec.setSecretKeyFile(optionSet.valueOf(secretKeyFile));
-    return clusterSpec;
+  protected ClusterSpec getClusterSpec(OptionSet optionSet) throws ConfigurationException {
+    Configuration optionsConfig = new PropertiesConfiguration();
+    for (Map.Entry<Property, OptionSpec> entry : optionSpecs.entrySet()) {
+      Property property = entry.getKey();
+      OptionSpec option = entry.getValue();
+      if (property.hasMultipleArguments()) {
+        optionsConfig.setProperty(property.getConfigName(),
+            optionSet.valuesOf(option));
+      } else {
+        optionsConfig.setProperty(property.getConfigName(),
+            optionSet.valueOf(option));
+      }
+    }
+    CompositeConfiguration config = new CompositeConfiguration();
+    config.addConfiguration(optionsConfig);
+    if (optionSet.has(configOption)) {
+      Configuration defaults = new PropertiesConfiguration(optionSet.valueOf(configOption));
+      config.addConfiguration(defaults);
+    }
+
+    for (Property required : EnumSet.of(SERVICE_NAME, CLUSTER_NAME, IDENTITY)) {
+      if (config.getString(required.getConfigName()) == null) {
+        throw new IllegalArgumentException(String.format("Option '%s' not set.",
+            required.getSimpleName()));
+      }
+    }
+    return ClusterSpec.fromConfiguration(config);
   }
 
 }

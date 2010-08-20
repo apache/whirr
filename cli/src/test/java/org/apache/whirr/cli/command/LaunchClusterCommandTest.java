@@ -18,6 +18,7 @@
 
 package org.apache.whirr.cli.command;
 
+import static org.apache.whirr.service.ClusterSpec.Property.INSTANCE_TEMPLATES;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
@@ -26,11 +27,15 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.google.common.collect.Sets;
+import com.google.inject.internal.Lists;
+
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.util.Collections;
 
-import org.apache.whirr.cli.command.LaunchClusterCommand;
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.whirr.service.Cluster;
 import org.apache.whirr.service.ClusterSpec;
 import org.apache.whirr.service.Service;
@@ -39,9 +44,6 @@ import org.hamcrest.Matcher;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.internal.matchers.StringContains;
-
-import com.google.common.collect.Sets;
-import com.google.inject.internal.Lists;
 
 public class LaunchClusterCommandTest {
 
@@ -58,34 +60,15 @@ public class LaunchClusterCommandTest {
     err = new PrintStream(errBytes);
   }
   @Test
-  public void testNoArgs() throws Exception {
+  public void testInsufficientArgs() throws Exception {
     LaunchClusterCommand command = new LaunchClusterCommand();
     int rc = command.run(null, null, err, Collections.<String>emptyList());
     assertThat(rc, is(-1));
     assertThat(errBytes.toString(), containsUsageString());
   }
   
-  @Test
-  public void testMissingNumberAndRoles() throws Exception {
-    LaunchClusterCommand command = new LaunchClusterCommand();
-    int rc = command.run(null, null, err, Lists.newArrayList("test-service",
-        "test-cluster"));
-    assertThat(rc, is(-1));
-    assertThat(errBytes.toString(), containsUsageString());
-  }
-  
-  @Test
-  public void testMissingRoles() throws Exception {
-    LaunchClusterCommand command = new LaunchClusterCommand();
-    int rc = command.run(null, null, err, Lists.newArrayList("test-service",
-        "test-cluster", "1", "role1+role2", "2"));
-    assertThat(rc, is(-1));
-    assertThat(errBytes.toString(), containsUsageString());
-  }
-  
   private Matcher<String> containsUsageString() {
-    return StringContains.containsString("Usage: whirr launch-cluster " +
-        "[OPTIONS] <service-name> <cluster-name> <num> <roles> [<num> <roles>]*");
+    return StringContains.containsString("Usage: whirr launch-cluster [OPTIONS]");
   }
   
   @Test
@@ -100,17 +83,21 @@ public class LaunchClusterCommandTest {
     LaunchClusterCommand command = new LaunchClusterCommand(factory);
     
     int rc = command.run(null, out, null, Lists.newArrayList(
-        "--cloud-provider", "rackspace",
-        "--cloud-identity", "myusername", "--cloud-credential", "mypassword",
-        "--secret-key-file", "secret-key",
-        "test-service", "test-cluster", "1", "role1+role2", "2", "role3"));
+        "--service-name", "test-service",
+        "--cluster-name", "test-cluster",
+        "--instance-templates", "1 role1+role2,2 role3",
+        "--provider", "rackspace",
+        "--identity", "myusername", "--credential", "mypassword",
+        "--secret-key-file", "secret-key"));
     
     assertThat(rc, is(0));
 
-    ClusterSpec expectedClusterSpec = new ClusterSpec(
+    ClusterSpec expectedClusterSpec = new ClusterSpec();
+    expectedClusterSpec.setInstanceTemplates(Lists.newArrayList(
         new ClusterSpec.InstanceTemplate(1, Sets.newHashSet("role1", "role2")),
         new ClusterSpec.InstanceTemplate(2, Sets.newHashSet("role3"))
-    );
+    ));
+    expectedClusterSpec.setServiceName("test-service");
     expectedClusterSpec.setProvider("rackspace");
     expectedClusterSpec.setIdentity("myusername");
     expectedClusterSpec.setCredential("mypassword");

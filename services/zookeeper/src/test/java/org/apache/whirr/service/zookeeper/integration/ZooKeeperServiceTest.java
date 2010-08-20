@@ -18,14 +18,20 @@
 
 package org.apache.whirr.service.zookeeper.integration;
 
-import static com.google.common.base.Preconditions.checkNotNull;
 import static junit.framework.Assert.assertEquals;
+import static org.hamcrest.Matchers.instanceOf;
+import static org.junit.Assert.assertThat;
 
 import java.io.IOException;
 import java.util.concurrent.CountDownLatch;
 
+import org.apache.commons.configuration.CompositeConfiguration;
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.whirr.service.ClusterSpec;
-import org.apache.whirr.service.ClusterSpec.InstanceTemplate;
+import org.apache.whirr.service.Service;
+import org.apache.whirr.service.ServiceFactory;
 import org.apache.whirr.service.zookeeper.ZooKeeperCluster;
 import org.apache.whirr.service.zookeeper.ZooKeeperService;
 import org.apache.zookeeper.CreateMode;
@@ -40,33 +46,21 @@ import org.junit.Test;
 
 public class ZooKeeperServiceTest {
   
-  private String clusterName = "zkclustertest";
-  
   private ClusterSpec clusterSpec;
   private ZooKeeperService service;
   private ZooKeeperCluster cluster;
   
   @Before
-  public void setUp() throws IOException {
-    String secretKeyFile;
-    try {
-       secretKeyFile = checkNotNull(System.getProperty("whirr.test.ssh.keyfile"));
-    } catch (NullPointerException e) {
-       secretKeyFile = System.getProperty("user.home") + "/.ssh/id_rsa";
+  public void setUp() throws ConfigurationException, IOException {
+    CompositeConfiguration config = new CompositeConfiguration();
+    if (System.getProperty("config") != null) {
+      config.addConfiguration(new PropertiesConfiguration(System.getProperty("config")));
     }
-    clusterSpec = new ClusterSpec(
-        new InstanceTemplate(2, ZooKeeperService.ZOOKEEPER_ROLE));
-    clusterSpec.setProvider(checkNotNull(System.getProperty("whirr.test.provider", "ec2")));
-    clusterSpec.setIdentity(checkNotNull(System.getProperty("whirr.test.identity")));
-    clusterSpec.setCredential(checkNotNull(System.getProperty("whirr.test.credential")));
-    String cidrs = System.getProperty("whirr.test.client-cidrs");
-    if (cidrs != null) {
-      clusterSpec.setClientCidrs(cidrs.split(","));
-    }
-    clusterSpec.setSecretKeyFile(secretKeyFile);
-    clusterSpec.setClusterName(clusterName);
-    service = new ZooKeeperService();
-    
+    config.addConfiguration(new PropertiesConfiguration("whirr-zookeeper-test.properties"));
+    clusterSpec = ClusterSpec.fromConfiguration(config);
+    Service s = new ServiceFactory().create(clusterSpec.getServiceName());
+    assertThat(s, instanceOf(ZooKeeperService.class));
+    service = (ZooKeeperService) s;
     cluster = service.launchCluster(clusterSpec);
     System.out.println(cluster.getHosts());
   }

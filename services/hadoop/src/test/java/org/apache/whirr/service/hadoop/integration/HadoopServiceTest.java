@@ -18,9 +18,10 @@
 
 package org.apache.whirr.service.hadoop.integration;
 
-import static com.google.common.base.Preconditions.checkNotNull;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNull;
+import static org.hamcrest.Matchers.instanceOf;
+import static org.junit.Assert.assertThat;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -30,6 +31,9 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.Map.Entry;
 
+import org.apache.commons.configuration.CompositeConfiguration;
+import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileSystem;
@@ -44,7 +48,8 @@ import org.apache.hadoop.mapred.JobConf;
 import org.apache.hadoop.mapred.lib.LongSumReducer;
 import org.apache.hadoop.mapred.lib.TokenCountMapper;
 import org.apache.whirr.service.ClusterSpec;
-import org.apache.whirr.service.ClusterSpec.InstanceTemplate;
+import org.apache.whirr.service.Service;
+import org.apache.whirr.service.ServiceFactory;
 import org.apache.whirr.service.hadoop.HadoopCluster;
 import org.apache.whirr.service.hadoop.HadoopProxy;
 import org.apache.whirr.service.hadoop.HadoopService;
@@ -54,34 +59,22 @@ import org.junit.Test;
 
 public class HadoopServiceTest {
   
-  private String clusterName = "hadoopclustertest";
-  
   private ClusterSpec clusterSpec;
   private HadoopService service;
   private HadoopProxy proxy;
   private HadoopCluster cluster;
   
   @Before
-  public void setUp() throws IOException {
-    String secretKeyFile;
-    try {
-       secretKeyFile = checkNotNull(System.getProperty("whirr.test.ssh.keyfile"));
-    } catch (NullPointerException e) {
-       secretKeyFile = System.getProperty("user.home") + "/.ssh/id_rsa";
+  public void setUp() throws ConfigurationException, IOException {
+    CompositeConfiguration config = new CompositeConfiguration();
+    if (System.getProperty("config") != null) {
+      config.addConfiguration(new PropertiesConfiguration(System.getProperty("config")));
     }
-    clusterSpec = new ClusterSpec(
-        new InstanceTemplate(1, HadoopService.MASTER_ROLE),
-        new InstanceTemplate(1, HadoopService.WORKER_ROLE));
-    clusterSpec.setProvider(checkNotNull(System.getProperty("whirr.test.provider", "ec2")));
-    clusterSpec.setIdentity(checkNotNull(System.getProperty("whirr.test.identity")));
-    clusterSpec.setCredential(checkNotNull(System.getProperty("whirr.test.credential")));
-    String cidrs = System.getProperty("whirr.test.client-cidrs");
-    if (cidrs != null) {
-      clusterSpec.setClientCidrs(cidrs.split(","));
-    }
-    clusterSpec.setSecretKeyFile(secretKeyFile);
-    clusterSpec.setClusterName(clusterName);
-    service = new HadoopService();
+    config.addConfiguration(new PropertiesConfiguration("whirr-hadoop-test.properties"));
+    clusterSpec = ClusterSpec.fromConfiguration(config);
+    Service s = new ServiceFactory().create(clusterSpec.getServiceName());
+    assertThat(s, instanceOf(HadoopService.class));
+    service = (HadoopService) s;
     
     cluster = service.launchCluster(clusterSpec);
     proxy = new HadoopProxy(clusterSpec, cluster);

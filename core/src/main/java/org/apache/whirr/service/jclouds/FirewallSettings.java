@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.io.IOUtils;
@@ -33,6 +34,7 @@ import org.jclouds.compute.ComputeServiceContext;
 import org.jclouds.compute.domain.NodeMetadata;
 
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 
 /**
  * Utility functions for controlling firewall settings for a cluster.
@@ -47,7 +49,7 @@ public class FirewallSettings {
     URL url = new URL("http://checkip.amazonaws.com/");
     HttpURLConnection connection = (HttpURLConnection) url.openConnection();
     connection.connect();
-    return IOUtils.toString(connection.getInputStream());
+    return IOUtils.toString(connection.getInputStream()).trim() + "/32";
   }
 
   public static void authorizeIngress(ComputeServiceContext computeServiceContext,
@@ -61,21 +63,20 @@ public class FirewallSettings {
       NodeMetadata node, ClusterSpec clusterSpec, String ip, int... ports) {
     
     authorizeIngress(computeServiceContext, Collections.singleton(node),
-        clusterSpec, new String[] { ip + "/32" }, ports);
+        clusterSpec, Lists.newArrayList(ip + "/32"), ports);
   }
 
   public static void authorizeIngress(ComputeServiceContext computeServiceContext,
       Set<? extends NodeMetadata> nodes, ClusterSpec clusterSpec, int... ports) throws IOException {
-    String[] cidrs = clusterSpec.getClientCidrs();
-    if (cidrs == null) {
-      cidrs = new String[] { getOriginatingIp() };
+    List<String> cidrs = clusterSpec.getClientCidrs();
+    if (cidrs == null || cidrs.isEmpty()) {
+      cidrs = Lists.newArrayList(getOriginatingIp());
     }
-    authorizeIngress(computeServiceContext, nodes,
-        clusterSpec, clusterSpec.getClientCidrs(), ports);
+    authorizeIngress(computeServiceContext, nodes, clusterSpec, cidrs, ports);
   }
 
   private static void authorizeIngress(ComputeServiceContext computeServiceContext,
-      Set<? extends NodeMetadata> nodes, ClusterSpec clusterSpec, String[] cidrs, int... ports) {
+      Set<? extends NodeMetadata> nodes, ClusterSpec clusterSpec, List<String> cidrs, int... ports) {
     
     if (clusterSpec.getProvider().equals("ec2")) {
       // This code (or something like it) may be added to jclouds (see

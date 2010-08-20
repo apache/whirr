@@ -49,22 +49,25 @@ public class DestroyClusterCommand extends ClusterSpecCommand {
     
     OptionSet optionSet = parser.parse(args.toArray(new String[0]));
 
-    List<String> nonOptionArguments = optionSet.nonOptionArguments();
-    if (nonOptionArguments.size() < 2) {
+    if (!optionSet.nonOptionArguments().isEmpty()) {
       printUsage(parser, err);
       return -1;
     }
-    String serviceName = nonOptionArguments.get(0);
-    ClusterSpec clusterSpec = getClusterSpec(optionSet);
-    clusterSpec.setClusterName(nonOptionArguments.get(1));
+    try {
+      ClusterSpec clusterSpec = getClusterSpec(optionSet);
 
-    Service service = factory.create(serviceName);
-    service.destroyCluster(clusterSpec);
-    return 0;
+      Service service = factory.create(clusterSpec.getServiceName());
+      service.destroyCluster(clusterSpec);
+      return 0;
+    } catch (IllegalArgumentException e) {
+      err.println(e.getMessage());
+      printUsage(parser, err);
+      return -1;
+    }
   }
 
   private void printUsage(OptionParser parser, PrintStream stream) throws IOException {
-    stream.println("Usage: whirr destroy-cluster [OPTIONS] <service-name> <cluster-name>");
+    stream.println("Usage: whirr destroy-cluster [OPTIONS]");
     stream.println();
     parser.printHelpOn(stream);
   }

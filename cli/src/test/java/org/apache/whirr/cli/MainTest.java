@@ -25,6 +25,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.google.inject.internal.Lists;
+
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.PrintStream;
@@ -32,8 +34,6 @@ import java.util.Collections;
 import java.util.List;
 
 import org.junit.Test;
-
-import com.google.inject.internal.Lists;
 
 public class MainTest {
   
