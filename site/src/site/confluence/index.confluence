@@ -7,16 +7,25 @@ Whirr provides
 * A common service API. The details of provisioning are particular to the service. 
 * Smart defaults for services. You can get a properly configured system running quickly, while still being able to override settings as needed. 
 
-Find out more about Whirr at our [wiki|https://cwiki.apache.org/confluence/display/WHIRR]
+Find out more about Whirr at our [wiki|https://cwiki.apache.org/confluence/display/WHIRR].
+
+h2. Which services and cloud providers are supported?
+
+Whirr uses [jclouds|http://code.google.com/p/jclouds/] for provisioning, so in principle it should support all the cloud providers that jclouds supports. The following table shows
+the cloud provider and service combinations that have been tested.
+
+||Cloud provider||Cassandra||Hadoop||ZooKeeper||
+|Amazon EC2|Yes|Yes|Yes|
+|Rackspace|No|No|No|
 
 h2. Download
 
-fill, should link to something like [this|http://www.apache.org/dyn/closer.cgi/incubator/whirr/]
+Download a release of Whirr from a [nearby mirror|http://www.apache.org/dyn/closer.cgi/incubator/whirr/].
 
 h2. Getting Started
 
-fill summary and [link to doc|getting-started.html]
+You can use Whirr's CLI or APIs to [get started with Whirr|quick-start-guide].
 
 h2. Getting Involved
 
-fill detail for contributors including [link to wiki|https://cwiki.apache.org/confluence/display/WHIRR/How+To+Contribute]
+Have you got a suggestion for improving Whirr? It's easy to [get involved|https://cwiki.apache.org/confluence/display/WHIRR/How+To+Contribute].

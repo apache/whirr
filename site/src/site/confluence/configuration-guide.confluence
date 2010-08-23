@@ -1,0 +1,49 @@
+h1. Java
+
+Whirr is configured using a properties file, and optionally using command line arguments when using the CLI. Command line arguments take precedence over properties specified in a properties file.
+
+|| Name || Command line option || Default || Description ||
+| {{config}} | {{\--config}} | none | A filename of a properties file containing properties in this table. |
+| {{service-name}} | {{\--service-name}} | none | The name of the service to use. E.g. {{hadoop}} |
+| {{cluster-name}} | {{\--cluster-name}} | none | The name of the cluster to operate on. E.g. {{hadoopcluster}}. The cluster name is used to tag the instances in some cloud-specific way. For example, in Amazon it is used to form the security group name. |
+| {{instance-templates}} | {{\--instance-templates}} | none | The number of instances to launch for each set of roles. E.g. {{1 nn+jt 1 dn+tt}}. |
+| {{provider}} | {{\--provider}} | {{ec2}} | The name of the cloud provider. |
+| {{identity}} | {{\--identity}} | none | The cloud identity. See the table below for how this maps to the credentials for your provider. |
+| {{credential}} | {{\--credential}} | none | The cloud credential. See the table below for how this maps to the credentials for your provider. |
+| {{secret-key-file}} | {{\--secret-key-file}} | _\~/.ssh/id\_rsa_ | The filename of the private key used to connect to instances. |
+| {{client-cidrs}} | {{\--client-cidrs}} | none | A comma-separated list of [CIDR |http://en.wikipedia.org/wiki/Classless\_Inter-Domain\_Routing] blocks. E.g. {{208.128.0.0/11,108.128.0.0/11}} |
+
+h2. Cloud provider specific configuration
+
+|| Compute Service Provider || {{provider}} || {{identity}} || {{credential}} || Cluster name usage ||
+| Amazon EC2 | {{ec2}} | Access Key ID | Secret Access Key | Used to form security Group (via jclouds tag) |
+| Rackspace Cloud Servers | {{cloudservers}} | Username | API Key | Server name ({{<username>-<security group>-<random junk>}}) |
+
+h1. Python
+
+See [https://docs.cloudera.com/display/DOC/Using+Command+Line+Options]
+
+h2. Comparison
+
+|| Python || Java || Notes ||
+| {{config-dir}} | {{config}} | |
+| {{service}} | {{service-name}} | |
+| none | {{cluster-name}} | Specified as a positional argument on the Python CLI. |
+| none | {{instance-templates}} | Specified as a positional arguments on the Python CLI. |
+| {{cloud-provider}} | {{provider}} | |
+| none | {{identity}} | Specified using environment variables for Python. E.g. {{AWS\_ACCESS\_KEY\_ID}}, {{RACKSPACE\_KEY}} |
+| none | {{credential}} | Specified using environment variables for Python. E.g. {{AWS\_ACCESS\_KEY\_ID}}, {{RACKSPACE\_SECRET}} |
+| {{private-key-file}} | {{secret-key-file}} | |
+| {{client-cidr}} | {{client-cidrs}} | Python {{client-cidr}} option may be repeated multiple times, whereas Java {{client-cidrs}} contains comma-separated CIDRs. |
+| {{public-key}} | none | Based on secret key in Java (add {{.pub}}). |
+| {{image-id}} | none | Need to add to Java. Along with more flexible image matching (pattern, OS, arch). See jclouds TemplateBuilder. |
+| {{instance-type}} | none | Ditto. |
+| {{availability-zone}} | none | Ditto. |
+| {{security-group}} | none | Amazon-specific. However, Amazon users may wish to start a cluster in additional security groups. |
+| {{env}} | none | May not be needed in Java with runurls. |
+| {{user-data-file}} | none | Amazon-specific. Use runurls. |
+| {{key-name}} | none | Amazon-specific. Jclouds generates a new key for clusters. |
+| {{user-packages}} | none | Implement by allowing arbitrary runurls. |
+| {{auto-shutdown}} | none | Implement by allowing arbitrary runurls. |
+| {{ssh-options}} | none | Jclouds handles SSH, so not needed in Java. |
+

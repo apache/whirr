@@ -48,6 +48,8 @@ Trunk (unreleased changes)
 
     WHIRR-75. Use Commons Configuration to manage cluster specs. (tomwhite)
 
+    WHIRR-40. Fill in getting started documentation. (tomwhite)
+
   BUG FIXES
 
     WHIRR-50. Cassandra POM should depend on top-level. (tomwhite)

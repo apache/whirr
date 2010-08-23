@@ -1,0 +1,60 @@
+h1. Getting Started with Whirr
+
+h2. Whirr CLI
+
+h3. Pre-requisites
+You need to install Java 6 on your machine. Also, you need to have an account with a cloud provider,
+such as Amazon EC2.
+
+h3. Install Whirr
+
+[Download|http://www.apache.org/dyn/closer.cgi/incubator/whirr/] or
+[build|https://cwiki.apache.org/confluence/display/WHIRR/How+To+Contribute] Whirr. Call the directory
+which contains the Whirr JAR files {{WHIRR\_HOME}} (you might like to define this as an environment variable).
+
+You can test that Whirr is working by running:
+
+{code}
+% java -jar $WHIRR_HOME/whirr-cli-0.1.0-SNAPSHOT.jar
+{code}
+
+It is handy to create an alias for whirr, and for one including cloud credentials:
+
+{code}
+% alias whirr='java -jar $WHIRR_HOME/whirr-cli-0.1.0-SNAPSHOT.jar'
+% alias whirr-ec2='whirr --identity=$AWS_ACCESS_KEY_ID --credential=$AWS_SECRET_ACCESS_KEY'
+{code}
+
+h3. Launch a cluster
+
+The following will launch a Hadoop cluster with a single machine for the namenode and jobtracker, and
+a further machine for a datanode and tasktracker.
+
+{code}
+% whirr-ec2 launch-cluster --service-name=hadoop --cluster-name=tomhadoopcluster \
+  --instance-templates='1 nn+jt 1 dn+tt'
+{code}
+
+Once the cluster has launched you can browse it by connecting to http://master-host:50030.
+
+h3. Configuration
+
+Whirr is configured using a properties file, and optionally using command line arguments when using the CLI. Command line arguments take precedence over properties specified in a properties file.
+
+See the [Configuration Guide|configuration-guide] for details.
+
+h3. Destroy a cluster
+
+When you've finished using a cluster you can terminate the instances and clean up resources with
+
+{code}
+% whirr-ec2 destroy-cluster --service-name hadoop --cluster-name tomhadoopcluster
+{code}
+
+h2. Whirr API
+
+Whirr provides a Java API for stopping and starting clusters. Please see the unit test source code for
+how to achieve this.
+
+There's also some example code at [http://github.com/hammer/whirr-demo].
+
