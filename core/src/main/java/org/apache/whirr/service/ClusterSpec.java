@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration.PropertiesConfiguration;
 
 /**
  * This class represents the specification of a cluster. It is used to describe
@@ -137,6 +138,7 @@ public class ClusterSpec {
   private String clusterName;
   private String secretKeyFile;
   private List<String> clientCidrs = Lists.newArrayList();
+  private Configuration config = new PropertiesConfiguration();
   
   public static ClusterSpec fromConfiguration(Configuration config) {
     ClusterSpec spec = new ClusterSpec();
@@ -150,6 +152,7 @@ public class ClusterSpec {
     spec.setClusterName(config.getString(Property.CLUSTER_NAME.getConfigName()));
     spec.setSecretKeyFile(config.getString(Property.SECRET_KEY_FILE.getConfigName()));
     spec.setClientCidrs(config.getList(Property.CLIENT_CIDRS.getConfigName()));
+    spec.config = config;
     return spec;
   }
 
@@ -225,6 +228,11 @@ public class ClusterSpec {
   }
 
   //
+  
+  public Configuration getConfiguration() {
+    return config;
+  }
+  
   public String readPrivateKey() throws IOException {
     return Files.toString(new File(getSecretKeyFile()), Charsets.UTF_8);
   }

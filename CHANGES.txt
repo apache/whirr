@@ -8,6 +8,9 @@ Trunk (unreleased changes)
 
     WHIRR-33. Add a CLI. (tomwhite)
 
+    WHIRR-54. Implement service/cdh. To run CDH rather than Apache Hadoop, set
+    the property whirr.hadoop-install-runurl to cloudera/cdh/install (tomwhite)
+
   IMPROVEMENTS
 
     WHIRR-2. Import initial Java source code. (tomwhite)

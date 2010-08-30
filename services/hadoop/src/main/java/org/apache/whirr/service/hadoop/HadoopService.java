@@ -59,6 +59,7 @@ public class HadoopService extends Service {
   public static final Set<String> MASTER_ROLE = Sets.newHashSet("nn", "jt");
   public static final Set<String> WORKER_ROLE = Sets.newHashSet("dn", "tt");
   
+  public static final int WEB_PORT = 80;
   public static final int NAMENODE_PORT = 8020;
   public static final int JOBTRACKER_PORT = 8021;
   public static final int NAMENODE_WEB_UI_PORT = 50070;
@@ -77,9 +78,12 @@ public class HadoopService extends Service {
     
     // Launch Hadoop "master" (NN and JT)
     // deal with user packages and autoshutdown with extra runurls
+    String hadoopInstallRunUrl = clusterSpec.getConfiguration().getString(
+        "whirr.hadoop-install-runurl", "apache/hadoop/install");
     byte[] nnjtBootScript = RunUrlBuilder.runUrls(
       "sun/java/install",
-      String.format("apache/hadoop/install nn,jt -c %s", clusterSpec.getProvider()));
+      String.format("%s nn,jt -c %s", hadoopInstallRunUrl,
+          clusterSpec.getProvider()));
 
     TemplateBuilder masterTemplateBuilder = computeService.templateBuilder()
       .osFamily(UBUNTU)
@@ -111,6 +115,8 @@ public class HadoopService extends Service {
     InetAddress jobtrackerPublicAddress = InetAddress.getByName(Iterables.get(node.getPublicAddresses(),0));
     
     FirewallSettings.authorizeIngress(computeServiceContext, node, clusterSpec,
+        WEB_PORT);
+    FirewallSettings.authorizeIngress(computeServiceContext, node, clusterSpec,
         NAMENODE_WEB_UI_PORT);
     FirewallSettings.authorizeIngress(computeServiceContext, node, clusterSpec,
         JOBTRACKER_WEB_UI_PORT);
@@ -128,7 +134,7 @@ public class HadoopService extends Service {
     // Launch slaves (DN and TT)
     byte[] slaveBootScript = RunUrlBuilder.runUrls(
       "sun/java/install",
-      String.format("apache/hadoop/install dn,tt -n %s -j %s",
+      String.format("cloudera/cdh/install dn,tt -n %s -j %s",
           namenodePublicAddress.getHostName(),
           jobtrackerPublicAddress.getHostName()));
 
