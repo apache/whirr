@@ -20,14 +20,14 @@
   <parent>
     <groupId>org.apache.whirr</groupId>
     <artifactId>whirr</artifactId>
-    <version>0.1.0-SNAPSHOT</version>
+    <version>0.1.0-incubating-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <groupId>org.apache.whirr</groupId>
   <artifactId>whirr-zookeeper</artifactId>
   <packaging>jar</packaging>
-  <version>0.1.0-SNAPSHOT</version>
-  <name>Whirr ZooKeeper</name>
+  <version>0.1.0-incubating-SNAPSHOT</version>
+  <name>Apache Whirr ZooKeeper</name>
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
@@ -96,22 +96,4 @@
     </dependency>
 
   </dependencies>
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <configuration>
-          <source>1.6</source>
-          <target>1.6</target>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
-  <repositories>
-    <repository>
-      <id>jclouds</id>
-      <url>http://jclouds.googlecode.com/svn/repo</url>
-    </repository>
-  </repositories>
 </project>

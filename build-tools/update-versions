@@ -1,0 +1,77 @@
+#!/usr/bin/ruby
+#
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+# This script is used to roll the version numbers of all modules up.
+# The version number is always determined from the master POM's version number.
+# However, when changing version number of the master POM, every module must have
+# it's <parent>/<version> element updated.  That's what this script is for.
+
+# Rub gems:  Think of it as Maven for Ruby but not brain-damaged. See http://www.rubygems.org/read/book/1
+
+require 'rubygems'
+
+# This script requires the Ruby gem hpricot ("gem install hpricot"). It was built with version 0.6.
+# http://code.whytheluckystiff.net/hpricot
+
+require 'hpricot'
+
+# This script doesn't bother with optparse, it's just a single command line option: the new version number.
+# Use with care!
+
+$version = ARGV[0]
+
+def read_pom(file)
+  open(file) do |f|
+    Hpricot.XML(f)
+  end
+end
+
+def write(file, pom)
+  puts "Updating #{file} ..."
+  
+  File.open(file, "w") do |stream|
+    stream << pom
+  end  
+end
+
+def edit_pom(file)
+  pom = read_pom(file)
+  yield pom
+  write(file, pom)
+end
+
+def process_module(mod_name)
+
+  edit_pom("#{mod_name}/pom.xml") do |pom|
+    pom.at("/project/parent/version").inner_html = $version
+  end
+end
+
+puts "Updating to version #{$version} ..."
+
+edit_pom("pom.xml") do |pom|
+  
+  modules = []
+
+  (pom/"project/modules/module").each { |elem| modules << elem.inner_html }
+
+  modules.sort.each { |mod_name| process_module(mod_name) }
+
+  pom.at("/project/version").inner_html = $version
+end
+

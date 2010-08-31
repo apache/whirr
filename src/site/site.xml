@@ -50,10 +50,8 @@
 
     <menu name="Whirr">
       <item name="About" href="index.html"/>
-      <!-- 
       <item name="Download" href="http://www.apache.org/dyn/closer.cgi/incubator/whirr/"/>
       <item name="Release Notes" href="release-notes.html" />
-      -->
       <item name="Road Map" href="https://cwiki.apache.org/confluence/display/WHIRR/RoadMap" />
       <item name="Wiki" href="https://cwiki.apache.org/confluence/display/WHIRR" />
       <item name="FAQ" href="https://cwiki.apache.org/confluence/display/WHIRR/FAQ" />
@@ -71,7 +69,7 @@
     <menu name="Documentation">
       <item name="Quick Start Guide" href="quick-start-guide.html"/>
       <item name="Configuration Guide" href="configuration-guide.html"/>
-      <!-- <item name="Javadoc" href="api/html/index.html"/> -->
+      <item name="Javadoc" href="apidocs/index.html"/>
     </menu>
 
   </body>

@@ -20,13 +20,13 @@
   <parent>
     <groupId>org.apache.whirr</groupId>
     <artifactId>whirr</artifactId>
-    <version>0.1.0-SNAPSHOT</version>
+    <version>0.1.0-incubating-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 
   <groupId>org.apache.whirr</groupId>
   <artifactId>whirr-site</artifactId>
-  <version>0.1.0-SNAPSHOT</version>
+  <version>0.1.0-incubating-SNAPSHOT</version>
   <name>Whirr Site</name>
 
   <dependencies>

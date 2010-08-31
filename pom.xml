@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
    Licensed to the Apache Software Foundation (ASF) under one or more
    contributor license agreements.  See the NOTICE file distributed with
@@ -19,9 +20,8 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.apache.whirr</groupId>
   <artifactId>whirr</artifactId>
+  <version>0.1.0-incubating-SNAPSHOT</version>
   <packaging>pom</packaging>
-  <version>0.1.0-SNAPSHOT</version>
-  <name>Whirr</name>
 
   <modules>
     <module>build-tools</module>
@@ -34,33 +34,29 @@
 
   <build>
     <plugins>
+      <!-- Plugins in alphabetical order: by group then artifact -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <version>2.2-beta-5</version>
         <configuration>
-          <source>1.6</source>
-          <target>1.6</target>
+          <descriptors>
+            <descriptor>build-tools/src/assemble.xml</descriptor>
+          </descriptors>
         </configuration>
-      </plugin>
-
-      <!-- mvn apache-rat:check - runs RAT check on the source -->
-      <plugin>
-        <groupId>org.apache.rat</groupId>
-        <artifactId>apache-rat-plugin</artifactId>
-        <version>0.6</version>
-        <configuration>
-          <excludes>
-            <exclude>**/CHANGES.txt</exclude>
-            <exclude>**/.svn/**</exclude>
-            <exclude>.git/**</exclude>
-            <exclude>.gitignore</exclude>
-            <exclude>**/*.json</exclude>
-            <exclude>**/*.confluence</exclude>
-            <exclude>**/.project</exclude>
-            <exclude>**/META-INF/services/*</exclude>
-            <exclude>**/target/**</exclude>
-          </excludes>
-        </configuration>
+        <executions>
+          <execution>
+            <id>dist-assembly</id>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+            <configuration>
+              <runOnlyAtExecutionRoot>true</runOnlyAtExecutionRoot>
+              <tarLongFileFormat>gnu</tarLongFileFormat>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -70,17 +66,29 @@
           <dependency>
             <groupId>org.apache.whirr</groupId>
             <artifactId>whirr-build-tools</artifactId>
-            <version>0.1.0-SNAPSHOT</version>
+            <version>0.1.0-incubating-SNAPSHOT</version>
           </dependency>
         </dependencies>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
+        <artifactId>maven-compiler-plugin</artifactId>
         <configuration>
-          <excludes>
-            <exclude>**/integration/*Test.java</exclude>
-          </excludes>
+          <source>1.6</source>
+          <target>1.6</target>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>2.3.1</version>
+        <configuration>
+          <archive>
+            <manifest>
+              <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+              <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+            </manifest>
+          </archive>
         </configuration>
       </plugin>
       <plugin>
@@ -107,7 +115,94 @@
           </execution>
         </executions>
       </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-remote-resources-plugin</artifactId>
+        <version>1.0</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>process</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <resourceBundles>
+            <resourceBundle>org.apache:apache-jar-resource-bundle:1.4</resourceBundle>
+          </resourceBundles>
+        </configuration>  
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <excludes>
+            <exclude>**/integration/*Test.java</exclude>
+          </excludes>
+        </configuration>
+      </plugin>
+      <!-- mvn apache-rat:check - runs RAT check on the source -->
+      <plugin>
+        <groupId>org.apache.rat</groupId>
+        <artifactId>apache-rat-plugin</artifactId>
+        <version>0.6</version>
+        <configuration>
+          <excludes>
+            <exclude>**/BUILD.txt</exclude>
+            <exclude>**/CHANGES.txt</exclude>
+            <exclude>**/DISCLAIMER.txt</exclude>
+            <exclude>**/.svn/**</exclude>
+            <exclude>.git/**</exclude>
+            <exclude>.gitignore</exclude>
+            <exclude>**/*.json</exclude>
+            <exclude>**/*.confluence</exclude>
+            <exclude>**/.project</exclude>
+            <exclude>**/META-INF/services/*</exclude>
+            <exclude>**/target/**</exclude>
+          </excludes>
+        </configuration>
+      </plugin>
     </plugins>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-pdf-plugin</artifactId>
+          <version>1.1</version>
+          <dependencies>
+            <dependency>
+              <groupId>org.apache.maven.doxia</groupId>
+              <artifactId>doxia-module-confluence</artifactId>
+              <version>1.1.3</version>
+            </dependency>
+          </dependencies>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-site-plugin</artifactId>
+          <version>2.1.1</version>
+          <dependencies>
+            <dependency>
+              <groupId>org.apache.maven.doxia</groupId>
+              <artifactId>doxia-module-confluence</artifactId>
+              <version>1.1.3</version>
+            </dependency>
+          </dependencies>
+        </plugin>
+      </plugins>
+    </pluginManagement>
   </build>
   <reporting>
     <plugins>
@@ -119,6 +214,228 @@
           <configLocation>checkstyle.xml</configLocation>
         </configuration>
       </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-project-info-reports-plugin</artifactId>
+        <version>2.2</version>
+        <reportSets>
+          <reportSet>
+            <reports>
+              <report>modules</report>
+              <report>project-team</report>
+              <report>mailing-list</report>
+              <report>issue-tracking</report>
+              <report>license</report>
+<!-- for now
+              <report>dependencies</report>
+              <report>cim</report>
+              <report>scm</report>
+-->
+            </reports>
+          </reportSet>
+        </reportSets>
+      </plugin>
     </plugins>
   </reporting>
+  
+  <name>Whirr</name>
+  <description>Libraries for running cloud services</description>
+  <url>http://incubator.apache.org/whirr</url>
+  <inceptionYear>2010</inceptionYear>
+  <licenses>
+    <license>
+      <name>The Apache Software License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+  <organization>
+    <name>Apache Software Foundation</name>
+    <url>http://www.apache.org</url>
+  </organization>
+  <developers>
+    <developer>
+      <id>apurtell</id>
+      <name>Andrew Purtell</name>
+      <organization>Trend Micro</organization>
+      <roles>
+        <role>committer</role>
+      </roles>
+    </developer>
+    <developer>
+      <id>cutting</id>
+      <organization>Cloudera</organization>
+      <name>Doug Cutting</name>
+      <roles>
+        <role>mentor</role>
+      </roles>
+    </developer>
+    <developer>
+      <id>johan</id>
+      <name>Johan Oskarsson</name>
+      <organization>Twitter</organization>
+      <roles>
+        <role>committer</role>
+      </roles>
+    </developer>
+    <developer>
+      <id>phunt</id>
+      <name>Patrick Hunt</name>
+      <organization>Cloudera</organization>
+      <roles>
+        <role>committer</role>
+      </roles>
+    </developer>
+    <developer>
+      <id>stevel</id>
+      <name>Steve Loughran</name>
+      <organization>HP Labs</organization>
+      <roles>
+        <role>mentor</role>
+        <role>committer</role>
+      </roles>
+    </developer>
+    <developer>
+      <id>tomwhite</id>
+      <name>Tom White</name>
+      <organization>Cloudera</organization>
+      <roles>
+        <role>mentor</role>
+        <role>committer</role>
+      </roles>
+    </developer>
+  </developers>
+  <issueManagement>
+    <system>JIRA</system>
+    <url>http://issues.apache.org/jira/browse/WHIRR</url>
+  </issueManagement>
+  <mailingLists>
+    <mailingList>
+      <name>Users</name>
+      <post>whirr-user@incubator.apache.org</post>
+      <subscribe>whirr-user-subscribe@incubator.apache.org</subscribe>
+      <unsubscribe>whirr-user-unsubscribe@incubator.apache.org</unsubscribe>
+      <archive>http://mail-archives.apache.org/mod_mbox/incubator-whirr-user/</archive>
+<!--
+      <otherArchives>
+        <otherArchive>http://whirr-user.917769.n3.nabble.com/</otherArchive>
+      </otherArchives>
+-->
+    </mailingList>
+    <mailingList>
+      <name>Development</name>
+      <post>whirr-dev@incubator.apache.org</post>
+      <subscribe>whirr-dev-subscribe@incubator.apache.org</subscribe>
+      <unsubscribe>whirr-dev-unsubscribe@incubator.apache.org</unsubscribe>
+      <archive>http://mail-archives.apache.org/mod_mbox/incubator-whirr-dev/</archive>
+<!--
+      <otherArchives>
+        <otherArchive>http://whirr-dev.917766.n3.nabble.com/</otherArchive>
+      </otherArchives>
+-->
+    </mailingList>
+    <mailingList>
+      <name>Commits</name>
+      <post>whirr-commits@incubator.apache.org</post>
+      <subscribe>whirr-commits-subscribe@incubator.apache.org</subscribe>
+      <unsubscribe>whirr-commits-unsubscribe@incubator.apache.org</unsubscribe>
+      <archive>http://mail-archives.apache.org/mod_mbox/incubator-whirr-commits/</archive>
+    </mailingList>
+  </mailingLists>
+  <scm>
+    <connection>scm:svn:http://svn.apache.org/repos/asf/incubator/whirr/trunk/</connection>
+    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/incubator/whirr/trunk/</developerConnection>
+    <url>http://svn.apache.org/viewvc/incubator/whirr/trunk/</url>
+  </scm>
+  <repositories>
+    <repository>
+      <id>jclouds</id>
+      <url>http://jclouds.googlecode.com/svn/repo</url>
+    </repository>
+  </repositories>
+  <pluginRepositories>
+    <pluginRepository>
+      <id>apache-snapshots</id>
+      <url>https://repository.apache.org/content/repositories/snapshots</url>
+    </pluginRepository>
+  </pluginRepositories>
+  <distributionManagement>
+    <site>
+      <id>apache.website</id>
+      <url>scpexe://people.apache.org/www/incubator.apache.org/whirr</url>
+    </site>
+    <repository>
+      <id>whirr-repo</id>
+      <name>Whirr staging repo</name>
+      <url>scpexe://people.apache.org/home/tomwhite/public_html/whirr-repo</url>
+    </repository>
+    <snapshotRepository>
+      <id>whirr-snapshot-repo</id>
+      <name>Whirr snapshot staging repo</name>
+      <url>scpexe://people.apache.org/home/tomwhite/public_html/whirr-snapshot-repo</url>
+      <!-- <url>file:///tmp/m2-repo</url> --> <!-- Uncomment to try locally. -->
+    </snapshotRepository>
+  </distributionManagement>
+  <profiles>
+    <profile>
+      <!-- Used only when cutting a full release.  Configures the deploy plugin to mark
+          each artifact as a release (especially important for the archetype). Signs each
+          file deployed (it actually signs way too many files and we have to clean up a bit
+          once deployed). -->
+      <id>deploy</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-gpg-plugin</artifactId>
+              <executions>
+              <execution>
+                <id>sign-artifacts</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>sign</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+      <properties>
+        <update-release-info>true</update-release-info>
+        <!--  Don't re-run tests as part of the deploy build. -->
+        <maven.test.skip>true</maven.test.skip>
+      </properties>
+    </profile>
+    <profile>
+      <!--  Only enable Javadoc when the javadoc profile is active, since it is slow. -->
+      <id>javadoc</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-javadoc-plugin</artifactId>
+            <version>2.7</version>
+            <configuration>
+              <excludePackageNames>org.jclouds.*</excludePackageNames>
+            </configuration>
+            <executions>
+              <execution>
+                <id>aggregate</id>
+                <goals>
+                  <goal>aggregate</goal>
+                </goals>
+                <phase>site</phase>
+              </execution>
+              <execution>
+                <id>attach-javadocs</id>
+                <goals>
+                  <goal>jar</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 </project>
