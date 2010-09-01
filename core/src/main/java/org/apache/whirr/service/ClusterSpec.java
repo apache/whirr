@@ -18,7 +18,11 @@
 
 package org.apache.whirr.service;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
+import static org.jclouds.http.Payloads.newStringPayload;
+import static org.jclouds.http.Payloads.newFilePayload;
+import static org.jclouds.util.Utils.toStringAndClose;
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Objects;
@@ -32,7 +36,9 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
+import org.jclouds.http.Payload;
 
 /**
  * This class represents the specification of a cluster. It is used to describe
@@ -47,7 +53,8 @@ public class ClusterSpec {
     CREDENTIAL(String.class, false),
     IDENTITY(String.class, false),
     CLUSTER_NAME(String.class, false),
-    SECRET_KEY_FILE(String.class, false),
+    PUBLIC_KEY_FILE(String.class, false),
+    PRIVATE_KEY_FILE(String.class, false),
     CLIENT_CIDRS(String.class, true);
     
     private Class<?> type;
@@ -136,11 +143,17 @@ public class ClusterSpec {
   private String identity;
   private String credential;
   private String clusterName;
-  private String secretKeyFile;
+  private Payload privateKey;
+  private Payload publicKey;
   private List<String> clientCidrs = Lists.newArrayList();
   private Configuration config = new PropertiesConfiguration();
   
-  public static ClusterSpec fromConfiguration(Configuration config) {
+  /**
+   * 
+   * @throws ConfigurationException if the public or private key cannot be read.
+   */
+  public static ClusterSpec fromConfiguration(Configuration config)
+  throws ConfigurationException {
     ClusterSpec spec = new ClusterSpec();
     spec.setServiceName(config.getString(Property.SERVICE_NAME.getConfigName()));
     spec.setInstanceTemplates(InstanceTemplate.parse(
@@ -150,7 +163,20 @@ public class ClusterSpec {
         config.getString(Property.IDENTITY.getConfigName()), Property.IDENTITY));
     spec.setCredential(config.getString(Property.CREDENTIAL.getConfigName()));
     spec.setClusterName(config.getString(Property.CLUSTER_NAME.getConfigName()));
-    spec.setSecretKeyFile(config.getString(Property.SECRET_KEY_FILE.getConfigName()));
+    try {
+      String privateKeyPath = config.getString(
+          Property.PRIVATE_KEY_FILE.getConfigName());
+      if (privateKeyPath != null)
+        spec.setPrivateKey(new File(privateKeyPath));
+      String publicKeyPath = config.getString(Property.PUBLIC_KEY_FILE.
+               getConfigName());
+      publicKeyPath = publicKeyPath == null && privateKeyPath != null ?
+                privateKeyPath + ".pub" : publicKeyPath;
+      if (publicKeyPath != null)
+        spec.setPublicKey(new File(publicKeyPath));
+    } catch (IOException e) {
+      throw new ConfigurationException("error reading key from file", e);
+    }
     spec.setClientCidrs(config.getList(Property.CLIENT_CIDRS.getConfigName()));
     spec.config = config;
     return spec;
@@ -188,8 +214,25 @@ public class ClusterSpec {
   public String getClusterName() {
     return clusterName;
   }
-  public String getSecretKeyFile() {
-    return secretKeyFile;
+  public Payload getPrivateKey() {
+    return privateKey;
+  }
+  public Payload getPublicKey() {
+    return publicKey;
+  }
+  /**
+   * @see #getPrivateKey
+   * @throws IOException if the payload cannot be read
+   */
+  public String readPrivateKey() throws IOException {
+    return toStringAndClose(getPrivateKey().getContent());
+  }
+  /**
+   * @see #getPublicKey
+   * @throws IOException if the payload cannot be read
+   */
+  public String readPublicKey() throws IOException {
+    return toStringAndClose(getPublicKey().getContent());
   }
   public List<String> getClientCidrs() {
     return clientCidrs;
@@ -219,8 +262,50 @@ public class ClusterSpec {
     this.clusterName = clusterName;
   }
 
-  public void setSecretKeyFile(String secretKeyFile) {
-    this.secretKeyFile = secretKeyFile;
+  /**
+   * The rsa public key which is authorized to login to your on the cloud nodes.
+   * 
+   * @param publicKey
+   */
+  public void setPublicKey(String publicKey) {
+    checkArgument(checkNotNull(publicKey, "publicKey").startsWith("ssh-rsa"),
+        "key should start with ssh-rsa");
+    this.publicKey = newStringPayload(publicKey);
+  }
+  
+  /**
+   * 
+   * @throws IOException
+   *           if there is a problem reading the file
+   * @see #setPublicKey(String)
+   */
+  public void setPublicKey(File publicKey) throws IOException {
+    this.publicKey = newFilePayload(checkNotNull(publicKey,
+        "publicKey"));
+  }
+
+  /**
+   * The rsa private key which is used as the login identity on the cloud 
+   * nodes.
+   * 
+   * @param privateKey
+   */
+  public void setPrivateKey(String privateKey) {
+    checkArgument(checkNotNull(privateKey, "privateKey")
+        .startsWith("-----BEGIN RSA PRIVATE KEY-----"),
+        "key should start with -----BEGIN RSA PRIVATE KEY-----");
+    this.privateKey = newStringPayload(privateKey);
+  }
+
+  /**
+   * 
+   * @throws IOException
+   *           if there is a problem reading the file
+   * @see #setPrivateKey(String)
+   */
+  public void setPrivateKey(File privateKey) throws IOException {
+    this.privateKey = newFilePayload(
+        checkNotNull(privateKey, "privateKey"));
   }
 
   public void setClientCidrs(List<String> clientCidrs) {
@@ -232,15 +317,7 @@ public class ClusterSpec {
   public Configuration getConfiguration() {
     return config;
   }
-  
-  public String readPrivateKey() throws IOException {
-    return Files.toString(new File(getSecretKeyFile()), Charsets.UTF_8);
-  }
     
-  public String readPublicKey() throws IOException {
-    return Files.toString(new File(getSecretKeyFile() + ".pub"), Charsets.UTF_8);
-  }
-  
   public boolean equals(Object o) {
     if (o instanceof ClusterSpec) {
       ClusterSpec that = (ClusterSpec) o;
@@ -250,7 +327,6 @@ public class ClusterSpec {
         && Objects.equal(identity, that.identity)
         && Objects.equal(credential, that.credential)
         && Objects.equal(clusterName, that.clusterName)
-        && Objects.equal(secretKeyFile, that.secretKeyFile)
         && Objects.equal(clientCidrs, that.clientCidrs);
     }
     return false;
@@ -258,8 +334,8 @@ public class ClusterSpec {
   
   public int hashCode() {
     return Objects.hashCode(instanceTemplates, serviceName,
-        provider, identity, credential, clusterName, secretKeyFile,
-        clientCidrs);
+        provider, identity, credential, clusterName, publicKey,
+        privateKey, clientCidrs);
   }
   
   public String toString() {
@@ -270,7 +346,8 @@ public class ClusterSpec {
       .add("identity", identity)
       .add("credential", credential)
       .add("clusterName", clusterName)
-      .add("secretKeyFile", secretKeyFile)
+      .add("publicKey", publicKey)
+      .add("privateKey", privateKey)
       .add("clientCidrs", clientCidrs)
       .toString();
   }

@@ -18,13 +18,18 @@
 
 package org.apache.whirr.service.hadoop;
 
+import static com.google.common.base.Preconditions.checkState;
+
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
 import org.apache.whirr.service.ClusterSpec;
 
 import com.google.common.collect.Iterables;
+import com.google.common.io.ByteStreams;
+import com.google.common.io.Files;
 
 public class HadoopProxy {
 
@@ -40,11 +45,19 @@ public class HadoopProxy {
   public void start() throws IOException {
     // jsch doesn't support SOCKS-based dynamic port forwarding, so we need to shell out...
     // TODO: Use static port forwarding instead?
-    String identityFile = clusterSpec.getSecretKeyFile();
+    checkState(clusterSpec.getPrivateKey() != null, "privateKey is needed");
+    File identity;
+    if (clusterSpec.getPrivateKey().getRawContent() instanceof File) {
+      identity = File.class.cast(clusterSpec.getPrivateKey().getRawContent());
+    } else {
+      identity = File.createTempFile("hadoop", "key");
+      identity.deleteOnExit();
+      Files.write(ByteStreams.toByteArray(clusterSpec.getPrivateKey().getContent()), identity);
+    }
     String user = Iterables.get(cluster.getInstances(), 0).getLoginCredentials().account;
     String server = cluster.getNamenodePublicAddress().getHostName();
     String[] command = new String[] { "ssh",
-      "-i", identityFile,
+      "-i", identity.getAbsolutePath(),
       "-o", "ConnectTimeout=10",
       "-o", "ServerAliveInterval=60",
       "-o", "StrictHostKeyChecking=no",

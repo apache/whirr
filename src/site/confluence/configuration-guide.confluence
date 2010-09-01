@@ -33,7 +33,7 @@ h2. Comparison
 | {{cloud-provider}} | {{provider}} | |
 | none | {{identity}} | Specified using environment variables for Python. E.g. {{AWS\_ACCESS\_KEY\_ID}}, {{RACKSPACE\_KEY}} |
 | none | {{credential}} | Specified using environment variables for Python. E.g. {{AWS\_ACCESS\_KEY\_ID}}, {{RACKSPACE\_SECRET}} |
-| {{private-key-file}} | {{secret-key-file}} | |
+| {{private-key-file}} | {{private-key-file}} | |
 | {{client-cidr}} | {{client-cidrs}} | Python {{client-cidr}} option may be repeated multiple times, whereas Java {{client-cidrs}} contains comma-separated CIDRs. |
 | {{public-key}} | none | Based on secret key in Java (add {{.pub}}). |
 | {{image-id}} | none | Need to add to Java. Along with more flexible image matching (pattern, OS, arch). See jclouds TemplateBuilder. |

@@ -55,6 +55,8 @@ Trunk (unreleased changes)
 
     WHIRR-77. Document and implement release process. (tomwhite)
 
+    WHIRR-70. decouple keypairs from the files that hold them. (Adrian Cole via tomwhite)
+
   BUG FIXES
 
     WHIRR-50. Cassandra POM should depend on top-level. (tomwhite)

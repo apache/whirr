@@ -28,9 +28,12 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.google.common.collect.Sets;
+import com.google.common.io.ByteStreams;
+import com.google.common.io.Files;
 import com.google.inject.internal.Lists;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.PrintStream;
 import java.util.Collections;
 
@@ -82,13 +85,24 @@ public class LaunchClusterCommandTest {
     
     LaunchClusterCommand command = new LaunchClusterCommand(factory);
     
+    File privateKeyFile = File.createTempFile("private", "key");
+    privateKeyFile.deleteOnExit();
+    Files.write("-----BEGIN RSA PRIVATE KEY-----".getBytes(),
+             privateKeyFile);
+    
+    File publicKeyFile = File.createTempFile("public", "key");
+    publicKeyFile.deleteOnExit();
+    Files.write("ssh-rsa".getBytes(), publicKeyFile);
+    
     int rc = command.run(null, out, null, Lists.newArrayList(
         "--service-name", "test-service",
         "--cluster-name", "test-cluster",
         "--instance-templates", "1 role1+role2,2 role3",
         "--provider", "rackspace",
         "--identity", "myusername", "--credential", "mypassword",
-        "--secret-key-file", "secret-key"));
+        "--private-key-file", privateKeyFile.getAbsolutePath(),
+        "--public-key-file", publicKeyFile.getAbsolutePath()
+        ));
     
     assertThat(rc, is(0));
 
@@ -102,7 +116,8 @@ public class LaunchClusterCommandTest {
     expectedClusterSpec.setIdentity("myusername");
     expectedClusterSpec.setCredential("mypassword");
     expectedClusterSpec.setClusterName("test-cluster");
-    expectedClusterSpec.setSecretKeyFile("secret-key");
+    expectedClusterSpec.setPrivateKey(privateKeyFile);
+    expectedClusterSpec.setPublicKey(publicKeyFile);
     
     verify(factory).create("test-service");
     
