@@ -65,3 +65,5 @@ Trunk (unreleased changes)
     fail for stopped instances). (tomwhite)
 
     WHIRR-71. Only allow access to clusters from defined networks. (tomwhite)
+
+    WHIRR-79. Hadoop service is broken. (tomwhite)

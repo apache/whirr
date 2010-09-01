@@ -134,7 +134,8 @@ public class HadoopService extends Service {
     // Launch slaves (DN and TT)
     byte[] slaveBootScript = RunUrlBuilder.runUrls(
       "sun/java/install",
-      String.format("cloudera/cdh/install dn,tt -n %s -j %s",
+      String.format("%s dn,tt -n %s -j %s",
+          hadoopInstallRunUrl,
           namenodePublicAddress.getHostName(),
           jobtrackerPublicAddress.getHostName()));
 
