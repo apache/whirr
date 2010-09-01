@@ -72,3 +72,5 @@ Trunk (unreleased changes)
     WHIRR-71. Only allow access to clusters from defined networks. (tomwhite)
 
     WHIRR-79. Hadoop service is broken. (tomwhite)
+
+    WHIRR-82. Integration tests should not run on "mvn install". (tomwhite)

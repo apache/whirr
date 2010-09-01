@@ -140,29 +140,6 @@
       <!-- Plugins in alphabetical order: by group then artifact -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-assembly-plugin</artifactId>
-        <version>2.2-beta-5</version>
-        <configuration>
-          <descriptors>
-            <descriptor>build-tools/src/assemble.xml</descriptor>
-          </descriptors>
-        </configuration>
-        <executions>
-          <execution>
-            <id>dist-assembly</id>
-            <phase>package</phase>
-            <goals>
-              <goal>single</goal>
-            </goals>
-            <configuration>
-              <runOnlyAtExecutionRoot>true</runOnlyAtExecutionRoot>
-              <tarLongFileFormat>gnu</tarLongFileFormat>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
         <version>2.5</version>
         <dependencies>
@@ -196,25 +173,18 @@
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-failsafe-plugin</artifactId>
-        <version>2.5</version>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <version>2.7</version>
         <configuration>
-          <includes>
-            <include>**/integration/*Test.java</include>
-          </includes>
+          <excludePackageNames>org.jclouds.*</excludePackageNames>
         </configuration>
         <executions>
           <execution>
-            <id>integration-test</id>
+            <id>aggregate</id>
             <goals>
-              <goal>integration-test</goal>
+              <goal>aggregate</goal>
             </goals>
-          </execution>
-          <execution>
-            <id>verify</id>
-            <goals>
-              <goal>verify</goal>
-            </goals>
+            <phase>site</phase>
           </execution>
         </executions>
       </plugin>
@@ -510,7 +480,7 @@
       </properties>
     </profile>
     <profile>
-      <!--  Only enable Javadoc when the javadoc profile is active, since it is slow. -->
+      <!--  Only bind Javadoc JARs when the javadoc profile is active, since it is slow. -->
       <id>javadoc</id>
       <build>
         <plugins>
@@ -534,6 +504,70 @@
                 <goals>
                   <goal>jar</goal>
                 </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <!--  Run integration tests against real cloud providers. -->
+      <id>integration</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-failsafe-plugin</artifactId>
+            <version>2.5</version>
+            <configuration>
+              <includes>
+                <include>**/integration/*Test.java</include>
+              </includes>
+            </configuration>
+            <executions>
+              <execution>
+                <id>integration-test</id>
+                <goals>
+                  <goal>integration-test</goal>
+                </goals>
+              </execution>
+              <execution>
+                <id>verify</id>
+                <goals>
+                  <goal>verify</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>        
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <!-- Build the source distribution. This is written as a profile
+      since it doesn't work in child modules. -->
+      <id>package</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-assembly-plugin</artifactId>
+            <version>2.2-beta-5</version>
+            <configuration>
+              <descriptors>
+                <descriptor>build-tools/src/assemble.xml</descriptor>
+              </descriptors>
+            </configuration>
+            <executions>
+              <execution>
+                <id>dist-assembly</id>
+                <phase>package</phase>
+                <goals>
+                  <goal>single</goal>
+                </goals>
+                <configuration>
+                  <runOnlyAtExecutionRoot>true</runOnlyAtExecutionRoot>
+                  <tarLongFileFormat>gnu</tarLongFileFormat>
+                </configuration>
               </execution>
             </executions>
           </plugin>
