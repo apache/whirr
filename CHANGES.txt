@@ -55,7 +55,10 @@ Trunk (unreleased changes)
 
     WHIRR-77. Document and implement release process. (tomwhite)
 
-    WHIRR-70. decouple keypairs from the files that hold them. (Adrian Cole via tomwhite)
+    WHIRR-70. decouple keypairs from the files that hold them.
+    (Adrian Cole via tomwhite)
+
+    WHIRR-80. Clean up POM dependencies. (tomwhite)
 
   BUG FIXES
 
