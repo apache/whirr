@@ -1,5 +1,7 @@
 Apache Whirr Change Log
 
+Trunk (unreleased changes)
+
 Release 0.1.0 - 2010-09-02
 
   INCOMPATIBLE CHANGES
