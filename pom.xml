@@ -20,7 +20,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.apache.whirr</groupId>
   <artifactId>whirr</artifactId>
-  <version>0.1.0-incubating-SNAPSHOT</version>
+  <version>0.1.0-incubating</version>
   <packaging>pom</packaging>
 
   <modules>
@@ -145,7 +145,7 @@
           <dependency>
             <groupId>org.apache.whirr</groupId>
             <artifactId>whirr-build-tools</artifactId>
-            <version>0.1.0-incubating-SNAPSHOT</version>
+            <version>0.1.0-incubating</version>
           </dependency>
         </dependencies>
       </plugin>

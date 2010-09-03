@@ -22,5 +22,122 @@
     </properties>
     <body>
     <!-- Paste release notes from https://issues.apache.org/jira/browse/WHIRR here. -->
+
+
+	        <h1>Release Notes - Whirr - Version 0.1.0</h1>
+
+	<h2>        Sub-task
+	</h2>
+	<ul>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-40'>WHIRR-40</a>] -         fill in getting started documentation - getting-started.confluence
+	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-77'>WHIRR-77</a>] -         Document and implement release process
+	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-78'>WHIRR-78</a>] -         Add KEYS file to distribution directory
+	</li>
+	</ul>
+
+	<h2>        Bug
+	</h2>
+	<ul>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-4'>WHIRR-4</a>] -         hadoop-cloud push command invokes proxy creation
+	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-37'>WHIRR-37</a>] -         Don't require manual installation of Apache RAT to compile
+	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-48'>WHIRR-48</a>] -         Fix RAT warnings due to site files
+	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-50'>WHIRR-50</a>] -         Cassandra POM should depend on top-level
+	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-65'>WHIRR-65</a>] -         Workaround bug 331 in jclouds (Some EC2ComputeService operations fail for stopped instances)
+	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-71'>WHIRR-71</a>] -         Only allow access to clusters from defined networks
+	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-79'>WHIRR-79</a>] -         Hadoop service is broken
+	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-82'>WHIRR-82</a>] -         Integration tests should not run on &quot;mvn install&quot;
+	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-84'>WHIRR-84</a>] -         Log4j is missing from the CLI JAR
+	</li>
+	</ul>
+
+	<h2>        Improvement
+	</h2>
+	<ul>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-8'>WHIRR-8</a>] -         Create ant build for running EC2 unit tests
+	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-9'>WHIRR-9</a>] -         Support additional security group option in hadoop-ec2 script
+	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-10'>WHIRR-10</a>] -         Create setup.py for EC2 cloud scripts
+	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-20'>WHIRR-20</a>] -         Generate RAT report
+	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-21'>WHIRR-21</a>] -         Enforce source code style
+	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-22'>WHIRR-22</a>] -         Separate unit and integration (system) tests
+	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-23'>WHIRR-23</a>] -         Upgrade to jclouds 1.0-beta-6 
+	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-26'>WHIRR-26</a>] -         Allow script locations to be overridden
+	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-31'>WHIRR-31</a>] -         Add Whirr quick start to README.txt and website (once it's live)
+	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-32'>WHIRR-32</a>] -         Update POM to point to Apache RAT 0.8-SNAPSHOT
+	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-34'>WHIRR-34</a>] -         Open up ports 50010 (JobTracker) and 50070 (NameNode) for the Hadoop Service
+	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-38'>WHIRR-38</a>] -         Add core javadoc
+	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-47'>WHIRR-47</a>] -         Create a Service factory
+	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-51'>WHIRR-51</a>] -         Allow the Hadoop service to be run on Rackspace Cloud servers
+	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-53'>WHIRR-53</a>] -         Adopt the standard Java SPI interface
+	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-54'>WHIRR-54</a>] -         Implement service/cdh
+	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-58'>WHIRR-58</a>] -         introduce naming consistency for cloud service providers
+	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-64'>WHIRR-64</a>] -         Unify ClusterSpec and ServiceSpec
+	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-70'>WHIRR-70</a>] -         decouple keypairs from the files that hold them
+	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-75'>WHIRR-75</a>] -         Use Commons Configuration to manage cluster specs
+	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-80'>WHIRR-80</a>] -         Clean up POM dependencies
+	</li>
+	</ul>
+
+	<h2>        New Feature
+	</h2>
+	<ul>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-3'>WHIRR-3</a>] -         Add support for EBS storage on EC2
+	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-5'>WHIRR-5</a>] -         Run namenode and jobtracker on separate EC2 instances
+	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-6'>WHIRR-6</a>] -         Write a Rackspace cloud provider
+	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-7'>WHIRR-7</a>] -         Add a ZooKeeper service to the cloud scripts
+	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-27'>WHIRR-27</a>] -         Add Cassandra service
+	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-33'>WHIRR-33</a>] -         Add a CLI
+	</li>
+	</ul>
+
+	<h2>        Task
+	</h2>
+	<ul>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-1'>WHIRR-1</a>] -         Import initial source code from Hadoop contrib
+	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-2'>WHIRR-2</a>] -         Import initial Java source code
+	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-19'>WHIRR-19</a>] -         Create project website
+	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-29'>WHIRR-29</a>] -         Add target directories to svn ignore
+	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-46'>WHIRR-46</a>] -         Release version 0.1.0
+	</li>
+	</ul>
+
     </body>
 </document>
