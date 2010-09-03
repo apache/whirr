@@ -76,3 +76,5 @@ Release 0.1.0 - 2010-09-02
     WHIRR-79. Hadoop service is broken. (tomwhite)
 
     WHIRR-82. Integration tests should not run on "mvn install". (tomwhite)
+
+    WHIRR-84. Log4j is missing from the CLI JAR. (tomwhite)
