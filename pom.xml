@@ -18,10 +18,22 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
+  
+  <parent>
+    <groupId>org.apache</groupId>
+    <artifactId>apache</artifactId>
+    <version>7</version>
+  </parent> 
+
   <groupId>org.apache.whirr</groupId>
   <artifactId>whirr</artifactId>
   <version>0.1.0-incubating</version>
   <packaging>pom</packaging>
+  
+  <name>Whirr</name>
+  <description>Libraries for running cloud services</description>
+  <url>http://incubator.apache.org/whirr</url>
+  <inceptionYear>2010</inceptionYear>
 
   <modules>
     <module>build-tools</module>
@@ -156,6 +168,26 @@
           <source>1.6</source>
           <target>1.6</target>
         </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-enforcer-plugin</artifactId>
+        <version>1.0-beta-1</version>
+        <executions>
+          <execution>
+            <id>enforce-java</id>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+            <configuration>
+              <rules>
+                <requireMavenVersion>
+                  <version>[2.2.1,)</version>
+                </requireMavenVersion>
+              </rules>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -309,22 +341,7 @@
       </plugin>
     </plugins>
   </reporting>
-  
-  <name>Whirr</name>
-  <description>Libraries for running cloud services</description>
-  <url>http://incubator.apache.org/whirr</url>
-  <inceptionYear>2010</inceptionYear>
-  <licenses>
-    <license>
-      <name>The Apache Software License, Version 2.0</name>
-      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-      <distribution>repo</distribution>
-    </license>
-  </licenses>
-  <organization>
-    <name>Apache Software Foundation</name>
-    <url>http://www.apache.org</url>
-  </organization>
+
   <developers>
     <developer>
       <id>apurtell</id>
@@ -421,6 +438,14 @@
   </scm>
   <repositories>
     <repository>
+      <id>apache.snapshots</id>
+      <name>Apache Snapshot Repository</name>
+      <url>http://repository.apache.org/snapshots</url>
+      <releases>
+        <enabled>false</enabled>
+      </releases>
+    </repository>
+    <repository>
       <id>jclouds</id>
       <url>http://jclouds.googlecode.com/svn/repo</url>
     </repository>
@@ -436,17 +461,6 @@
       <id>apache.website</id>
       <url>scpexe://people.apache.org/www/incubator.apache.org/whirr</url>
     </site>
-    <repository>
-      <id>whirr-repo</id>
-      <name>Whirr staging repo</name>
-      <url>scpexe://people.apache.org/home/tomwhite/public_html/whirr-repo</url>
-    </repository>
-    <snapshotRepository>
-      <id>whirr-snapshot-repo</id>
-      <name>Whirr snapshot staging repo</name>
-      <url>scpexe://people.apache.org/home/tomwhite/public_html/whirr-snapshot-repo</url>
-      <!-- <url>file:///tmp/m2-repo</url> --> <!-- Uncomment to try locally. -->
-    </snapshotRepository>
   </distributionManagement>
   <profiles>
     <profile>

@@ -60,6 +60,9 @@ Release 0.1.0 - 2010-09-02
 
     WHIRR-80. Clean up POM dependencies. (tomwhite)
 
+    WHIRR-85. Publish Maven artifacts to http://repository.apache.org.
+    (tomwhite)
+
   BUG FIXES
 
     WHIRR-50. Cassandra POM should depend on top-level. (tomwhite)
