@@ -79,3 +79,6 @@ Release 0.1.0 - 2010-09-02
     WHIRR-82. Integration tests should not run on "mvn install". (tomwhite)
 
     WHIRR-84. Log4j is missing from the CLI JAR. (tomwhite)
+
+    WHIRR-86. Update quick start documentation to work with release 0.1.0.
+    (tomwhite)
