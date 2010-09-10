@@ -23,7 +23,6 @@
     <body>
     <!-- Paste release notes from https://issues.apache.org/jira/browse/WHIRR here. -->
 
-
 	        <h1>Release Notes - Whirr - Version 0.1.0</h1>
 
 	<h2>        Sub-task
@@ -34,6 +33,10 @@
 	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-77'>WHIRR-77</a>] -         Document and implement release process
 	</li>
 	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-78'>WHIRR-78</a>] -         Add KEYS file to distribution directory
+	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-85'>WHIRR-85</a>] -         Publish Maven artifacts to http://repository.apache.org
+	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-86'>WHIRR-86</a>] -         Update quick start documentation to work with release 0.1.0
 	</li>
 	</ul>
 
