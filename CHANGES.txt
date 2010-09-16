@@ -2,6 +2,10 @@ Apache Whirr Change Log
 
 Trunk (unreleased changes)
 
+  IMPROVEMENTS
+
+    WHIRR-89. Support maven 3 builds. (Adrian Cole via tomwhite)
+
 Release 0.1.0 - 2010-09-02
 
   INCOMPATIBLE CHANGES
@@ -84,3 +88,4 @@ Release 0.1.0 - 2010-09-02
 
     WHIRR-86. Update quick start documentation to work with release 0.1.0.
     (tomwhite)
+
