@@ -127,11 +127,11 @@ public class HadoopServiceTest {
       ClusterStatus clusterStatus = client.getClusterStatus();
       int taskTrackerCount = clusterStatus.getTaskTrackers();
       if (taskTrackerCount > 0) {
-	break;
+        break;
       }
       try {
-	System.out.print(".");
-	Thread.sleep(1000);
+        System.out.print(".");
+        Thread.sleep(1000);
       } catch (InterruptedException e) {
         break;
       }

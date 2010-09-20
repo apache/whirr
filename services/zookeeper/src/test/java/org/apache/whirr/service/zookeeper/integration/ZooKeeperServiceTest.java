@@ -26,7 +26,6 @@ import java.io.IOException;
 import java.util.concurrent.CountDownLatch;
 
 import org.apache.commons.configuration.CompositeConfiguration;
-import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.whirr.service.ClusterSpec;
@@ -73,25 +72,25 @@ public class ZooKeeperServiceTest {
       private CountDownLatch latch = new CountDownLatch(1);
       
       public void connect(String hosts) throws IOException, InterruptedException {
-	zk = new ZooKeeper(hosts, 5000, this);
-	latch.await();
+        zk = new ZooKeeper(hosts, 5000, this);
+        latch.await();
       }
       
       public ZooKeeper getZooKeeper() {
-	return zk;
+        return zk;
       }
       
       @Override
       public void process(WatchedEvent event) {
-	if (event.getState() == KeeperState.SyncConnected) {
-	  latch.countDown();
-	}
+        if (event.getState() == KeeperState.SyncConnected) {
+          latch.countDown();
+        }
       }
       
       public void close() throws InterruptedException {
-	if (zk != null) {
-	  zk.close();
-	}
+        if (zk != null) {
+          zk.close();
+        }
       }
       
     }

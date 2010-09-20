@@ -24,11 +24,9 @@ import static org.jclouds.http.Payloads.newStringPayload;
 import static org.jclouds.http.Payloads.newFilePayload;
 import static org.jclouds.util.Utils.toStringAndClose;
 
-import com.google.common.base.Charsets;
 import com.google.common.base.Objects;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import com.google.common.io.Files;
 
 import java.io.File;
 import java.io.IOException;
