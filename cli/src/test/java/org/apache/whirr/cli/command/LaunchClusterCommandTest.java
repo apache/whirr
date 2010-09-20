@@ -18,7 +18,6 @@
 
 package org.apache.whirr.cli.command;
 
-import static org.apache.whirr.service.ClusterSpec.Property.INSTANCE_TEMPLATES;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
@@ -28,7 +27,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.google.common.collect.Sets;
-import com.google.common.io.ByteStreams;
 import com.google.common.io.Files;
 import com.google.inject.internal.Lists;
 
@@ -37,8 +35,6 @@ import java.io.File;
 import java.io.PrintStream;
 import java.util.Collections;
 
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.whirr.service.Cluster;
 import org.apache.whirr.service.ClusterSpec;
 import org.apache.whirr.service.Service;

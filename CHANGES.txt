@@ -6,6 +6,10 @@ Trunk (unreleased changes)
 
     WHIRR-89. Support maven 3 builds. (Adrian Cole via tomwhite)
 
+  BUG FIXES
+
+    WHIRR-93. Fail on checkstyle violation. (tomwhite)
+
 Release 0.1.0 - 2010-09-02
 
   INCOMPATIBLE CHANGES
