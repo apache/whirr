@@ -56,7 +56,7 @@ public class ZooKeeperServiceTest {
       config.addConfiguration(new PropertiesConfiguration(System.getProperty("config")));
     }
     config.addConfiguration(new PropertiesConfiguration("whirr-zookeeper-test.properties"));
-    clusterSpec = ClusterSpec.fromConfiguration(config);
+    clusterSpec = new ClusterSpec(config);
     Service s = new ServiceFactory().create(clusterSpec.getServiceName());
     assertThat(s, instanceOf(ZooKeeperService.class));
     service = (ZooKeeperService) s;

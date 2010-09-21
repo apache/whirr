@@ -33,6 +33,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
@@ -53,7 +54,8 @@ public class ClusterSpec {
     CLUSTER_NAME(String.class, false),
     PUBLIC_KEY_FILE(String.class, false),
     PRIVATE_KEY_FILE(String.class, false),
-    CLIENT_CIDRS(String.class, true);
+    CLIENT_CIDRS(String.class, true),
+    RUN_URL_BASE(String.class, false);
     
     private Class<?> type;
     private boolean multipleArguments;
@@ -134,8 +136,10 @@ public class ClusterSpec {
       return templates;
     }
   }
+
+  private static final String DEFAULT_PROPERTIES = "whirr-default.properties";
   
-  private List<InstanceTemplate> instanceTemplates = Lists.newArrayList();
+  private List<InstanceTemplate> instanceTemplates;
   private String serviceName;
   private String provider;
   private String identity;
@@ -143,41 +147,48 @@ public class ClusterSpec {
   private String clusterName;
   private Payload privateKey;
   private Payload publicKey;
-  private List<String> clientCidrs = Lists.newArrayList();
-  private Configuration config = new PropertiesConfiguration();
+  private List<String> clientCidrs;
+  private String runUrlBase;
+  
+  private Configuration config;
+  
+  public ClusterSpec() throws ConfigurationException {
+    this(new PropertiesConfiguration());
+  }
   
   /**
    * 
    * @throws ConfigurationException if the public or private key cannot be read.
    */
-  public static ClusterSpec fromConfiguration(Configuration config)
-  throws ConfigurationException {
-    ClusterSpec spec = new ClusterSpec();
-    spec.setServiceName(config.getString(Property.SERVICE_NAME.getConfigName()));
-    spec.setInstanceTemplates(InstanceTemplate.parse(
-        config.getStringArray(Property.INSTANCE_TEMPLATES.getConfigName())));
-    spec.setProvider(config.getString(Property.PROVIDER.getConfigName()));
-    spec.setIdentity(checkNotNull(
-        config.getString(Property.IDENTITY.getConfigName()), Property.IDENTITY));
-    spec.setCredential(config.getString(Property.CREDENTIAL.getConfigName()));
-    spec.setClusterName(config.getString(Property.CLUSTER_NAME.getConfigName()));
+  public ClusterSpec(Configuration config)
+      throws ConfigurationException {
+    CompositeConfiguration c = new CompositeConfiguration();
+    c.addConfiguration(config);
+    c.addConfiguration(new PropertiesConfiguration(DEFAULT_PROPERTIES));
+    setServiceName(c.getString(Property.SERVICE_NAME.getConfigName()));
+    setInstanceTemplates(InstanceTemplate.parse(
+        c.getStringArray(Property.INSTANCE_TEMPLATES.getConfigName())));
+    setProvider(c.getString(Property.PROVIDER.getConfigName()));
+    setIdentity(c.getString(Property.IDENTITY.getConfigName()));
+    setCredential(c.getString(Property.CREDENTIAL.getConfigName()));
+    setClusterName(c.getString(Property.CLUSTER_NAME.getConfigName()));
     try {
-      String privateKeyPath = config.getString(
+      String privateKeyPath = c.getString(
           Property.PRIVATE_KEY_FILE.getConfigName());
       if (privateKeyPath != null)
-        spec.setPrivateKey(new File(privateKeyPath));
-      String publicKeyPath = config.getString(Property.PUBLIC_KEY_FILE.
+        setPrivateKey(new File(privateKeyPath));
+      String publicKeyPath = c.getString(Property.PUBLIC_KEY_FILE.
                getConfigName());
       publicKeyPath = publicKeyPath == null && privateKeyPath != null ?
                 privateKeyPath + ".pub" : publicKeyPath;
       if (publicKeyPath != null)
-        spec.setPublicKey(new File(publicKeyPath));
+        setPublicKey(new File(publicKeyPath));
     } catch (IOException e) {
       throw new ConfigurationException("error reading key from file", e);
     }
-    spec.setClientCidrs(config.getList(Property.CLIENT_CIDRS.getConfigName()));
-    spec.config = config;
-    return spec;
+    setClientCidrs(c.getList(Property.CLIENT_CIDRS.getConfigName()));
+    setRunUrlBase(c.getString(Property.RUN_URL_BASE.getConfigName()));
+    this.config = c;
   }
 
   public List<InstanceTemplate> getInstanceTemplates() {
@@ -234,6 +245,10 @@ public class ClusterSpec {
   }
   public List<String> getClientCidrs() {
     return clientCidrs;
+  }
+  
+  public String getRunUrlBase() {
+    return runUrlBase;
   }
   
   public void setInstanceTemplates(List<InstanceTemplate> instanceTemplates) {
@@ -310,6 +325,10 @@ public class ClusterSpec {
     this.clientCidrs = clientCidrs;
   }
 
+  public void setRunUrlBase(String runUrlBase) {
+    this.runUrlBase = runUrlBase;
+  }
+  
   //
   
   public Configuration getConfiguration() {
@@ -325,7 +344,9 @@ public class ClusterSpec {
         && Objects.equal(identity, that.identity)
         && Objects.equal(credential, that.credential)
         && Objects.equal(clusterName, that.clusterName)
-        && Objects.equal(clientCidrs, that.clientCidrs);
+        && Objects.equal(clientCidrs, that.clientCidrs)
+        && Objects.equal(runUrlBase, that.runUrlBase)
+        ;
     }
     return false;
   }
@@ -333,7 +354,7 @@ public class ClusterSpec {
   public int hashCode() {
     return Objects.hashCode(instanceTemplates, serviceName,
         provider, identity, credential, clusterName, publicKey,
-        privateKey, clientCidrs);
+        privateKey, clientCidrs, runUrlBase);
   }
   
   public String toString() {
@@ -347,6 +368,7 @@ public class ClusterSpec {
       .add("publicKey", publicKey)
       .add("privateKey", privateKey)
       .add("clientCidrs", clientCidrs)
+      .add("runUrlBase", runUrlBase)
       .toString();
   }
   

@@ -71,7 +71,7 @@ public class HadoopServiceTest {
       config.addConfiguration(new PropertiesConfiguration(System.getProperty("config")));
     }
     config.addConfiguration(new PropertiesConfiguration("whirr-hadoop-test.properties"));
-    clusterSpec = ClusterSpec.fromConfiguration(config);
+    clusterSpec = new ClusterSpec(config);
     Service s = new ServiceFactory().create(clusterSpec.getServiceName());
     assertThat(s, instanceOf(HadoopService.class));
     service = (HadoopService) s;

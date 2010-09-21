@@ -95,7 +95,7 @@ public abstract class ClusterSpecCommand extends Command {
             required.getSimpleName()));
       }
     }
-    return ClusterSpec.fromConfiguration(config);
+    return new ClusterSpec(config);
   }
 
 }

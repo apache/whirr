@@ -60,7 +60,7 @@ public class CassandraServiceTest {
       config.addConfiguration(new PropertiesConfiguration(System.getProperty("config")));
     }
     config.addConfiguration(new PropertiesConfiguration("whirr-cassandra-test.properties"));
-    clusterSpec = ClusterSpec.fromConfiguration(config);
+    clusterSpec = new ClusterSpec(config);
     Service s = new ServiceFactory().create(clusterSpec.getServiceName());
     assertThat(s, instanceOf(CassandraService.class));
     service = (CassandraService) s;
