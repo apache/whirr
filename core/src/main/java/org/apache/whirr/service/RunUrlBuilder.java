@@ -18,35 +18,35 @@
 
 package org.apache.whirr.service;
 
+import static org.jclouds.scriptbuilder.domain.Statements.exec;
+
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import static org.jclouds.scriptbuilder.domain.Statements.exec;
-
 import org.jclouds.scriptbuilder.ScriptBuilder;
+import org.jclouds.scriptbuilder.domain.OsFamily;
 
 /**
  * A convenience class for building scripts to run on nodes.
  */
 public class RunUrlBuilder {
 
-  // Need to be able to specify base URL
-  // Perhaps make these scripts parameterizable?
-  // e.g. just java/install then base url is .../openjdk or .../sun or
-  // .../apache or .../cloudera
-  public static byte[] runUrls(String... urls) throws MalformedURLException {
+  /**
+   * 
+   * @param runUrlBase The base URL to construct URLs from.
+   * @param urls The (possibly relative) URLs to build the runurls from.
+   * @return
+   * @throws MalformedURLException
+   */
+  public static byte[] runUrls(String runUrlBase, String... urls) throws MalformedURLException {
     ScriptBuilder scriptBuilder = new ScriptBuilder().addStatement(
       exec("wget -qO/usr/bin/runurl run.alestic.com/runurl")).addStatement(
       exec("chmod 755 /usr/bin/runurl"));
-
-    // Note that the runurl scripts should be checked in to whirr/scripts/
-    String runUrlBase = System.getProperty("whirr.runurl.base", "http://whirr.s3.amazonaws.com/");
     for (String url : urls) {
-      scriptBuilder.addStatement(exec("runurl " + new URL(new URL(runUrlBase), url)));
+      String runUrl = new URL(new URL(runUrlBase), url).toExternalForm();
+      scriptBuilder.addStatement(exec("runurl " + runUrl));
     }
-
-    return scriptBuilder.build(org.jclouds.scriptbuilder.domain.OsFamily.UNIX)
-      .getBytes();
+    return scriptBuilder.build(OsFamily.UNIX).getBytes();
   }
 
 }

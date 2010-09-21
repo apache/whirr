@@ -6,6 +6,8 @@ Trunk (unreleased changes)
 
     WHIRR-89. Support maven 3 builds. (Adrian Cole via tomwhite)
 
+    WHIRR-90. Scripts should be versioned. (tomwhite)
+
   BUG FIXES
 
     WHIRR-93. Fail on checkstyle violation. (tomwhite)

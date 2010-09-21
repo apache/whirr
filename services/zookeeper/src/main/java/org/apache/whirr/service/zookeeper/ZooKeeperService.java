@@ -70,7 +70,7 @@ public class ZooKeeperService extends Service {
       ComputeServiceContextBuilder.build(clusterSpec);
     ComputeService computeService = computeServiceContext.getComputeService();
 
-    byte[] bootScript = RunUrlBuilder.runUrls(
+    byte[] bootScript = RunUrlBuilder.runUrls(clusterSpec.getRunUrlBase(),
       "sun/java/install",
       "apache/zookeeper/install");
     
@@ -107,7 +107,7 @@ public class ZooKeeperService extends Service {
     // Pass list of all servers in ensemble to configure script.
     // Position is significant: i-th server has id i.
     String servers = Joiner.on(' ').join(getPrivateIps(nodes));
-    byte[] configureScript = RunUrlBuilder.runUrls(
+    byte[] configureScript = RunUrlBuilder.runUrls(clusterSpec.getRunUrlBase(),
       "apache/zookeeper/post-configure " + servers);
     try {
       computeService.runScriptOnNodesMatching(runningWithTag(clusterSpec.getClusterName()), configureScript);

@@ -80,7 +80,7 @@ public class HadoopService extends Service {
     // deal with user packages and autoshutdown with extra runurls
     String hadoopInstallRunUrl = clusterSpec.getConfiguration().getString(
         "whirr.hadoop-install-runurl", "apache/hadoop/install");
-    byte[] nnjtBootScript = RunUrlBuilder.runUrls(
+    byte[] nnjtBootScript = RunUrlBuilder.runUrls(clusterSpec.getRunUrlBase(),
       "sun/java/install",
       String.format("%s nn,jt -c %s", hadoopInstallRunUrl,
           clusterSpec.getProvider()));
@@ -132,7 +132,7 @@ public class HadoopService extends Service {
     }
 
     // Launch slaves (DN and TT)
-    byte[] slaveBootScript = RunUrlBuilder.runUrls(
+    byte[] slaveBootScript = RunUrlBuilder.runUrls(clusterSpec.getRunUrlBase(),
       "sun/java/install",
       String.format("%s dn,tt -n %s -j %s",
           hadoopInstallRunUrl,

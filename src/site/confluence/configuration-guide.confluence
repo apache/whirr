@@ -12,6 +12,7 @@ Whirr is configured using a properties file, and optionally using command line a
 | {{credential}} | {{\--credential}} | none | The cloud credential. See the table below for how this maps to the credentials for your provider. |
 | {{secret-key-file}} | {{\--secret-key-file}} | _\~/.ssh/id\_rsa_ | The filename of the private key used to connect to instances. |
 | {{client-cidrs}} | {{\--client-cidrs}} | none | A comma-separated list of [CIDR |http://en.wikipedia.org/wiki/Classless\_Inter-Domain\_Routing] blocks. E.g. {{208.128.0.0/11,108.128.0.0/11}} |
+| {{run-url-base}} | {{\--run-url-base}} | {{http://whirr.s3.amazonaws.com/VERSION/}} | The base URL for forming run urls from. Change this to host your own set of launch scripts. |
 
 h2. Cloud provider specific configuration
 
@@ -35,6 +36,7 @@ h2. Comparison
 | none | {{credential}} | Specified using environment variables for Python. E.g. {{AWS\_ACCESS\_KEY\_ID}}, {{RACKSPACE\_SECRET}} |
 | {{private-key-file}} | {{private-key-file}} | |
 | {{client-cidr}} | {{client-cidrs}} | Python {{client-cidr}} option may be repeated multiple times, whereas Java {{client-cidrs}} contains comma-separated CIDRs. |
+| none | {{run-url-base}} | Specified using {{user-data-file}} in Python. |
 | {{public-key}} | none | Based on secret key in Java (add {{.pub}}). |
 | {{image-id}} | none | Need to add to Java. Along with more flexible image matching (pattern, OS, arch). See jclouds TemplateBuilder. |
 | {{instance-type}} | none | Ditto. |

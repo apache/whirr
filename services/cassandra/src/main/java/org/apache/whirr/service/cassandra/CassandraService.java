@@ -73,7 +73,8 @@ public class CassandraService extends Service {
         ComputeServiceContextBuilder.build(clusterSpec);
     ComputeService computeService = computeServiceContext.getComputeService();
 
-    byte[] bootScript = RunUrlBuilder.runUrls("sun/java/install",
+    byte[] bootScript = RunUrlBuilder.runUrls(clusterSpec.getRunUrlBase(),
+        "sun/java/install",
         "apache/cassandra/install");
 
     TemplateBuilder templateBuilder = computeService.templateBuilder()
@@ -110,7 +111,8 @@ public class CassandraService extends Service {
     // Pass list of all servers in cluster to configure script.
     String servers = Joiner.on(' ').join(getPrivateIps(seeds));
     byte[] configureScript = RunUrlBuilder
-        .runUrls("apache/cassandra/post-configure " + servers);
+        .runUrls(clusterSpec.getRunUrlBase(),
+            "apache/cassandra/post-configure " + servers);
 
     try {
       Map<? extends NodeMetadata, ExecResponse> responses = computeService
