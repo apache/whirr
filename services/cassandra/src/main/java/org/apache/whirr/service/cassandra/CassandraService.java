@@ -19,9 +19,11 @@
 package org.apache.whirr.service.cassandra;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static org.apache.whirr.service.RunUrlBuilder.runUrls;
 import static org.jclouds.compute.domain.OsFamily.UBUNTU;
 import static org.jclouds.compute.options.TemplateOptions.Builder.runScript;
 import static org.jclouds.compute.predicates.NodePredicates.runningWithTag;
+import static org.jclouds.io.Payloads.newStringPayload;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -35,19 +37,19 @@ import java.util.Set;
 import org.apache.whirr.service.Cluster;
 import org.apache.whirr.service.ClusterSpec;
 import org.apache.whirr.service.ComputeServiceContextBuilder;
-import org.apache.whirr.service.RunUrlBuilder;
 import org.apache.whirr.service.Service;
 import org.apache.whirr.service.Cluster.Instance;
 import org.apache.whirr.service.ClusterSpec.InstanceTemplate;
 import org.apache.whirr.service.jclouds.FirewallSettings;
+import org.jclouds.aws.ec2.domain.InstanceType;
 import org.jclouds.compute.ComputeService;
 import org.jclouds.compute.ComputeServiceContext;
 import org.jclouds.compute.RunNodesException;
 import org.jclouds.compute.RunScriptOnNodesException;
-import org.jclouds.compute.domain.Architecture;
 import org.jclouds.compute.domain.NodeMetadata;
 import org.jclouds.compute.domain.Template;
 import org.jclouds.compute.domain.TemplateBuilder;
+import org.jclouds.io.Payload;
 import org.jclouds.ssh.ExecResponse;
 
 import com.google.common.base.Function;
@@ -73,20 +75,21 @@ public class CassandraService extends Service {
         ComputeServiceContextBuilder.build(clusterSpec);
     ComputeService computeService = computeServiceContext.getComputeService();
 
-    byte[] bootScript = RunUrlBuilder.runUrls(clusterSpec.getRunUrlBase(),
+    Payload bootScript = newStringPayload(runUrls(clusterSpec.getRunUrlBase(),
         "sun/java/install",
-        "apache/cassandra/install");
+        "apache/cassandra/install"));
 
     TemplateBuilder templateBuilder = computeService.templateBuilder()
         .osFamily(UBUNTU).options(
             runScript(bootScript).installPrivateKey(
-                clusterSpec.readPrivateKey()).authorizePublicKey(
-                clusterSpec.readPublicKey()));
+                clusterSpec.getPrivateKey()).authorizePublicKey(
+                clusterSpec.getPublicKey()));
 
     // TODO extract this logic elsewhere
     if (clusterSpec.getProvider().equals("ec2"))
-      templateBuilder.imageNameMatches(".*10\\.?04.*").osDescriptionMatches(
-          "^ubuntu-images.*").architecture(Architecture.X86_32);
+       templateBuilder.osVersionMatches("10.04")
+      .imageDescriptionMatches(".*ubuntu-images.*")
+      .hardwareId(InstanceType.M1_SMALL);
 
     Template template = templateBuilder.build();
 
@@ -110,9 +113,8 @@ public class CassandraService extends Service {
 
     // Pass list of all servers in cluster to configure script.
     String servers = Joiner.on(' ').join(getPrivateIps(seeds));
-    byte[] configureScript = RunUrlBuilder
-        .runUrls(clusterSpec.getRunUrlBase(),
-            "apache/cassandra/post-configure " + servers);
+    Payload configureScript = newStringPayload(runUrls(clusterSpec.getRunUrlBase(),
+            "apache/cassandra/post-configure " + servers));
 
     try {
       Map<? extends NodeMetadata, ExecResponse> responses = computeService

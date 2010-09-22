@@ -52,9 +52,9 @@ public class HadoopProxy {
     } else {
       identity = File.createTempFile("hadoop", "key");
       identity.deleteOnExit();
-      Files.write(ByteStreams.toByteArray(clusterSpec.getPrivateKey().getContent()), identity);
+      Files.write(ByteStreams.toByteArray(clusterSpec.getPrivateKey().getInput()), identity);
     }
-    String user = Iterables.get(cluster.getInstances(), 0).getLoginCredentials().account;
+    String user = Iterables.get(cluster.getInstances(), 0).getLoginCredentials().identity;
     String server = cluster.getNamenodePublicAddress().getHostName();
     String[] command = new String[] { "ssh",
       "-i", identity.getAbsolutePath(),

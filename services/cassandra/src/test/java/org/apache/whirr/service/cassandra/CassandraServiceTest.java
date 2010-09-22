@@ -32,10 +32,10 @@ import org.junit.Test;
 public class CassandraServiceTest {
 
   private NodeMetadata getNodeMetadata(String id) {
-    return new NodeMetadataImpl("1", null, "1", null, null, 
-        new HashMap<String, String>(), null, null, 
+    return new NodeMetadataImpl("1", null, "1", null, null,
+        new HashMap<String, String>(), null, null, null, null,
         NodeState.RUNNING, new ArrayList<String>(), 
-        new ArrayList<String>(), new HashMap<String, String>(), null); 
+        new ArrayList<String>(), null); 
   }
   
   @Test()

@@ -85,7 +85,7 @@ public class FirewallSettings {
       String region = EC2Utils.parseHandle(Iterables.get(nodes, 0).getId())[0];
       EC2Client ec2Client = EC2Client.class.cast(
           computeServiceContext.getProviderSpecificContext().getApi());
-      String groupName = "jclouds#" + clusterSpec.getClusterName();
+      String groupName = "jclouds#" + clusterSpec.getClusterName() + "#" + region;
       for (String cidr : cidrs) {
         for (int port : ports) {
           ec2Client.getSecurityGroupServices()

@@ -20,8 +20,8 @@ package org.apache.whirr.service;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.jclouds.http.Payloads.newStringPayload;
-import static org.jclouds.http.Payloads.newFilePayload;
+import static org.jclouds.io.Payloads.newStringPayload;
+import static org.jclouds.io.Payloads.newFilePayload;
 import static org.jclouds.util.Utils.toStringAndClose;
 
 import com.google.common.base.Objects;
@@ -37,7 +37,7 @@ import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
-import org.jclouds.http.Payload;
+import org.jclouds.io.Payload;
 
 /**
  * This class represents the specification of a cluster. It is used to describe
@@ -234,14 +234,14 @@ public class ClusterSpec {
    * @throws IOException if the payload cannot be read
    */
   public String readPrivateKey() throws IOException {
-    return toStringAndClose(getPrivateKey().getContent());
+    return toStringAndClose(getPrivateKey().getInput());
   }
   /**
    * @see #getPublicKey
    * @throws IOException if the payload cannot be read
    */
   public String readPublicKey() throws IOException {
-    return toStringAndClose(getPublicKey().getContent());
+    return toStringAndClose(getPublicKey().getInput());
   }
   public List<String> getClientCidrs() {
     return clientCidrs;

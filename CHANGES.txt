@@ -8,6 +8,8 @@ Trunk (unreleased changes)
 
     WHIRR-90. Scripts should be versioned. (tomwhite)
 
+    WHIRR-66. Upgrade to jclouds 1.0-beta-7. (Adrian Cole via tomwhite)
+
   BUG FIXES
 
     WHIRR-93. Fail on checkstyle violation. (tomwhite)

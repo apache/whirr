@@ -18,10 +18,12 @@
 
 package org.apache.whirr.service.hadoop;
 
+import static org.apache.whirr.service.RunUrlBuilder.runUrls;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.jclouds.compute.domain.OsFamily.UBUNTU;
 import static org.jclouds.compute.options.TemplateOptions.Builder.runScript;
+import static org.jclouds.io.Payloads.newStringPayload;
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Function;
@@ -41,18 +43,18 @@ import java.util.Set;
 
 import org.apache.whirr.service.ClusterSpec;
 import org.apache.whirr.service.ComputeServiceContextBuilder;
-import org.apache.whirr.service.RunUrlBuilder;
 import org.apache.whirr.service.Service;
 import org.apache.whirr.service.Cluster.Instance;
 import org.apache.whirr.service.ClusterSpec.InstanceTemplate;
 import org.apache.whirr.service.jclouds.FirewallSettings;
+import org.jclouds.aws.ec2.domain.InstanceType;
 import org.jclouds.compute.ComputeService;
 import org.jclouds.compute.ComputeServiceContext;
 import org.jclouds.compute.RunNodesException;
-import org.jclouds.compute.domain.Architecture;
 import org.jclouds.compute.domain.NodeMetadata;
 import org.jclouds.compute.domain.Template;
 import org.jclouds.compute.domain.TemplateBuilder;
+import org.jclouds.io.Payload;
 
 public class HadoopService extends Service {
   
@@ -80,22 +82,22 @@ public class HadoopService extends Service {
     // deal with user packages and autoshutdown with extra runurls
     String hadoopInstallRunUrl = clusterSpec.getConfiguration().getString(
         "whirr.hadoop-install-runurl", "apache/hadoop/install");
-    byte[] nnjtBootScript = RunUrlBuilder.runUrls(clusterSpec.getRunUrlBase(),
+    Payload nnjtBootScript = newStringPayload(runUrls(clusterSpec.getRunUrlBase(),
       "sun/java/install",
       String.format("%s nn,jt -c %s", hadoopInstallRunUrl,
-          clusterSpec.getProvider()));
+          clusterSpec.getProvider())));
 
     TemplateBuilder masterTemplateBuilder = computeService.templateBuilder()
       .osFamily(UBUNTU)
       .options(runScript(nnjtBootScript)
-      .installPrivateKey(clusterSpec.readPrivateKey())
-      .authorizePublicKey(clusterSpec.readPublicKey()));
+      .installPrivateKey(clusterSpec.getPrivateKey())
+      .authorizePublicKey(clusterSpec.getPublicKey()));
     
     // TODO extract this logic elsewhere
     if (clusterSpec.getProvider().equals("ec2"))
-      masterTemplateBuilder.imageNameMatches(".*10\\.?04.*")
-      .osDescriptionMatches("^ubuntu-images.*")
-      .architecture(Architecture.X86_32);
+      masterTemplateBuilder.osVersionMatches("10.04")
+      .imageDescriptionMatches(".*ubuntu-images.*")
+      .hardwareId(InstanceType.M1_SMALL);
     
     Template masterTemplate = masterTemplateBuilder.build();
     
@@ -132,24 +134,24 @@ public class HadoopService extends Service {
     }
 
     // Launch slaves (DN and TT)
-    byte[] slaveBootScript = RunUrlBuilder.runUrls(clusterSpec.getRunUrlBase(),
+    Payload slaveBootScript = newStringPayload(runUrls(clusterSpec.getRunUrlBase(),
       "sun/java/install",
       String.format("%s dn,tt -n %s -j %s",
           hadoopInstallRunUrl,
           namenodePublicAddress.getHostName(),
-          jobtrackerPublicAddress.getHostName()));
+          jobtrackerPublicAddress.getHostName())));
 
     TemplateBuilder slaveTemplateBuilder = computeService.templateBuilder()
       .osFamily(UBUNTU)
       .options(runScript(slaveBootScript)
-      .installPrivateKey(clusterSpec.readPrivateKey())
-      .authorizePublicKey(clusterSpec.readPublicKey()));
+      .installPrivateKey(clusterSpec.getPrivateKey())
+      .authorizePublicKey(clusterSpec.getPublicKey()));
 
     // TODO extract this logic elsewhere
     if (clusterSpec.getProvider().equals("ec2"))
-      slaveTemplateBuilder.imageNameMatches(".*10\\.?04.*")
-      .osDescriptionMatches("^ubuntu-images.*")
-      .architecture(Architecture.X86_32);
+       slaveTemplateBuilder.osVersionMatches("10.04")
+      .imageDescriptionMatches(".*ubuntu-images.*")
+      .hardwareId(InstanceType.M1_SMALL);
     
     Template slaveTemplate = slaveTemplateBuilder.build();
     
