@@ -45,7 +45,7 @@
   </modules>
 
   <properties>
-    <jclouds.version>1.0-beta-6</jclouds.version>
+    <jclouds.version>1.0-beta-7</jclouds.version>
   </properties>
 
   <dependencyManagement>

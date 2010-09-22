@@ -26,7 +26,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.google.common.io.Files;
-import com.google.inject.internal.Lists;
+import com.google.common.collect.Lists;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;

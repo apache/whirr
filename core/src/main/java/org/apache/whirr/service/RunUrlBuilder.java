@@ -38,7 +38,7 @@ public class RunUrlBuilder {
    * @return
    * @throws MalformedURLException
    */
-  public static byte[] runUrls(String runUrlBase, String... urls) throws MalformedURLException {
+  public static String runUrls(String runUrlBase, String... urls) throws MalformedURLException {
     ScriptBuilder scriptBuilder = new ScriptBuilder().addStatement(
       exec("wget -qO/usr/bin/runurl run.alestic.com/runurl")).addStatement(
       exec("chmod 755 /usr/bin/runurl"));
@@ -46,7 +46,7 @@ public class RunUrlBuilder {
       String runUrl = new URL(new URL(runUrlBase), url).toExternalForm();
       scriptBuilder.addStatement(exec("runurl " + runUrl));
     }
-    return scriptBuilder.build(OsFamily.UNIX).getBytes();
+    return scriptBuilder.build(OsFamily.UNIX);
   }
 
 }
