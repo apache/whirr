@@ -54,6 +54,9 @@ public class ClusterSpec {
     CLUSTER_NAME(String.class, false),
     PUBLIC_KEY_FILE(String.class, false),
     PRIVATE_KEY_FILE(String.class, false),
+    IMAGE_ID(String.class, false),
+    HARDWARE_ID(String.class, false),
+    LOCATION_ID(String.class, false),
     CLIENT_CIDRS(String.class, true),
     RUN_URL_BASE(String.class, false);
     
@@ -147,6 +150,9 @@ public class ClusterSpec {
   private String clusterName;
   private Payload privateKey;
   private Payload publicKey;
+  private String imageId;
+  private String hardwareId;
+  private String locationId;
   private List<String> clientCidrs;
   private String runUrlBase;
   
@@ -186,6 +192,9 @@ public class ClusterSpec {
     } catch (IOException e) {
       throw new ConfigurationException("error reading key from file", e);
     }
+    setImageId(config.getString(Property.IMAGE_ID.getConfigName()));
+    setHardwareId(config.getString(Property.HARDWARE_ID.getConfigName()));
+    setLocationId(config.getString(Property.LOCATION_ID.getConfigName()));
     setClientCidrs(c.getList(Property.CLIENT_CIDRS.getConfigName()));
     setRunUrlBase(c.getString(Property.RUN_URL_BASE.getConfigName()));
     this.config = c;
@@ -242,6 +251,15 @@ public class ClusterSpec {
    */
   public String readPublicKey() throws IOException {
     return toStringAndClose(getPublicKey().getInput());
+  }
+  public String getImageId() {
+    return imageId;
+  }
+  public String getHardwareId() {
+    return hardwareId;
+  }
+  public String getLocationId() {
+    return locationId;
   }
   public List<String> getClientCidrs() {
     return clientCidrs;
@@ -321,6 +339,18 @@ public class ClusterSpec {
         checkNotNull(privateKey, "privateKey"));
   }
 
+  public void setImageId(String imageId) {
+    this.imageId = imageId;
+  }
+  
+  public void setHardwareId(String hardwareId) {
+    this.hardwareId = hardwareId;
+  }
+  
+  public void setLocationId(String locationId) {
+    this.locationId = locationId;
+  }
+  
   public void setClientCidrs(List<String> clientCidrs) {
     this.clientCidrs = clientCidrs;
   }
@@ -344,6 +374,9 @@ public class ClusterSpec {
         && Objects.equal(identity, that.identity)
         && Objects.equal(credential, that.credential)
         && Objects.equal(clusterName, that.clusterName)
+        && Objects.equal(imageId, that.imageId)
+        && Objects.equal(hardwareId, that.hardwareId)
+        && Objects.equal(locationId, that.locationId)
         && Objects.equal(clientCidrs, that.clientCidrs)
         && Objects.equal(runUrlBase, that.runUrlBase)
         ;
@@ -354,7 +387,8 @@ public class ClusterSpec {
   public int hashCode() {
     return Objects.hashCode(instanceTemplates, serviceName,
         provider, identity, credential, clusterName, publicKey,
-        privateKey, clientCidrs, runUrlBase);
+        privateKey, imageId, hardwareId, locationId, clientCidrs,
+        runUrlBase);
   }
   
   public String toString() {
@@ -367,6 +401,9 @@ public class ClusterSpec {
       .add("clusterName", clusterName)
       .add("publicKey", publicKey)
       .add("privateKey", privateKey)
+      .add("imageId", imageId)
+      .add("instanceSizeId", hardwareId)
+      .add("locationId", locationId)
       .add("clientCidrs", clientCidrs)
       .add("runUrlBase", runUrlBase)
       .toString();

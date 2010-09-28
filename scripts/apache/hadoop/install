@@ -371,7 +371,10 @@ function setup_web() {
     apt-get -y install thttpd
     WWW_BASE=/var/www
   elif which rpm &> /dev/null; then
-    yum install -y thttpd
+    # enable EPEL for thttpd package
+    rpm -Uvh http://download.fedora.redhat.com/pub/epel/5/i386/epel-release-5-4.noarch.rpm
+    sed -i -e 's/enabled=1/enabled=0/' /etc/yum.repos.d/epel.repo
+    yum install -y --enablerepo=epel thttpd
     chkconfig --add thttpd
     WWW_BASE=/var/www/thttpd/html
   fi

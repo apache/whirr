@@ -17,23 +17,24 @@
 #
 # Install Sun Java 6.
 #
-# TODO: Update for RPM-based systems too.
 
 set -x
 set -e
 
-# Enable multiverse
-# TODO: check that it is not already enabled
-sed -i -e 's/universe$/universe multiverse/' /etc/apt/sources.list
-
-cat > /etc/apt/sources.list.d/canonical.com.list <<EOF
-deb http://archive.canonical.com/ubuntu lucid partner
-deb-src http://archive.canonical.com/ubuntu lucid partner
+function install_java_deb() {
+  # Enable multiverse
+  # TODO: check that it is not already enabled
+  sed -i -e 's/universe$/universe multiverse/' /etc/apt/sources.list
+  
+  DISTRO=`lsb_release -s -c`
+  cat > /etc/apt/sources.list.d/canonical.com.list <<EOF
+deb http://archive.canonical.com/ubuntu $DISTRO partner
+deb-src http://archive.canonical.com/ubuntu $DISTRO partner
 EOF
-
-apt-get update
-
-echo 'sun-java6-bin   shared/accepted-sun-dlj-v1-1    boolean true
+  
+  apt-get update
+  
+  echo 'sun-java6-bin   shared/accepted-sun-dlj-v1-1    boolean true
 sun-java6-jdk   shared/accepted-sun-dlj-v1-1    boolean true
 sun-java6-jre   shared/accepted-sun-dlj-v1-1    boolean true
 sun-java6-jre   sun-java6-jre/stopthread        boolean true
@@ -42,9 +43,41 @@ sun-java6-bin   shared/present-sun-dlj-v1-1     note
 sun-java6-jdk   shared/present-sun-dlj-v1-1     note
 sun-java6-jre   shared/present-sun-dlj-v1-1     note
 ' | debconf-set-selections
+  
+  apt-get -y install sun-java6-jdk
+  
+  echo "export JAVA_HOME=/usr/lib/jvm/java-6-sun" >> /etc/profile
+  export JAVA_HOME=/usr/lib/jvm/java-6-sun
+  java -version
+  
+}
 
-apt-get -y install sun-java6-jdk
+function install_java_rpm() {
+  MACHINE_TYPE=`uname -m`
+  if [ ${MACHINE_TYPE} == 'x86_64' ]; then
+    JDK_PACKAGE=jdk-6u21-linux-x64-rpm.bin
+  else
+    JDK_PACKAGE=jdk-6u21-linux-i586-rpm.bin
+  fi
+  JDK_INSTALL_PATH=/usr/java
+  mkdir -p $JDK_INSTALL_PATH
+  cd $JDK_INSTALL_PATH
+  wget http://whirr-third-party.s3.amazonaws.com/$JDK_PACKAGE
+  chmod +x $JDK_PACKAGE
+  mv /bin/more /bin/more.no
+  yes | ./$JDK_PACKAGE -noregister
+  mv /bin/more.no /bin/more
+  rm -f *.rpm $JDK_PACKAGE
+  
+  export JAVA_HOME=$(ls -d $JDK_INSTALL_PATH/jdk*)
+  echo "export JAVA_HOME=$JAVA_HOME" >> /etc/profile
+  alternatives --install /usr/bin/java java $JAVA_HOME/bin/java 17000
+  alternatives --set java $JAVA_HOME/bin/java
+  java -version
+}
 
-echo "export JAVA_HOME=/usr/lib/jvm/java-6-sun" >> /etc/profile
-export JAVA_HOME=/usr/lib/jvm/java-6-sun
-java -version
+if which dpkg &> /dev/null; then
+  install_java_deb
+elif which rpm &> /dev/null; then
+  install_java_rpm
+fi
