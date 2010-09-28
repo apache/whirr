@@ -11,6 +11,9 @@ Whirr is configured using a properties file, and optionally using command line a
 | {{identity}} | {{\--identity}} | none | The cloud identity. See the table below for how this maps to the credentials for your provider. |
 | {{credential}} | {{\--credential}} | none | The cloud credential. See the table below for how this maps to the credentials for your provider. |
 | {{secret-key-file}} | {{\--secret-key-file}} | _\~/.ssh/id\_rsa_ | The filename of the private key used to connect to instances. |
+| {{image-id}} | {{\--image-id}} | none | The ID of the image to use for instances. If not specified then a vanilla Ubuntu image is chosen. |
+| {{hardware-id}} | {{\--hardware-id}} | none | The type of hardware to use for the instance. This must be compatible with the image ID. |
+| {{location-id}} | {{\--location-id}} | none | The location to launch instances in. If not specified then an arbitrary location will be chosen. |
 | {{client-cidrs}} | {{\--client-cidrs}} | none | A comma-separated list of [CIDR |http://en.wikipedia.org/wiki/Classless\_Inter-Domain\_Routing] blocks. E.g. {{208.128.0.0/11,108.128.0.0/11}} |
 | {{run-url-base}} | {{\--run-url-base}} | {{http://whirr.s3.amazonaws.com/VERSION/}} | The base URL for forming run urls from. Change this to host your own set of launch scripts. |
 
@@ -38,9 +41,9 @@ h2. Comparison
 | {{client-cidr}} | {{client-cidrs}} | Python {{client-cidr}} option may be repeated multiple times, whereas Java {{client-cidrs}} contains comma-separated CIDRs. |
 | none | {{run-url-base}} | Specified using {{user-data-file}} in Python. |
 | {{public-key}} | none | Based on secret key in Java (add {{.pub}}). |
-| {{image-id}} | none | Need to add to Java. Along with more flexible image matching (pattern, OS, arch). See jclouds TemplateBuilder. |
-| {{instance-type}} | none | Ditto. |
-| {{availability-zone}} | none | Ditto. |
+| {{image-id}} | {{image-id}} | |
+| {{instance-type}} | {{hardware-id}} |  |
+| {{availability-zone}} | {{location-id}} | Location is more general than availability zone. |
 | {{security-group}} | none | Amazon-specific. However, Amazon users may wish to start a cluster in additional security groups. |
 | {{env}} | none | May not be needed in Java with runurls. |
 | {{user-data-file}} | none | Amazon-specific. Use runurls. |

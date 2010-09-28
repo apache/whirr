@@ -20,33 +20,9 @@ package org.apache.whirr.service.zookeeper;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.apache.whirr.service.RunUrlBuilder.runUrls;
-import static org.jclouds.compute.domain.OsFamily.UBUNTU;
 import static org.jclouds.compute.options.TemplateOptions.Builder.runScript;
 import static org.jclouds.compute.predicates.NodePredicates.runningWithTag;
 import static org.jclouds.io.Payloads.newStringPayload;
-
-import java.io.IOException;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-
-import org.apache.whirr.service.ClusterSpec;
-import org.apache.whirr.service.ComputeServiceContextBuilder;
-import org.apache.whirr.service.Service;
-import org.apache.whirr.service.Cluster.Instance;
-import org.apache.whirr.service.ClusterSpec.InstanceTemplate;
-import org.apache.whirr.service.jclouds.FirewallSettings;
-import org.jclouds.aws.ec2.domain.InstanceType;
-import org.jclouds.compute.ComputeService;
-import org.jclouds.compute.ComputeServiceContext;
-import org.jclouds.compute.RunNodesException;
-import org.jclouds.compute.RunScriptOnNodesException;
-import org.jclouds.compute.domain.NodeMetadata;
-import org.jclouds.compute.domain.Template;
-import org.jclouds.compute.domain.TemplateBuilder;
-import org.jclouds.io.Payload;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
@@ -55,6 +31,29 @@ import com.google.common.collect.Collections2;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+
+import org.apache.whirr.service.Cluster.Instance;
+import org.apache.whirr.service.ClusterSpec;
+import org.apache.whirr.service.ClusterSpec.InstanceTemplate;
+import org.apache.whirr.service.ComputeServiceContextBuilder;
+import org.apache.whirr.service.Service;
+import org.apache.whirr.service.jclouds.FirewallSettings;
+import org.apache.whirr.service.jclouds.TemplateBuilderStrategy;
+import org.jclouds.compute.ComputeService;
+import org.jclouds.compute.ComputeServiceContext;
+import org.jclouds.compute.RunNodesException;
+import org.jclouds.compute.RunScriptOnNodesException;
+import org.jclouds.compute.domain.NodeMetadata;
+import org.jclouds.compute.domain.Template;
+import org.jclouds.compute.domain.TemplateBuilder;
+import org.jclouds.io.Payload;
 
 public class ZooKeeperService extends Service {
     
@@ -77,16 +76,12 @@ public class ZooKeeperService extends Service {
       "apache/zookeeper/install"));
     
     TemplateBuilder templateBuilder = computeService.templateBuilder()
-      .osFamily(UBUNTU)
       .options(runScript(bootScript)
       .installPrivateKey(clusterSpec.getPrivateKey())
       .authorizePublicKey(clusterSpec.getPublicKey()));
     
-    // TODO extract this logic elsewhere
-    if (clusterSpec.getProvider().equals("ec2"))
-       templateBuilder.osVersionMatches("10.04")
-      .imageDescriptionMatches(".*ubuntu-images.*")
-      .hardwareId(InstanceType.M1_SMALL);
+    new TemplateBuilderStrategy().configureTemplateBuilder(clusterSpec,
+        templateBuilder);
     
     Template template = templateBuilder.build();
     

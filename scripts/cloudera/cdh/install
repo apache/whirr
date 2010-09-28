@@ -399,18 +399,20 @@ function install_hue() {
     apt-get -y install hue-useradmin hue-jobsub hue-beeswax
   elif which rpm &> /dev/null; then
     yum install -y hue-common
-    yum install hue-useradmin hue-jobsub hue-beeswax
+    yum install -y hue-useradmin hue-jobsub hue-beeswax
   fi
   
   # Configure hue
   sed -i -e "s|http_port=8088|http_port=80|" /etc/hue/hue.ini
   
   # Hue logs should be on the /mnt partition
-  rm -rf /var/log/hue
+  mv /var/log/hue /var/log/hue.tmp
   mkdir -p $MOUNT/hue/logs
   chown hue:hue $MOUNT/hue/logs
   ln -s $MOUNT/hue/logs /var/log/hue
   chown -R hue:hue /var/log/hue
+  mv /var/log/hue.tmp/* /var/log/hue
+  rm -rf /var/log/hue.tmp
 }
 
 function install_hue_plugins() {
@@ -431,17 +433,14 @@ function start_namenode() {
     # Format HDFS
     [ ! -e $FIRST_MOUNT/hadoop/hdfs ] && $AS_HADOOP "$HADOOP namenode -format"
     update-rc.d $HADOOP-namenode defaults
-    update-rc.d $HADOOP-secondarynamenode defaults
   elif which rpm &> /dev/null; then
     AS_HADOOP="/sbin/runuser -s /bin/bash - hadoop -c"
     # Format HDFS
     [ ! -e $FIRST_MOUNT/hadoop/hdfs ] && $AS_HADOOP "$HADOOP namenode -format"
     chkconfig --add $HADOOP-namenode
-    chkconfig --add $HADOOP-secondarynamenode
   fi
 
   service $HADOOP-namenode start
-  service $HADOOP-secondarynamenode start
 
   $AS_HADOOP "$HADOOP dfsadmin -safemode wait"
   $AS_HADOOP "/usr/bin/$HADOOP fs -mkdir /user"

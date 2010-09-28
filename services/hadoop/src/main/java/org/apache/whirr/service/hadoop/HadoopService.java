@@ -18,10 +18,9 @@
 
 package org.apache.whirr.service.hadoop;
 
-import static org.apache.whirr.service.RunUrlBuilder.runUrls;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.jclouds.compute.domain.OsFamily.UBUNTU;
+import static org.apache.whirr.service.RunUrlBuilder.runUrls;
 import static org.jclouds.compute.options.TemplateOptions.Builder.runScript;
 import static org.jclouds.io.Payloads.newStringPayload;
 
@@ -41,13 +40,13 @@ import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 
+import org.apache.whirr.service.Cluster.Instance;
 import org.apache.whirr.service.ClusterSpec;
+import org.apache.whirr.service.ClusterSpec.InstanceTemplate;
 import org.apache.whirr.service.ComputeServiceContextBuilder;
 import org.apache.whirr.service.Service;
-import org.apache.whirr.service.Cluster.Instance;
-import org.apache.whirr.service.ClusterSpec.InstanceTemplate;
 import org.apache.whirr.service.jclouds.FirewallSettings;
-import org.jclouds.aws.ec2.domain.InstanceType;
+import org.apache.whirr.service.jclouds.TemplateBuilderStrategy;
 import org.jclouds.compute.ComputeService;
 import org.jclouds.compute.ComputeServiceContext;
 import org.jclouds.compute.RunNodesException;
@@ -88,16 +87,12 @@ public class HadoopService extends Service {
           clusterSpec.getProvider())));
 
     TemplateBuilder masterTemplateBuilder = computeService.templateBuilder()
-      .osFamily(UBUNTU)
       .options(runScript(nnjtBootScript)
       .installPrivateKey(clusterSpec.getPrivateKey())
       .authorizePublicKey(clusterSpec.getPublicKey()));
     
-    // TODO extract this logic elsewhere
-    if (clusterSpec.getProvider().equals("ec2"))
-      masterTemplateBuilder.osVersionMatches("10.04")
-      .imageDescriptionMatches(".*ubuntu-images.*")
-      .hardwareId(InstanceType.M1_SMALL);
+    TemplateBuilderStrategy strategy = new HadoopTemplateBuilderStrategy();
+    strategy.configureTemplateBuilder(clusterSpec, masterTemplateBuilder);
     
     Template masterTemplate = masterTemplateBuilder.build();
     
@@ -142,16 +137,11 @@ public class HadoopService extends Service {
           jobtrackerPublicAddress.getHostName())));
 
     TemplateBuilder slaveTemplateBuilder = computeService.templateBuilder()
-      .osFamily(UBUNTU)
       .options(runScript(slaveBootScript)
       .installPrivateKey(clusterSpec.getPrivateKey())
       .authorizePublicKey(clusterSpec.getPublicKey()));
 
-    // TODO extract this logic elsewhere
-    if (clusterSpec.getProvider().equals("ec2"))
-       slaveTemplateBuilder.osVersionMatches("10.04")
-      .imageDescriptionMatches(".*ubuntu-images.*")
-      .hardwareId(InstanceType.M1_SMALL);
+    strategy.configureTemplateBuilder(clusterSpec, slaveTemplateBuilder);
     
     Template slaveTemplate = slaveTemplateBuilder.build();
     
