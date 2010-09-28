@@ -2,6 +2,10 @@ Apache Whirr Change Log
 
 Trunk (unreleased changes)
 
+  NEW FEATURES
+
+    WHIRR-100. Create a binary distribution of Whirr. (tomwhite)
+
   IMPROVEMENTS
 
     WHIRR-89. Support maven 3 builds. (Adrian Cole via tomwhite)

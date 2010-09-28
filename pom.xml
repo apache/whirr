@@ -89,16 +89,19 @@
         <groupId>junit</groupId>
         <artifactId>junit</artifactId>
         <version>4.8.1</version>
+        <scope>test</scope>
       </dependency>
       <dependency>
         <groupId>org.hamcrest</groupId>
         <artifactId>hamcrest-all</artifactId>
         <version>1.1</version>
+        <scope>test</scope>
       </dependency>
       <dependency>
         <groupId>org.mockito</groupId>
         <artifactId>mockito-all</artifactId>
-        <version>1.8.5</version> 
+        <version>1.8.5</version>
+        <scope>test</scope>
       </dependency>
       <dependency>
         <groupId>commons-configuration</groupId>
@@ -149,6 +152,18 @@
   <build>
     <plugins>
       <!-- Plugins in alphabetical order: by group then artifact -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <version>2.2-beta-5</version>
+        <configuration>
+          <appendAssemblyId>false</appendAssemblyId>
+          <tarLongFileFormat>gnu</tarLongFileFormat>
+          <descriptors>
+            <descriptor>build-tools/src/assemble-bin.xml</descriptor>
+          </descriptors>
+        </configuration>
+      </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
@@ -572,7 +587,7 @@
             <version>2.2-beta-5</version>
             <configuration>
               <descriptors>
-                <descriptor>build-tools/src/assemble.xml</descriptor>
+                <descriptor>build-tools/src/assemble-src.xml</descriptor>
               </descriptors>
             </configuration>
             <executions>
@@ -583,6 +598,7 @@
                   <goal>single</goal>
                 </goals>
                 <configuration>
+                  <appendAssemblyId>true</appendAssemblyId>
                   <runOnlyAtExecutionRoot>true</runOnlyAtExecutionRoot>
                   <tarLongFileFormat>gnu</tarLongFileFormat>
                 </configuration>
