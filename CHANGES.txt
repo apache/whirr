@@ -10,6 +10,8 @@ Trunk (unreleased changes)
 
     WHIRR-66. Upgrade to jclouds 1.0-beta-7. (Adrian Cole via tomwhite)
 
+    WHIRR-103. Add more to .gitignore. (phunt via tomwhite)
+
   BUG FIXES
 
     WHIRR-93. Fail on checkstyle violation. (tomwhite)
