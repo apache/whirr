@@ -16,6 +16,8 @@ Trunk (unreleased changes)
 
     WHIRR-103. Add more to .gitignore. (phunt via tomwhite)
 
+    WHIRR-105. Add version command to the CLI. (tomwhite)
+
   BUG FIXES
 
     WHIRR-93. Fail on checkstyle violation. (tomwhite)
