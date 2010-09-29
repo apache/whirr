@@ -29,6 +29,7 @@ import java.util.Map;
 
 import org.apache.whirr.cli.command.DestroyClusterCommand;
 import org.apache.whirr.cli.command.LaunchClusterCommand;
+import org.apache.whirr.cli.command.VersionCommand;
 
 /**
  * The entry point for the Whirr CLI.
@@ -63,6 +64,7 @@ public class Main {
 
   public static void main(String... args) throws Exception {
     Main main = new Main(
+        new VersionCommand(),
         new LaunchClusterCommand(),
         new DestroyClusterCommand()
     );
