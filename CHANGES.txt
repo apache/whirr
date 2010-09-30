@@ -28,6 +28,8 @@ Trunk (unreleased changes)
     WHIRR-102. unknown service NPEs cli, should print the bad service
     to console (phunt)
 
+    WHIRR-104. print available services in cli help string (phunt)
+
 Release 0.1.0 - 2010-09-02
 
   INCOMPATIBLE CHANGES
