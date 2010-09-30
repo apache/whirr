@@ -22,8 +22,6 @@ import static org.apache.whirr.service.ClusterSpec.Property.CLUSTER_NAME;
 import static org.apache.whirr.service.ClusterSpec.Property.IDENTITY;
 import static org.apache.whirr.service.ClusterSpec.Property.SERVICE_NAME;
 
-import com.google.common.collect.Maps;
-
 import java.util.EnumSet;
 import java.util.Map;
 
@@ -38,25 +36,28 @@ import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.whirr.cli.Command;
 import org.apache.whirr.service.ClusterSpec;
-import org.apache.whirr.service.ServiceFactory;
 import org.apache.whirr.service.ClusterSpec.Property;
+import org.apache.whirr.service.Service;
+import org.apache.whirr.service.ServiceFactory;
+
+import com.google.common.collect.Maps;
 
 /**
  * An abstract command for interacting with clusters.
  */
-public abstract class ClusterSpecCommand extends Command {
+public abstract class AbstractClusterSpecCommand extends Command {
 
   protected ServiceFactory factory;
-  
+
   protected OptionParser parser = new OptionParser();
   private Map<Property, OptionSpec> optionSpecs;
   private OptionSpec<String> configOption = parser.accepts("config")
     .withRequiredArg().ofType(String.class);
 
-  public ClusterSpecCommand(String name, String description, ServiceFactory factory) {
+  public AbstractClusterSpecCommand(String name, String description, ServiceFactory factory) {
     super(name, description);
     this.factory = factory;
-    
+
     optionSpecs = Maps.newHashMap();
     for (Property property : EnumSet.allOf(Property.class)) {
       ArgumentAcceptingOptionSpec<?> spec = parser.accepts(property.getSimpleName())
@@ -68,7 +69,7 @@ public abstract class ClusterSpecCommand extends Command {
       optionSpecs.put(property, spec);
     }
   }
-  
+
   protected ClusterSpec getClusterSpec(OptionSet optionSet) throws ConfigurationException {
     Configuration optionsConfig = new PropertiesConfiguration();
     for (Map.Entry<Property, OptionSpec> entry : optionSpecs.entrySet()) {
@@ -96,6 +97,21 @@ public abstract class ClusterSpecCommand extends Command {
       }
     }
     return new ClusterSpec(config);
+  }
+
+  /**
+   * Create the specified service
+   * @param serviceName
+   * @return
+   * @throws IllegalArgumentException if serviceName is not found
+   */
+  protected Service createService(String serviceName) {
+    Service service = factory.create(serviceName);
+    if (service == null) {
+      throw new IllegalArgumentException("Unable to find service "
+          + serviceName + ", exiting");
+    }
+    return service;
   }
 
 }

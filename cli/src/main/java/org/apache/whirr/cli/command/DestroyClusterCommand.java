@@ -33,7 +33,7 @@ import org.apache.whirr.service.ServiceFactory;
 /**
  * A command to destroy a running cluster (terminate and cleanup).
  */
-public class DestroyClusterCommand extends ClusterSpecCommand {
+public class DestroyClusterCommand extends AbstractClusterSpecCommand {
 
   public DestroyClusterCommand() throws IOException {
     this(new ServiceFactory());
@@ -56,7 +56,7 @@ public class DestroyClusterCommand extends ClusterSpecCommand {
     try {
       ClusterSpec clusterSpec = getClusterSpec(optionSet);
 
-      Service service = factory.create(clusterSpec.getServiceName());
+      Service service = createService(clusterSpec.getServiceName());
       service.destroyCluster(clusterSpec);
       return 0;
     } catch (IllegalArgumentException e) {
