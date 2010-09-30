@@ -34,7 +34,7 @@ import org.apache.whirr.service.ServiceFactory;
 /**
  * A command to launch a new cluster.
  */
-public class LaunchClusterCommand extends ClusterSpecCommand {
+public class LaunchClusterCommand extends AbstractClusterSpecCommand {
 
   public LaunchClusterCommand() throws IOException {
     this(new ServiceFactory());
@@ -57,7 +57,7 @@ public class LaunchClusterCommand extends ClusterSpecCommand {
     
     try {
       ClusterSpec clusterSpec = getClusterSpec(optionSet);
-      Service service = factory.create(clusterSpec.getServiceName());
+      Service service = createService(clusterSpec.getServiceName());
       Cluster cluster = service.launchCluster(clusterSpec);
       out.printf("Started cluster of %s instances\n",
           cluster.getInstances().size());

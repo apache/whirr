@@ -31,11 +31,11 @@ import org.apache.whirr.service.ClusterSpec;
 import org.apache.whirr.service.ServiceFactory;
 import org.junit.Test;
 
-public class ClusterSpecCommandTest {
+public class AbstractClusterSpecCommandTest {
 
   @Test
   public void testOverrides() throws Exception {
-    ClusterSpecCommand clusterSpecCommand = new ClusterSpecCommand("name",
+    AbstractClusterSpecCommand clusterSpecCommand = new AbstractClusterSpecCommand("name",
         "description", new ServiceFactory()) {
       @Override
       public int run(InputStream in, PrintStream out, PrintStream err,
@@ -43,7 +43,7 @@ public class ClusterSpecCommandTest {
         return 0;
       }
     };
-    
+
     OptionSet optionSet = clusterSpecCommand.parser.parse(
         "--service-name", "overridden-test-service",
         "--config", "whirr-override-test.properties");
@@ -51,5 +51,26 @@ public class ClusterSpecCommandTest {
     assertThat(clusterSpec.getServiceName(), is("overridden-test-service"));
     assertThat(clusterSpec.getClusterName(), is("test-cluster"));
   }
-  
+
+  /**
+   * Ensure that an invalid service name causes failure
+   */
+  @Test(expected=IllegalArgumentException.class)
+  public void testCreateServer_InvalidServiceName() throws Exception {
+    AbstractClusterSpecCommand clusterSpecCommand = new AbstractClusterSpecCommand("name",
+        "description", new ServiceFactory()) {
+      @Override
+      public int run(InputStream in, PrintStream out, PrintStream err,
+          List<String> args) throws Exception {
+        return 0;
+      }
+    };
+
+    OptionSet optionSet = clusterSpecCommand.parser.parse(
+        "--service-name", "foo",
+        "--config", "whirr-override-test.properties");
+    ClusterSpec clusterSpec = clusterSpecCommand.getClusterSpec(optionSet);
+    // this should fail - non-existent service
+    clusterSpecCommand.createService("bar");
+  }
 }

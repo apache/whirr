@@ -25,6 +25,9 @@ Trunk (unreleased changes)
     WHIRR-97. Lucid is not stable on EC2. Default is now the Amazon Linux AMI
     on EC2. (tomwhite)
 
+    WHIRR-102. unknown service NPEs cli, should print the bad service
+    to console (phunt)
+
 Release 0.1.0 - 2010-09-02
 
   INCOMPATIBLE CHANGES
