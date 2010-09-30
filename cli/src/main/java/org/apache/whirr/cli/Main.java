@@ -18,18 +18,20 @@
 
 package org.apache.whirr.cli;
 
-import com.google.common.collect.Maps;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeSet;
 
 import org.apache.whirr.cli.command.DestroyClusterCommand;
 import org.apache.whirr.cli.command.LaunchClusterCommand;
 import org.apache.whirr.cli.command.VersionCommand;
+import org.apache.whirr.service.ServiceFactory;
+
+import com.google.common.collect.Maps;
 
 /**
  * The entry point for the Whirr CLI.
@@ -55,6 +57,13 @@ public class Main {
       for (Command command : commandMap.values()) {
         out.printf("%" + maxLen + "s  %s\n", command.getName(),
             command.getDescription());
+      }
+      out.println();
+      out.println("Available services:");
+      ServiceFactory serviceFactory = new ServiceFactory();
+      for (String serviceName :
+        new TreeSet<String>(serviceFactory.availableServices())) {
+        out.println("  " + serviceName);
       }
       return -1;
     }

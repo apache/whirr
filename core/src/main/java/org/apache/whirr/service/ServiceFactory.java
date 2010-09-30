@@ -19,6 +19,9 @@
 package org.apache.whirr.service;
 
 import java.util.ServiceLoader;
+import java.util.Set;
+
+import com.google.common.collect.Sets;
 
 /**
  * This class is used to create {@link Service} instances.
@@ -43,5 +46,17 @@ public class ServiceFactory {
       }
     }
     return null;
+  }
+
+  /**
+   * Return a collection of available services.
+   * @return
+   */
+  public Set<String> availableServices() {
+    Set<String> result = Sets.newHashSet();
+    for (Service s : serviceLoader) {
+      result.add(s.getName());
+    }
+    return result;
   }
 }
