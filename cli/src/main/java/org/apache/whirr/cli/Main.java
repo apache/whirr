@@ -18,6 +18,8 @@
 
 package org.apache.whirr.cli;
 
+import com.google.common.collect.Maps;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
@@ -28,10 +30,9 @@ import java.util.TreeSet;
 
 import org.apache.whirr.cli.command.DestroyClusterCommand;
 import org.apache.whirr.cli.command.LaunchClusterCommand;
+import org.apache.whirr.cli.command.ListClusterCommand;
 import org.apache.whirr.cli.command.VersionCommand;
 import org.apache.whirr.service.ServiceFactory;
-
-import com.google.common.collect.Maps;
 
 /**
  * The entry point for the Whirr CLI.
@@ -51,31 +52,41 @@ public class Main {
   int run(InputStream in, PrintStream out, PrintStream err,
       List<String> list) throws Exception {
     if (list.isEmpty()) {
-      out.println("Usage: whirr COMMAND [ARGS]");
-      out.println("where COMMAND may be one of:");
-      out.println();
-      for (Command command : commandMap.values()) {
-        out.printf("%" + maxLen + "s  %s\n", command.getName(),
-            command.getDescription());
-      }
-      out.println();
-      out.println("Available services:");
-      ServiceFactory serviceFactory = new ServiceFactory();
-      for (String serviceName :
-        new TreeSet<String>(serviceFactory.availableServices())) {
-        out.println("  " + serviceName);
-      }
+      printUsage(out);
       return -1;
     }
     Command command = commandMap.get(list.get(0));
+    if (command == null) {
+      err.printf("Unrecognized command '%s'\n", list.get(0));
+      err.println();
+      printUsage(err);
+      return -1;
+    }
     return command.run(in, out, err, list.subList(1, list.size()));
   }
-
+  
+  private void printUsage(PrintStream stream) {
+    stream.println("Usage: whirr COMMAND [ARGS]");
+    stream.println("where COMMAND may be one of:");
+    stream.println();
+    for (Command command : commandMap.values()) {
+      stream.printf("%" + maxLen + "s  %s\n", command.getName(),
+          command.getDescription());
+    }
+    stream.println();
+    stream.println("Available services:");
+    ServiceFactory serviceFactory = new ServiceFactory();
+    for (String serviceName : new TreeSet<String>(
+        serviceFactory.availableServices())) {
+      stream.println("  " + serviceName);
+    }
+  }
   public static void main(String... args) throws Exception {
     Main main = new Main(
         new VersionCommand(),
         new LaunchClusterCommand(),
-        new DestroyClusterCommand()
+        new DestroyClusterCommand(),
+        new ListClusterCommand()
     );
     int rc = main.run(System.in, System.out, System.err, Arrays.asList(args));
     System.exit(rc);

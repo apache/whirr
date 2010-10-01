@@ -61,6 +61,16 @@ public class MainTest {
   }
   
   @Test
+  public void testUnrecognizedCommand() throws Exception {
+    Main main = new Main(new TestCommand());
+    ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+    PrintStream err = new PrintStream(bytes);
+    int rc = main.run(null, null, err, Lists.newArrayList("bogus-command"));
+    assertThat(rc, is(-1));
+    assertThat(bytes.toString(), containsString("Unrecognized command 'bogus-command'"));
+  }
+  
+  @Test
   public void testCommand() throws Exception {
     Command command = mock(Command.class);
     when(command.getName()).thenReturn("mock-command");
