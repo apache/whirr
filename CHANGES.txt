@@ -6,6 +6,8 @@ Trunk (unreleased changes)
 
     WHIRR-100. Create a binary distribution of Whirr. (tomwhite)
 
+    WHIRR-73. Add a list command to the CLI. (tomwhite)
+
   IMPROVEMENTS
 
     WHIRR-89. Support maven 3 builds. (Adrian Cole via tomwhite)

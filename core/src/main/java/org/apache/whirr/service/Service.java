@@ -20,9 +20,15 @@ package org.apache.whirr.service;
 
 import static org.jclouds.compute.predicates.NodePredicates.withTag;
 
+import com.google.common.base.Predicate;
+
 import java.io.IOException;
+import java.util.Set;
 
 import org.jclouds.compute.ComputeService;
+import org.jclouds.compute.domain.ComputeMetadata;
+import org.jclouds.compute.domain.NodeMetadata;
+import org.jclouds.compute.domain.NodeState;
 
 /**
  * This class represents a service that a client wants to use. This class is
@@ -57,6 +63,33 @@ public abstract class Service {
     ComputeService computeService =
       ComputeServiceContextBuilder.build(clusterSpec).getComputeService();
     computeService.destroyNodesMatching(withTag(clusterSpec.getClusterName()));
+  }
+  
+  public Set<? extends NodeMetadata> getNodes(ClusterSpec clusterSpec)
+    throws IOException {
+    ComputeService computeService =
+      ComputeServiceContextBuilder.build(clusterSpec).getComputeService();
+    return computeService.listNodesDetailsMatching(
+        runningWithTag(clusterSpec.getClusterName()));
+  }
+  
+  public static Predicate<ComputeMetadata> runningWithTag(final String tag) {
+    return new Predicate<ComputeMetadata>() {
+      @Override
+      public boolean apply(ComputeMetadata computeMetadata) {
+        // Not all list calls return NodeMetadata (e.g. VCloud)
+        if (computeMetadata instanceof NodeMetadata) {
+          NodeMetadata nodeMetadata = (NodeMetadata) computeMetadata;
+          return tag.equals(nodeMetadata.getTag())
+            && nodeMetadata.getState() == NodeState.RUNNING;
+        }
+        return false;
+      }
+      @Override
+      public String toString() {
+        return "runningWithTag(" + tag + ")";
+      }
+    };
   }
 
 }

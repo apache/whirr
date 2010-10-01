@@ -21,7 +21,6 @@ package org.apache.whirr.service.cassandra;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.apache.whirr.service.RunUrlBuilder.runUrls;
 import static org.jclouds.compute.options.TemplateOptions.Builder.runScript;
-import static org.jclouds.compute.predicates.NodePredicates.runningWithTag;
 import static org.jclouds.io.Payloads.newStringPayload;
 
 import com.google.common.base.Function;
@@ -55,6 +54,7 @@ import org.jclouds.compute.RunScriptOnNodesException;
 import org.jclouds.compute.domain.NodeMetadata;
 import org.jclouds.compute.domain.Template;
 import org.jclouds.compute.domain.TemplateBuilder;
+import org.jclouds.compute.predicates.NodePredicates;
 import org.jclouds.io.Payload;
 import org.jclouds.ssh.ExecResponse;
 
@@ -115,7 +115,8 @@ public class CassandraService extends Service {
     try {
       Map<? extends NodeMetadata, ExecResponse> responses = computeService
           .runScriptOnNodesMatching(
-              runningWithTag(clusterSpec.getClusterName()), configureScript);
+            NodePredicates.runningWithTag(clusterSpec.getClusterName()),
+              configureScript);
       assert responses.size() > 0 : "no nodes matched "
           + clusterSpec.getClusterName();
     } catch (RunScriptOnNodesException e) {
