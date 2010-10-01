@@ -32,6 +32,8 @@ Trunk (unreleased changes)
 
     WHIRR-104. print available services in cli help string (phunt)
 
+    WHIRR-108. Fix checkstyle and rat violations. (tomwhite)
+
 Release 0.1.0 - 2010-09-02
 
   INCOMPATIBLE CHANGES

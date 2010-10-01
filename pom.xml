@@ -295,6 +295,8 @@
             <exclude>**/.project</exclude>
             <exclude>**/META-INF/services/*</exclude>
             <exclude>**/target/**</exclude>
+            <exclude>lib/*LICENSE*</exclude>
+            <exclude>**/src/main/resources/version-banner.txt</exclude>
           </excludes>
         </configuration>
       </plugin>
