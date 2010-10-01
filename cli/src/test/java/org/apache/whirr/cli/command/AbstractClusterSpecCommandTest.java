@@ -56,7 +56,7 @@ public class AbstractClusterSpecCommandTest {
    * Ensure that an invalid service name causes failure
    */
   @Test(expected=IllegalArgumentException.class)
-  public void testCreateServer_InvalidServiceName() throws Exception {
+  public void testCreateServerWithInvalidServiceName() throws Exception {
     AbstractClusterSpecCommand clusterSpecCommand = new AbstractClusterSpecCommand("name",
         "description", new ServiceFactory()) {
       @Override
