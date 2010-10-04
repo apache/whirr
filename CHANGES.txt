@@ -42,6 +42,8 @@ Trunk (unreleased changes)
     WHIRR-107. Test failing due to not matching Amazon Linux AMI on EC2.
     (tomwhite)
 
+    WHIRR-106. Improve logging in whirr cli. (tomwhite)
+
 Release 0.1.0 - 2010-09-02
 
   INCOMPATIBLE CHANGES

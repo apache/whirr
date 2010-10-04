@@ -71,7 +71,6 @@ public class ZooKeeperServiceTest {
     assertThat(s, instanceOf(ZooKeeperService.class));
     service = (ZooKeeperService) s;
     cluster = service.launchCluster(clusterSpec);
-    System.out.println(cluster.getHosts());
   }
   
   @Test

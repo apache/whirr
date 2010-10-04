@@ -57,8 +57,13 @@ import org.jclouds.compute.domain.TemplateBuilder;
 import org.jclouds.compute.predicates.NodePredicates;
 import org.jclouds.io.Payload;
 import org.jclouds.ssh.ExecResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class CassandraService extends Service {
+  
+  private static final Logger LOG =
+    LoggerFactory.getLogger(CassandraService.class);
 
   public static final String CASSANDRA_ROLE = "cassandra";
   public static final int CLIENT_PORT = 9160;
@@ -70,6 +75,8 @@ public class CassandraService extends Service {
 
   @Override
   public Cluster launchCluster(ClusterSpec clusterSpec) throws IOException {
+    LOG.info("Launching " + clusterSpec.getClusterName() + " cluster");
+    
     ComputeServiceContext computeServiceContext =
         ComputeServiceContextBuilder.build(clusterSpec);
     ComputeService computeService = computeServiceContext.getComputeService();
@@ -87,6 +94,7 @@ public class CassandraService extends Service {
     new TemplateBuilderStrategy().configureTemplateBuilder(clusterSpec,
         templateBuilder);
 
+    LOG.info("Configuring template");
     Template template = templateBuilder.build();
 
     InstanceTemplate instanceTemplate = clusterSpec
@@ -95,13 +103,16 @@ public class CassandraService extends Service {
     int clusterSize = instanceTemplate.getNumberOfInstances();
     Set<? extends NodeMetadata> nodeMap;
     try {
+      LOG.info("Starting {} node(s)", clusterSize);
       nodeMap = computeService.runNodesWithTag(clusterSpec.getClusterName(),
           clusterSize, template);
+      LOG.info("Nodes started: {}", nodeMap);
     } catch (RunNodesException e) {
       // TODO: can we do better here
       throw new IOException(e);
     }
     
+    LOG.info("Authorizing firewall");
     FirewallSettings.authorizeIngress(computeServiceContext, nodeMap, clusterSpec, CLIENT_PORT);
 
     List<NodeMetadata> nodes = Lists.newArrayList(nodeMap);
@@ -113,6 +124,7 @@ public class CassandraService extends Service {
             "apache/cassandra/post-configure " + servers));
 
     try {
+      LOG.info("Running configuration script");
       Map<? extends NodeMetadata, ExecResponse> responses = computeService
           .runScriptOnNodesMatching(
             NodePredicates.runningWithTag(clusterSpec.getClusterName()),
@@ -124,6 +136,7 @@ public class CassandraService extends Service {
       throw new IOException(e);
     }
 
+    LOG.info("Completed launch of {}", clusterSpec.getClusterName());
     return new Cluster(getInstances(nodes));
   }
 
