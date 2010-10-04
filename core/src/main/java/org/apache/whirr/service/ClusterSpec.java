@@ -181,13 +181,13 @@ public class ClusterSpec {
     try {
       String privateKeyPath = c.getString(
           Property.PRIVATE_KEY_FILE.getConfigName());
-      if (privateKeyPath != null)
+      if (privateKeyPath != null && new File(privateKeyPath).exists())
         setPrivateKey(new File(privateKeyPath));
       String publicKeyPath = c.getString(Property.PUBLIC_KEY_FILE.
                getConfigName());
       publicKeyPath = publicKeyPath == null && privateKeyPath != null ?
                 privateKeyPath + ".pub" : publicKeyPath;
-      if (publicKeyPath != null)
+      if (publicKeyPath != null && new File(publicKeyPath).exists())
         setPublicKey(new File(publicKeyPath));
     } catch (IOException e) {
       throw new ConfigurationException("error reading key from file", e);

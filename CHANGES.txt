@@ -20,6 +20,9 @@ Trunk (unreleased changes)
 
     WHIRR-105. Add version command to the CLI. (tomwhite)
 
+    WHIRR-109. Unit tests fail if there is no private key found at
+    ~/.ssh/id_rsa. (Adrian Cole via tomwhite)
+
   BUG FIXES
 
     WHIRR-93. Fail on checkstyle violation. (tomwhite)
