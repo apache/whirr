@@ -25,6 +25,7 @@ import static org.junit.Assert.assertTrue;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.cassandra.thrift.Cassandra;
@@ -41,9 +42,12 @@ import org.apache.whirr.service.Service;
 import org.apache.whirr.service.ServiceFactory;
 import org.apache.whirr.service.Cluster.Instance;
 import org.apache.whirr.service.cassandra.CassandraService;
+import org.apache.whirr.ssh.KeyPair;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
+import com.jcraft.jsch.JSchException;
 
 public class CassandraServiceTest {
 
@@ -54,13 +58,19 @@ public class CassandraServiceTest {
   private Cluster cluster;
 
   @Before
-  public void setUp() throws ConfigurationException, IOException {
+  public void setUp() throws ConfigurationException, IOException,
+      JSchException {
     CompositeConfiguration config = new CompositeConfiguration();
     if (System.getProperty("config") != null) {
       config.addConfiguration(new PropertiesConfiguration(System.getProperty("config")));
     }
     config.addConfiguration(new PropertiesConfiguration("whirr-cassandra-test.properties"));
     clusterSpec = new ClusterSpec(config);
+    if (clusterSpec.getPrivateKey() == null) {
+      Map<String, String> pair = KeyPair.generate();
+      clusterSpec.setPublicKey(pair.get("public"));
+      clusterSpec.setPrivateKey(pair.get("private"));
+    }
     Service s = new ServiceFactory().create(clusterSpec.getServiceName());
     assertThat(s, instanceOf(CassandraService.class));
     service = (CassandraService) s;

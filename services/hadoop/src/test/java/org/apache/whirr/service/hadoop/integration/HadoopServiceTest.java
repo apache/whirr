@@ -29,6 +29,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.commons.configuration.CompositeConfiguration;
@@ -53,9 +54,12 @@ import org.apache.whirr.service.ServiceFactory;
 import org.apache.whirr.service.hadoop.HadoopCluster;
 import org.apache.whirr.service.hadoop.HadoopProxy;
 import org.apache.whirr.service.hadoop.HadoopService;
+import org.apache.whirr.ssh.KeyPair;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
+import com.jcraft.jsch.JSchException;
 
 public class HadoopServiceTest {
   
@@ -65,13 +69,19 @@ public class HadoopServiceTest {
   private HadoopCluster cluster;
   
   @Before
-  public void setUp() throws ConfigurationException, IOException {
+  public void setUp() throws ConfigurationException, IOException, 
+      JSchException {
     CompositeConfiguration config = new CompositeConfiguration();
     if (System.getProperty("config") != null) {
       config.addConfiguration(new PropertiesConfiguration(System.getProperty("config")));
     }
     config.addConfiguration(new PropertiesConfiguration("whirr-hadoop-test.properties"));
     clusterSpec = new ClusterSpec(config);
+    if (clusterSpec.getPrivateKey() == null) {
+      Map<String, String> pair = KeyPair.generate();
+      clusterSpec.setPublicKey(pair.get("public"));
+      clusterSpec.setPrivateKey(pair.get("private"));
+    }
     Service s = new ServiceFactory().create(clusterSpec.getServiceName());
     assertThat(s, instanceOf(HadoopService.class));
     service = (HadoopService) s;
