@@ -39,6 +39,9 @@ Trunk (unreleased changes)
 
     WHIRR-101. Hadoop on EC2 does not use the /mnt partition. (tomwhite)
 
+    WHIRR-107. Test failing due to not matching Amazon Linux AMI on EC2.
+    (tomwhite)
+
 Release 0.1.0 - 2010-09-02
 
   INCOMPATIBLE CHANGES

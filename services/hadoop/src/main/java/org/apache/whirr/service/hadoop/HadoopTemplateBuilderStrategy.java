@@ -21,6 +21,7 @@ package org.apache.whirr.service.hadoop;
 import org.apache.whirr.service.ClusterSpec;
 import org.apache.whirr.service.jclouds.TemplateBuilderStrategy;
 import org.jclouds.aws.ec2.compute.domain.EC2Hardware;
+import org.jclouds.compute.domain.OsFamily;
 import org.jclouds.compute.domain.TemplateBuilder;
 
 public class HadoopTemplateBuilderStrategy extends TemplateBuilderStrategy {
@@ -29,6 +30,10 @@ public class HadoopTemplateBuilderStrategy extends TemplateBuilderStrategy {
       TemplateBuilder templateBuilder) {
     super.configureTemplateBuilder(clusterSpec, templateBuilder);
     
+    if ("ec2".equals(clusterSpec.getProvider()) 
+        && clusterSpec.getImageId() == null) {
+      templateBuilder.osFamily(OsFamily.AMZN_LINUX);
+    }
     if ("ec2".equals(clusterSpec.getProvider())
         && clusterSpec.getHardwareId() == null) {
       // micro is too small for Hadoop (even for testing)
