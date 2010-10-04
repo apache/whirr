@@ -34,6 +34,8 @@ Trunk (unreleased changes)
 
     WHIRR-108. Fix checkstyle and rat violations. (tomwhite)
 
+    WHIRR-101. Hadoop on EC2 does not use the /mnt partition. (tomwhite)
+
 Release 0.1.0 - 2010-09-02
 
   INCOMPATIBLE CHANGES

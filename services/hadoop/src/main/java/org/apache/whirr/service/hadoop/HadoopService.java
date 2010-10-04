@@ -131,10 +131,11 @@ public class HadoopService extends Service {
     // Launch slaves (DN and TT)
     Payload slaveBootScript = newStringPayload(runUrls(clusterSpec.getRunUrlBase(),
       "sun/java/install",
-      String.format("%s dn,tt -n %s -j %s",
+      String.format("%s dn,tt -n %s -j %s -c %s",
           hadoopInstallRunUrl,
           namenodePublicAddress.getHostName(),
-          jobtrackerPublicAddress.getHostName())));
+          jobtrackerPublicAddress.getHostName(),
+          clusterSpec.getProvider())));
 
     TemplateBuilder slaveTemplateBuilder = computeService.templateBuilder()
       .options(runScript(slaveBootScript)

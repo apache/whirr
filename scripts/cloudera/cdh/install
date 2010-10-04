@@ -144,8 +144,14 @@ function make_hadoop_dirs {
 
 # Configure Hadoop by setting up disks and site file
 function configure_hadoop() {
-
-  MOUNT=/data
+  case $CLOUD_PROVIDER in
+  ec2)
+    MOUNT=/mnt
+    ;;
+  *)
+    MOUNT=/data
+    ;;
+  esac
   FIRST_MOUNT=$MOUNT
   DFS_NAME_DIR=$MOUNT/hadoop/hdfs/name
   FS_CHECKPOINT_DIR=$MOUNT/hadoop/hdfs/secondary
