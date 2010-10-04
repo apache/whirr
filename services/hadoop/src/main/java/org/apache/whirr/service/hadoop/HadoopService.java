@@ -54,8 +54,13 @@ import org.jclouds.compute.domain.NodeMetadata;
 import org.jclouds.compute.domain.Template;
 import org.jclouds.compute.domain.TemplateBuilder;
 import org.jclouds.io.Payload;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class HadoopService extends Service {
+  
+  private static final Logger LOG =
+    LoggerFactory.getLogger(HadoopService.class);
   
   public static final Set<String> MASTER_ROLE = Sets.newHashSet("nn", "jt");
   public static final Set<String> WORKER_ROLE = Sets.newHashSet("dn", "tt");
@@ -73,6 +78,8 @@ public class HadoopService extends Service {
   
   @Override
   public HadoopCluster launchCluster(ClusterSpec clusterSpec) throws IOException {
+    LOG.info("Launching " + clusterSpec.getClusterName() + " cluster");
+    
     ComputeServiceContext computeServiceContext =
       ComputeServiceContextBuilder.build(clusterSpec);
     ComputeService computeService = computeServiceContext.getComputeService();
@@ -86,6 +93,7 @@ public class HadoopService extends Service {
       String.format("%s nn,jt -c %s", hadoopInstallRunUrl,
           clusterSpec.getProvider())));
 
+    LOG.info("Configuring template");
     TemplateBuilder masterTemplateBuilder = computeService.templateBuilder()
       .options(runScript(nnjtBootScript)
       .installPrivateKey(clusterSpec.getPrivateKey())
@@ -101,8 +109,10 @@ public class HadoopService extends Service {
     checkArgument(instanceTemplate.getNumberOfInstances() == 1);
     Set<? extends NodeMetadata> nodes;
     try {
+      LOG.info("Starting master node");
       nodes = computeService.runNodesWithTag(
           clusterSpec.getClusterName(), 1, masterTemplate);
+      LOG.info("Master node started: {}", nodes);
     } catch (RunNodesException e) {
       // TODO: can we do better here (retry?)
       throw new IOException(e);
@@ -111,6 +121,7 @@ public class HadoopService extends Service {
     InetAddress namenodePublicAddress = InetAddress.getByName(Iterables.get(node.getPublicAddresses(),0));
     InetAddress jobtrackerPublicAddress = InetAddress.getByName(Iterables.get(node.getPublicAddresses(),0));
     
+    LOG.info("Authorizing firewall");
     FirewallSettings.authorizeIngress(computeServiceContext, node, clusterSpec,
         WEB_PORT);
     FirewallSettings.authorizeIngress(computeServiceContext, node, clusterSpec,
@@ -151,8 +162,10 @@ public class HadoopService extends Service {
 
     Set<? extends NodeMetadata> workerNodes;
     try {
+      LOG.info("Starting {} worker node(s)", instanceTemplate.getNumberOfInstances());
       workerNodes = computeService.runNodesWithTag(clusterSpec.getClusterName(),
         instanceTemplate.getNumberOfInstances(), slaveTemplate);
+      LOG.info("Worker nodes started: {}", workerNodes);
     } catch (RunNodesException e) {
       // TODO: don't bail out if only a few have failed to start
       throw new IOException(e);
@@ -163,6 +176,9 @@ public class HadoopService extends Service {
     Set<Instance> instances = Sets.union(getInstances(MASTER_ROLE, Collections.singleton(node)),
       getInstances(WORKER_ROLE, workerNodes));
     
+    LOG.info("Completed launch of {}", clusterSpec.getClusterName());
+    LOG.info("Web UI available at http://{}",
+        namenodePublicAddress.getHostName());
     Properties config = createClientSideProperties(namenodePublicAddress, jobtrackerPublicAddress);
     return new HadoopCluster(instances, config);
   }

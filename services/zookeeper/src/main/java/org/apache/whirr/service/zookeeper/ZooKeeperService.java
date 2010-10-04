@@ -54,8 +54,13 @@ import org.jclouds.compute.domain.Template;
 import org.jclouds.compute.domain.TemplateBuilder;
 import org.jclouds.compute.predicates.NodePredicates;
 import org.jclouds.io.Payload;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ZooKeeperService extends Service {
+  
+  private static final Logger LOG =
+    LoggerFactory.getLogger(ZooKeeperService.class);
     
   public static final String ZOOKEEPER_ROLE = "zk";
   private static final int CLIENT_PORT = 2181;
@@ -67,6 +72,8 @@ public class ZooKeeperService extends Service {
   
   @Override
   public ZooKeeperCluster launchCluster(ClusterSpec clusterSpec) throws IOException {
+    LOG.info("Launching " + clusterSpec.getClusterName() + " cluster");
+    
     ComputeServiceContext computeServiceContext =
       ComputeServiceContextBuilder.build(clusterSpec);
     ComputeService computeService = computeServiceContext.getComputeService();
@@ -83,6 +90,7 @@ public class ZooKeeperService extends Service {
     new TemplateBuilderStrategy().configureTemplateBuilder(clusterSpec,
         templateBuilder);
     
+    LOG.info("Configuring template");
     Template template = templateBuilder.build();
     
     InstanceTemplate instanceTemplate = clusterSpec.getInstanceTemplate(ZOOKEEPER_ROLE);
@@ -90,13 +98,16 @@ public class ZooKeeperService extends Service {
     int ensembleSize = instanceTemplate.getNumberOfInstances();
     Set<? extends NodeMetadata> nodeMap;
     try {
+      LOG.info("Starting {} node(s)", ensembleSize);
       nodeMap = computeService.runNodesWithTag(clusterSpec.getClusterName(), ensembleSize,
       template);
+      LOG.info("Nodes started: {}", nodeMap);
     } catch (RunNodesException e) {
       // TODO: can we do better here - proceed if ensemble is big enough?
       throw new IOException(e);
     }
     
+    LOG.info("Authorizing firewall");
     FirewallSettings.authorizeIngress(computeServiceContext, nodeMap, clusterSpec, CLIENT_PORT);
     
     List<NodeMetadata> nodes = Lists.newArrayList(nodeMap);
@@ -107,6 +118,7 @@ public class ZooKeeperService extends Service {
     Payload configureScript = newStringPayload(runUrls(clusterSpec.getRunUrlBase(),
       "apache/zookeeper/post-configure " + servers));
     try {
+      LOG.info("Running configuration script");
       computeService.runScriptOnNodesMatching(NodePredicates.runningWithTag(
           clusterSpec.getClusterName()), configureScript);
     } catch (RunScriptOnNodesException e) {
@@ -114,7 +126,9 @@ public class ZooKeeperService extends Service {
       throw new IOException(e);
     }
     
+    LOG.info("Completed launch of {}", clusterSpec.getClusterName());
     String hosts = Joiner.on(',').join(getHosts(nodes));
+    LOG.info("Hosts: {}", hosts);
     return new ZooKeeperCluster(getInstances(nodes), hosts);
   }
 

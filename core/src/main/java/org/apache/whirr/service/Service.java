@@ -30,11 +30,16 @@ import org.jclouds.compute.domain.ComputeMetadata;
 import org.jclouds.compute.domain.NodeMetadata;
 import org.jclouds.compute.domain.NodeState;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * This class represents a service that a client wants to use. This class is
  * used to start and stop clusters that provide the service.
  */
 public abstract class Service {
+  
+  private static final Logger LOG = LoggerFactory.getLogger(Service.class);
 
   /**
    * @return the unique name of the service.
@@ -60,9 +65,11 @@ public abstract class Service {
    * cluster may or may not have been stopped.
    */
   public void destroyCluster(ClusterSpec clusterSpec) throws IOException {
+    LOG.info("Destroying " + clusterSpec.getClusterName() + " cluster");
     ComputeService computeService =
       ComputeServiceContextBuilder.build(clusterSpec).getComputeService();
     computeService.destroyNodesMatching(withTag(clusterSpec.getClusterName()));
+    LOG.info("Cluster {} destroyed", clusterSpec.getClusterName());
   }
   
   public Set<? extends NodeMetadata> getNodes(ClusterSpec clusterSpec)
