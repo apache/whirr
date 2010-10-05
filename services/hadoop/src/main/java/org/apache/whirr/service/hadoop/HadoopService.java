@@ -26,6 +26,7 @@ import static org.jclouds.io.Payloads.newStringPayload;
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Function;
+import com.google.common.base.Joiner;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
@@ -180,7 +181,10 @@ public class HadoopService extends Service {
     LOG.info("Web UI available at http://{}",
         namenodePublicAddress.getHostName());
     Properties config = createClientSideProperties(namenodePublicAddress, jobtrackerPublicAddress);
-    return new HadoopCluster(instances, config);
+    createClientSideHadoopSiteFile(clusterSpec, config);
+    HadoopCluster cluster = new HadoopCluster(instances, config);
+    createProxyScript(clusterSpec, cluster);
+    return cluster; 
   }
   
   private Set<Instance> getInstances(final Set<String> roles, Set<? extends NodeMetadata> nodes) {
@@ -209,9 +213,24 @@ public class HadoopService extends Service {
       return config;
   }
 
-  private void createClientSideHadoopSiteFile(InetAddress namenode, InetAddress jobtracker) throws IOException {
-    File file = new File("/tmp/hadoop-site.xml");
-    Files.write(generateHadoopConfigurationFile(createClientSideProperties(namenode, jobtracker)), file, Charsets.UTF_8);
+  private void createClientSideHadoopSiteFile(ClusterSpec clusterSpec, Properties config) {
+    File configDir = getConfigDir(clusterSpec);
+    File hadoopSiteFile = new File(configDir, "hadoop-site.xml");
+    try {
+      Files.write(generateHadoopConfigurationFile(config), hadoopSiteFile,
+          Charsets.UTF_8);
+      LOG.info("Wrote Hadoop site file {}", hadoopSiteFile);
+    } catch (IOException e) {
+      LOG.error("Problem writing Hadoop site file {}", hadoopSiteFile, e);
+    }
+  }
+  
+  private File getConfigDir(ClusterSpec clusterSpec) {
+    File configDir = new File(new File(System.getProperty("user.home")),
+        ".whirr");
+    configDir = new File(configDir, clusterSpec.getClusterName());
+    configDir.mkdirs();
+    return configDir;
   }
   
   private CharSequence generateHadoopConfigurationFile(Properties config) {
@@ -220,13 +239,29 @@ public class HadoopService extends Service {
     sb.append("<?xml-stylesheet type=\"text/xsl\" href=\"configuration.xsl\"?>\n");
     sb.append("<configuration>\n");
     for (Entry<Object, Object> entry : config.entrySet()) {
-      sb.append("<property>\n");
-      sb.append("<name>").append(entry.getKey()).append("</name>\n");
-      sb.append("<value>").append(entry.getValue()).append("</value>\n");
-      sb.append("</property>\n");
+      sb.append("  <property>\n");
+      sb.append("    <name>").append(entry.getKey()).append("</name>\n");
+      sb.append("    <value>").append(entry.getValue()).append("</value>\n");
+      sb.append("  </property>\n");
     }
     sb.append("</configuration>\n");
     return sb;
+  }
+  
+  private void createProxyScript(ClusterSpec clusterSpec, HadoopCluster cluster) {
+    File configDir = getConfigDir(clusterSpec);
+    File hadoopProxyFile = new File(configDir, "hadoop-proxy.sh");
+    try {
+      HadoopProxy proxy = new HadoopProxy(clusterSpec, cluster);
+      String script = String.format("echo 'Running proxy to Hadoop cluster at %s. " +
+          "Use Ctrl-c to quit.'\n",
+          cluster.getNamenodePublicAddress().getHostName())
+        + Joiner.on(" ").join(proxy.getProxyCommand());
+      Files.write(script, hadoopProxyFile, Charsets.UTF_8);
+      LOG.info("Wrote Hadoop proxy script {}", hadoopProxyFile);
+    } catch (IOException e) {
+      LOG.error("Problem writing Hadoop proxy script {}", hadoopProxyFile, e);
+    }
   }
   
 }

@@ -41,10 +41,8 @@ public class HadoopProxy {
     this.clusterSpec = clusterSpec;
     this.cluster = cluster;
   }
-
-  public void start() throws IOException {
-    // jsch doesn't support SOCKS-based dynamic port forwarding, so we need to shell out...
-    // TODO: Use static port forwarding instead?
+  
+  public String[] getProxyCommand() throws IOException {
     checkState(clusterSpec.getPrivateKey() != null, "privateKey is needed");
     File identity;
     if (clusterSpec.getPrivateKey().getRawContent() instanceof File) {
@@ -56,14 +54,21 @@ public class HadoopProxy {
     }
     String user = Iterables.get(cluster.getInstances(), 0).getLoginCredentials().identity;
     String server = cluster.getNamenodePublicAddress().getHostName();
-    String[] command = new String[] { "ssh",
-      "-i", identity.getAbsolutePath(),
-      "-o", "ConnectTimeout=10",
-      "-o", "ServerAliveInterval=60",
-      "-o", "StrictHostKeyChecking=no",
-      "-N",
-      "-D 6666",
-      String.format("%s@%s", user, server)};
+    return new String[] { "ssh",
+        "-i", identity.getAbsolutePath(),
+        "-o", "ConnectTimeout=10",
+        "-o", "ServerAliveInterval=60",
+        "-o", "StrictHostKeyChecking=no",
+        "-N",
+        "-D 6666",
+        String.format("%s@%s", user, server)};
+  }
+
+  public void start() throws IOException {
+    // jsch doesn't support SOCKS-based dynamic port forwarding
+    // so we need to shell out
+
+    String[] command = getProxyCommand();
     ProcessBuilder processBuilder = new ProcessBuilder(command);
     process = processBuilder.start();
     
