@@ -47,6 +47,9 @@ Trunk (unreleased changes)
 
     WHIRR-106. Improve logging in whirr cli. (tomwhite)
 
+    WHIRR-113. Hadoop cluster instances should all start in the same location.
+    (tomwhite)
+
 Release 0.1.0 - 2010-09-02
 
   INCOMPATIBLE CHANGES
