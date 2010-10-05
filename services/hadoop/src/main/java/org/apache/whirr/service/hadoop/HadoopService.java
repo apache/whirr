@@ -155,6 +155,7 @@ public class HadoopService extends Service {
       .authorizePublicKey(clusterSpec.getPublicKey()));
 
     strategy.configureTemplateBuilder(clusterSpec, slaveTemplateBuilder);
+    slaveTemplateBuilder.locationId(masterTemplate.getLocation().getId());
     
     Template slaveTemplate = slaveTemplateBuilder.build();
     
