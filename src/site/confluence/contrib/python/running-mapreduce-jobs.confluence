@@ -1,0 +1,43 @@
+h1. Running MapReduce Jobs
+
+After you launch a cluster, a {{hadoop-site.xml}} file is created in the
+directory {{~/.hadoop-cloud/<cluster-name>}}. You can use this to connect to
+the cluster by setting the {{HADOOP\_CONF\_DIR}} environment variable. (It is
+also possible to set the configuration file to use by passing it as a {{-conf}}
+option to Hadoop Tools):
+{code}
+% export HADOOP_CONF_DIR=~/.hadoop-cloud/my-hadoop-cluster
+{code}
+*To browse HDFS:*
+{code}
+% hadoop fs -ls /
+{code}
+Note that the version of Hadoop installed locally should match the version
+installed on the cluster.
+\\
+\\
+*To run a job locally:*
+{code}
+% hadoop fs -mkdir input # create an input directory
+% hadoop fs -put $HADOOP_HOME/LICENSE.txt input # copy a file there
+% hadoop jar $HADOOP_HOME/hadoop-*examples*.jar wordcount input output
+% hadoop fs -cat output/part-* | head
+{code}
+The preceding examples assume that you installed Hadoop on your local machine.
+But you can also run jobs within the cluster.
+\\
+\\
+*To run jobs within the cluster:*
+
+1. Log into the Namenode:
+{code}
+% hadoop-ec2 login my-hadoop-cluster
+{code}
+
+2. Run the job:
+{code}
+# hadoop fs -mkdir input
+# hadoop fs -put /etc/hadoop/conf/*.xml input
+# hadoop jar /usr/lib/hadoop/hadoop-*-examples.jar grep input output 'dfs\[a-z.]+'
+# hadoop fs -cat output/part-* | head
+{code}

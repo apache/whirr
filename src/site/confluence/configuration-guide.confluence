@@ -1,50 +1,51 @@
-h1. Java
+h1. Configuration Guide
 
 Whirr is configured using a properties file, and optionally using command line arguments when using the CLI. Command line arguments take precedence over properties specified in a properties file.
 
 || Name || Command line option || Default || Description ||
-| {{config}} | {{\--config}} | none | A filename of a properties file containing properties in this table. |
-| {{service-name}} | {{\--service-name}} | none | The name of the service to use. E.g. {{hadoop}} |
-| {{cluster-name}} | {{\--cluster-name}} | none | The name of the cluster to operate on. E.g. {{hadoopcluster}}. The cluster name is used to tag the instances in some cloud-specific way. For example, in Amazon it is used to form the security group name. |
-| {{instance-templates}} | {{\--instance-templates}} | none | The number of instances to launch for each set of roles. E.g. {{1 nn+jt 1 dn+tt}}. |
-| {{provider}} | {{\--provider}} | {{ec2}} | The name of the cloud provider. |
-| {{identity}} | {{\--identity}} | none | The cloud identity. See the table below for how this maps to the credentials for your provider. |
-| {{credential}} | {{\--credential}} | none | The cloud credential. See the table below for how this maps to the credentials for your provider. |
-| {{secret-key-file}} | {{\--secret-key-file}} | _\~/.ssh/id\_rsa_ | The filename of the private key used to connect to instances. |
-| {{image-id}} | {{\--image-id}} | none | The ID of the image to use for instances. If not specified then a vanilla Ubuntu image is chosen. |
-| {{hardware-id}} | {{\--hardware-id}} | none | The type of hardware to use for the instance. This must be compatible with the image ID. |
-| {{location-id}} | {{\--location-id}} | none | The location to launch instances in. If not specified then an arbitrary location will be chosen. |
-| {{client-cidrs}} | {{\--client-cidrs}} | none | A comma-separated list of [CIDR |http://en.wikipedia.org/wiki/Classless\_Inter-Domain\_Routing] blocks. E.g. {{208.128.0.0/11,108.128.0.0/11}} |
-| {{run-url-base}} | {{\--run-url-base}} | {{http://whirr.s3.amazonaws.com/VERSION/}} | The base URL for forming run urls from. Change this to host your own set of launch scripts. |
+| {{whirr.config}} | {{\--config}} | none | A filename of a properties file containing properties in this table. Note that Whirr properties specified in this file all have a {{whirr.}} prefix. |
+| {{whirr.service-name}} | {{\--service-name}} | none | The name of the service to use. E.g. {{hadoop}}. |
+| {{whirr.cluster-name}} | {{\--cluster-name}} | none | The name of the cluster to operate on. E.g. {{hadoopcluster}}. The cluster name is used to tag the instances in some cloud-specific way. For example, in Amazon it is used to form the security group name. |
+| {{whirr.instance-templates}} | {{\--instance-templates}} | none | The number of instances to launch for each set of roles. E.g. {{1 nn+jt,10 dn+tt}} means one instance with the roles {{nn}} (namenode) and {{jt}} (jobtracker), and ten instances each with the roles {{dn}} (datanode) and {{tt}} (tasktracker). |
+| {{whirr.provider}} | {{\--provider}} | {{ec2}} | The name of the cloud provider. See the [table below|#cloud-provider-config] for possible provider names.|
+| {{whirr.identity}} | {{\--identity}} | none | The cloud identity. See the [table below|#cloud-provider-config] for how this maps to the credentials for your provider. |
+| {{whirr.credential}} | {{\--credential}} | none | The cloud credential. See the [table below|#cloud-provider-config] for how this maps to the credentials for your provider. |
+| {{whirr.private-key-file}} | {{\--private-key-file}} | _\~/.ssh/id\_rsa_ | The filename of the private key used to connect to instances. |
+| {{whirr.public-key-file}} | {{\--public-key-file}} | _\~/.ssh/id\_rsa_.pub | The filename of the public key used to connect to instances. |
+| {{whirr.image-id}} | {{\--image-id}} | none | The ID of the image to use for instances. If not specified then a vanilla Linux image is chosen. |
+| {{whirr.hardware-id}} | {{\--hardware-id}} | none | The type of hardware to use for the instance. This must be compatible with the image ID. |
+| {{whirr.location-id}} | {{\--location-id}} | none | The location to launch instances in. If not specified then an arbitrary location will be chosen. |
+| {{whirr.client-cidrs}} | {{\--client-cidrs}} | none | A comma-separated list of [CIDR |http://en.wikipedia.org/wiki/Classless\_Inter-Domain\_Routing] blocks. E.g. {{208.128.0.0/11,108.128.0.0/11}} |
+| {{whirr.run-url-base}} | {{\--run-url-base}} | {{http://whirr.s3.amazonaws.com/VERSION/}} | The base URL for forming run urls from. Change this to host your own set of launch scripts, as explained in the [FAQ|faq#how-can-i-modify-the-instance-installation-and-configuration-scripts]. |
 
+{anchor:cloud-provider-config}
 h2. Cloud provider specific configuration
 
-|| Compute Service Provider || {{provider}} || {{identity}} || {{credential}} || Cluster name usage ||
-| Amazon EC2 | {{ec2}} | Access Key ID | Secret Access Key | Used to form security Group (via jclouds tag) |
-| Rackspace Cloud Servers | {{cloudservers}} | Username | API Key | Server name ({{<username>-<security group>-<random junk>}}) |
+|| Compute Service Provider || {{whirr.provider}} || {{whirr.identity}} || {{whirr.credential}} || Cluster name usage || Notes ||
+| Amazon EC2 | {{ec2}} | Access Key ID | Secret Access Key | Used to form security Group (via jclouds tag) | |
+| Rackspace Cloud Servers | {{cloudservers}} | Username | API Key | Server name ({{<username>-<security group>-<random junk>}}) | Rackspace is not yet supported |
 
-h1. Python
+{anchor:comparison-with-python}
+h1. Comparison with Python
 
-See [https://docs.cloudera.com/display/DOC/Using+Command+Line+Options]
-
-h2. Comparison
+See [Using Command Line Options|contrib/python/using-command-line-options].
 
 || Python || Java || Notes ||
-| {{config-dir}} | {{config}} | |
-| {{service}} | {{service-name}} | |
-| none | {{cluster-name}} | Specified as a positional argument on the Python CLI. |
-| none | {{instance-templates}} | Specified as a positional arguments on the Python CLI. |
-| {{cloud-provider}} | {{provider}} | |
-| none | {{identity}} | Specified using environment variables for Python. E.g. {{AWS\_ACCESS\_KEY\_ID}}, {{RACKSPACE\_KEY}} |
-| none | {{credential}} | Specified using environment variables for Python. E.g. {{AWS\_ACCESS\_KEY\_ID}}, {{RACKSPACE\_SECRET}} |
-| {{private-key-file}} | {{private-key-file}} | |
-| {{client-cidr}} | {{client-cidrs}} | Python {{client-cidr}} option may be repeated multiple times, whereas Java {{client-cidrs}} contains comma-separated CIDRs. |
-| none | {{run-url-base}} | Specified using {{user-data-file}} in Python. |
-| {{public-key}} | none | Based on secret key in Java (add {{.pub}}). |
-| {{image-id}} | {{image-id}} | |
-| {{instance-type}} | {{hardware-id}} |  |
-| {{availability-zone}} | {{location-id}} | Location is more general than availability zone. |
-| {{security-group}} | none | Amazon-specific. However, Amazon users may wish to start a cluster in additional security groups. |
+| {{config-dir}} | {{whirr.config}} | |
+| {{service}} | {{whirr.service-name}} | |
+| none | {{whirr.cluster-name}} | Specified as a positional argument on the Python CLI. |
+| none | {{whirr.instance-templates}} | Specified as a positional arguments on the Python CLI. |
+| {{cloud-provider}} | {{whirr.provider}} | |
+| none | {{whirr.identity}} | Specified using environment variables for Python. E.g. {{AWS\_ACCESS\_KEY\_ID}}, {{RACKSPACE\_KEY}} |
+| none | {{whirr.credential}} | Specified using environment variables for Python. E.g. {{AWS\_ACCESS\_KEY\_ID}}, {{RACKSPACE\_SECRET}} |
+| {{private-key}} | {{whirr.private-key-file}} | |
+| {{public-key}} | {{whirr.public-key-file}} | |
+| {{client-cidr}} | {{whirr.client-cidrs}} | Python's {{client-cidr}} option may be repeated multiple times, whereas Java's {{whirr.client-cidrs}} contains comma-separated CIDRs. |
+| none | {{whirr.run-url-base}} | Specified using {{user-data-file}} in Python. |
+| {{image-id}} | {{whirr.image-id}} | |
+| {{instance-type}} | {{whirr.hardware-id}} |  |
+| {{availability-zone}} | {{whirr.location-id}} | Location is more general than availability zone. |
+| {{security-group}} | none | Amazon-specific. However, Amazon users may wish to start a cluster in additional security groups, which isn't currently supported in Java. |
 | {{env}} | none | May not be needed in Java with runurls. |
 | {{user-data-file}} | none | Amazon-specific. Use runurls. |
 | {{key-name}} | none | Amazon-specific. Jclouds generates a new key for clusters. |

@@ -26,6 +26,8 @@ Trunk (unreleased changes)
     WHIRR-110. Create client-side Hadoop configuration file during cluster
     launch. (tomwhite)
 
+    WHIRR-112. Expand documentation. (tomwhite)
+
   BUG FIXES
 
     WHIRR-93. Fail on checkstyle violation. (tomwhite)

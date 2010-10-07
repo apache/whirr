@@ -1,0 +1,7 @@
+h1. API Guide
+
+Whirr provides a Java API for stopping and starting clusters. Please see the
+[javadoc|apidocs/index.html] and the unit test source code for how to
+achieve this.
+
+There's also some example code at [http://github.com/hammer/whirr-demo].
