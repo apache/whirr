@@ -1,0 +1,77 @@
+h1. Using Command Line Options
+
+It is possible to specify options on the command line when you launch a cluster.
+The options take precedence over any settings specified in the configuration
+file.
+
+For example, the following command launches a 10-node cluster using a specified
+image and instance type, overriding the equivalent settings (if any) that are
+in the {{my-hadoop-cluster}} section of the configuration file. Note that words
+in options are separated by hyphens ({{--instance-type}}) while the
+corresponding configuration parameter are separated by underscores
+({{instance\_type}}).
+{code}
+% hadoop-ec2 launch-cluster --image-id ami-2359bf4a --instance-type c1.xlarge \
+my-hadoop-cluster 10
+{code}
+
+If there options are that you want to specify multiple times, you can set them
+in the configuration file by separating them with newlines (and leading
+whitespace). For example:
+{code}
+env=AWS_ACCESS_KEY_ID=...
+    AWS_SECRET_ACCESS_KEY=...
+{code}
+
+The scripts install Hadoop from a tarball (or, in the case of CDH, from RPMs or
+Debian packages, depending on the OS) at instance boot time.
+
+By default, Apache Hadoop 0.20.1 is installed. To run a different version of
+Hadoop, change the {{user\_data\_file}} setting.
+
+For example, to use the latest version of CDH3 add the following parameter:
+{code}
+--user-data-file http://archive.cloudera.com/cloud/ec2/cdh3/hadoop-ec2-init-remote.sh
+{code}
+By default, the latest version of the specified CDH release series is used. To
+use a particular release of CDH, use the {{REPO env}} parameter, in addition to
+setting {{user\_data\_file}}. For example, to specify the Beta 1 release of CDH3:
+{code}
+--env REPO=cdh3b1
+{code}
+For this release, Hadoop configuration files can be found in {{/etc/hadoop/conf}} and logs are in {{/var/log/hadoop}}.
+
+
+h2. Customization
+
+You can specify a list of packages to install on every instance at boot time by
+using the {{--user-packages}} command-line option or the {{user\_packages}}
+configuration parameter. Packages should be space-separated. Note that package
+names should reflect the package manager being used to install them ({{yum}} or
+{{apt-get}} depending on the OS).
+
+For example, to install RPMs for R and git:
+{code}
+% hadoop-ec2 launch-cluster --user-packages 'R git-core' my-hadoop-cluster 10
+{code}
+You have full control over the script that is run when each instance boots. The
+default script, {{hadoop-ec2-init-remote.sh}}, may be used as a starting point
+to add extra configuration or customization of the instance. Make a copy of the
+script in your home directory, or somewhere similar, and set the
+{{--user-data-file}} command-line option (or the {{user\_data\_file}}
+configuration parameter) to point to the (modified) copy. This option may also
+point to an arbitrary URL, which makes it easy to share scripts.
+
+For CDH, use the script located at [http://archive.cloudera.com/cloud/ec2/cdh3/hadoop-ec2-init-remote.sh]
+
+The {{hadoop-ec2}} script will replace {{%ENV%}} in your user data script with
+{{USER\_PACKAGES}}, {{AUTO\_SHUTDOWN}}, and {{EBS\_MAPPINGS}}, as well as extra
+parameters supplied using the {{--env}} command-line flag.
+
+Another way of customizing the instance, which may be more appropriate for
+larger changes, is to create your own image.
+
+It's possible to use any image, as long as it satisfies both of the following
+conditions:
+* Runs (gzip compressed) user data on boot
+* Has Java installed

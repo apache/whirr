@@ -1,0 +1,15 @@
+h1. Terminating a Cluster
+
+When you are done using your cluster, you can terminate all instances in it.
+
+*WARNING: All data will be deleted when you terminate the cluster, unless you are using EBS.*
+
+*To terminate a cluster:*
+{code}
+% hadoop-ec2 terminate-cluster my-hadoop-cluster
+{code}
+
+*To delete the EC2 security groups:*
+{code}
+% hadoop-ec2 delete-cluster my-hadoop-cluster
+{code} 

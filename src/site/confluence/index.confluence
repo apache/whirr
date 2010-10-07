@@ -26,6 +26,25 @@ h2. Getting Started
 
 You can use Whirr's CLI or APIs to [get started with Whirr|quick-start-guide].
 
+There is also an [FAQ|faq] which covers how to achieve common
+tasks with Whirr, and a [configuration guide|configuration-guide] for reference.
+
 h2. Getting Involved
 
 Have you got a suggestion for improving Whirr? It's easy to [get involved|https://cwiki.apache.org/confluence/display/WHIRR/How+To+Contribute].
+
+h2. History
+
+The code that would become Whirr started out in 2007 as some
+[bash scripts in Apache Hadoop|https://issues.apache.org/jira/browse/HADOOP-884]
+for running Hadoop clusters on EC2. Later the scripts were
+[ported to Python|https://issues.apache.org/jira/browse/WHIRR-3]
+for extra features (such as EBS support) and a wider range of cloud providers.
+These Python scripts are available today in Whirr under _contrib/python_.
+
+In May 2010 the [Apache Whirr Incubator|http://incubator.apache.org/whirr]
+project was started to give a home to
+the existing work that had been done, but also to create a Java version 
+using [jclouds|http://code.google.com/p/jclouds/] as the cloud provisioning
+library. jclouds supports many providers and has a very rich API for running
+code on instances, so it provides a very solid foundation for building Whirr on.

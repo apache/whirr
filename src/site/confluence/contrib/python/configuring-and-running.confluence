@@ -1,0 +1,69 @@
+h1. Configuring and Running
+
+h2. Setting Environment Variables to Specify AWS Credentials
+
+You must specify your AWS credentials when using the cloud scripts (see
+ [How do I find my cloud credentials?|../../faq#how-do-i-find-my-cloud-credentials]). The
+simplest way to do this is to set the environment variables (see
+[this page|http://code.google.com/p/boto/wiki/BotoConfig] for other options):
+* {{AWS\_ACCESS\_KEY\_ID}}: Your AWS Access Key ID
+* {{AWS\_SECRET\_ACCESS\_KEY}}: Your AWS Secret Access Key
+
+h2. Configuring the Python Cloud Scripts
+
+To configure the scripts, create a directory called _.hadoop-cloud_ in your
+home directory (note the leading period "."). In that directory, create a file
+called _clusters.cfg_ that contains a section for each cluster you want to
+control. The following example shows how to specify an i386 Ubuntu OS as the
+AMI in a _clusters.cfg_ file.
+
+{code}
+[my-hadoop-cluster]
+image_id=ami-ed59bf84
+instance_type=c1.medium
+key_name=tom
+availability_zone=us-east-1c
+private_key=/path/to/private/key/file
+ssh_options=-i %(private_key)s -o StrictHostKeyChecking=no
+{code}
+
+You can select a suitable AMI from the following table:
+
+|| AMI (bucket/name) || ID || OS || 
+| cloudera-ec2-hadoop-images/cloudera-hadoop-ubuntu-20090623-i386 | ami-ed59bf84 | Ubuntu 8.10 (Intrepid) |
+| cloudera-ec2-hadoop-images/cloudera-hadoop-ubuntu-20090623-x86_64 | ami-8759bfee | Ubuntu 8.10 (Intrepid) |
+| cloudera-ec2-hadoop-images/cloudera-hadoop-fedora-20090623-i386 | ami-6159bf08 | Fedora release 8 (Werewolf) |
+| cloudera-ec2-hadoop-images/cloudera-hadoop-fedora-20090623-x86_64 | ami-2359bf4a | Fedora release 8 (Werewolf) |
+
+*The architecture must be compatible with the instance type. For {{m1.small}} and {{c1.medium}} instances, use the i386 AMIs. For {{m1.large}}, {{m1.xlarge}}, and {{c1.xlarge}} instances, use the x86_64 AMIs. One of the high CPU instances ({{c1.medium}} or {{c1.xlarge}}) is recommended.*
+
+If you wish to use [CDH|http://www.cloudera.com/hadoop/] instead of Apache
+Hadoop, use the following configuration:
+
+{code}
+[my-hadoop-cluster]
+image_id=ami-2d4aa444
+instance_type=c1.medium
+key_name=tom
+availability_zone=us-east-1c
+private_key=/path/to/private/key/file
+ssh_options=-i %(private_key)s -o StrictHostKeyChecking=no
+user_data_file=http://archive.cloudera.com/cloud/ec2/cdh3/hadoop-ec2-init-remote.sh
+{code}
+
+Note that this example uses CDH3, as specified by the {{user\_data\_file}}
+property (the version of Hadoop to install is determined by this script).
+For CDH, use one of the AMIs from this table:
+
+|| AMI (bucket/name) || ID || OS || Notes ||
+| ubuntu-images/ubuntu-lucid-10.04-i386-server-20100427.1 | ami-2d4aa444 | Ubuntu 10.04 (Lucid) | This AMI is suitable for use with CDH3b2 onwards. See http://alestic.com/ |
+| ubuntu-images/ubuntu-lucid-10.04-amd64-server-20100427.1 | ami-fd4aa494 | Ubuntu 10.04 (Lucid) | This AMI is suitable for use with CDH3b2 onwards. See http://alestic.com/ |
+
+h2. {anchor:running-a-basic-cloud-script}Running a Basic Cloud Script
+
+After specifying an AMI, you can run the {{hadoop-ec2}} script. It will display usage instructions when you invoke it without arguments.
+
+You can test that the script can connect to your cloud provider by typing:
+{code}
+% hadoop-ec2 list
+{code} 

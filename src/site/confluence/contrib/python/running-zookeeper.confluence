@@ -1,0 +1,21 @@
+h1. Running Apache ZooKeeper
+
+The main use of the Python Cloud Scripts is to run Hadoop clusters, but you can
+also run other services such as Apache ZooKeeper.
+
+*To run Apache ZooKeeper, set the {{service}} parameter to {{zookeeper}}:*
+{code}
+[my-zookeeper-cluster]
+service=zookeeper
+ami=ami-ed59bf84
+instance_type=m1.small
+key_name=tom
+availability_zone=us-east-1c
+public_key=/path/to/public/key/file
+private_key=/path/to/private/key/file
+{code}
+
+*To launch a three-node ZooKeeper ensemble:*
+{code}
+% ./hadoop-ec2 launch-cluster my-zookeeper-cluster 3 zk
+{code} 

@@ -1,37 +1,37 @@
 h1. Getting Started with Whirr
 
-h2. Whirr CLI
+The Whirr CLI provides the most convenient way to launch clusters.
 
 h3. Pre-requisites
-You need to install Java 6 on your machine. Also, you need to have an account with a cloud provider,
-such as Amazon EC2.
+You need to install Java 6 on your machine. Also, you need to have an account with a cloud provider, such as Amazon EC2.
 
 h3. Install Whirr
 
 [Download|http://www.apache.org/dyn/closer.cgi/incubator/whirr/] or
-[build|https://cwiki.apache.org/confluence/display/WHIRR/How+To+Contribute] Whirr. Call the directory
-which contains the Whirr JAR files {{WHIRR\_HOME}} (you might like to define this as an environment variable).
+[build|https://cwiki.apache.org/confluence/display/WHIRR/How+To+Contribute] Whirr.
 
-You can test that Whirr is working by running
-(this is for version {{0.1.0-incubating}}):
+You can test that Whirr is working by running:
 
 {code}
-% java -jar $WHIRR_HOME/whirr-cli-0.1.0-incubating.jar
+% bin/whirr version
 {code}
 
-It is handy to create an alias for whirr:
+Which will display the version of Whirr that is installed.
+
+To get usage instructions and a list of available services type:
 
 {code}
-% alias whirr='java -jar $WHIRR_HOME/whirr-cli-0.1.0-incubating.jar'
+% bin/whirr
 {code}
 
-h3. Launch a cluster
+h3. Launch a Hadoop cluster
 
 First, create a properties file to define the cluster. The name doesn't matter,
 but here we will assume it is called _hadoop.properties_ and located in your home directory.
 This file defines a cluster
 with a single machine for the namenode and jobtracker, and
-a further machine for a datanode and tasktracker.
+a further machine for a datanode and tasktracker. You can see how to launch
+other services in the [FAQ|faq#other-services].
 
 {code}
 whirr.service-name=hadoop
@@ -43,32 +43,114 @@ whirr.credential=<cloud-provider-credential>
 whirr.private-key-file=${sys:user.home}/.ssh/id_rsa
 {code}
 
+Note that you do not need to choose a particular cloud image, since the default
+(which depends on the provider) should work well. However, it is possible to
+choose a particular image if you want to; see the [Configuration Guide|configuration-guide]
+for details. 
+
 Run the following command to launch a cluster:
 
 {code}
-% whirr launch-cluster --config hadoop.properties
+% bin/whirr launch-cluster --config hadoop.properties
 {code}
 
-Once the cluster has launched you can browse it by connecting to http://master-host:50030.
+Messages will be logged to the console as the cluster starts. You can see
+debug-level logging in a file named _whirr.log_ in the directory you ran the
+_whirr_ command from.
+
+A message will be printed out when the cluster has started, with a URL that you
+can use to access the web UI.
+
+h3. Run a proxy
+
+For security reasons, traffic from the network your client is running on is
+proxied through the master node of the cluster using an SSH tunnel
+(a SOCKS proxy on port 6666).
+
+A script to launch the proxy is created when you launch the cluster, and may be found in
+_~/.whirr/<cluster-name>_. Run it as a follows (in a new terminal window):
+
+{code}
+% . ~/.whirr/myhadoopcluster/hadoop-proxy.sh
+{code}
+
+To stop the proxy, just kill the process with Ctrl-C.
+
+Web browsers need to be configured to use this proxy too, so you can view pages
+served by worker nodes in the cluster. The most convenient way to do this is to
+use a
+[proxy auto-config (PAC) file|http://en.wikipedia.org/wiki/Proxy\_auto-config]
+file, such as [this one|http://apache-hadoop-ec2.s3.amazonaws.com/proxy.pac] for
+Hadoop EC2 clusters.
+
+If you are using Firefox, then you may find
+[FoxyProxy|http://foxyproxy.mozdev.org/] useful for managing PAC files.
+
+h3. Run a MapReduce job
+
+After you launch a cluster, a _hadoop-site.xml_ file is created in the directory
+_~/.whirr/<cluster-name>_. You can use this to connect to the cluster by setting
+the {{HADOOP\_CONF\_DIR}} environment variable.
+(It is also possible to set the configuration file to use by passing it as a
+{{-conf}} option to Hadoop Tools):
+
+{code}
+% export HADOOP_CONF_DIR=~/.whirr/myhadoopcluster
+{code}
+
+You should now be able to browse HDFS:
+
+{code}
+% hadoop fs -ls /
+{code}
+
+Note that the version of Hadoop installed locally should match the version
+installed on the cluster. You should also make sure that the {{HADOOP\_HOME}}
+environment variable is set.
+
+Here's how you can run a MapReduce job:
+
+{code}
+hadoop fs -mkdir input
+hadoop fs -put $HADOOP_HOME/LICENSE.txt input
+hadoop jar $HADOOP_HOME/hadoop-*examples.jar wordcount input output
+hadoop fs -cat output/part-* | head
+{code}
 
 h3. Configuration
 
 Whirr is configured using a properties file, and optionally using command line arguments when using the CLI. Command line arguments take precedence over properties specified in a properties file.
 
-See the [Configuration Guide|configuration-guide] for details.
+For example, instead of using the properties file above, you could launch a
+Hadoop cluster with the following command line (note that the {{whirr.}} prefix
+for properties is not reflected in the command line argument):
+
+{code}
+% bin/whirr launch-cluster \
+    --service-name=hadoop \
+    --cluster-name=myhadoopcluster \
+    --instance-templates='1 jt+nn,1 dn+tt' \
+    --provider=ec2 \
+    --identity=$AWS_ACCESS_KEY_ID \
+    --credential=$AWS_SECRET_ACCESS_KEY \
+    --private-key-file=~/.ssh/id_rsa
+{code}
+
+Notice that here we took advantage of the fact that the AWS credentials have
+been defined in environment variables.
+
+See the [configuration guide|configuration-guide] for a list of all the configuration
+properties you can set.
 
 h3. Destroy a cluster
 
-When you've finished using a cluster you can terminate the instances and clean up resources with
+When you've finished using a cluster you can terminate the instances and clean up resources with the following.
+
+*WARNING: All data will be deleted when you destroy the cluster.*
 
 {code}
-% whirr destroy-cluster --config hadoop.properties
+% bin/whirr destroy-cluster --config hadoop.properties
 {code}
 
-h2. Whirr API
-
-Whirr provides a Java API for stopping and starting clusters. Please see the unit test source code for
-how to achieve this.
-
-There's also some example code at [http://github.com/hammer/whirr-demo].
-
+At this point you shut down the SSH proxy to the cluster if you started one
+earlier.
