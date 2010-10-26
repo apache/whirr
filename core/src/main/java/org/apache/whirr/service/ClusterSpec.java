@@ -30,6 +30,8 @@ import com.google.common.collect.Sets;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.List;
 import java.util.Set;
 
@@ -58,6 +60,7 @@ public class ClusterSpec {
     HARDWARE_ID(String.class, false),
     LOCATION_ID(String.class, false),
     CLIENT_CIDRS(String.class, true),
+    VERSION(String.class, false),
     RUN_URL_BASE(String.class, false);
     
     private Class<?> type;
@@ -154,6 +157,7 @@ public class ClusterSpec {
   private String hardwareId;
   private String locationId;
   private List<String> clientCidrs;
+  private String version;
   private String runUrlBase;
   
   private Configuration config;
@@ -196,7 +200,17 @@ public class ClusterSpec {
     setHardwareId(config.getString(Property.HARDWARE_ID.getConfigName()));
     setLocationId(config.getString(Property.LOCATION_ID.getConfigName()));
     setClientCidrs(c.getList(Property.CLIENT_CIDRS.getConfigName()));
-    setRunUrlBase(c.getString(Property.RUN_URL_BASE.getConfigName()));
+    setVersion(c.getString(Property.VERSION.getConfigName()));
+    String runUrlBase = c.getString(Property.RUN_URL_BASE.getConfigName());
+    if (runUrlBase == null) {
+      try {
+        runUrlBase = String.format("http://whirr.s3.amazonaws.com/%s/",
+            URLEncoder.encode(getVersion(), "UTF-8"));
+      } catch (UnsupportedEncodingException e) {
+        throw new ConfigurationException(e);
+      }
+    }
+    setRunUrlBase(runUrlBase);
     this.config = c;
   }
 
@@ -264,7 +278,9 @@ public class ClusterSpec {
   public List<String> getClientCidrs() {
     return clientCidrs;
   }
-  
+  public String getVersion() {
+    return version;
+  }
   public String getRunUrlBase() {
     return runUrlBase;
   }
@@ -354,6 +370,10 @@ public class ClusterSpec {
   public void setClientCidrs(List<String> clientCidrs) {
     this.clientCidrs = clientCidrs;
   }
+  
+  public void setVersion(String version) {
+    this.version = version;
+  }
 
   public void setRunUrlBase(String runUrlBase) {
     this.runUrlBase = runUrlBase;
@@ -378,6 +398,7 @@ public class ClusterSpec {
         && Objects.equal(hardwareId, that.hardwareId)
         && Objects.equal(locationId, that.locationId)
         && Objects.equal(clientCidrs, that.clientCidrs)
+        && Objects.equal(version, that.version)
         && Objects.equal(runUrlBase, that.runUrlBase)
         ;
     }
@@ -387,7 +408,7 @@ public class ClusterSpec {
   public int hashCode() {
     return Objects.hashCode(instanceTemplates, serviceName,
         provider, identity, credential, clusterName, publicKey,
-        privateKey, imageId, hardwareId, locationId, clientCidrs,
+        privateKey, imageId, hardwareId, locationId, clientCidrs, version,
         runUrlBase);
   }
   
@@ -405,6 +426,7 @@ public class ClusterSpec {
       .add("instanceSizeId", hardwareId)
       .add("locationId", locationId)
       .add("clientCidrs", clientCidrs)
+      .add("version", version)
       .add("runUrlBase", runUrlBase)
       .toString();
   }

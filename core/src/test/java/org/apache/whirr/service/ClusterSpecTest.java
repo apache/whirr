@@ -18,6 +18,7 @@
 
 package org.apache.whirr.service;
 
+import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertThat;
 
@@ -41,8 +42,16 @@ public class ClusterSpecTest {
     conf.setProperty(ClusterSpec.Property.RUN_URL_BASE.getConfigName(),
         "http://example.org");
     ClusterSpec spec = new ClusterSpec(conf);
-    assertThat(spec.getRunUrlBase(),
-        startsWith("http://example.org"));
+    assertThat(spec.getRunUrlBase(), is("http://example.org"));
   }
 
+  @Test
+  public void testVersionInRunUrlbaseIsUrlEncoded()
+      throws ConfigurationException {
+    Configuration conf = new PropertiesConfiguration();
+    conf.setProperty(ClusterSpec.Property.VERSION.getConfigName(), "0.1.0+1");
+    ClusterSpec spec = new ClusterSpec(conf);
+    assertThat(spec.getRunUrlBase(),
+        is("http://whirr.s3.amazonaws.com/0.1.0%2B1/"));
+  }
 }
