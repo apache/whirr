@@ -52,6 +52,8 @@ Trunk (unreleased changes)
     WHIRR-113. Hadoop cluster instances should all start in the same location.
     (tomwhite)
 
+    WHIRR-114. Support + character in version number. (tomwhite)
+
 Release 0.1.0 - 2010-09-02
 
   INCOMPATIBLE CHANGES
