@@ -54,7 +54,9 @@ import org.jclouds.compute.RunScriptOnNodesException;
 import org.jclouds.compute.domain.NodeMetadata;
 import org.jclouds.compute.domain.Template;
 import org.jclouds.compute.domain.TemplateBuilder;
+import org.jclouds.compute.options.RunScriptOptions;
 import org.jclouds.compute.predicates.NodePredicates;
+import org.jclouds.domain.Credentials;
 import org.jclouds.io.Payload;
 import org.jclouds.ssh.ExecResponse;
 import org.slf4j.Logger;
@@ -121,14 +123,21 @@ public class CassandraService extends Service {
     // Pass list of all servers in cluster to configure script.
     String servers = Joiner.on(' ').join(getPrivateIps(seeds));
     Payload configureScript = newStringPayload(runUrls(clusterSpec.getRunUrlBase(),
-            "apache/cassandra/post-configure " + servers));
+        String.format("apache/cassandra/post-configure -c %s %s",
+            clusterSpec.getProvider(),
+            servers)));
+    // Use private key to run script
+    Credentials credentials = new Credentials(
+      Iterables.get(nodes, 0).getCredentials().identity,
+      clusterSpec.readPrivateKey());
 
     try {
       LOG.info("Running configuration script");
       Map<? extends NodeMetadata, ExecResponse> responses = computeService
           .runScriptOnNodesMatching(
             NodePredicates.runningWithTag(clusterSpec.getClusterName()),
-              configureScript);
+              configureScript,
+              RunScriptOptions.Builder.overrideCredentialsWith(credentials));
       assert responses.size() > 0 : "no nodes matched "
           + clusterSpec.getClusterName();
     } catch (RunScriptOnNodesException e) {

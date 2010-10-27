@@ -52,7 +52,7 @@
     <dependencies>
       <dependency>
         <groupId>org.jclouds</groupId>
-        <artifactId>jclouds-aws</artifactId>
+        <artifactId>jclouds-allcompute</artifactId>
         <version>${jclouds.version}</version>
       </dependency>
       <dependency>

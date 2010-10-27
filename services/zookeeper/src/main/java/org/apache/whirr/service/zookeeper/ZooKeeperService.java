@@ -52,7 +52,9 @@ import org.jclouds.compute.RunScriptOnNodesException;
 import org.jclouds.compute.domain.NodeMetadata;
 import org.jclouds.compute.domain.Template;
 import org.jclouds.compute.domain.TemplateBuilder;
+import org.jclouds.compute.options.RunScriptOptions;
 import org.jclouds.compute.predicates.NodePredicates;
+import org.jclouds.domain.Credentials;
 import org.jclouds.io.Payload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -116,11 +118,19 @@ public class ZooKeeperService extends Service {
     // Position is significant: i-th server has id i.
     String servers = Joiner.on(' ').join(getPrivateIps(nodes));
     Payload configureScript = newStringPayload(runUrls(clusterSpec.getRunUrlBase(),
-      "apache/zookeeper/post-configure " + servers));
+      String.format("apache/zookeeper/post-configure -c %s %s",
+          clusterSpec.getProvider(),
+          servers)));
+    // Use private key to run script
+    Credentials credentials = new Credentials(
+      Iterables.get(nodes, 0).getCredentials().identity,
+      clusterSpec.readPrivateKey());
     try {
       LOG.info("Running configuration script");
       computeService.runScriptOnNodesMatching(NodePredicates.runningWithTag(
-          clusterSpec.getClusterName()), configureScript);
+          clusterSpec.getClusterName()),
+          configureScript,
+          RunScriptOptions.Builder.overrideCredentialsWith(credentials));
     } catch (RunScriptOnNodesException e) {
       // TODO: retry
       throw new IOException(e);
@@ -138,11 +148,11 @@ public class ZooKeeperService extends Service {
       @Override
       public String apply(NodeMetadata node) {
         try {
-         return InetAddress.getByName(Iterables.get(node.getPrivateAddresses(), 0)).getHostAddress();
-      } catch (UnknownHostException e) {
-         Throwables.propagate(e);
-         return null;
-      }
+          return InetAddress.getByName(Iterables.get(node.getPrivateAddresses(), 0)).getHostAddress();
+        } catch (UnknownHostException e) {
+          Throwables.propagate(e);
+          return null;
+        }
       }
     });
   }
@@ -153,9 +163,9 @@ public class ZooKeeperService extends Service {
       @Override
       public Instance apply(NodeMetadata node) {
         try {
-        return new Instance(node.getCredentials(), Collections.singleton(ZOOKEEPER_ROLE),
-          InetAddress.getByName(Iterables.get(node.getPublicAddresses(), 0)),
-          InetAddress.getByName(Iterables.get(node.getPrivateAddresses(), 0)));
+          return new Instance(node.getCredentials(), Collections.singleton(ZOOKEEPER_ROLE),
+            InetAddress.getByName(Iterables.get(node.getPublicAddresses(), 0)),
+            InetAddress.getByName(Iterables.get(node.getPrivateAddresses(), 0)));
         } catch (UnknownHostException e) {
           throw new RuntimeException(e);
         }
@@ -169,12 +179,12 @@ public class ZooKeeperService extends Service {
       @Override
       public String apply(NodeMetadata node) {
         String publicIp;
-      try {
-         publicIp = InetAddress.getByName(Iterables.get(node.getPublicAddresses(), 0)).getHostName();
-      } catch (UnknownHostException e) {
-         Throwables.propagate(e);
-         return null;
-      }
+        try {
+          publicIp = InetAddress.getByName(Iterables.get(node.getPublicAddresses(), 0)).getHostName();
+        } catch (UnknownHostException e) {
+          Throwables.propagate(e);
+          return null;
+        }
         return String.format("%s:%d", publicIp, CLIENT_PORT);
       }
     });

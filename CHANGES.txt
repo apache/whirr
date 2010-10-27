@@ -28,6 +28,8 @@ Trunk (unreleased changes)
 
     WHIRR-112. Expand documentation. (tomwhite)
 
+    WHIRR-52. Support all services on Rackspace Cloud Servers. (tomwhite)
+
   BUG FIXES
 
     WHIRR-93. Fail on checkstyle violation. (tomwhite)

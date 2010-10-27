@@ -43,7 +43,7 @@
     </dependency>
     <dependency>
       <groupId>org.jclouds</groupId>
-      <artifactId>jclouds-aws</artifactId>
+      <artifactId>jclouds-allcompute</artifactId>
     </dependency>
     <dependency>
       <groupId>org.jclouds</groupId>

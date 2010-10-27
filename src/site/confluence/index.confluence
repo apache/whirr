@@ -16,7 +16,7 @@ the cloud provider and service combinations that have been tested.
 
 ||Cloud provider||Cassandra||Hadoop||ZooKeeper||
 |Amazon EC2|Yes|Yes|Yes|
-|Rackspace|No|No|No|
+|Rackspace Cloud Servers|Yes|Yes|Yes|
 
 h2. Download
 
