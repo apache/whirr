@@ -90,6 +90,7 @@ public class HadoopService extends Service {
     String hadoopInstallRunUrl = clusterSpec.getConfiguration().getString(
         "whirr.hadoop-install-runurl", "apache/hadoop/install");
     Payload nnjtBootScript = newStringPayload(runUrls(clusterSpec.getRunUrlBase(),
+      String.format("util/configure-hostnames -c %s", clusterSpec.getProvider()),
       "sun/java/install",
       String.format("%s nn,jt -c %s", hadoopInstallRunUrl,
           clusterSpec.getProvider())));
@@ -142,6 +143,7 @@ public class HadoopService extends Service {
 
     // Launch slaves (DN and TT)
     Payload slaveBootScript = newStringPayload(runUrls(clusterSpec.getRunUrlBase(),
+      String.format("util/configure-hostnames -c %s", clusterSpec.getProvider()),
       "sun/java/install",
       String.format("%s dn,tt -n %s -j %s -c %s",
           hadoopInstallRunUrl,
@@ -154,7 +156,7 @@ public class HadoopService extends Service {
       .installPrivateKey(clusterSpec.getPrivateKey())
       .authorizePublicKey(clusterSpec.getPublicKey()));
 
-    strategy.configureTemplateBuilder(clusterSpec, slaveTemplateBuilder);
+    slaveTemplateBuilder.fromTemplate(masterTemplate); // base on master
     slaveTemplateBuilder.locationId(masterTemplate.getLocation().getId());
     
     Template slaveTemplate = slaveTemplateBuilder.build();

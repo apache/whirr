@@ -21,7 +21,30 @@
 set -x
 set -e
 
-SELF_HOST=`/sbin/ifconfig eth0 | grep 'inet addr:' | cut -d: -f2 | awk '{ print $1}'`
+CLOUD_PROVIDER=
+while getopts "c:" OPTION; do
+  case $OPTION in
+  c)
+    CLOUD_PROVIDER="$OPTARG"
+    shift $((OPTIND-1)); OPTIND=1
+    ;;
+  esac
+done
+
+case $CLOUD_PROVIDER in
+  # We want the gossip protocol to use internal (private) addresses, and the
+  # client to use public addresses.
+  # See http://wiki.apache.org/cassandra/FAQ#cant_listen_on_ip_any
+  ec2)
+    PRIVATE_SELF_HOST=`wget -q -O - http://169.254.169.254/latest/meta-data/local-ipv4`
+    # EC2 is NATed
+    PUBLIC_SELF_HOST=$PRIVATE_SELF_HOST
+    ;;
+  *)
+    PUBLIC_SELF_HOST=`/sbin/ifconfig eth0 | grep 'inet addr:' | cut -d: -f2 | awk '{ print $1}'`
+    PRIVATE_SELF_HOST=`/sbin/ifconfig eth1 | grep 'inet addr:' | cut -d: -f2 | awk '{ print $1}'`
+    ;;
+esac
 
 config_file=/etc/cassandra/conf/storage-conf.xml
 
@@ -33,8 +56,8 @@ done
 
 #TODO set replication
 sed -i -e "s|<Seed>127.0.0.1</Seed>|$seeds|" $config_file
-sed -i -e "s|<ListenAddress>localhost</ListenAddress>|<ListenAddress>$SELF_HOST</ListenAddress>|" $config_file
-sed -i -e "s|<ThriftAddress>localhost</ThriftAddress>|<ThriftAddress>$SELF_HOST</ThriftAddress>|" $config_file
+sed -i -e "s|<ListenAddress>localhost</ListenAddress>|<ListenAddress>$PRIVATE_SELF_HOST</ListenAddress>|" $config_file
+sed -i -e "s|<ThriftAddress>localhost</ThriftAddress>|<ThriftAddress>$PUBLIC_SELF_HOST</ThriftAddress>|" $config_file
 
 # Now that it's configured, start Cassandra
 nohup /etc/rc.local &

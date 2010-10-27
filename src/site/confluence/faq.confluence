@@ -10,6 +10,21 @@ On EC2:
 
 Another good resource is [Understanding Access Credentials for AWS/EC2|http://alestic.com/2009/11/ec2-credentials] by Eric Hammond.
 
+h2. Can I specify my own private key?
+
+Yes, by setting {{whirr.private-key-file}} (or {{\--private-key-file}} on the
+command line). You should also set {{whirr.public-key-file}}
+({{\--public-key-file}}) at the same time.
+
+Private keys must not have a passphrase associated with them. You can check this
+with:
+
+{code}
+grep ENCRYPTED ~/.ssh/id_rsa
+{code}
+
+If there is no passphrase then there will be no match.
+
 h2. How do I access my cluster from a different network?
 
 By default, access to clusters is restricted to the single IP address of the
