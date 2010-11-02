@@ -54,7 +54,7 @@
       <item name="Release Notes" href="release-notes.html" />
       <item name="Road Map" href="https://cwiki.apache.org/confluence/display/WHIRR/RoadMap" />
       <item name="Wiki" href="https://cwiki.apache.org/confluence/display/WHIRR" />
-      <item name="FAQ" href="https://cwiki.apache.org/confluence/display/WHIRR/FAQ" />
+      <item name="FAQ" href="faq.html"/>
     </menu>
 
     <menu name="Project Information">
@@ -69,7 +69,6 @@
     <menu name="Java Documentation">
       <item name="Quick Start Guide" href="quick-start-guide.html"/>
       <item name="Configuration Guide" href="configuration-guide.html"/>
-      <item name="FAQ" href="faq.html"/>
       <item name="API Guide" href="api-guide.html"/>
       <item name="Javadoc" href="apidocs/index.html"/>
     </menu>

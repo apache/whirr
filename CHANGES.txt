@@ -58,6 +58,8 @@ Release 0.2.0 - 2010-11-04
 
     WHIRR-91. Add DISCLAIMER file to CLI JAR (phunt)
 
+    WHIRR-122. whirr site has two FAQ links (phunt)
+
 Release 0.1.0 - 2010-09-02
 
   INCOMPATIBLE CHANGES
