@@ -519,8 +519,10 @@
       </build>
       <properties>
         <update-release-info>true</update-release-info>
-        <!--  Don't re-run tests as part of the deploy build. -->
-        <maven.test.skip>true</maven.test.skip>
+        <!--  Don't re-run tests as part of the deploy build.
+              Note we use skipTests, not maven.test.skip, since the latter skips
+              compilation too and we want to deploy tests. -->
+        <skipTests>true</skipTests>
       </properties>
     </profile>
     <profile>

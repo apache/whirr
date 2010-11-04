@@ -1,6 +1,6 @@
 Apache Whirr Change Log
 
-Release 0.2.0 - 2010-11-04
+Release 0.2.0 - 2010-11-08
 
   NEW FEATURES
 
@@ -59,6 +59,9 @@ Release 0.2.0 - 2010-11-04
     WHIRR-91. Add DISCLAIMER file to CLI JAR (phunt)
 
     WHIRR-122. whirr site has two FAQ links (phunt)
+
+    WHIRR-126. Deployment process does not deploy required test JARs
+    (tomwhite)
 
 Release 0.1.0 - 2010-09-02
 
