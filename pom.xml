@@ -27,7 +27,7 @@
 
   <groupId>org.apache.whirr</groupId>
   <artifactId>whirr</artifactId>
-  <version>0.2.0-incubating-SNAPSHOT</version>
+  <version>0.2.0-incubating</version>
   <packaging>pom</packaging>
   
   <name>Whirr</name>
@@ -179,7 +179,7 @@
           <dependency>
             <groupId>org.apache.whirr</groupId>
             <artifactId>whirr-build-tools</artifactId>
-            <version>0.2.0-incubating-SNAPSHOT</version>
+            <version>0.2.0-incubating</version>
           </dependency>
         </dependencies>
       </plugin>
