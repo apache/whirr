@@ -8,6 +8,8 @@ Trunk (unreleased changes)
 
   BUG FIXES
 
+    WHIRR-128. Fix DNS resolution for clients running within EC2.
+    (Tibor Kiss via tomwhite)
 
 Release 0.2.0 - 2010-11-04
 

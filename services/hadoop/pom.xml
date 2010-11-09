@@ -95,5 +95,9 @@
       <version>0.20.2</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>dnsjava</groupId>
+      <artifactId>dnsjava</artifactId>
+    </dependency>
   </dependencies>
 </project>

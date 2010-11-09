@@ -53,7 +53,7 @@ public class HadoopProxy {
       Files.write(ByteStreams.toByteArray(clusterSpec.getPrivateKey().getInput()), identity);
     }
     String user = Iterables.get(cluster.getInstances(), 0).getLoginCredentials().identity;
-    String server = cluster.getNamenodePublicAddress().getHostName();
+    String server = DnsUtil.resolveAddress(cluster.getNamenodePublicAddress().getHostAddress());
     return new String[] { "ssh",
         "-i", identity.getAbsolutePath(),
         "-o", "ConnectTimeout=10",
