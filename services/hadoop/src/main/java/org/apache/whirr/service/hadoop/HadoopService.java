@@ -147,8 +147,8 @@ public class HadoopService extends Service {
       "sun/java/install",
       String.format("%s dn,tt -n %s -j %s -c %s",
           hadoopInstallRunUrl,
-          namenodePublicAddress.getHostName(),
-          jobtrackerPublicAddress.getHostName(),
+          DnsUtil.resolveAddress(namenodePublicAddress.getHostAddress()),
+          DnsUtil.resolveAddress(jobtrackerPublicAddress.getHostAddress()),
           clusterSpec.getProvider())));
 
     TemplateBuilder slaveTemplateBuilder = computeService.templateBuilder()
@@ -182,7 +182,7 @@ public class HadoopService extends Service {
     
     LOG.info("Completed launch of {}", clusterSpec.getClusterName());
     LOG.info("Web UI available at http://{}",
-        namenodePublicAddress.getHostName());
+	    DnsUtil.resolveAddress(namenodePublicAddress.getHostAddress()));
     Properties config = createClientSideProperties(namenodePublicAddress, jobtrackerPublicAddress);
     createClientSideHadoopSiteFile(clusterSpec, config);
     HadoopCluster cluster = new HadoopCluster(instances, config);
@@ -209,8 +209,8 @@ public class HadoopService extends Service {
   private Properties createClientSideProperties(InetAddress namenode, InetAddress jobtracker) throws IOException {
       Properties config = new Properties();
       config.setProperty("hadoop.job.ugi", "root,root");
-      config.setProperty("fs.default.name", String.format("hdfs://%s:8020/", namenode.getHostName()));
-      config.setProperty("mapred.job.tracker", String.format("%s:8021", jobtracker.getHostName()));
+      config.setProperty("fs.default.name", String.format("hdfs://%s:8020/", DnsUtil.resolveAddress(namenode.getHostAddress())));
+      config.setProperty("mapred.job.tracker", String.format("%s:8021", DnsUtil.resolveAddress(jobtracker.getHostAddress())));
       config.setProperty("hadoop.socks.server", "localhost:6666");
       config.setProperty("hadoop.rpc.socket.factory.class.default", "org.apache.hadoop.net.SocksSocketFactory");
       return config;
@@ -258,7 +258,7 @@ public class HadoopService extends Service {
       HadoopProxy proxy = new HadoopProxy(clusterSpec, cluster);
       String script = String.format("echo 'Running proxy to Hadoop cluster at %s. " +
           "Use Ctrl-c to quit.'\n",
-          cluster.getNamenodePublicAddress().getHostName())
+          DnsUtil.resolveAddress(cluster.getNamenodePublicAddress().getHostAddress()))
         + Joiner.on(" ").join(proxy.getProxyCommand());
       Files.write(script, hadoopProxyFile, Charsets.UTF_8);
       LOG.info("Wrote Hadoop proxy script {}", hadoopProxyFile);
