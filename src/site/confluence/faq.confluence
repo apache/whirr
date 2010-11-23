@@ -57,6 +57,17 @@ cluster in the US-East region, while setting it to {{us-east-1a}} (note the
 final {{a}}) would start the cluster in that particular availability zone
 ({{us-east-1a}}) in the US-East region.
 
+h2. How can I use a custom image? How can I control the cloud hardware used?
+
+The default image used is dependent on the Cloud provider, the hardware, and the
+service.
+
+Use {{image-id}} to specify the image used, and {{hardware-id}} to specify the
+hardware. Both are cloud-specific.
+
+In addition, on EC2 you need to set jclouds.ec2.ami-owners to include the AMI
+owner if it is not Amazon, Alestic, Canonical, or RightScale.
+
 h2. How do I log in to a node in the cluster?
 
 On EC2, if you know the node's address you can do

@@ -11,6 +11,8 @@ Trunk (unreleased changes)
     WHIRR-128. Fix DNS resolution for clients running within EC2.
     (Tibor Kiss via tomwhite)
 
+    WHIRR-137. Allow use of an arbitrary AMI on EC2. (tomwhite)
+
 Release 0.2.0 - 2010-11-04
 
   NEW FEATURES

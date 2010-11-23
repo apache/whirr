@@ -25,6 +25,7 @@ import static org.jclouds.io.Payloads.newFilePayload;
 import static org.jclouds.util.Utils.toStringAndClose;
 
 import com.google.common.base.Objects;
+import com.google.common.base.Predicate;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
@@ -32,6 +33,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -383,6 +385,16 @@ public class ClusterSpec {
   
   public Configuration getConfiguration() {
     return config;
+  }
+  
+  public Configuration getConfigurationForKeysWithPrefix(String prefix) {
+    Configuration c = new PropertiesConfiguration();
+    for (@SuppressWarnings("unchecked")
+        Iterator<String> it = config.getKeys(prefix); it.hasNext(); ) {
+      String key = it.next();
+      c.setProperty(key, config.getProperty(key));
+    }
+    return c;
   }
     
   public boolean equals(Object o) {
