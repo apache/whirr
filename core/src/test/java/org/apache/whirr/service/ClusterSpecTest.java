@@ -22,6 +22,13 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertThat;
 
+import com.google.common.collect.Iterators;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
+
+import java.util.List;
+import java.util.SortedSet;
+
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
@@ -53,5 +60,21 @@ public class ClusterSpecTest {
     ClusterSpec spec = new ClusterSpec(conf);
     assertThat(spec.getRunUrlBase(),
         is("http://whirr.s3.amazonaws.com/0.1.0%2B1/"));
+  }
+  
+  @Test
+  public void testGetConfigurationForKeysWithPrefix()
+      throws ConfigurationException {
+    Configuration conf = new PropertiesConfiguration();
+    conf.setProperty("a.b", 1);
+    conf.setProperty("b.a", 2);
+    conf.setProperty("a.c", 3);
+    ClusterSpec spec = new ClusterSpec(conf);
+    Configuration prefixConf = spec.getConfigurationForKeysWithPrefix("a");
+    List<String> prefixKeys = Lists.newArrayList();
+    Iterators.addAll(prefixKeys, prefixConf.getKeys());
+    assertThat(prefixKeys.size(), is(2));
+    assertThat(prefixKeys.get(0), is("a.b"));
+    assertThat(prefixKeys.get(1), is("a.c"));
   }
 }
