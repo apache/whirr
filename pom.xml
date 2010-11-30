@@ -40,6 +40,7 @@
     <module>cli</module>
     <module>core</module>
     <module>services/cassandra</module>
+    <module>services/cdh</module>
     <module>services/hadoop</module>
     <module>services/zookeeper</module>
   </modules>
@@ -484,6 +485,10 @@
     <repository>
       <id>jclouds</id>
       <url>http://jclouds.googlecode.com/svn/repo</url>
+    </repository>
+    <repository>
+      <id>cloudera</id>
+      <url>https://repository.cloudera.com/content/repositories/releases/</url>
     </repository>
   </repositories>
   <pluginRepositories>

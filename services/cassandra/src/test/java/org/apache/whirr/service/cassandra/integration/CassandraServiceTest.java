@@ -31,23 +31,20 @@ import java.util.Set;
 import org.apache.cassandra.thrift.Cassandra;
 import org.apache.cassandra.thrift.TokenRange;
 import org.apache.commons.configuration.CompositeConfiguration;
-import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.thrift.TException;
 import org.apache.thrift.protocol.TBinaryProtocol;
 import org.apache.thrift.transport.TSocket;
 import org.apache.whirr.service.Cluster;
+import org.apache.whirr.service.Cluster.Instance;
 import org.apache.whirr.service.ClusterSpec;
 import org.apache.whirr.service.Service;
 import org.apache.whirr.service.ServiceFactory;
-import org.apache.whirr.service.Cluster.Instance;
 import org.apache.whirr.service.cassandra.CassandraService;
 import org.apache.whirr.ssh.KeyPair;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import com.jcraft.jsch.JSchException;
 
 public class CassandraServiceTest {
 
@@ -58,8 +55,7 @@ public class CassandraServiceTest {
   private Cluster cluster;
 
   @Before
-  public void setUp() throws ConfigurationException, IOException,
-      JSchException {
+  public void setUp() throws Exception {
     CompositeConfiguration config = new CompositeConfiguration();
     if (System.getProperty("config") != null) {
       config.addConfiguration(new PropertiesConfiguration(System.getProperty("config")));
@@ -128,7 +124,7 @@ public class CassandraServiceTest {
   }
   
   @After
-  public void tearDown() throws IOException {
+  public void tearDown() throws IOException, InterruptedException {
     if (service != null) {
       service.destroyCluster(clusterSpec);      
     }

@@ -24,10 +24,8 @@ import static org.junit.Assert.assertThat;
 
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 
 import java.util.List;
-import java.util.SortedSet;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;

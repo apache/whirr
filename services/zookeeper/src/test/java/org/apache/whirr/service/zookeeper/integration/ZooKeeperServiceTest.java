@@ -27,7 +27,6 @@ import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 
 import org.apache.commons.configuration.CompositeConfiguration;
-import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.whirr.service.ClusterSpec;
 import org.apache.whirr.service.Service;
@@ -38,14 +37,12 @@ import org.apache.whirr.ssh.KeyPair;
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.WatchedEvent;
 import org.apache.zookeeper.Watcher;
-import org.apache.zookeeper.ZooKeeper;
 import org.apache.zookeeper.Watcher.Event.KeeperState;
 import org.apache.zookeeper.ZooDefs.Ids;
+import org.apache.zookeeper.ZooKeeper;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import com.jcraft.jsch.JSchException;
 
 public class ZooKeeperServiceTest {
   
@@ -54,8 +51,7 @@ public class ZooKeeperServiceTest {
   private ZooKeeperCluster cluster;
   
   @Before
-  public void setUp() throws ConfigurationException, IOException, 
-      JSchException {
+  public void setUp() throws Exception {
     CompositeConfiguration config = new CompositeConfiguration();
     if (System.getProperty("config") != null) {
       config.addConfiguration(new PropertiesConfiguration(System.getProperty("config")));
@@ -120,7 +116,7 @@ public class ZooKeeperServiceTest {
   }
   
   @After
-  public void tearDown() throws IOException {
+  public void tearDown() throws IOException, InterruptedException {
     service.destroyCluster(clusterSpec);
   }
   

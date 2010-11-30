@@ -55,16 +55,19 @@ public abstract class Service {
    * @return an object representing the running cluster
    * @throws IOException if there is a problem while starting the cluster. The
    * cluster may or may not have started.
+   * @throws InterruptedException if the thread is interrupted.
    */
   public abstract Cluster launchCluster(ClusterSpec clusterSpec)
-    throws IOException;
+    throws IOException, InterruptedException;
   
   /**
    * Stop the cluster and destroy all resources associated with it.
    * @throws IOException if there is a problem while stopping the cluster. The
    * cluster may or may not have been stopped.
+   * @throws InterruptedException if the thread is interrupted.
    */
-  public void destroyCluster(ClusterSpec clusterSpec) throws IOException {
+  public void destroyCluster(ClusterSpec clusterSpec) throws IOException,
+      InterruptedException {
     LOG.info("Destroying " + clusterSpec.getClusterName() + " cluster");
     ComputeService computeService =
       ComputeServiceContextBuilder.build(clusterSpec).getComputeService();
@@ -73,7 +76,7 @@ public abstract class Service {
   }
   
   public Set<? extends NodeMetadata> getNodes(ClusterSpec clusterSpec)
-    throws IOException {
+    throws IOException, InterruptedException {
     ComputeService computeService =
       ComputeServiceContextBuilder.build(clusterSpec).getComputeService();
     return computeService.listNodesDetailsMatching(

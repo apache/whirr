@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.apache.whirr.service.hadoop.integration;
+package org.apache.whirr.service.cdh.integration;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNull;
@@ -58,7 +58,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-public class HadoopServiceTest {
+public class CdhHadoopServiceTest {
   
   private ClusterSpec clusterSpec;
   private HadoopService service;
@@ -91,7 +91,7 @@ public class HadoopServiceTest {
   public void test() throws Exception {
     Configuration conf = getConfiguration();
     
-    JobConf job = new JobConf(conf, HadoopServiceTest.class);
+    JobConf job = new JobConf(conf, CdhHadoopServiceTest.class);
     JobClient client = new JobClient(job);
     waitForTaskTrackers(client);
 

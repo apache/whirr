@@ -6,6 +6,8 @@ Trunk (unreleased changes)
 
   IMPROVEMENTS
 
+    WHIRR-87. Parallelize Hadoop cluster creation. (tomwhite)
+
   BUG FIXES
 
     WHIRR-128. Fix DNS resolution for clients running within EC2.
