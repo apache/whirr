@@ -25,7 +25,6 @@ import static org.jclouds.io.Payloads.newFilePayload;
 import static org.jclouds.util.Utils.toStringAndClose;
 
 import com.google.common.base.Objects;
-import com.google.common.base.Predicate;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 

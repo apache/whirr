@@ -27,6 +27,8 @@ import static org.jclouds.io.Payloads.newStringPayload;
 import com.google.common.base.Charsets;
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
+import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
@@ -40,6 +42,11 @@ import java.util.Collections;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import org.apache.whirr.service.Cluster.Instance;
 import org.apache.whirr.service.ClusterSpec;
@@ -50,7 +57,7 @@ import org.apache.whirr.service.jclouds.FirewallSettings;
 import org.apache.whirr.service.jclouds.TemplateBuilderStrategy;
 import org.jclouds.compute.ComputeService;
 import org.jclouds.compute.ComputeServiceContext;
-import org.jclouds.compute.RunNodesException;
+import org.jclouds.compute.RunScriptOnNodesException;
 import org.jclouds.compute.domain.NodeMetadata;
 import org.jclouds.compute.domain.Template;
 import org.jclouds.compute.domain.TemplateBuilder;
@@ -78,44 +85,71 @@ public class HadoopService extends Service {
   }
   
   @Override
-  public HadoopCluster launchCluster(ClusterSpec clusterSpec) throws IOException {
+  public HadoopCluster launchCluster(final ClusterSpec clusterSpec)
+      throws IOException, InterruptedException {
     LOG.info("Launching " + clusterSpec.getClusterName() + " cluster");
     
+    ExecutorService executorService = Executors.newCachedThreadPool();
     ComputeServiceContext computeServiceContext =
       ComputeServiceContextBuilder.build(clusterSpec);
-    ComputeService computeService = computeServiceContext.getComputeService();
+    final ComputeService computeService =
+      computeServiceContext.getComputeService();
     
-    // Launch Hadoop "master" (NN and JT)
-    // deal with user packages and autoshutdown with extra runurls
     String hadoopInstallRunUrl = clusterSpec.getConfiguration().getString(
-        "whirr.hadoop-install-runurl", "apache/hadoop/install");
-    Payload nnjtBootScript = newStringPayload(runUrls(clusterSpec.getRunUrlBase(),
-      String.format("util/configure-hostnames -c %s", clusterSpec.getProvider()),
+      "whirr.hadoop-install-runurl", "apache/hadoop/install");
+    
+    Payload installScript = newStringPayload(runUrls(clusterSpec.getRunUrlBase(),
       "sun/java/install",
-      String.format("%s nn,jt -c %s", hadoopInstallRunUrl,
+      String.format("%s -c %s", hadoopInstallRunUrl,
           clusterSpec.getProvider())));
 
     LOG.info("Configuring template");
-    TemplateBuilder masterTemplateBuilder = computeService.templateBuilder()
-      .options(runScript(nnjtBootScript)
+    TemplateBuilder templateBuilder = computeService.templateBuilder()
+      .options(runScript(installScript)
       .installPrivateKey(clusterSpec.getPrivateKey())
       .authorizePublicKey(clusterSpec.getPublicKey()));
     
     TemplateBuilderStrategy strategy = new HadoopTemplateBuilderStrategy();
-    strategy.configureTemplateBuilder(clusterSpec, masterTemplateBuilder);
+    strategy.configureTemplateBuilder(clusterSpec, templateBuilder);
     
-    Template masterTemplate = masterTemplateBuilder.build();
+    final Template template = templateBuilder.build();
+
+    InstanceTemplate masterInstanceTemplate =
+        clusterSpec.getInstanceTemplate(MASTER_ROLE);
+    checkNotNull(masterInstanceTemplate);
+    checkArgument(masterInstanceTemplate.getNumberOfInstances() == 1);
+    Future<Set<? extends NodeMetadata>> nodesFuture = executorService.submit(
+        new Callable<Set<? extends NodeMetadata>>(){
+      public Set<? extends NodeMetadata> call() throws Exception {
+        LOG.info("Starting master node");
+        Set<? extends NodeMetadata> nodes = computeService.runNodesWithTag(
+          clusterSpec.getClusterName(), 1, template);
+        LOG.info("Master node started: {}", nodes);
+        return nodes;
+      }
+    });
     
-    InstanceTemplate instanceTemplate = clusterSpec.getInstanceTemplate(MASTER_ROLE);
-    checkNotNull(instanceTemplate);
-    checkArgument(instanceTemplate.getNumberOfInstances() == 1);
+    final InstanceTemplate workerInstanceTemplate =
+        clusterSpec.getInstanceTemplate(WORKER_ROLE);
+    checkNotNull(workerInstanceTemplate);
+    Future<Set<? extends NodeMetadata>> workerNodesFuture =
+      executorService.submit(new Callable<Set<? extends NodeMetadata>>(){
+      public Set<? extends NodeMetadata> call() throws Exception {
+        int num = workerInstanceTemplate.getNumberOfInstances();
+        LOG.info("Starting {} worker node(s)", num);
+        Set<? extends NodeMetadata> nodes =  computeService.runNodesWithTag(
+            clusterSpec.getClusterName(), num, template);
+        LOG.info("Worker nodes started: {}", nodes);
+        return nodes;
+      }
+    });
+    
     Set<? extends NodeMetadata> nodes;
     try {
-      LOG.info("Starting master node");
-      nodes = computeService.runNodesWithTag(
-          clusterSpec.getClusterName(), 1, masterTemplate);
-      LOG.info("Master node started: {}", nodes);
-    } catch (RunNodesException e) {
+      LOG.info("Waiting for master node to start...");
+      nodes = nodesFuture.get();
+    } catch (ExecutionException e) {
+      // Check for RunNodesException
       // TODO: can we do better here (retry?)
       throw new IOException(e);
     }
@@ -141,40 +175,54 @@ public class HadoopService extends Service {
           jobtrackerPublicAddress.getHostAddress(), JOBTRACKER_PORT);
     }
 
-    // Launch slaves (DN and TT)
-    Payload slaveBootScript = newStringPayload(runUrls(clusterSpec.getRunUrlBase(),
-      String.format("util/configure-hostnames -c %s", clusterSpec.getProvider()),
-      "sun/java/install",
-      String.format("%s dn,tt -n %s -j %s -c %s",
-          hadoopInstallRunUrl,
-          DnsUtil.resolveAddress(namenodePublicAddress.getHostAddress()),
-          DnsUtil.resolveAddress(jobtrackerPublicAddress.getHostAddress()),
+    String hadoopConfigureRunUrl = clusterSpec.getConfiguration().getString(
+        "whirr.hadoop-configure-runurl", "apache/hadoop/post-configure");
+    Payload nnjtConfigureScript = newStringPayload(runUrls(
+        clusterSpec.getRunUrlBase(),
+        String.format(
+          "%s nn,jt -n %s -j %s -c %s",
+          hadoopConfigureRunUrl,
+          namenodePublicAddress.getHostName(),
+          jobtrackerPublicAddress.getHostName(),
           clusterSpec.getProvider())));
-
-    TemplateBuilder slaveTemplateBuilder = computeService.templateBuilder()
-      .options(runScript(slaveBootScript)
-      .installPrivateKey(clusterSpec.getPrivateKey())
-      .authorizePublicKey(clusterSpec.getPublicKey()));
-
-    slaveTemplateBuilder.fromTemplate(masterTemplate); // base on master
-    slaveTemplateBuilder.locationId(masterTemplate.getLocation().getId());
-    
-    Template slaveTemplate = slaveTemplateBuilder.build();
-    
-    instanceTemplate = clusterSpec.getInstanceTemplate(WORKER_ROLE);
-    checkNotNull(instanceTemplate);
-
-    Set<? extends NodeMetadata> workerNodes;
     try {
-      LOG.info("Starting {} worker node(s)", instanceTemplate.getNumberOfInstances());
-      workerNodes = computeService.runNodesWithTag(clusterSpec.getClusterName(),
-        instanceTemplate.getNumberOfInstances(), slaveTemplate);
-      LOG.info("Worker nodes started: {}", workerNodes);
-    } catch (RunNodesException e) {
-      // TODO: don't bail out if only a few have failed to start
+      LOG.info("Running configure script on master");
+      computeService.runScriptOnNodesMatching(withIds(node.getId()),
+          nnjtConfigureScript);
+    } catch (RunScriptOnNodesException e) {
+      // TODO: retry
       throw new IOException(e);
     }
-    
+              
+    Set<? extends NodeMetadata> workerNodes;
+    try {
+      workerNodes = workerNodesFuture.get();
+    } catch (ExecutionException e) {
+      // TODO: Check for RunNodesException and don't bail out if only a few have
+      // failed to start
+      throw new IOException(e);
+    }
+
+    Payload dnttConfigureScript = newStringPayload(runUrls(
+        clusterSpec.getRunUrlBase(),
+        String.format(
+          "%s dn,tt -n %s -j %s -c %s",
+          hadoopConfigureRunUrl,
+          namenodePublicAddress.getHostName(),
+          jobtrackerPublicAddress.getHostName(),
+          clusterSpec.getProvider())));
+    try {
+      LOG.info("Running configure script on workers");
+      Predicate<NodeMetadata> workerPredicate = Predicates.and(
+          runningWithTag(clusterSpec.getClusterName()),
+          Predicates.not(withIds(node.getId())));
+      computeService.runScriptOnNodesMatching(workerPredicate,
+          dnttConfigureScript);
+    } catch (RunScriptOnNodesException e) {
+      // TODO: retry
+      throw new IOException(e);
+    }
+        
     // TODO: wait for TTs to come up (done in test for the moment)
     
     Set<Instance> instances = Sets.union(getInstances(MASTER_ROLE, Collections.singleton(node)),
@@ -182,7 +230,7 @@ public class HadoopService extends Service {
     
     LOG.info("Completed launch of {}", clusterSpec.getClusterName());
     LOG.info("Web UI available at http://{}",
-	    DnsUtil.resolveAddress(namenodePublicAddress.getHostAddress()));
+      DnsUtil.resolveAddress(namenodePublicAddress.getHostAddress()));
     Properties config = createClientSideProperties(namenodePublicAddress, jobtrackerPublicAddress);
     createClientSideHadoopSiteFile(clusterSpec, config);
     HadoopCluster cluster = new HadoopCluster(instances, config);
@@ -204,6 +252,21 @@ public class HadoopService extends Service {
         }
       }
     }));
+  }
+  
+  private static Predicate<NodeMetadata> withIds(String... ids) {
+    checkNotNull(ids, "ids must be defined");
+    final Set<String> search = Sets.newHashSet(ids);
+    return new Predicate<NodeMetadata>() {
+       @Override
+       public boolean apply(NodeMetadata nodeMetadata) {
+          return search.contains(nodeMetadata.getId());
+       }
+       @Override
+       public String toString() {
+          return "withIds(" + search + ")";
+       }
+    };
   }
   
   private Properties createClientSideProperties(InetAddress namenode, InetAddress jobtracker) throws IOException {
@@ -259,7 +322,7 @@ public class HadoopService extends Service {
       String script = String.format("echo 'Running proxy to Hadoop cluster at %s. " +
           "Use Ctrl-c to quit.'\n",
           DnsUtil.resolveAddress(cluster.getNamenodePublicAddress().getHostAddress()))
-        + Joiner.on(" ").join(proxy.getProxyCommand());
+          + Joiner.on(" ").join(proxy.getProxyCommand());
       Files.write(script, hadoopProxyFile, Charsets.UTF_8);
       LOG.info("Wrote Hadoop proxy script {}", hadoopProxyFile);
     } catch (IOException e) {

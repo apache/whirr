@@ -29,7 +29,6 @@ import java.net.UnknownHostException;
 import java.util.Collections;
 import java.util.Enumeration;
 
-import org.apache.whirr.service.hadoop.DnsUtil;
 import org.junit.Test;
 import org.xbill.DNS.Address;
 
