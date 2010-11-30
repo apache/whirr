@@ -15,6 +15,9 @@ Trunk (unreleased changes)
 
     WHIRR-137. Allow use of an arbitrary AMI on EC2. (tomwhite)
 
+    WHIRR-146. Changing the mapred.child.java.opts value does not change the
+    heap size from a default one. (Tibor Kiss via tomwhite)
+
 Release 0.2.0 - 2010-11-04
 
   NEW FEATURES

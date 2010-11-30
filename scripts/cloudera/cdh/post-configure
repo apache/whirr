@@ -124,8 +124,10 @@ function configure_hadoop() {
   MAPRED_LOCAL_DIR=$MOUNT/hadoop/mapred/local
   MAX_MAP_TASKS=2
   MAX_REDUCE_TASKS=1
-  CHILD_OPTS=-Xmx550m
-  CHILD_ULIMIT=1126400
+  CHILD_MAP_OPTS=-Xmx550m
+  CHILD_REDUCE_OPTS=-Xmx550m
+  CHILD_MAP_ULIMIT=1126400
+  CHILD_REDUCE_ULIMIT=1126400
   TMP_DIR=$MOUNT/tmp/hadoop-\${user.name}
 
   mkdir -p $MOUNT/hadoop
@@ -214,12 +216,21 @@ function configure_hadoop() {
   <value>65536</value>
 </property>
 <property>
-  <name>mapred.child.java.opts</name>
-  <value>$CHILD_OPTS</value>
+  <name>mapred.map.child.java.opts</name>
+  <value>$CHILD_MAP_OPTS</value>
 </property>
 <property>
-  <name>mapred.child.ulimit</name>
-  <value>$CHILD_ULIMIT</value>
+  <name>mapred.reduce.child.java.opts</name>
+  <value>$CHILD_REDUCE_OPTS</value>
+</property>
+<property>
+  <name>mapred.map.child.ulimit</name>
+  <value>$CHILD_MAP_ULIMIT</value>
+  <final>true</final>
+</property>
+<property>
+  <name>mapred.reduce.child.ulimit</name>
+  <value>$CHILD_REDUCE_ULIMIT</value>
   <final>true</final>
 </property>
 <property>
