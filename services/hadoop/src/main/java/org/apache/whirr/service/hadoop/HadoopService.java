@@ -182,8 +182,8 @@ public class HadoopService extends Service {
         String.format(
           "%s nn,jt -n %s -j %s -c %s",
           hadoopConfigureRunUrl,
-          namenodePublicAddress.getHostName(),
-          jobtrackerPublicAddress.getHostName(),
+          DnsUtil.resolveAddress(namenodePublicAddress.getHostAddress()),
+          DnsUtil.resolveAddress(jobtrackerPublicAddress.getHostAddress()),
           clusterSpec.getProvider())));
     try {
       LOG.info("Running configure script on master");
@@ -208,8 +208,8 @@ public class HadoopService extends Service {
         String.format(
           "%s dn,tt -n %s -j %s -c %s",
           hadoopConfigureRunUrl,
-          namenodePublicAddress.getHostName(),
-          jobtrackerPublicAddress.getHostName(),
+          DnsUtil.resolveAddress(namenodePublicAddress.getHostAddress()),
+          DnsUtil.resolveAddress(jobtrackerPublicAddress.getHostAddress()),
           clusterSpec.getProvider())));
     try {
       LOG.info("Running configure script on workers");
