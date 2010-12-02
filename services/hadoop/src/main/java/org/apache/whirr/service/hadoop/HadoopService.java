@@ -61,6 +61,8 @@ import org.jclouds.compute.RunScriptOnNodesException;
 import org.jclouds.compute.domain.NodeMetadata;
 import org.jclouds.compute.domain.Template;
 import org.jclouds.compute.domain.TemplateBuilder;
+import org.jclouds.compute.options.RunScriptOptions;
+import org.jclouds.domain.Credentials;
 import org.jclouds.io.Payload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -175,6 +177,11 @@ public class HadoopService extends Service {
           jobtrackerPublicAddress.getHostAddress(), JOBTRACKER_PORT);
     }
 
+    // Use private key to run script
+    Credentials credentials = new Credentials(
+      Iterables.get(nodes, 0).getCredentials().identity,
+      clusterSpec.readPrivateKey());
+    
     String hadoopConfigureRunUrl = clusterSpec.getConfiguration().getString(
         "whirr.hadoop-configure-runurl", "apache/hadoop/post-configure");
     Payload nnjtConfigureScript = newStringPayload(runUrls(
@@ -188,7 +195,8 @@ public class HadoopService extends Service {
     try {
       LOG.info("Running configure script on master");
       computeService.runScriptOnNodesMatching(withIds(node.getId()),
-          nnjtConfigureScript);
+          nnjtConfigureScript,
+          RunScriptOptions.Builder.overrideCredentialsWith(credentials));
     } catch (RunScriptOnNodesException e) {
       // TODO: retry
       throw new IOException(e);
@@ -217,7 +225,8 @@ public class HadoopService extends Service {
           runningWithTag(clusterSpec.getClusterName()),
           Predicates.not(withIds(node.getId())));
       computeService.runScriptOnNodesMatching(workerPredicate,
-          dnttConfigureScript);
+          dnttConfigureScript,
+          RunScriptOptions.Builder.overrideCredentialsWith(credentials));
     } catch (RunScriptOnNodesException e) {
       // TODO: retry
       throw new IOException(e);
