@@ -28,6 +28,9 @@
   <packaging>jar</packaging>
   <version>0.3.0-incubating-SNAPSHOT</version>
   <name>Apache Whirr Hadoop</name>
+  <properties>
+    <hadoop.version>0.20.2</hadoop.version>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
@@ -90,14 +93,27 @@
       <artifactId>log4j</artifactId>
     </dependency>
     <dependency>
+      <groupId>dnsjava</groupId>
+      <artifactId>dnsjava</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.apache.hadoop</groupId>
       <artifactId>hadoop-core</artifactId>
-      <version>0.20.2</version>
+      <version>${hadoop.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>dnsjava</groupId>
-      <artifactId>dnsjava</artifactId>
+      <groupId>org.apache.hadoop</groupId>
+      <artifactId>hadoop-examples</artifactId>
+      <version>${hadoop.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.hadoop</groupId>
+      <artifactId>hadoop-test</artifactId>
+      <version>0.20.3-SNAPSHOT</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/lib/hadoop-test-0.20.3-SNAPSHOT.jar</systemPath>
     </dependency>
   </dependencies>
 </project>
