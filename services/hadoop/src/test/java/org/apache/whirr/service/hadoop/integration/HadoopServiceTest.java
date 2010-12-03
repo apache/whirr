@@ -20,80 +20,49 @@ package org.apache.whirr.service.hadoop.integration;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNull;
-import static org.hamcrest.Matchers.instanceOf;
-import static org.junit.Assert.assertThat;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
-import java.util.Map;
-import java.util.Map.Entry;
 
-import org.apache.commons.configuration.CompositeConfiguration;
-import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
-import org.apache.hadoop.mapred.ClusterStatus;
 import org.apache.hadoop.mapred.FileInputFormat;
 import org.apache.hadoop.mapred.FileOutputFormat;
 import org.apache.hadoop.mapred.JobClient;
 import org.apache.hadoop.mapred.JobConf;
 import org.apache.hadoop.mapred.lib.LongSumReducer;
 import org.apache.hadoop.mapred.lib.TokenCountMapper;
-import org.apache.whirr.service.ClusterSpec;
-import org.apache.whirr.service.Service;
-import org.apache.whirr.service.ServiceFactory;
-import org.apache.whirr.service.hadoop.HadoopCluster;
-import org.apache.whirr.service.hadoop.HadoopProxy;
-import org.apache.whirr.service.hadoop.HadoopService;
-import org.apache.whirr.ssh.KeyPair;
-import org.junit.After;
-import org.junit.Before;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class HadoopServiceTest {
-  
-  private ClusterSpec clusterSpec;
-  private HadoopService service;
-  private HadoopProxy proxy;
-  private HadoopCluster cluster;
-  
-  @Before
-  public void setUp() throws Exception {
-    CompositeConfiguration config = new CompositeConfiguration();
-    if (System.getProperty("config") != null) {
-      config.addConfiguration(new PropertiesConfiguration(System.getProperty("config")));
-    }
-    config.addConfiguration(new PropertiesConfiguration("whirr-hadoop-test.properties"));
-    clusterSpec = new ClusterSpec(config);
-    if (clusterSpec.getPrivateKey() == null) {
-      Map<String, String> pair = KeyPair.generate();
-      clusterSpec.setPublicKey(pair.get("public"));
-      clusterSpec.setPrivateKey(pair.get("private"));
-    }
-    Service s = new ServiceFactory().create(clusterSpec.getServiceName());
-    assertThat(s, instanceOf(HadoopService.class));
-    service = (HadoopService) s;
-    
-    cluster = service.launchCluster(clusterSpec);
-    proxy = new HadoopProxy(clusterSpec, cluster);
-    proxy.start();
+
+  private static HadoopServiceController controller =
+    HadoopServiceController.getInstance();
+
+        
+  @BeforeClass
+  public static void setUp() throws Exception {
+    controller.ensureClusterRunning();
+  }
+        
+  @AfterClass
+  public static void tearDown() throws Exception {
+    controller.shutdown();
   }
   
   @Test
   public void test() throws Exception {
-    Configuration conf = getConfiguration();
-    
+    Configuration conf = controller.getConfiguration();
     JobConf job = new JobConf(conf, HadoopServiceTest.class);
-    JobClient client = new JobClient(job);
-    waitForTaskTrackers(client);
 
     FileSystem fs = FileSystem.get(conf);
     
@@ -118,38 +87,6 @@ public class HadoopServiceTest {
     assertNull(reader.readLine());
     reader.close();
     
-  }
-  
-  private Configuration getConfiguration() {
-    Configuration conf = new Configuration();
-    for (Entry<Object, Object> entry : cluster.getConfiguration().entrySet()) {
-      conf.set(entry.getKey().toString(), entry.getValue().toString());
-    }
-    return conf;
-  }
-  
-  private static void waitForTaskTrackers(JobClient client) throws IOException {
-    while (true) {
-      ClusterStatus clusterStatus = client.getClusterStatus();
-      int taskTrackerCount = clusterStatus.getTaskTrackers();
-      if (taskTrackerCount > 0) {
-        break;
-      }
-      try {
-        System.out.print(".");
-        Thread.sleep(1000);
-      } catch (InterruptedException e) {
-        break;
-      }
-    }
-  }
-  
-  @After
-  public void tearDown() throws IOException, InterruptedException {
-    if (proxy != null) {
-      proxy.stop();
-    }
-    service.destroyCluster(clusterSpec);
   }
 
 }
