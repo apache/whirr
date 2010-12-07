@@ -18,34 +18,31 @@
 
 package org.apache.whirr.service;
 
-import static org.jclouds.compute.predicates.NodePredicates.withTag;
-
 import com.google.common.base.Predicate;
 
 import java.io.IOException;
 import java.util.Set;
 
+import org.apache.whirr.cluster.actions.BootstrapClusterAction;
+import org.apache.whirr.cluster.actions.ConfigureClusterAction;
+import org.apache.whirr.cluster.actions.DestroyClusterAction;
 import org.jclouds.compute.ComputeService;
 import org.jclouds.compute.domain.ComputeMetadata;
 import org.jclouds.compute.domain.NodeMetadata;
 import org.jclouds.compute.domain.NodeState;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * This class represents a service that a client wants to use. This class is
  * used to start and stop clusters that provide the service.
  */
-public abstract class Service {
+public class Service {
   
-  private static final Logger LOG = LoggerFactory.getLogger(Service.class);
-
   /**
    * @return the unique name of the service.
    */
-  public abstract String getName();
-
+  public String getName() {
+    throw new UnsupportedOperationException("No service name");
+  }
   /**
    * Start the cluster described by <code>clusterSpec</code> and block until the
    * cluster is
@@ -57,8 +54,17 @@ public abstract class Service {
    * cluster may or may not have started.
    * @throws InterruptedException if the thread is interrupted.
    */
-  public abstract Cluster launchCluster(ClusterSpec clusterSpec)
-    throws IOException, InterruptedException;
+  public Cluster launchCluster(ClusterSpec clusterSpec)
+      throws IOException, InterruptedException {
+    
+    BootstrapClusterAction bootstrapper = new BootstrapClusterAction();
+    Cluster cluster = bootstrapper.execute(clusterSpec, null);
+
+    ConfigureClusterAction configurer = new ConfigureClusterAction();
+    cluster = configurer.execute(clusterSpec, cluster);
+    
+    return cluster;
+  }
   
   /**
    * Stop the cluster and destroy all resources associated with it.
@@ -68,11 +74,8 @@ public abstract class Service {
    */
   public void destroyCluster(ClusterSpec clusterSpec) throws IOException,
       InterruptedException {
-    LOG.info("Destroying " + clusterSpec.getClusterName() + " cluster");
-    ComputeService computeService =
-      ComputeServiceContextBuilder.build(clusterSpec).getComputeService();
-    computeService.destroyNodesMatching(withTag(clusterSpec.getClusterName()));
-    LOG.info("Cluster {} destroyed", clusterSpec.getClusterName());
+    DestroyClusterAction destroyer = new DestroyClusterAction();
+    destroyer.execute(clusterSpec, null);
   }
   
   public Set<? extends NodeMetadata> getNodes(ClusterSpec clusterSpec)

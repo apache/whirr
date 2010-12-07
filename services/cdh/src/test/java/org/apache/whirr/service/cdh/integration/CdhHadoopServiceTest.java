@@ -47,12 +47,11 @@ import org.apache.hadoop.mapred.JobClient;
 import org.apache.hadoop.mapred.JobConf;
 import org.apache.hadoop.mapred.lib.LongSumReducer;
 import org.apache.hadoop.mapred.lib.TokenCountMapper;
+import org.apache.whirr.service.Cluster;
 import org.apache.whirr.service.ClusterSpec;
 import org.apache.whirr.service.Service;
 import org.apache.whirr.service.ServiceFactory;
-import org.apache.whirr.service.hadoop.HadoopCluster;
 import org.apache.whirr.service.hadoop.HadoopProxy;
-import org.apache.whirr.service.hadoop.HadoopService;
 import org.apache.whirr.ssh.KeyPair;
 import org.junit.After;
 import org.junit.Before;
@@ -61,9 +60,9 @@ import org.junit.Test;
 public class CdhHadoopServiceTest {
   
   private ClusterSpec clusterSpec;
-  private HadoopService service;
+  private Service service;
   private HadoopProxy proxy;
-  private HadoopCluster cluster;
+  private Cluster cluster;
   
   @Before
   public void setUp() throws Exception {
@@ -78,9 +77,7 @@ public class CdhHadoopServiceTest {
       clusterSpec.setPublicKey(pair.get("public"));
       clusterSpec.setPrivateKey(pair.get("private"));
     }
-    Service s = new ServiceFactory().create(clusterSpec.getServiceName());
-    assertThat(s, instanceOf(HadoopService.class));
-    service = (HadoopService) s;
+    service = new Service();
     
     cluster = service.launchCluster(clusterSpec);
     proxy = new HadoopProxy(clusterSpec, cluster);

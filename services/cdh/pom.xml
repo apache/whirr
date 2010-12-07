@@ -95,6 +95,10 @@
       <artifactId>log4j</artifactId>
     </dependency>
     <dependency>
+      <groupId>dnsjava</groupId>
+      <artifactId>dnsjava</artifactId>
+    </dependency>
+    <dependency>
       <groupId>com.cloudera.hadoop</groupId>
       <artifactId>hadoop-core</artifactId>
       <version>0.20.2-737</version>

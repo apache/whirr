@@ -16,17 +16,20 @@
  * limitations under the License.
  */
 
-package org.apache.whirr.service.hadoop;
+package org.apache.whirr.service;
 
-import java.net.InetAddress;
+import java.io.IOException;
 
-import org.apache.whirr.service.Cluster;
-import org.apache.whirr.service.RolePredicates;
+/**
+ * Performs an action on a cluster. Example actions include bootstrapping
+ * (launching, creating), configuring, or running an arbitrary command on the
+ * cluster.
+ */
+public abstract class ClusterAction {
+  
+  protected abstract String getAction();
 
-public class HadoopCluster {
-  public static InetAddress getNamenodePublicAddress(Cluster cluster) {
-    return cluster.getInstanceMatching(
-        RolePredicates.role(HadoopNameNodeClusterActionHandler.ROLE))
-        .getPublicAddress();
-  }
+  public abstract Cluster execute(ClusterSpec clusterSpec, Cluster cluster)
+      throws IOException, InterruptedException;
+  
 }

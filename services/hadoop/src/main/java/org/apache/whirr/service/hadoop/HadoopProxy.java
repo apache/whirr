@@ -20,24 +20,26 @@ package org.apache.whirr.service.hadoop;
 
 import static com.google.common.base.Preconditions.checkState;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
-
-import org.apache.whirr.service.ClusterSpec;
-
 import com.google.common.collect.Iterables;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.Files;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.InetAddress;
+
+import org.apache.whirr.service.Cluster;
+import org.apache.whirr.service.ClusterSpec;
+
 public class HadoopProxy {
 
   private ClusterSpec clusterSpec;
-  private HadoopCluster cluster;
+  private Cluster cluster;
   private Process process;
   
-  public HadoopProxy(ClusterSpec clusterSpec, HadoopCluster cluster) {
+  public HadoopProxy(ClusterSpec clusterSpec, Cluster cluster) {
     this.clusterSpec = clusterSpec;
     this.cluster = cluster;
   }
@@ -53,7 +55,8 @@ public class HadoopProxy {
       Files.write(ByteStreams.toByteArray(clusterSpec.getPrivateKey().getInput()), identity);
     }
     String user = Iterables.get(cluster.getInstances(), 0).getLoginCredentials().identity;
-    String server = DnsUtil.resolveAddress(cluster.getNamenodePublicAddress().getHostAddress());
+    InetAddress namenode = HadoopCluster.getNamenodePublicAddress(cluster);
+    String server = DnsUtil.resolveAddress(namenode.getHostAddress());
     return new String[] { "ssh",
         "-i", identity.getAbsolutePath(),
         "-o", "ConnectTimeout=10",
