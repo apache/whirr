@@ -18,9 +18,6 @@
 
 package org.apache.whirr.service.hadoop.integration;
 
-import static org.hamcrest.Matchers.instanceOf;
-import static org.junit.Assert.assertThat;
-
 import java.io.IOException;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -34,12 +31,10 @@ import org.apache.hadoop.hdfs.protocol.FSConstants;
 import org.apache.hadoop.mapred.ClusterStatus;
 import org.apache.hadoop.mapred.JobClient;
 import org.apache.hadoop.mapred.JobConf;
+import org.apache.whirr.service.Cluster;
 import org.apache.whirr.service.ClusterSpec;
 import org.apache.whirr.service.Service;
-import org.apache.whirr.service.ServiceFactory;
-import org.apache.whirr.service.hadoop.HadoopCluster;
 import org.apache.whirr.service.hadoop.HadoopProxy;
-import org.apache.whirr.service.hadoop.HadoopService;
 import org.apache.whirr.ssh.KeyPair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,9 +53,9 @@ public class HadoopServiceController {
   
   private boolean running;
   private ClusterSpec clusterSpec;
-  private HadoopService service;
+  private Service service;
   private HadoopProxy proxy;
-  private HadoopCluster cluster;
+  private Cluster cluster;
   
   private HadoopServiceController() {
   }
@@ -88,9 +83,7 @@ public class HadoopServiceController {
       clusterSpec.setPublicKey(pair.get("public"));
       clusterSpec.setPrivateKey(pair.get("private"));
     }
-    Service s = new ServiceFactory().create(clusterSpec.getServiceName());
-    assertThat(s, instanceOf(HadoopService.class));
-    service = (HadoopService) s;
+    service = new Service();
     
     cluster = service.launchCluster(clusterSpec);
     proxy = new HadoopProxy(clusterSpec, cluster);
@@ -104,7 +97,7 @@ public class HadoopServiceController {
     running = true;
   }
   
-  public HadoopCluster getCluster() {
+  public Cluster getCluster() {
     return cluster;
   }
   

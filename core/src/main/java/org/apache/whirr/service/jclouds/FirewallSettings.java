@@ -18,6 +18,9 @@
 
 package org.apache.whirr.service.jclouds;
 
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
+
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -26,15 +29,12 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.whirr.service.Cluster.Instance;
 import org.apache.whirr.service.ClusterSpec;
 import org.jclouds.aws.ec2.EC2Client;
 import org.jclouds.aws.ec2.domain.IpProtocol;
 import org.jclouds.aws.ec2.util.EC2Utils;
 import org.jclouds.compute.ComputeServiceContext;
-import org.jclouds.compute.domain.NodeMetadata;
-
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 
 /**
  * Utility functions for controlling firewall settings for a cluster.
@@ -53,36 +53,36 @@ public class FirewallSettings {
   }
 
   public static void authorizeIngress(ComputeServiceContext computeServiceContext,
-      NodeMetadata node, ClusterSpec clusterSpec, int... ports) throws IOException {
+      Instance instance, ClusterSpec clusterSpec, int... ports) throws IOException {
     
-    authorizeIngress(computeServiceContext, Collections.singleton(node),
+    authorizeIngress(computeServiceContext, Collections.singleton(instance),
         clusterSpec, ports);
   }
   
   public static void authorizeIngress(ComputeServiceContext computeServiceContext,
-      NodeMetadata node, ClusterSpec clusterSpec, String ip, int... ports) {
+      Instance instance, ClusterSpec clusterSpec, String ip, int... ports) {
     
-    authorizeIngress(computeServiceContext, Collections.singleton(node),
+    authorizeIngress(computeServiceContext, Collections.singleton(instance),
         clusterSpec, Lists.newArrayList(ip + "/32"), ports);
   }
 
   public static void authorizeIngress(ComputeServiceContext computeServiceContext,
-      Set<? extends NodeMetadata> nodes, ClusterSpec clusterSpec, int... ports) throws IOException {
+      Set<Instance> instances, ClusterSpec clusterSpec, int... ports) throws IOException {
     List<String> cidrs = clusterSpec.getClientCidrs();
     if (cidrs == null || cidrs.isEmpty()) {
       cidrs = Lists.newArrayList(getOriginatingIp());
     }
-    authorizeIngress(computeServiceContext, nodes, clusterSpec, cidrs, ports);
+    authorizeIngress(computeServiceContext, instances, clusterSpec, cidrs, ports);
   }
 
   private static void authorizeIngress(ComputeServiceContext computeServiceContext,
-      Set<? extends NodeMetadata> nodes, ClusterSpec clusterSpec, List<String> cidrs, int... ports) {
+      Set<Instance> instances, ClusterSpec clusterSpec, List<String> cidrs, int... ports) {
     
     if (clusterSpec.getProvider().equals("ec2")) {
       // This code (or something like it) may be added to jclouds (see
       // http://code.google.com/p/jclouds/issues/detail?id=336).
       // Until then we need this temporary workaround.
-      String region = EC2Utils.parseHandle(Iterables.get(nodes, 0).getId())[0];
+      String region = EC2Utils.parseHandle(Iterables.get(instances, 0).getId())[0];
       EC2Client ec2Client = EC2Client.class.cast(
           computeServiceContext.getProviderSpecificContext().getApi());
       String groupName = "jclouds#" + clusterSpec.getClusterName() + "#" + region;

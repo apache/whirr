@@ -26,9 +26,12 @@ import java.util.Set;
 import org.jclouds.domain.Credentials;
 
 import com.google.common.base.Objects;
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Sets;
 
 /**
- * This class represents a real cluster of {@link Instances}.
+ * This class represents a real cluster of {@link Instance}s.
  *
  */
 public class Cluster {
@@ -43,13 +46,15 @@ public class Cluster {
     private final Set<String> roles;
     private final InetAddress publicAddress;
     private final InetAddress privateAddress;
+    private final String id;
 
     public Instance(Credentials loginCredentials, Set<String> roles, InetAddress publicAddress,
-        InetAddress privateAddress) {
+        InetAddress privateAddress, String id) {
       this.loginCredentials = checkNotNull(loginCredentials, "loginCredentials");
       this.roles = checkNotNull(roles, "roles");
       this.publicAddress = checkNotNull(publicAddress, "publicAddress");
       this.privateAddress = checkNotNull(privateAddress, "privateAddress");
+      this.id = checkNotNull(id, "id");
     }
 
     public Credentials getLoginCredentials() {
@@ -68,11 +73,16 @@ public class Cluster {
       return privateAddress;
     }
     
+    public String getId() {
+      return id;
+    }
+    
     public String toString() {
       return Objects.toStringHelper(this)
         .add("roles", roles)
         .add("publicAddress", publicAddress)
         .add("privateAddress", privateAddress)
+        .add("id", id)
         .toString();
     }
     
@@ -89,19 +99,27 @@ public class Cluster {
     this.instances = instances;
     this.configuration = configuration;
   }
-
+  
   public Set<Instance> getInstances() {
     return instances;
   }  
   public Properties getConfiguration() {
     return configuration;
   }
-  
+
+  public Instance getInstanceMatching(Predicate<Instance> predicate) {
+    return Iterables.getOnlyElement(Sets.filter(instances, predicate));
+  }
+
+  public Set<Instance> getInstancesMatching(Predicate<Instance> predicate) {
+    return Sets.filter(instances, predicate);
+  }
+
   public String toString() {
     return Objects.toStringHelper(this)
       .add("instances", instances)
       .add("configuration", configuration)
       .toString();
   }
-
+  
 }

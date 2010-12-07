@@ -4,6 +4,8 @@ Trunk (unreleased changes)
 
   NEW FEATURES
 
+    WHIRR-117. Composable services. (tomwhite)
+
   IMPROVEMENTS
 
     WHIRR-87. Parallelize Hadoop cluster creation. (tomwhite)

@@ -1,0 +1,4 @@
+org.apache.whirr.service.hadoop.HadoopNameNodeClusterActionHandler
+org.apache.whirr.service.hadoop.HadoopDataNodeClusterActionHandler
+org.apache.whirr.service.hadoop.HadoopJobTrackerClusterActionHandler
+org.apache.whirr.service.hadoop.HadoopTaskTrackerClusterActionHandler

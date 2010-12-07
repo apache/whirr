@@ -19,8 +19,6 @@
 package org.apache.whirr.service.zookeeper.integration;
 
 import static junit.framework.Assert.assertEquals;
-import static org.hamcrest.Matchers.instanceOf;
-import static org.junit.Assert.assertThat;
 
 import java.io.IOException;
 import java.util.Map;
@@ -28,11 +26,10 @@ import java.util.concurrent.CountDownLatch;
 
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.PropertiesConfiguration;
+import org.apache.whirr.service.Cluster;
 import org.apache.whirr.service.ClusterSpec;
 import org.apache.whirr.service.Service;
-import org.apache.whirr.service.ServiceFactory;
 import org.apache.whirr.service.zookeeper.ZooKeeperCluster;
-import org.apache.whirr.service.zookeeper.ZooKeeperService;
 import org.apache.whirr.ssh.KeyPair;
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.WatchedEvent;
@@ -47,8 +44,9 @@ import org.junit.Test;
 public class ZooKeeperServiceTest {
   
   private ClusterSpec clusterSpec;
-  private ZooKeeperService service;
-  private ZooKeeperCluster cluster;
+  private Cluster cluster;
+  private Service service;
+  private String hosts;
   
   @Before
   public void setUp() throws Exception {
@@ -63,10 +61,9 @@ public class ZooKeeperServiceTest {
       clusterSpec.setPublicKey(pair.get("public"));
       clusterSpec.setPrivateKey(pair.get("private"));
     }
-    Service s = new ServiceFactory().create(clusterSpec.getServiceName());
-    assertThat(s, instanceOf(ZooKeeperService.class));
-    service = (ZooKeeperService) s;
+    service = new Service();
     cluster = service.launchCluster(clusterSpec);
+    hosts = ZooKeeperCluster.getHosts(cluster);
   }
   
   @Test
@@ -103,13 +100,13 @@ public class ZooKeeperServiceTest {
     String path = "/data";
     String data = "Hello";
     ConnectionWatcher watcher = new ConnectionWatcher();
-    watcher.connect(cluster.getHosts());
+    watcher.connect(hosts);
     watcher.getZooKeeper().create(path, data.getBytes(), Ids.OPEN_ACL_UNSAFE,
       CreateMode.PERSISTENT);
     watcher.close();
     
     watcher = new ConnectionWatcher();
-    watcher.connect(cluster.getHosts());
+    watcher.connect(hosts);
     byte[] actualData = watcher.getZooKeeper().getData(path, false, null);
     assertEquals(data, new String(actualData));
     watcher.close();

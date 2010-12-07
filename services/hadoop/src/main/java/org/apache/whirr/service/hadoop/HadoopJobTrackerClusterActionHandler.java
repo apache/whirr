@@ -18,15 +18,15 @@
 
 package org.apache.whirr.service.hadoop;
 
-import java.net.InetAddress;
+import org.apache.whirr.service.ClusterActionHandlerSupport;
 
-import org.apache.whirr.service.Cluster;
-import org.apache.whirr.service.RolePredicates;
+// Currently the jobtracker is started by HadoopNameNodeClusterActionHandler
+public class HadoopJobTrackerClusterActionHandler extends ClusterActionHandlerSupport {
 
-public class HadoopCluster {
-  public static InetAddress getNamenodePublicAddress(Cluster cluster) {
-    return cluster.getInstanceMatching(
-        RolePredicates.role(HadoopNameNodeClusterActionHandler.ROLE))
-        .getPublicAddress();
+  public static final String ROLE = "jt";
+  
+  @Override
+  public String getRole() {
+    return ROLE;
   }
 }

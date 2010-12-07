@@ -18,8 +18,6 @@
 
 package org.apache.whirr.service.cassandra.integration;
 
-import static org.hamcrest.Matchers.instanceOf;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
@@ -39,8 +37,7 @@ import org.apache.whirr.service.Cluster;
 import org.apache.whirr.service.Cluster.Instance;
 import org.apache.whirr.service.ClusterSpec;
 import org.apache.whirr.service.Service;
-import org.apache.whirr.service.ServiceFactory;
-import org.apache.whirr.service.cassandra.CassandraService;
+import org.apache.whirr.service.cassandra.CassandraClusterActionHandler;
 import org.apache.whirr.ssh.KeyPair;
 import org.junit.After;
 import org.junit.Before;
@@ -51,7 +48,7 @@ public class CassandraServiceTest {
   private static final String KEYSPACE = "Keyspace1";
 
   private ClusterSpec clusterSpec;
-  private CassandraService service;
+  private Service service;
   private Cluster cluster;
 
   @Before
@@ -67,9 +64,7 @@ public class CassandraServiceTest {
       clusterSpec.setPublicKey(pair.get("public"));
       clusterSpec.setPrivateKey(pair.get("private"));
     }
-    Service s = new ServiceFactory().create(clusterSpec.getServiceName());
-    assertThat(s, instanceOf(CassandraService.class));
-    service = (CassandraService) s;
+    service = new Service();
     cluster = service.launchCluster(clusterSpec);
 
     // give it a sec to boot up the cluster
@@ -81,7 +76,7 @@ public class CassandraServiceTest {
       while (true) {
         try {
           TSocket socket = new TSocket(instance.getPublicAddress()
-              .getHostAddress(), CassandraService.CLIENT_PORT);
+              .getHostAddress(), CassandraClusterActionHandler.CLIENT_PORT);
           socket.open();
           TBinaryProtocol protocol = new TBinaryProtocol(socket);
           Cassandra.Client client = new Cassandra.Client(protocol);
@@ -105,7 +100,7 @@ public class CassandraServiceTest {
     Set<String> endPoints = new HashSet<String>();
     for (Instance instance : cluster.getInstances()) {
       TSocket socket = new TSocket(instance.getPublicAddress().getHostAddress(), 
-          CassandraService.CLIENT_PORT);
+          CassandraClusterActionHandler.CLIENT_PORT);
       socket.open();
       TBinaryProtocol protocol = new TBinaryProtocol(socket);
       Cassandra.Client client = new Cassandra.Client(protocol);

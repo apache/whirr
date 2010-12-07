@@ -68,6 +68,6 @@ sed -i -e "s|log4j.rootLogger=INFO, CONSOLE|log4j.rootLogger=INFO, ROLLINGFILE|"
     $ZK_CONF_DIR/log4j.properties
     
 # Ensure ZooKeeper starts on boot
-cat > /etc/rc.local <<EOF
+cat >> /etc/rc.local <<EOF
 ZOOCFGDIR=$ZK_CONF_DIR $ZOOKEEPER_HOME/bin/zkServer.sh start > /dev/null 2>&1 &
 EOF

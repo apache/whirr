@@ -18,21 +18,13 @@
 
 package org.apache.whirr.service.zookeeper;
 
-import java.util.Set;
+import com.google.common.base.Joiner;
 
 import org.apache.whirr.service.Cluster;
 
-public class ZooKeeperCluster extends Cluster {
-  
-  private String hosts;
-
-  public ZooKeeperCluster(Set<Instance> instances, String hosts) {
-    super(instances);
-    this.hosts = hosts;
+public class ZooKeeperCluster {
+  public static String getHosts(Cluster cluster) {
+    return Joiner.on(',').join(
+        ZooKeeperClusterActionHandler.getHosts(cluster.getInstances()));
   }
-  
-  public String getHosts() {
-    return hosts;
-  }
-
 }
