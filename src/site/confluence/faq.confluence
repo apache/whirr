@@ -125,8 +125,9 @@ configuration scripts" above.
 h2. How do I run Cloudera's Distribution for Hadoop?
 
 You can run CDH rather than Apache Hadoop by running the {{hadoop}} service and
-setting {{whirr.hadoop-install-runurl}} to {{cloudera/cdh/install}} (the 
-default is {{apache/hadoop/install}}). Here is a sample configuration:
+setting the {{whirr.hadoop-install-runurl}} and
+{{whirr.hadoop-configure-runurl}}
+properties. Here is a sample configuration:
 
 {code}
 whirr.service-name=hadoop
@@ -137,6 +138,7 @@ whirr.identity=<cloud-provider-identity>
 whirr.credential=<cloud-provider-credential>
 whirr.private-key-file=${sys:user.home}/.ssh/id_rsa
 whirr.hadoop-install-runurl=cloudera/cdh/install
+whirr.hadoop-configure-runurl=cloudera/cdh/post-configure
 {code}
 
 {anchor:other-services}
