@@ -15,6 +15,8 @@ Trunk (unreleased changes)
     WHIRR-153. Add documentation for WHIRR-87 (Parallelize Hadoop cluster
     creation). (tomwhite)
 
+    WHIRR-115. Distribution should include documentation. (tomwhite)
+
   BUG FIXES
 
     WHIRR-128. Fix DNS resolution for clients running within EC2.

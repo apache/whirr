@@ -56,5 +56,9 @@
         <exclude>**/dependency-reduced-pom.xml</exclude>
       </excludes>
     </fileSet>
+    <fileSet>
+      <directory>${project.build.directory}/site</directory>
+      <outputDirectory>docs</outputDirectory>
+    </fileSet>
   </fileSets>
 </assembly>
