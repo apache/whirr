@@ -44,6 +44,7 @@ public class CassandraClusterActionHandler extends ClusterActionHandlerSupport {
     
   public static final String CASSANDRA_ROLE = "cassandra";
   public static final int CLIENT_PORT = 9160;
+  public static final int JMX_PORT = 8080;
 
   @Override
   public String getRole() {
@@ -66,6 +67,8 @@ public class CassandraClusterActionHandler extends ClusterActionHandlerSupport {
       ComputeServiceContextBuilder.build(clusterSpec);
     FirewallSettings.authorizeIngress(computeServiceContext,
         cluster.getInstances(), clusterSpec, CLIENT_PORT);
+    FirewallSettings.authorizeIngress(computeServiceContext,
+        cluster.getInstances(), clusterSpec, JMX_PORT);
     
     List<Instance> seeds = getSeeds(cluster.getInstances());
     String servers = Joiner.on(' ').join(getPrivateIps(seeds));
