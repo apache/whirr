@@ -62,6 +62,7 @@ cp $CASSANDRA_HOME/conf/storage-conf.xml $C_CONF_DIR
 sed -i -e "s|CASSANDRA_CONF=\$cassandra_home/conf|CASSANDRA_CONF=$C_CONF_DIR|" $CASSANDRA_HOME/bin/cassandra.in.sh
 
 # Ensure Cassandra starts on boot
+sed -i -e "s/exit 0//" /etc/rc.local
 cat >> /etc/rc.local <<EOF
 $CASSANDRA_HOME/bin/cassandra > /dev/null 2>&1 &
 EOF
