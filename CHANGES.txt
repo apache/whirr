@@ -19,6 +19,8 @@ Trunk (unreleased changes)
 
     WHIRR-154. Cassandra: expose JMX port. (Kelvin Kakugawa via tomwhite)
 
+    WHIRR-160. Improve SSH key diagnostics. (Andrei Savu via tomwhite)
+
   BUG FIXES
 
     WHIRR-128. Fix DNS resolution for clients running within EC2.

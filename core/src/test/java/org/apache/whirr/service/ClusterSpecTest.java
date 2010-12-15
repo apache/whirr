@@ -25,11 +25,18 @@ import static org.junit.Assert.assertThat;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
+import com.google.common.io.Files;
+import com.jcraft.jsch.JSchException;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
+import org.apache.commons.io.IOUtils;
+import org.apache.whirr.ssh.KeyPair;
+import org.junit.Assert;
 import org.junit.Test;
 
 public class ClusterSpecTest {
@@ -67,12 +74,90 @@ public class ClusterSpecTest {
     conf.setProperty("a.b", 1);
     conf.setProperty("b.a", 2);
     conf.setProperty("a.c", 3);
+
     ClusterSpec spec = new ClusterSpec(conf);
     Configuration prefixConf = spec.getConfigurationForKeysWithPrefix("a");
+
     List<String> prefixKeys = Lists.newArrayList();
     Iterators.addAll(prefixKeys, prefixConf.getKeys());
+
     assertThat(prefixKeys.size(), is(2));
     assertThat(prefixKeys.get(0), is("a.b"));
     assertThat(prefixKeys.get(1), is("a.c"));
   }
+
+  @Test
+  public void testDefaultPublicKey()
+  throws ConfigurationException, JSchException, IOException {
+    Map<String, File> keys = KeyPair.generateTemporaryFiles();
+
+    Configuration conf = new PropertiesConfiguration();
+    conf.setProperty("whirr.private-key-file", keys.get("private").getAbsolutePath());
+    // If no public-key-file is specified it should append .pub to the private-key-file
+
+    ClusterSpec spec = new ClusterSpec(conf);
+    Assert.assertEquals(IOUtils.toString(
+            new FileReader(keys.get("public"))), spec.readPublicKey());
+  }
+
+  @Test(expected = ConfigurationException.class)
+  public void testDummyPrivateKey()
+  throws JSchException, IOException, ConfigurationException {
+    File privateKeyFile = File.createTempFile("private", "key");
+    privateKeyFile.deleteOnExit();
+    Files.write(("-----BEGIN RSA PRIVATE KEY-----\n" +
+            "DUMMY FILE\n" +
+            "-----END RSA PRIVATE KEY-----").getBytes(), privateKeyFile);
+
+    Configuration conf = new PropertiesConfiguration();
+    conf.setProperty("whirr.private-key-file", privateKeyFile.getAbsolutePath());
+
+    ClusterSpec spec = new ClusterSpec(conf);
+  }
+
+  @Test(expected = ConfigurationException.class)
+  public void testEncryptedPrivateKey()
+  throws JSchException, IOException, ConfigurationException {
+    File privateKey = KeyPair.generateTemporaryFiles("dummy").get("private");
+
+    Configuration conf = new PropertiesConfiguration();
+    conf.setProperty("whirr.private-key-file", privateKey.getAbsolutePath());
+
+    ClusterSpec spec = new ClusterSpec(conf);
+  }
+
+  @Test(expected = ConfigurationException.class)
+  public void testMissingPrivateKey() throws ConfigurationException {
+    Configuration conf = new PropertiesConfiguration();
+    conf.setProperty("whirr.private-key-file", "/dummy/path/that/does/not/exists");
+
+    ClusterSpec spec = new ClusterSpec(conf);      
+  }
+
+  @Test(expected = ConfigurationException.class)
+  public void testMissingPublicKey() throws JSchException, IOException, ConfigurationException {
+    File privateKey = KeyPair.generateTemporaryFiles().get("private");
+
+    Configuration conf = new PropertiesConfiguration();
+    conf.setProperty("whirr.private-key-file", privateKey.getAbsolutePath());
+    conf.setProperty("whirr.public-key-file", "/dummy/path/that/does/not/exists");
+
+    ClusterSpec spec = new ClusterSpec(conf);
+  }
+
+  @Test(expected = ConfigurationException.class)
+  public void testBrokenPublicKey() throws IOException, JSchException, ConfigurationException {
+    File privateKey = KeyPair.generateTemporaryFiles().get("private");
+
+    File publicKey = File.createTempFile("public", "key");
+    publicKey.deleteOnExit();
+    Files.write("ssh-rsa BROKEN PUBLIC KEY".getBytes(), publicKey);
+
+    Configuration conf = new PropertiesConfiguration();
+    conf.setProperty("whirr.private-key-file", privateKey.getAbsolutePath());
+    conf.setProperty("whirr.public-key-file", publicKey.getAbsolutePath());
+
+    ClusterSpec spec = new ClusterSpec(conf);
+  }
+
 }

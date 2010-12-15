@@ -21,7 +21,6 @@ package org.apache.whirr.service;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.jclouds.io.Payloads.newStringPayload;
-import static org.jclouds.io.Payloads.newFilePayload;
 import static org.jclouds.util.Utils.toStringAndClose;
 
 import com.google.common.base.Objects;
@@ -29,6 +28,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -36,10 +36,14 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import com.jcraft.jsch.JSch;
+import com.jcraft.jsch.JSchException;
+import com.jcraft.jsch.KeyPair;
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
+import org.apache.commons.io.IOUtils;
 import org.jclouds.io.Payload;
 
 /**
@@ -169,13 +173,15 @@ public class ClusterSpec {
   
   /**
    * 
-   * @throws ConfigurationException if the public or private key cannot be read.
+   * @throws ConfigurationException if something is wrong
    */
   public ClusterSpec(Configuration config)
       throws ConfigurationException {
+
     CompositeConfiguration c = new CompositeConfiguration();
     c.addConfiguration(config);
     c.addConfiguration(new PropertiesConfiguration(DEFAULT_PROPERTIES));
+
     setServiceName(c.getString(Property.SERVICE_NAME.getConfigName()));
     setInstanceTemplates(InstanceTemplate.parse(
         c.getStringArray(Property.INSTANCE_TEMPLATES.getConfigName())));
@@ -183,26 +189,40 @@ public class ClusterSpec {
     setIdentity(c.getString(Property.IDENTITY.getConfigName()));
     setCredential(c.getString(Property.CREDENTIAL.getConfigName()));
     setClusterName(c.getString(Property.CLUSTER_NAME.getConfigName()));
+
     try {
       String privateKeyPath = c.getString(
           Property.PRIVATE_KEY_FILE.getConfigName());
-      if (privateKeyPath != null && new File(privateKeyPath).exists())
-        setPrivateKey(new File(privateKeyPath));
-      String publicKeyPath = c.getString(Property.PUBLIC_KEY_FILE.
-               getConfigName());
-      publicKeyPath = publicKeyPath == null && privateKeyPath != null ?
+
+      String publicKeyPath = c.getString(Property.PUBLIC_KEY_FILE.getConfigName());
+      publicKeyPath = (publicKeyPath == null && privateKeyPath != null) ?
                 privateKeyPath + ".pub" : publicKeyPath;
-      if (publicKeyPath != null && new File(publicKeyPath).exists())
-        setPublicKey(new File(publicKeyPath));
+
+      KeyPair pair = KeyPair.load(new JSch(), privateKeyPath, publicKeyPath);
+      if (pair.isEncrypted()) {
+        throw new ConfigurationException("Key pair is encrypted");
+      }
+
+      setPrivateKey(new File(privateKeyPath));
+      setPublicKey(new File(publicKeyPath));
+
+    } catch (JSchException e) {
+      throw new ConfigurationException("Invalid key pair", e);
+
+    } catch (IllegalArgumentException e) {
+      throw new ConfigurationException("Invalid key", e);
+
     } catch (IOException e) {
-      throw new ConfigurationException("error reading key from file", e);
+      throw new ConfigurationException("Error reading one of key file", e);
     }
+
     setImageId(config.getString(Property.IMAGE_ID.getConfigName()));
     setHardwareId(config.getString(Property.HARDWARE_ID.getConfigName()));
     setLocationId(config.getString(Property.LOCATION_ID.getConfigName()));
     setClientCidrs(c.getList(Property.CLIENT_CIDRS.getConfigName()));
     setVersion(c.getString(Property.VERSION.getConfigName()));
     String runUrlBase = c.getString(Property.RUN_URL_BASE.getConfigName());
+
     if (runUrlBase == null) {
       try {
         runUrlBase = String.format("http://whirr.s3.amazonaws.com/%s/",
@@ -212,6 +232,7 @@ public class ClusterSpec {
       }
     }
     setRunUrlBase(runUrlBase);
+
     this.config = c;
   }
 
@@ -316,8 +337,13 @@ public class ClusterSpec {
    * @param publicKey
    */
   public void setPublicKey(String publicKey) {
-    checkArgument(checkNotNull(publicKey, "publicKey").startsWith("ssh-rsa"),
-        "key should start with ssh-rsa");
+    /*
+     * http://stackoverflow.com/questions/2494645#2494645
+     */
+    checkArgument(checkNotNull(publicKey, "publicKey")
+            .startsWith("ssh-rsa AAAAB3NzaC1yc2EA"),
+        "key should start with ssh-rsa AAAAB3NzaC1yc2EA");
+
     this.publicKey = newStringPayload(publicKey);
   }
   
@@ -328,8 +354,7 @@ public class ClusterSpec {
    * @see #setPublicKey(String)
    */
   public void setPublicKey(File publicKey) throws IOException {
-    this.publicKey = newFilePayload(checkNotNull(publicKey,
-        "publicKey"));
+    setPublicKey(IOUtils.toString(new FileReader(publicKey)));
   }
 
   /**
@@ -352,8 +377,7 @@ public class ClusterSpec {
    * @see #setPrivateKey(String)
    */
   public void setPrivateKey(File privateKey) throws IOException {
-    this.privateKey = newFilePayload(
-        checkNotNull(privateKey, "privateKey"));
+    setPrivateKey(IOUtils.toString(new FileReader(privateKey)));
   }
 
   public void setImageId(String imageId) {

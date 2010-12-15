@@ -27,18 +27,19 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.google.common.collect.Sets;
-import com.google.common.io.Files;
 import com.google.common.collect.Lists;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.PrintStream;
 import java.util.Collections;
+import java.util.Map;
 
 import org.apache.whirr.service.Cluster;
 import org.apache.whirr.service.ClusterSpec;
 import org.apache.whirr.service.Service;
 import org.apache.whirr.service.ServiceFactory;
+import org.apache.whirr.ssh.KeyPair;
 import org.hamcrest.Matcher;
 import org.junit.Before;
 import org.junit.Test;
@@ -55,6 +56,7 @@ public class LaunchClusterCommandTest {
   public void setUp() {
     outBytes = new ByteArrayOutputStream();
     out = new PrintStream(outBytes);
+
     errBytes = new ByteArrayOutputStream();
     err = new PrintStream(errBytes);
   }
@@ -80,15 +82,7 @@ public class LaunchClusterCommandTest {
     when(service.launchCluster((ClusterSpec) any())).thenReturn(cluster);
     
     LaunchClusterCommand command = new LaunchClusterCommand(factory);
-    
-    File privateKeyFile = File.createTempFile("private", "key");
-    privateKeyFile.deleteOnExit();
-    Files.write("-----BEGIN RSA PRIVATE KEY-----".getBytes(),
-             privateKeyFile);
-    
-    File publicKeyFile = File.createTempFile("public", "key");
-    publicKeyFile.deleteOnExit();
-    Files.write("ssh-rsa".getBytes(), publicKeyFile);
+    Map<String, File> keys = KeyPair.generateTemporaryFiles();
     
     int rc = command.run(null, out, null, Lists.newArrayList(
         "--service-name", "test-service",
@@ -96,8 +90,8 @@ public class LaunchClusterCommandTest {
         "--instance-templates", "1 role1+role2,2 role3",
         "--provider", "rackspace",
         "--identity", "myusername", "--credential", "mypassword",
-        "--private-key-file", privateKeyFile.getAbsolutePath(),
-        "--public-key-file", publicKeyFile.getAbsolutePath()
+        "--private-key-file", keys.get("private").getAbsolutePath(),
+        "--public-key-file", keys.get("public").getAbsolutePath()
         ));
     
     assertThat(rc, is(0));
@@ -112,8 +106,8 @@ public class LaunchClusterCommandTest {
     expectedClusterSpec.setIdentity("myusername");
     expectedClusterSpec.setCredential("mypassword");
     expectedClusterSpec.setClusterName("test-cluster");
-    expectedClusterSpec.setPrivateKey(privateKeyFile);
-    expectedClusterSpec.setPublicKey(publicKeyFile);
+    expectedClusterSpec.setPrivateKey(keys.get("private"));
+    expectedClusterSpec.setPublicKey(keys.get("public"));
     
     verify(factory).create("test-service");
     
