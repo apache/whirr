@@ -24,13 +24,15 @@ import static org.junit.Assert.assertThat;
 
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
+import com.google.common.io.Files;
+import com.jcraft.jsch.JSchException;
 
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
-import com.google.common.io.Files;
-import com.jcraft.jsch.JSchException;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
