@@ -22,6 +22,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertThat;
 
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 import com.google.common.io.Files;
@@ -32,6 +33,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
@@ -86,6 +88,21 @@ public class ClusterSpecTest {
     assertThat(prefixKeys.size(), is(2));
     assertThat(prefixKeys.get(0), is("a.b"));
     assertThat(prefixKeys.get(1), is("a.c"));
+  }
+  
+  @Test
+  public void testEnvVariableInterpolation() {
+    Map<String, String> envMap = System.getenv();
+    assertThat(envMap.isEmpty(), is(false));
+    String undefinedEnvVar = "UNDEFINED_ENV_VAR";
+    assertThat(envMap.containsKey(undefinedEnvVar), is(false));
+    Entry<String, String> firstEntry = Iterables.get(envMap.entrySet(), 0);
+    Configuration conf = new PropertiesConfiguration();
+    conf.setProperty("a", String.format("${env:%s}", firstEntry.getKey()));
+    conf.setProperty("b", String.format("${env:%s}", undefinedEnvVar));
+    assertThat(conf.getString("a"), is(firstEntry.getValue()));
+    assertThat(conf.getString("b"),
+        is(String.format("${env:%s}", undefinedEnvVar)));
   }
 
   @Test

@@ -23,6 +23,9 @@ Trunk (unreleased changes)
 
     WHIRR-150. Allow retrieval of instance roles. (tomwhite)
 
+    WHIRR-163. Support environment variable interpolation in configuration
+    properties. (tomwhite)
+
   BUG FIXES
 
     WHIRR-128. Fix DNS resolution for clients running within EC2.
