@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.apache.whirr.service.hadoop;
+package org.apache.whirr.net;
 
 import java.io.IOException;
 

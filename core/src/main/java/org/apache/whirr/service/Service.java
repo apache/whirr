@@ -18,25 +18,35 @@
 
 package org.apache.whirr.service;
 
+import com.google.common.base.Charsets;
+import com.google.common.base.Joiner;
 import com.google.common.base.Predicate;
+import com.google.common.io.Files;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Set;
 
 import org.apache.whirr.cluster.actions.BootstrapClusterAction;
 import org.apache.whirr.cluster.actions.ConfigureClusterAction;
 import org.apache.whirr.cluster.actions.DestroyClusterAction;
+import org.apache.whirr.net.DnsUtil;
+import org.apache.whirr.service.Cluster.Instance;
 import org.jclouds.compute.ComputeService;
 import org.jclouds.compute.domain.ComputeMetadata;
 import org.jclouds.compute.domain.NodeMetadata;
 import org.jclouds.compute.domain.NodeState;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class represents a service that a client wants to use. This class is
  * used to start and stop clusters that provide the service.
  */
 public class Service {
-  
+
+  private static final Logger LOG = LoggerFactory.getLogger(Service.class);
+
   /**
    * @return the unique name of the service.
    */
@@ -63,7 +73,34 @@ public class Service {
     ConfigureClusterAction configurer = new ConfigureClusterAction();
     cluster = configurer.execute(clusterSpec, cluster);
     
+    createInstancesFile(clusterSpec, cluster);
+    
     return cluster;
+  }
+  
+  private void createInstancesFile(ClusterSpec clusterSpec, Cluster cluster)
+      throws IOException {
+    
+    File clusterDir = clusterSpec.getClusterDirectory();
+    File instancesFile = new File(clusterDir, "instances");
+    StringBuilder sb = new StringBuilder();
+    for (Instance instance : cluster.getInstances()) {
+      String id = instance.getId();
+      String roles = Joiner.on(',').join(instance.getRoles());
+      String publicAddress = DnsUtil.resolveAddress(instance.getPublicAddress()
+          .getHostAddress());
+      String privateAddress = instance.getPrivateAddress().getHostAddress();
+      sb.append(id).append("\t");
+      sb.append(roles).append("\t");
+      sb.append(publicAddress).append("\t");
+      sb.append(privateAddress).append("\n");
+    }
+    try {
+      Files.write(sb.toString(), instancesFile, Charsets.UTF_8);
+      LOG.info("Wrote instances file {}", instancesFile);
+    } catch (IOException e) {
+      LOG.error("Problem writing instances file {}", instancesFile, e);
+    }
   }
   
   /**
@@ -76,6 +113,7 @@ public class Service {
       InterruptedException {
     DestroyClusterAction destroyer = new DestroyClusterAction();
     destroyer.execute(clusterSpec, null);
+    Files.deleteRecursively(clusterSpec.getClusterDirectory());
   }
   
   public Set<? extends NodeMetadata> getNodes(ClusterSpec clusterSpec)

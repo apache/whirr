@@ -21,6 +21,8 @@ Trunk (unreleased changes)
 
     WHIRR-160. Improve SSH key diagnostics. (Andrei Savu via tomwhite)
 
+    WHIRR-150. Allow retrieval of instance roles. (tomwhite)
+
   BUG FIXES
 
     WHIRR-128. Fix DNS resolution for clients running within EC2.

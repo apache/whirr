@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.apache.whirr.service.hadoop;
+package org.apache.whirr.net.integration;
 
 import static org.junit.Assert.*;
 import static java.lang.System.out;
@@ -29,6 +29,7 @@ import java.net.UnknownHostException;
 import java.util.Collections;
 import java.util.Enumeration;
 
+import org.apache.whirr.net.DnsUtil;
 import org.junit.Test;
 import org.xbill.DNS.Address;
 
