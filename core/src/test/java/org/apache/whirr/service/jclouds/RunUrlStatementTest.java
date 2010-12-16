@@ -21,7 +21,8 @@ package org.apache.whirr.service.jclouds;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
-import java.net.MalformedURLException;
+import java.io.IOException;
+import java.net.URL;
 
 import org.jclouds.scriptbuilder.domain.OsFamily;
 import org.junit.Test;
@@ -31,25 +32,44 @@ public class RunUrlStatementTest {
   private static final String NL = System.getProperty("line.separator");
 
   @Test
-  public void testBaseWithTrailingSlash() throws MalformedURLException {
+  public void testBaseWithTrailingSlash() throws IOException {
     assertThat(
-        new RunUrlStatement("http://example.org/", "a/b").render(OsFamily.UNIX),
-        is("runurl http://example.org/a/b" + NL));
-  }
-  
-  @Test
-  public void testBaseWithoutTrailingSlash() throws MalformedURLException {
-    assertThat(
-        new RunUrlStatement("http://example.org", "a/b").render(OsFamily.UNIX),
+        new RunUrlStatement(false, "http://example.org/", "a/b").render(OsFamily.UNIX),
         is("runurl http://example.org/a/b" + NL));
   }
 
   @Test
-  public void testAbsolutePath() throws MalformedURLException {
+  public void testWithArgs() throws IOException {
     assertThat(
-        new RunUrlStatement("http://example.org/", "http://example2.org/a/b")
+        new RunUrlStatement(false, "http://example.org/", "a/b", "x", "y").render(OsFamily.UNIX),
+        is("runurl http://example.org/a/b x y" + NL));
+  }
+  
+  @Test
+  public void testBaseWithoutTrailingSlash() throws IOException {
+    assertThat(
+        new RunUrlStatement(false, "http://example.org", "a/b").render(OsFamily.UNIX),
+        is("runurl http://example.org/a/b" + NL));
+  }
+
+  @Test
+  public void testAbsolutePath() throws IOException {
+    assertThat(
+        new RunUrlStatement(false, "http://example.org/", "http://example2.org/a/b")
           .render(OsFamily.UNIX),
         is("runurl http://example2.org/a/b" + NL));
+  }
+  
+  @Test
+  public void testCheckUrlExists() throws IOException {
+    RunUrlStatement.checkUrlExists(new URL("http://whirr.s3.amazonaws.com/"),
+        "Exists");
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void testCheckUrlDoesNotExist() throws IOException {
+    RunUrlStatement.checkUrlExists(
+        new URL("http://whirr.s3.amazonaws.com/non-existent"), "Doesn't exist");
   }
 
 }

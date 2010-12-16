@@ -23,7 +23,7 @@ import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
-import java.net.MalformedURLException;
+import java.io.IOException;
 
 import org.jclouds.scriptbuilder.domain.OsFamily;
 import org.junit.Test;
@@ -31,11 +31,14 @@ import org.junit.Test;
 public class StatementBuilderTest {
   
   @Test
-  public void testDeduplication() throws MalformedURLException {
+  public void testDeduplication() throws IOException {
     StatementBuilder builder = new StatementBuilder();
-    builder.addStatement(new RunUrlStatement("http://example.org/a/b c"));
-    builder.addStatement(new RunUrlStatement("http://example.org/d/e f"));
-    builder.addStatement(new RunUrlStatement("http://example.org/a/b c"));
+    builder.addStatement(
+        new RunUrlStatement(false, "http://example.org/", "a/b", "c"));
+    builder.addStatement(
+        new RunUrlStatement(false, "http://example.org/", "d/e", "f"));
+    builder.addStatement(
+        new RunUrlStatement(false, "http://example.org/", "a/b", "c"));
     String script = builder.render(OsFamily.UNIX);
     int first = script.indexOf("runurl http://example.org/a/b c");
     assertThat(first, greaterThan(-1));

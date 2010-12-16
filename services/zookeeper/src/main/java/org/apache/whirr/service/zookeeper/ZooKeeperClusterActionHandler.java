@@ -68,10 +68,9 @@ public class ZooKeeperClusterActionHandler extends ClusterActionHandlerSupport {
     // Pass list of all servers in ensemble to configure script.
     // Position is significant: i-th server has id i.
     String servers = Joiner.on(' ').join(getPrivateIps(cluster.getInstances()));
-    addRunUrl(event,
-        String.format("apache/zookeeper/post-configure -c %s %s",
+    addRunUrl(event, "apache/zookeeper/post-configure", "-c",
         clusterSpec.getProvider(),
-        servers));
+        servers);
   }
   
   @Override
