@@ -43,7 +43,9 @@ import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
+import org.apache.commons.configuration.interpol.ConfigurationInterpolator;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.text.StrLookup;
 import org.jclouds.io.Payload;
 
 /**
@@ -51,6 +53,18 @@ import org.jclouds.io.Payload;
  * the properties of a cluster before it is launched.
  */
 public class ClusterSpec {
+  
+  static {
+    // Environment variable interpolation (e.g. {env:MY_VAR}) is supported
+    // natively in Commons Configuration 1.7, but until it's released we
+    // do it ourselves here
+    ConfigurationInterpolator.registerGlobalLookup("env", new StrLookup() {
+      @Override
+      public String lookup(String key) {
+        return System.getenv(key);
+      }
+    });
+  }
   
   public enum Property {
     SERVICE_NAME(String.class, false),
