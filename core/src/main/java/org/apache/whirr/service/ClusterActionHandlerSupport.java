@@ -19,7 +19,6 @@
 package org.apache.whirr.service;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 
 import org.apache.whirr.service.jclouds.RunUrlStatement;
 import org.jclouds.scriptbuilder.domain.Statement;
@@ -82,10 +81,11 @@ public abstract class ClusterActionHandlerSupport extends ClusterActionHandler {
    * A convenience method for adding a {@link RunUrlStatement} to a
    * {@link ClusterActionEvent}.
    */
-  public static void addRunUrl(ClusterActionEvent event, String runUrl)
-      throws MalformedURLException {
-    Statement statement = new RunUrlStatement(event.getClusterSpec()
-        .getRunUrlBase(), runUrl);
+  public static void addRunUrl(ClusterActionEvent event, String runUrl,
+      String... args)
+      throws IOException {
+    Statement statement = new RunUrlStatement(
+        event.getClusterSpec().getRunUrlBase(), runUrl, args);
     event.getStatementBuilder().addStatement(statement);
   }
 }

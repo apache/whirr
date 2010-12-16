@@ -41,13 +41,11 @@ public class HadoopDataNodeClusterActionHandler extends ClusterActionHandlerSupp
   @Override
   protected void beforeBootstrap(ClusterActionEvent event) throws IOException {
     ClusterSpec clusterSpec = event.getClusterSpec();
-    addRunUrl(event, String.format("util/configure-hostnames -c %s",
-        clusterSpec.getProvider()));
+    addRunUrl(event, "util/configure-hostnames", "-c", clusterSpec.getProvider());
     String hadoopInstallRunUrl = clusterSpec.getConfiguration().getString(
         "whirr.hadoop-install-runurl", "apache/hadoop/install");
     addRunUrl(event, "sun/java/install");
-    addRunUrl(event, String.format("%s -c %s", hadoopInstallRunUrl,
-            clusterSpec.getProvider()));
+    addRunUrl(event, hadoopInstallRunUrl, "-c", clusterSpec.getProvider());
     event.setTemplateBuilderStrategy(new HadoopTemplateBuilderStrategy());
   }
   
@@ -64,13 +62,11 @@ public class HadoopDataNodeClusterActionHandler extends ClusterActionHandlerSupp
 
     String hadoopConfigureRunUrl = clusterSpec.getConfiguration().getString(
         "whirr.hadoop-configure-runurl", "apache/hadoop/post-configure");
-    addRunUrl(event,
-        String.format(
-          "%s dn,tt -n %s -j %s -c %s",
-          hadoopConfigureRunUrl,
-          DnsUtil.resolveAddress(namenodePublicAddress.getHostAddress()),
-          DnsUtil.resolveAddress(jobtrackerPublicAddress.getHostAddress()),
-          clusterSpec.getProvider()));
+    addRunUrl(event, hadoopConfigureRunUrl,
+        "dn,tt",
+        "-n", DnsUtil.resolveAddress(namenodePublicAddress.getHostAddress()),
+        "-j", DnsUtil.resolveAddress(jobtrackerPublicAddress.getHostAddress()),
+        clusterSpec.getProvider());
   }
   
 }

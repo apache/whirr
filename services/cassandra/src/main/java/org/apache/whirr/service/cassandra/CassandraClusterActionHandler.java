@@ -72,10 +72,8 @@ public class CassandraClusterActionHandler extends ClusterActionHandlerSupport {
     
     List<Instance> seeds = getSeeds(cluster.getInstances());
     String servers = Joiner.on(' ').join(getPrivateIps(seeds));
-    addRunUrl(event,
-        String.format("apache/cassandra/post-configure -c %s %s",
-            clusterSpec.getProvider(),
-            servers));
+    addRunUrl(event, "apache/cassandra/post-configure",
+        "-c", clusterSpec.getProvider(), servers);
   }
 
   private List<String> getPrivateIps(List<Instance> instances) {
