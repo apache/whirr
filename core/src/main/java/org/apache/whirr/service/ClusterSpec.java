@@ -419,6 +419,17 @@ public class ClusterSpec {
     }
     return c;
   }
+  
+  /**
+   * @return the directory for storing cluster-related files
+   */
+  public File getClusterDirectory() {
+    File clusterDir = new File(new File(System.getProperty("user.home")),
+        ".whirr");
+    clusterDir = new File(clusterDir, getClusterName());
+    clusterDir.mkdirs();
+    return clusterDir;
+  }
     
   public boolean equals(Object o) {
     if (o instanceof ClusterSpec) {
