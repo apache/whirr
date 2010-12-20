@@ -10,8 +10,8 @@ Whirr is configured using a properties file, and optionally using command line a
 | {{whirr.provider}} | {{\--provider}} | {{ec2}} | The name of the cloud provider. See the [table below|#cloud-provider-config] for possible provider names.|
 | {{whirr.identity}} | {{\--identity}} | none | The cloud identity. See the [table below|#cloud-provider-config] for how this maps to the credentials for your provider. |
 | {{whirr.credential}} | {{\--credential}} | none | The cloud credential. See the [table below|#cloud-provider-config] for how this maps to the credentials for your provider. |
-| {{whirr.private-key-file}} | {{\--private-key-file}} | _\~/.ssh/id\_rsa_ | The filename of the private key used to connect to instances. |
-| {{whirr.public-key-file}} | {{\--public-key-file}} | _\~/.ssh/id\_rsa_.pub | The filename of the public key used to connect to instances. |
+| {{whirr.private-key-file}} | {{\--private-key-file}} | _\~/.ssh/id\_rsa_ | The filename of the private key used to connect to instances. Note: the public/private key must be set together, and must be passwordless. |
+| {{whirr.public-key-file}} | {{\--public-key-file}} | _\~/.ssh/id\_rsa_.pub | The filename of the public key used to connect to instances. Note: the public/private key must be set together, and must be passwordless.|
 | {{whirr.image-id}} | {{\--image-id}} | none | The ID of the image to use for instances. If not specified then a vanilla Linux image is chosen. |
 | {{whirr.hardware-id}} | {{\--hardware-id}} | none | The type of hardware to use for the instance. This must be compatible with the image ID. |
 | {{whirr.location-id}} | {{\--location-id}} | none | The location to launch instances in. If not specified then an arbitrary location will be chosen. |
