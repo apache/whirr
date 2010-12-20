@@ -34,7 +34,6 @@ a further machine for a datanode and tasktracker. You can see how to launch
 other services in the [FAQ|faq#other-services].
 
 {code}
-whirr.service-name=hadoop
 whirr.cluster-name=myhadoopcluster
 whirr.instance-templates=1 jt+nn,1 dn+tt
 whirr.provider=ec2
@@ -127,7 +126,6 @@ for properties is not reflected in the command line argument):
 
 {code}
 % bin/whirr launch-cluster \
-    --service-name=hadoop \
     --cluster-name=myhadoopcluster \
     --instance-templates='1 jt+nn,1 dn+tt' \
     --provider=ec2 \

@@ -44,4 +44,11 @@ public class ServiceFactoryTest {
     Service service = factory.create("test-service");
     assertThat(service, instanceOf(TestService.class));
   }
+
+  @Test
+  public void testServiceFactoryWithNullServiceName() throws IOException {
+    ServiceFactory factory = new ServiceFactory();
+    Service service = factory.create(null);
+    assertThat(service, instanceOf(Service.class));
+  }
 }

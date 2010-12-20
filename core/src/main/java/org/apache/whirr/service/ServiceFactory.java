@@ -40,6 +40,9 @@ public class ServiceFactory {
    * name.
    */
   public Service create(String serviceName) {
+    if (serviceName == null) {
+      return new Service();
+    }
     for (Service service : serviceLoader) {
       if (service.getName().equals(serviceName)) {
         return service;
