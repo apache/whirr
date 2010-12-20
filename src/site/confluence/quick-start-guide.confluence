@@ -40,6 +40,7 @@ whirr.provider=ec2
 whirr.identity=<cloud-provider-identity>
 whirr.credential=<cloud-provider-credential>
 whirr.private-key-file=${sys:user.home}/.ssh/id_rsa
+whirr.public-key-file=${sys:user.home}/.ssh/id_rsa.pub
 {code}
 
 Note that you do not need to choose a particular cloud image, since the default

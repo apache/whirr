@@ -26,6 +26,10 @@ Trunk (unreleased changes)
     WHIRR-163. Support environment variable interpolation in configuration
     properties. (tomwhite)
 
+    WHIRR-157. Remove service name property. (tomwhite)
+
+    WHIRR-166. Improve docs regarding private keys. (Stu Hood via tomwhite)
+
   BUG FIXES
 
     WHIRR-128. Fix DNS resolution for clients running within EC2.
@@ -48,8 +52,6 @@ Trunk (unreleased changes)
 
     WHIRR-156. Cli script doesn't launch post-modularization. (Andrei Savu and
     tomwhite via tomwhite)
-
-    WHIRR-157. Remove service name property. (tomwhite)
 
 Release 0.2.0 - 2010-11-04
 
