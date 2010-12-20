@@ -130,7 +130,6 @@ setting the {{whirr.hadoop-install-runurl}} and
 properties. Here is a sample configuration:
 
 {code}
-whirr.service-name=hadoop
 whirr.cluster-name=myhadoopcluster
 whirr.instance-templates=1 jt+nn,1 dn+tt
 whirr.provider=ec2
@@ -144,12 +143,9 @@ whirr.hadoop-configure-runurl=cloudera/cdh/post-configure
 {anchor:other-services}
 h2. How do I run a ZooKeeper cluster?
 
-The {{service-name}} property determines the service to run, for ZooKeeper it
-should be set to {{zookeeper}}. Here is a sample ZooKeeper configuration for
-running a three-node ensemble:
+Here is a sample ZooKeeper configuration for running a three-node ensemble:
 
 {code}
-whirr.service-name=zookeeper
 whirr.cluster-name=myzkcluster
 whirr.instance-templates=3 zk
 whirr.provider=ec2
@@ -160,12 +156,9 @@ whirr.private-key-file=${sys:user.home}/.ssh/id_rsa
 
 h2. How do I run a Cassandra cluster?
 
-The {{service-name}} property determines the service to run, for Cassandra it
-should be set to {{cassandra}}. Here is a sample Cassandra configuration for
-running a three-node cluster:
+Here is a sample Cassandra configuration for running a three-node cluster:
 
 {code}
-whirr.service-name=cassandra
 whirr.cluster-name=mycassandracluster
 whirr.instance-templates=3 cassandra
 whirr.provider=ec2

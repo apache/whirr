@@ -90,7 +90,7 @@ public abstract class AbstractClusterSpecCommand extends Command {
       config.addConfiguration(defaults);
     }
 
-    for (Property required : EnumSet.of(SERVICE_NAME, CLUSTER_NAME, IDENTITY)) {
+    for (Property required : EnumSet.of(CLUSTER_NAME, IDENTITY)) {
       if (config.getString(required.getConfigName()) == null) {
         throw new IllegalArgumentException(String.format("Option '%s' not set.",
             required.getSimpleName()));
