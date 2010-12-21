@@ -49,10 +49,10 @@ public class DnsUtilTest {
           long end = System.currentTimeMillis();
           // we know that java.net.InetAddress's getHostName takes > 4.5s if
           // there is no reverse address assigned to it
-          // but DnsUtil can resolve any address without this delaying problem.
+          // DnsUtil should resolve any address in less than 5 seconds or fail
           assertTrue("DnsUtil.resolveAddress takes " + (end - start)
-              + " millis, it should be shorter than a second",
-              end - start < 1000);
+              + " millis, it should be shorter than five seconds",
+              end - start < 5000);
           if (inetAddress.toString().substring(1).equals(reverse)) {
             out.printf(
                 "InetAddress %s on interface %s does not have reverse dns name, so their reverse remains: %s\n",
