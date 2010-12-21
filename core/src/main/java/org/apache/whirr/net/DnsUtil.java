@@ -41,6 +41,7 @@ public class DnsUtil {
    */
   public static String resolveAddress(String hostIp) throws IOException {
     Resolver res = new ExtendedResolver();
+    res.setTimeout(5); // seconds
 
     Name name = ReverseMap.fromAddress(hostIp);
     int type = Type.PTR;
