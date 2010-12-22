@@ -31,6 +31,7 @@ import org.apache.whirr.service.ClusterActionEvent;
 import org.apache.whirr.service.ClusterActionHandlerSupport;
 import org.apache.whirr.service.ClusterSpec;
 import org.apache.whirr.service.ComputeServiceContextBuilder;
+import org.apache.whirr.service.RolePredicates;
 import org.apache.whirr.service.jclouds.FirewallSettings;
 import org.jclouds.compute.ComputeServiceContext;
 import org.slf4j.Logger;
@@ -67,7 +68,8 @@ public class ZooKeeperClusterActionHandler extends ClusterActionHandlerSupport {
     
     // Pass list of all servers in ensemble to configure script.
     // Position is significant: i-th server has id i.
-    String servers = Joiner.on(' ').join(getPrivateIps(cluster.getInstances()));
+    String servers = Joiner.on(' ').join(getPrivateIps(cluster.getInstancesMatching(
+      RolePredicates.role(ZooKeeperClusterActionHandler.ZOOKEEPER_ROLE))));
     addRunUrl(event, "apache/zookeeper/post-configure", "-c",
         clusterSpec.getProvider(),
         servers);
@@ -78,7 +80,8 @@ public class ZooKeeperClusterActionHandler extends ClusterActionHandlerSupport {
     ClusterSpec clusterSpec = event.getClusterSpec();
     Cluster cluster = event.getCluster();
     LOG.info("Completed configuration of {}", clusterSpec.getClusterName());
-    String hosts = Joiner.on(',').join(getHosts(cluster.getInstances()));
+    String hosts = Joiner.on(',').join(getHosts(cluster.getInstancesMatching(
+      RolePredicates.role(ZooKeeperClusterActionHandler.ZOOKEEPER_ROLE))));
     LOG.info("Hosts: {}", hosts);
   }
 
