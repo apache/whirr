@@ -30,6 +30,9 @@ Trunk (unreleased changes)
 
     WHIRR-166. Improve docs regarding private keys. (Stu Hood via tomwhite)
 
+    WHIRR-174. Fix ZooKeeper to allow stand-alone mode setups.
+    (Lars George via tomwhite)
+
   BUG FIXES
 
     WHIRR-128. Fix DNS resolution for clients running within EC2.

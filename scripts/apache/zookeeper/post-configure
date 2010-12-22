@@ -63,21 +63,22 @@ clientPort=2181
 # The servers in the ensemble
 EOF
 
-id=1
-for server in "$@"; do
-  if [ $server == $SELF_HOST ]; then
-    myid=$id
+if [[ $# -gt 1 ]]; then
+  id=1
+  for server in "$@"; do
+    if [ $server == $SELF_HOST ]; then
+      myid=$id
+    fi
+    echo "server.$id=$server:2888:3888" >> $config_file
+    id=$((id+1))
+  done
+
+  if [ -z $myid ]; then
+    echo "Could not determine id for my host $SELF_HOST against servers $@."
+    exit 1
   fi
-  echo "server.$id=$server:2888:3888" >> $config_file
-  id=$((id+1))
-done
-
-if [ -z $myid ]; then
-  echo "Could not determine id for my host $SELF_HOST against servers $@."
-  exit 1
+  echo $myid > $myid_file
 fi
-
-echo $myid > $myid_file
 
 # Now that it's configured, start ZooKeeper
 nohup /etc/rc.local &
