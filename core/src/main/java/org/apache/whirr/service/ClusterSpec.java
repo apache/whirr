@@ -20,6 +20,7 @@ package org.apache.whirr.service;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
+import static org.jclouds.io.Payloads.newFilePayload;
 import static org.jclouds.io.Payloads.newStringPayload;
 import static org.jclouds.util.Utils.toStringAndClose;
 
@@ -351,13 +352,7 @@ public class ClusterSpec {
    * @param publicKey
    */
   public void setPublicKey(String publicKey) {
-    /*
-     * http://stackoverflow.com/questions/2494645#2494645
-     */
-    checkArgument(checkNotNull(publicKey, "publicKey")
-            .startsWith("ssh-rsa AAAAB3NzaC1yc2EA"),
-        "key should start with ssh-rsa AAAAB3NzaC1yc2EA");
-
+    checkPublicKey(publicKey);
     this.publicKey = newStringPayload(publicKey);
   }
   
@@ -368,9 +363,19 @@ public class ClusterSpec {
    * @see #setPublicKey(String)
    */
   public void setPublicKey(File publicKey) throws IOException {
-    setPublicKey(IOUtils.toString(new FileReader(publicKey)));
+    checkPublicKey(IOUtils.toString(new FileReader(publicKey)));
+    this.publicKey = newFilePayload(publicKey);
   }
 
+  private void checkPublicKey(String publicKey) {
+    /*
+     * http://stackoverflow.com/questions/2494645#2494645
+     */
+    checkArgument(checkNotNull(publicKey, "publicKey")
+            .startsWith("ssh-rsa AAAAB3NzaC1yc2EA"),
+        "key should start with ssh-rsa AAAAB3NzaC1yc2EA");
+  }
+  
   /**
    * The rsa private key which is used as the login identity on the cloud 
    * nodes.
@@ -378,9 +383,7 @@ public class ClusterSpec {
    * @param privateKey
    */
   public void setPrivateKey(String privateKey) {
-    checkArgument(checkNotNull(privateKey, "privateKey")
-        .startsWith("-----BEGIN RSA PRIVATE KEY-----"),
-        "key should start with -----BEGIN RSA PRIVATE KEY-----");
+    checkPrivateKey(privateKey);
     this.privateKey = newStringPayload(privateKey);
   }
 
@@ -391,7 +394,14 @@ public class ClusterSpec {
    * @see #setPrivateKey(String)
    */
   public void setPrivateKey(File privateKey) throws IOException {
-    setPrivateKey(IOUtils.toString(new FileReader(privateKey)));
+    checkPrivateKey(IOUtils.toString(new FileReader(privateKey)));
+    this.privateKey = newFilePayload(privateKey);
+  }
+  
+  private void checkPrivateKey(String privateKey) {
+    checkArgument(checkNotNull(privateKey, "privateKey")
+        .startsWith("-----BEGIN RSA PRIVATE KEY-----"),
+        "key should start with -----BEGIN RSA PRIVATE KEY-----");
   }
 
   public void setImageId(String imageId) {
