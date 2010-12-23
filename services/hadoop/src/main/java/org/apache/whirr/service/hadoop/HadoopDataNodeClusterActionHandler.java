@@ -67,7 +67,7 @@ public class HadoopDataNodeClusterActionHandler extends ClusterActionHandlerSupp
         "dn,tt",
         "-n", DnsUtil.resolveAddress(namenodePublicAddress.getHostAddress()),
         "-j", DnsUtil.resolveAddress(jobtrackerPublicAddress.getHostAddress()),
-        clusterSpec.getProvider());
+        "-c", clusterSpec.getProvider());
   }
   
 }
