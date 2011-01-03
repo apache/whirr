@@ -58,7 +58,9 @@ function install_packages() {
 }
 
 function install_hadoop() {
-  useradd hadoop
+  if ! id hadoop &> /dev/null; then
+    useradd hadoop
+  fi
 
   hadoop_tar_url=http://archive.apache.org/dist/hadoop/core/hadoop-$HADOOP_VERSION/hadoop-$HADOOP_VERSION.tar.gz
   hadoop_tar_file=`basename $hadoop_tar_url`
