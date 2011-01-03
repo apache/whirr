@@ -46,6 +46,9 @@ Trunk (unreleased changes)
     WHIRR-184. Add HBase service to list of dependencies.
     (Lars George via tomwhite)
 
+    WHIRR-187. [HBase] Change hbase.tmp.dir to be in line with Hadoop service.
+    (Lars George via tomwhite)
+
   BUG FIXES
 
     WHIRR-128. Fix DNS resolution for clients running within EC2.
