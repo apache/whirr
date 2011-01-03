@@ -43,6 +43,9 @@ Trunk (unreleased changes)
     WHIRR-178. [Hadoop] Guard useradd against existing user account.
     (Lars George via tomwhite)
 
+    WHIRR-184. Add HBase service to list of dependencies.
+    (Lars George via tomwhite)
+
   BUG FIXES
 
     WHIRR-128. Fix DNS resolution for clients running within EC2.
