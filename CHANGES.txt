@@ -40,6 +40,9 @@ Trunk (unreleased changes)
 
     WHIRR-145. Add Whirr recipes for common configurations. (tomwhite)
 
+    WHIRR-178. [Hadoop] Guard useradd against existing user account.
+    (Lars George via tomwhite)
+
   BUG FIXES
 
     WHIRR-128. Fix DNS resolution for clients running within EC2.

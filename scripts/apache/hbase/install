@@ -58,9 +58,9 @@ function install_packages() {
 }
 
 function install_hbase() {
-  set +e
-  useradd hadoop
-  set -e
+  if ! id hadoop &> /dev/null; then
+    useradd hadoop
+  fi
 
   # up file-max
   sysctl -w fs.file-max=65535
