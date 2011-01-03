@@ -21,10 +21,12 @@ package org.apache.whirr.service.zookeeper;
 import com.google.common.base.Joiner;
 
 import org.apache.whirr.service.Cluster;
+import org.apache.whirr.service.RolePredicates;
 
 public class ZooKeeperCluster {
   public static String getHosts(Cluster cluster) {
     return Joiner.on(',').join(
-        ZooKeeperClusterActionHandler.getHosts(cluster.getInstances()));
+      ZooKeeperClusterActionHandler.getHosts(cluster.getInstancesMatching(
+      RolePredicates.role(ZooKeeperClusterActionHandler.ZOOKEEPER_ROLE))));
   }
 }
