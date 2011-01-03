@@ -21,13 +21,17 @@
     <groupId>org.apache.whirr</groupId>
     <artifactId>whirr</artifactId>
     <version>0.3.0-incubating-SNAPSHOT</version>
-    <relativePath>../pom.xml</relativePath>
+    <relativePath>../../pom.xml</relativePath>
   </parent>
   <groupId>org.apache.whirr</groupId>
-  <artifactId>whirr-cli</artifactId>
+  <artifactId>whirr-hbase</artifactId>
   <packaging>jar</packaging>
   <version>0.3.0-incubating-SNAPSHOT</version>
-  <name>Apache Whirr CLI</name>
+  <name>Apache Whirr HBase</name>
+  <properties>
+    <hadoop.version>0.20.2</hadoop.version>
+    <hbase.version>0.89.20100924-28</hbase.version>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
@@ -36,8 +40,10 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>whirr-cassandra</artifactId>
+      <artifactId>whirr-core</artifactId>
       <version>${project.version}</version>
+      <type>test-jar</type>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
@@ -50,17 +56,16 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>whirr-hbase</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
       <groupId>org.jclouds</groupId>
       <artifactId>jclouds-allcompute</artifactId>
     </dependency>
     <dependency>
       <groupId>org.jclouds</groupId>
       <artifactId>jclouds-compute</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.jclouds</groupId>
+      <artifactId>jclouds-core</artifactId>
     </dependency>
     <dependency>
       <groupId>org.jclouds</groupId>
@@ -83,8 +88,8 @@
       <artifactId>hamcrest-all</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.mockito</groupId>
-      <artifactId>mockito-all</artifactId>
+      <groupId>commons-configuration</groupId>
+      <artifactId>commons-configuration</artifactId>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
@@ -93,67 +98,40 @@
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-log4j12</artifactId>
-      <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>log4j</groupId>
       <artifactId>log4j</artifactId>
-      <scope>compile</scope>
     </dependency>
     <dependency>
-      <groupId>commons-configuration</groupId>
-      <artifactId>commons-configuration</artifactId>
+      <groupId>org.apache.hadoop</groupId>
+      <artifactId>zookeeper</artifactId>
+      <version>3.3.1</version>
+      <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>net.sf.jopt-simple</groupId>
-      <artifactId>jopt-simple</artifactId>
-      <version>3.2</version>
+      <groupId>dnsjava</groupId>
+      <artifactId>dnsjava</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.hadoop</groupId>
+      <artifactId>hadoop-core</artifactId>
+      <version>${hadoop.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.cloudera.hbase</groupId>
+      <artifactId>hbase</artifactId>
+      <version>${hbase.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.cloudera.hbase</groupId>
+      <artifactId>hbase</artifactId>
+      <version>${hbase.version}</version>
+      <classifier>tests</classifier>
     </dependency>
   </dependencies>
-  <build>
-    <resources>
-      <resource>
-        <directory>${project.basedir}/src/main/resources</directory>
-        <filtering>true</filtering>
-      </resource>
-    </resources>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-shade-plugin</artifactId>
-        <version>1.4</version>
-        <executions>
-          <execution>
-            <phase>package</phase>
-            <goals>
-              <goal>shade</goal>
-            </goals>
-            <configuration>
-              <finalName>whirr-cli-${project.version}</finalName>
-              <transformers>
-                <transformer implementation="org.apache.maven.plugins.shade.resource.ApacheLicenseResourceTransformer" />
-                <transformer implementation="org.apache.maven.plugins.shade.resource.ApacheNoticeResourceTransformer">
-                  <projectName>Apache Whirr</projectName>
-                </transformer>
-                <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
-                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                  <mainClass>org.apache.whirr.cli.Main</mainClass>
-                </transformer>
-              </transformers>
-              <filters>
-                <filter>
-                  <artifact>*:*</artifact>
-                  <excludes>
-                    <exclude>META-INF/*.SF</exclude>
-                    <exclude>META-INF/*.DSA</exclude>
-                    <exclude>META-INF/*.RSA</exclude>
-                  </excludes>
-                </filter>
-              </filters>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>   
-    </plugins>
-  </build>
 </project>
+
+
+

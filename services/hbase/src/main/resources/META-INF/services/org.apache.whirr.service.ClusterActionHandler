@@ -1,0 +1,5 @@
+org.apache.whirr.service.hbase.HBaseMasterClusterActionHandler
+org.apache.whirr.service.hbase.HBaseRegionServerClusterActionHandler
+org.apache.whirr.service.hbase.HBaseRestServerClusterActionHandler
+org.apache.whirr.service.hbase.HBaseAvroServerClusterActionHandler
+org.apache.whirr.service.hbase.HBaseThriftServerClusterActionHandler
