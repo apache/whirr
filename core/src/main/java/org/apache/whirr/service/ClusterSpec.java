@@ -68,26 +68,58 @@ public class ClusterSpec {
   }
   
   public enum Property {
-    SERVICE_NAME(String.class, false),
-    INSTANCE_TEMPLATES(String.class, false),
-    PROVIDER(String.class, false),
-    CREDENTIAL(String.class, false),
-    IDENTITY(String.class, false),
-    CLUSTER_NAME(String.class, false),
-    PUBLIC_KEY_FILE(String.class, false),
-    PRIVATE_KEY_FILE(String.class, false),
-    IMAGE_ID(String.class, false),
-    HARDWARE_ID(String.class, false),
-    LOCATION_ID(String.class, false),
-    CLIENT_CIDRS(String.class, true),
-    VERSION(String.class, false),
-    RUN_URL_BASE(String.class, false);
+    SERVICE_NAME(String.class, false, "(optional) The name of the " + 
+      "service to use. E.g. hadoop."),
+      
+    INSTANCE_TEMPLATES(String.class, false, "The number of instances " +
+      "to launch for each set of roles. E.g. 1 nn+jt,10 dn+tt means " + 
+      "one instance with the roles nn (namenode) and jt (jobtracker)," +
+      " and ten instances each with the roles dn (datanode) and tt " + 
+      "(tasktracker)."),
+      
+    PROVIDER(String.class, false, "The name of the cloud provider. " + 
+      "E.g. ec2, cloudservers"),
+      
+    CREDENTIAL(String.class, false, "The cloud credential."),
+    
+    IDENTITY(String.class, false, "The cloud identity."),
+    
+    CLUSTER_NAME(String.class, false,  "The name of the cluster " + 
+      "to operate on. E.g. hadoopcluster."),
+      
+    PUBLIC_KEY_FILE(String.class, false, "The filename of the public " +
+      "key used to connect to instances."),
+      
+    PRIVATE_KEY_FILE(String.class, false, "The filename of the " + 
+      "private RSA key used to connect to instances."),
+      
+    IMAGE_ID(String.class, false, "The ID of the image to use for " + 
+      "instances. If not specified then a vanilla Linux image is " + 
+      "chosen."),
+      
+    HARDWARE_ID(String.class, false, "The type of hardware to use for" + 
+      " the instance. This must be compatible with the image ID."),
+      
+    LOCATION_ID(String.class, false, "The location to launch " + 
+      "instances in. If not specified then an arbitrary location " + 
+      "will be chosen."),
+      
+    CLIENT_CIDRS(String.class, true, "A comma-separated list of CIDR" + 
+      " blocks. E.g. 208.128.0.0/11,108.128.0.0/11"),
+      
+    VERSION(String.class, false, ""),
+    
+    RUN_URL_BASE(String.class, false, "The base URL for forming run " + 
+      "urls from. Change this to host your own set of launch scripts.");
     
     private Class<?> type;
     private boolean multipleArguments;
-    Property(Class<?> type, boolean multipleArguments) {
+    private String description;
+    
+    Property(Class<?> type, boolean multipleArguments, String description) {
       this.type = type;
       this.multipleArguments = multipleArguments;
+      this.description = description;
     }
     
     public String getSimpleName() {
@@ -104,6 +136,10 @@ public class ClusterSpec {
     
     public boolean hasMultipleArguments() {
       return multipleArguments;
+    }
+    
+    public String getDescription() {
+      return description;
     }
   }
   

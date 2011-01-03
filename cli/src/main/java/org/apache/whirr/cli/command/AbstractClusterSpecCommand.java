@@ -51,8 +51,12 @@ public abstract class AbstractClusterSpecCommand extends Command {
 
   protected OptionParser parser = new OptionParser();
   private Map<Property, OptionSpec> optionSpecs;
-  private OptionSpec<String> configOption = parser.accepts("config")
-    .withRequiredArg().ofType(String.class);
+  private OptionSpec<String> configOption = parser
+    .accepts("config", "Note that Whirr properties specified in " + 
+      "this file  should all have a whirr. prefix.")
+    .withRequiredArg()
+    .describedAs("config.properties")
+    .ofType(String.class);
 
   public AbstractClusterSpecCommand(String name, String description, ServiceFactory factory) {
     super(name, description);
@@ -60,7 +64,8 @@ public abstract class AbstractClusterSpecCommand extends Command {
 
     optionSpecs = Maps.newHashMap();
     for (Property property : EnumSet.allOf(Property.class)) {
-      ArgumentAcceptingOptionSpec<?> spec = parser.accepts(property.getSimpleName())
+      ArgumentAcceptingOptionSpec<?> spec = parser
+        .accepts(property.getSimpleName(), property.getDescription())
         .withRequiredArg()
         .ofType(property.getType());
       if (property.hasMultipleArguments()) {
