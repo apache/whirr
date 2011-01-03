@@ -38,6 +38,8 @@ Trunk (unreleased changes)
     WHIRR-174. Fix ZooKeeper to allow stand-alone mode setups.
     (Lars George via tomwhite)
 
+    WHIRR-145. Add Whirr recipes for common configurations. (tomwhite)
+
   BUG FIXES
 
     WHIRR-128. Fix DNS resolution for clients running within EC2.
