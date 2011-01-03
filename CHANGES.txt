@@ -9,6 +9,8 @@ Trunk (unreleased changes)
     WHIRR-176. Set AWS credentials in the local site file for Hadoop S3 access.
     (Lars George via tomwhite)
 
+    WHIRR-25. Add HBase service. (Lars George via tomwhite)
+
   IMPROVEMENTS
 
     WHIRR-87. Parallelize Hadoop cluster creation. (tomwhite)

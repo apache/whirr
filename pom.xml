@@ -43,6 +43,7 @@
     <module>services/cdh</module>
     <module>services/hadoop</module>
     <module>services/zookeeper</module>
+    <module>services/hbase</module>
   </modules>
 
   <properties>
