@@ -123,19 +123,26 @@ public class HadoopNameNodeClusterActionHandler extends ClusterActionHandlerSupp
 
     LOG.info("Web UI available at http://{}",
       DnsUtil.resolveAddress(namenodePublicAddress.getHostAddress()));
-    Properties config = createClientSideProperties(namenodePublicAddress, jobtrackerPublicAddress);
+    Properties config = createClientSideProperties(clusterSpec, namenodePublicAddress, jobtrackerPublicAddress);
     createClientSideHadoopSiteFile(clusterSpec, config);
     createProxyScript(clusterSpec, cluster);
     event.setCluster(new Cluster(cluster.getInstances(), config));
   }
-  
-  private Properties createClientSideProperties(InetAddress namenode, InetAddress jobtracker) throws IOException {
+
+  private Properties createClientSideProperties(ClusterSpec clusterSpec,
+      InetAddress namenode, InetAddress jobtracker) throws IOException {
     Properties config = new Properties();
     config.setProperty("hadoop.job.ugi", "root,root");
     config.setProperty("fs.default.name", String.format("hdfs://%s:8020/", DnsUtil.resolveAddress(namenode.getHostAddress())));
     config.setProperty("mapred.job.tracker", String.format("%s:8021", DnsUtil.resolveAddress(jobtracker.getHostAddress())));
     config.setProperty("hadoop.socks.server", "localhost:6666");
     config.setProperty("hadoop.rpc.socket.factory.class.default", "org.apache.hadoop.net.SocksSocketFactory");
+    if ("ec2".equals(clusterSpec.getProvider())) {
+      config.setProperty("fs.s3.awsAccessKeyId", clusterSpec.getIdentity());
+      config.setProperty("fs.s3.awsSecretAccessKey", clusterSpec.getCredential());
+      config.setProperty("fs.s3n.awsAccessKeyId", clusterSpec.getIdentity());
+      config.setProperty("fs.s3n.awsSecretAccessKey", clusterSpec.getCredential());
+    }
     return config;
   }
 
