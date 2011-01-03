@@ -107,13 +107,13 @@ function configure_hadoop() {
   MAX_REDUCE_TASKS=1
   CHILD_OPTS=-Xmx550m
   CHILD_ULIMIT=1126400
-  TMP_DIR=$MOUNT/tmp/hadoop-\${user.name}
 
   mkdir -p $MOUNT/hadoop
   chown hadoop:hadoop $MOUNT/hadoop
-  mkdir $MOUNT/tmp
-  chmod a+rwxt $MOUNT/tmp
-
+  if [ ! -e $MOUNT/tmp ]; then
+    mkdir $MOUNT/tmp
+    chmod a+rwxt $MOUNT/tmp
+  fi
   mkdir /etc/hadoop
   ln -s $HADOOP_CONF_DIR /etc/hadoop/conf
 

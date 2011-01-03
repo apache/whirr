@@ -78,11 +78,13 @@ function configure_hbase() {
     MOUNT=/data
     ;;
   esac
+
   mkdir -p $MOUNT/hbase
   chown hadoop:hadoop $MOUNT/hbase
-  mkdir $MOUNT/tmp
-  chmod a+rwxt $MOUNT/tmp
-
+  if [ ! -e $MOUNT/tmp ]; then
+    mkdir $MOUNT/tmp
+    chmod a+rwxt $MOUNT/tmp
+  fi
   mkdir /etc/hbase
   ln -s $HBASE_CONF_DIR /etc/hbase/conf
 
