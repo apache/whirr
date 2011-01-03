@@ -61,7 +61,7 @@ public class ListClusterCommand extends AbstractClusterSpecCommand {
     try {
       ClusterSpec clusterSpec = getClusterSpec(optionSet);
 
-      Service service = factory.create(clusterSpec.getServiceName());
+      Service service = createService(clusterSpec.getServiceName());
       Set<? extends NodeMetadata> nodes = service.getNodes(clusterSpec);
       for (NodeMetadata node : nodes) {
         out.println(Joiner.on('\t').join(node.getId(), node.getImageId(),
