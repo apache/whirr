@@ -121,7 +121,7 @@ cat > $HBASE_HOME/conf/hbase-site.xml <<EOF
 </property>
 <property>
  <name>hbase.tmp.dir</name>
- <value>/mnt/hbase</value>
+ <value>$MOUNT/tmp/hbase-\${user.name}</value>
 </property>
 </configuration>
 EOF
