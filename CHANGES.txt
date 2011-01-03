@@ -70,6 +70,9 @@ Trunk (unreleased changes)
     WHIRR-165. Hadoop integration tests fail due to WHIRR-160 changes.
     (tomwhite)
 
+    WHIRR-180. ListClusterCommand.run throws a NullPointerException for
+    unrecognized service names. (Andrei Savu via tomwhite)
+
 Release 0.2.0 - 2010-11-04
 
   NEW FEATURES
