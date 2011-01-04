@@ -71,12 +71,7 @@ public class CdhHadoopServiceTest {
       config.addConfiguration(new PropertiesConfiguration(System.getProperty("config")));
     }
     config.addConfiguration(new PropertiesConfiguration("whirr-hadoop-test.properties"));
-    clusterSpec = new ClusterSpec(config);
-    if (clusterSpec.getPrivateKey() == null) {
-      Map<String, String> pair = KeyPair.generate();
-      clusterSpec.setPublicKey(pair.get("public"));
-      clusterSpec.setPrivateKey(pair.get("private"));
-    }
+    clusterSpec = ClusterSpec.withTemporaryKeys(config);
     service = new Service();
     
     cluster = service.launchCluster(clusterSpec);

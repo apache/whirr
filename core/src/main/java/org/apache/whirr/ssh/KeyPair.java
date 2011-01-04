@@ -90,13 +90,28 @@ public class KeyPair {
     File privateKeyFile = File.createTempFile("private", "key");
     privateKeyFile.deleteOnExit();
     Files.write(keys.get("private").getBytes(), privateKeyFile);
+    setPermissionsTo600(privateKeyFile);
 
     File publicKeyFile = new File(privateKeyFile.getAbsolutePath() + ".pub");
     publicKeyFile.deleteOnExit();
     Files.write(keys.get("public").getBytes(), publicKeyFile);
+    setPermissionsTo600(publicKeyFile);
 
     return ImmutableMap.<String, File> of("public", publicKeyFile,
               "private", privateKeyFile);
+  }
+  
+  /**
+   * Set file permissions to 600 (unix)
+   */
+  public static void setPermissionsTo600(File f) {
+    f.setReadable(false, false);
+    f.setReadable(true, true);
+
+    f.setWritable(false, false);
+    f.setWritable(true, true);
+
+    f.setExecutable(false);
   }
 
   public static boolean sameKeyPair(File privateKeyFile, File publicKeyFile) throws IOException {

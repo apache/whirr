@@ -46,40 +46,42 @@ import org.junit.Test;
 public class ClusterSpecTest {
   
   @Test
-  public void testDefaultsAreSet() throws ConfigurationException {
-    ClusterSpec spec = new ClusterSpec();
+  public void testDefaultsAreSet()
+  throws ConfigurationException, JSchException, IOException {
+    ClusterSpec spec = ClusterSpec.withTemporaryKeys();
     assertThat(spec.getRunUrlBase(),
         startsWith("http://whirr.s3.amazonaws.com/"));
   }
 
   @Test
-  public void testDefaultsCanBeOverridden() throws ConfigurationException {
+  public void testDefaultsCanBeOverridden()
+  throws ConfigurationException, JSchException, IOException {
     Configuration conf = new PropertiesConfiguration();
     conf.setProperty(ClusterSpec.Property.RUN_URL_BASE.getConfigName(),
         "http://example.org");
-    ClusterSpec spec = new ClusterSpec(conf);
+    ClusterSpec spec = ClusterSpec.withNoDefaults(conf);
     assertThat(spec.getRunUrlBase(), is("http://example.org"));
   }
 
   @Test
   public void testVersionInRunUrlbaseIsUrlEncoded()
-      throws ConfigurationException {
+  throws ConfigurationException, JSchException, IOException {
     Configuration conf = new PropertiesConfiguration();
     conf.setProperty(ClusterSpec.Property.VERSION.getConfigName(), "0.1.0+1");
-    ClusterSpec spec = new ClusterSpec(conf);
+    ClusterSpec spec = ClusterSpec.withNoDefaults(conf);
     assertThat(spec.getRunUrlBase(),
         is("http://whirr.s3.amazonaws.com/0.1.0%2B1/"));
   }
   
   @Test
   public void testGetConfigurationForKeysWithPrefix()
-      throws ConfigurationException {
+  throws ConfigurationException, JSchException, IOException {
     Configuration conf = new PropertiesConfiguration();
     conf.setProperty("a.b", 1);
     conf.setProperty("b.a", 2);
     conf.setProperty("a.c", 3);
 
-    ClusterSpec spec = new ClusterSpec(conf);
+    ClusterSpec spec = ClusterSpec.withNoDefaults(conf);
     Configuration prefixConf = spec.getConfigurationForKeysWithPrefix("a");
 
     List<String> prefixKeys = Lists.newArrayList();
@@ -114,7 +116,7 @@ public class ClusterSpecTest {
     conf.setProperty("whirr.private-key-file", keys.get("private").getAbsolutePath());
     // If no public-key-file is specified it should append .pub to the private-key-file
 
-    ClusterSpec spec = new ClusterSpec(conf);
+    ClusterSpec spec = ClusterSpec.withNoDefaults(conf);
     Assert.assertEquals(IOUtils.toString(
             new FileReader(keys.get("public"))), spec.readPublicKey());
   }
@@ -131,7 +133,7 @@ public class ClusterSpecTest {
     Configuration conf = new PropertiesConfiguration();
     conf.setProperty("whirr.private-key-file", privateKeyFile.getAbsolutePath());
 
-    ClusterSpec spec = new ClusterSpec(conf);
+    ClusterSpec.withNoDefaults(conf);
   }
 
   @Test(expected = ConfigurationException.class)
@@ -142,7 +144,7 @@ public class ClusterSpecTest {
     Configuration conf = new PropertiesConfiguration();
     conf.setProperty("whirr.private-key-file", privateKey.getAbsolutePath());
 
-    ClusterSpec spec = new ClusterSpec(conf);
+    ClusterSpec.withNoDefaults(conf);
   }
 
   @Test(expected = ConfigurationException.class)
@@ -150,7 +152,7 @@ public class ClusterSpecTest {
     Configuration conf = new PropertiesConfiguration();
     conf.setProperty("whirr.private-key-file", "/dummy/path/that/does/not/exists");
 
-    ClusterSpec spec = new ClusterSpec(conf);      
+    ClusterSpec.withNoDefaults(conf);      
   }
 
   @Test(expected = ConfigurationException.class)
@@ -161,7 +163,7 @@ public class ClusterSpecTest {
     conf.setProperty("whirr.private-key-file", privateKey.getAbsolutePath());
     conf.setProperty("whirr.public-key-file", "/dummy/path/that/does/not/exists");
 
-    ClusterSpec spec = new ClusterSpec(conf);
+    ClusterSpec.withNoDefaults(conf);
   }
 
   @Test(expected = ConfigurationException.class)
@@ -176,7 +178,7 @@ public class ClusterSpecTest {
     conf.setProperty("whirr.private-key-file", privateKey.getAbsolutePath());
     conf.setProperty("whirr.public-key-file", publicKey.getAbsolutePath());
 
-    ClusterSpec spec = new ClusterSpec(conf);
+    ClusterSpec.withNoDefaults(conf);
   }
 
   @Test(expected = ConfigurationException.class)
@@ -188,6 +190,6 @@ public class ClusterSpecTest {
     conf.setProperty("whirr.private-key-file", first.get("private").getAbsolutePath());
     conf.setProperty("whirr.public-key-file", second.get("public").getAbsolutePath());
 
-    ClusterSpec spec = new ClusterSpec(conf);      
+    ClusterSpec.withNoDefaults(conf);      
   }
 }

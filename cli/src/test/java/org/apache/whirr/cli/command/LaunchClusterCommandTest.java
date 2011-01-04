@@ -35,6 +35,8 @@ import java.io.PrintStream;
 import java.util.Collections;
 import java.util.Map;
 
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.whirr.service.Cluster;
 import org.apache.whirr.service.ClusterSpec;
 import org.apache.whirr.service.Service;
@@ -91,12 +93,15 @@ public class LaunchClusterCommandTest {
         "--provider", "rackspace",
         "--identity", "myusername", "--credential", "mypassword",
         "--private-key-file", keys.get("private").getAbsolutePath(),
-        "--public-key-file", keys.get("public").getAbsolutePath()
+        "--version", "version-string"
         ));
     
     assertThat(rc, is(0));
 
-    ClusterSpec expectedClusterSpec = new ClusterSpec();
+    Configuration conf = new PropertiesConfiguration();
+    conf.addProperty("whirr.version", "version-string");
+
+    ClusterSpec expectedClusterSpec = ClusterSpec.withNoDefaults(conf);
     expectedClusterSpec.setInstanceTemplates(Lists.newArrayList(
         new ClusterSpec.InstanceTemplate(1, Sets.newHashSet("role1", "role2")),
         new ClusterSpec.InstanceTemplate(2, Sets.newHashSet("role3"))

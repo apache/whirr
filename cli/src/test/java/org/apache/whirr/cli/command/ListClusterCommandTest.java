@@ -29,13 +29,16 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.PrintStream;
 import java.util.Collections;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.whirr.service.ClusterSpec;
 import org.apache.whirr.service.Service;
 import org.apache.whirr.service.ServiceFactory;
+import org.apache.whirr.ssh.KeyPair;
 import org.hamcrest.Matcher;
 import org.jclouds.compute.domain.NodeMetadata;
 import org.jclouds.compute.domain.NodeState;
@@ -95,13 +98,16 @@ public class ListClusterCommandTest {
         Lists.newArrayList("10.0.0.2"), null);
     when(service.getNodes((ClusterSpec) any())).thenReturn(
         (Set) Sets.newLinkedHashSet(Lists.newArrayList(node1, node2)));
-    
+
     ListClusterCommand command = new ListClusterCommand(factory);
-    
+
+    Map<String, File> keys = KeyPair.generateTemporaryFiles();
     int rc = command.run(null, out, null, Lists.newArrayList(
         "--service-name", "test-service",
         "--cluster-name", "test-cluster",
-        "--identity", "myusername"));
+        "--identity", "myusername",
+        "--private-key-file", keys.get("private").getAbsolutePath())
+    );
     
     assertThat(rc, is(0));
     

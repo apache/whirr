@@ -21,14 +21,17 @@ package org.apache.whirr.cli.command;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
+import java.io.File;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.util.List;
+import java.util.Map;
 
 import joptsimple.OptionSet;
 
 import org.apache.whirr.service.ClusterSpec;
 import org.apache.whirr.service.ServiceFactory;
+import org.apache.whirr.ssh.KeyPair;
 import org.junit.Test;
 
 public class AbstractClusterSpecCommandTest {
@@ -44,9 +47,12 @@ public class AbstractClusterSpecCommandTest {
       }
     };
 
+    Map<String, File> keys = KeyPair.generateTemporaryFiles();
     OptionSet optionSet = clusterSpecCommand.parser.parse(
         "--service-name", "overridden-test-service",
-        "--config", "whirr-override-test.properties");
+        "--config", "whirr-override-test.properties",
+        "--private-key-file", keys.get("private").getAbsolutePath()
+    );
     ClusterSpec clusterSpec = clusterSpecCommand.getClusterSpec(optionSet);
     assertThat(clusterSpec.getServiceName(), is("overridden-test-service"));
     assertThat(clusterSpec.getClusterName(), is("test-cluster"));
@@ -66,9 +72,12 @@ public class AbstractClusterSpecCommandTest {
       }
     };
 
+    Map<String, File> keys = KeyPair.generateTemporaryFiles();
     OptionSet optionSet = clusterSpecCommand.parser.parse(
         "--service-name", "foo",
-        "--config", "whirr-override-test.properties");
+        "--config", "whirr-override-test.properties",
+        "--private-key-file", keys.get("private").getAbsolutePath()
+    );
     ClusterSpec clusterSpec = clusterSpecCommand.getClusterSpec(optionSet);
     // this should fail - non-existent service
     clusterSpecCommand.createService("bar");
