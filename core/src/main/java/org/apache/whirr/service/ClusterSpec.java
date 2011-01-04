@@ -25,6 +25,7 @@ import static org.jclouds.io.Payloads.newStringPayload;
 import static org.jclouds.util.Utils.toStringAndClose;
 import static org.apache.whirr.ssh.KeyPair.sameKeyPair;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Objects;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -36,6 +37,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import com.jcraft.jsch.JSch;
@@ -201,7 +203,44 @@ public class ClusterSpec {
   }
 
   private static final String DEFAULT_PROPERTIES = "whirr-default.properties";
-  
+
+  /**
+   * Create an instance that uses a temporary RSA key pair.
+   */
+  @VisibleForTesting
+  public static ClusterSpec withTemporaryKeys()
+  throws ConfigurationException, JSchException, IOException {
+    return withTemporaryKeys(new PropertiesConfiguration());
+  }
+  @VisibleForTesting
+  public static ClusterSpec withTemporaryKeys(Configuration conf) 
+  throws ConfigurationException, JSchException, IOException {
+    
+    if (!conf.containsKey(Property.PRIVATE_KEY_FILE.getConfigName())) {
+      Map<String, File> keys = org.apache.whirr.ssh.KeyPair.generateTemporaryFiles();
+      
+      conf.addProperty(Property.PRIVATE_KEY_FILE.getConfigName(), 
+        keys.get("private").getAbsolutePath());
+      conf.addProperty(Property.PUBLIC_KEY_FILE.getConfigName(), 
+        keys.get("public").getAbsolutePath());
+    }
+    
+    return new ClusterSpec(conf);
+  }
+
+  /**
+   * Create new empty instance for testing.
+   */
+  @VisibleForTesting
+  public static ClusterSpec withNoDefaults() throws ConfigurationException {
+    return withNoDefaults(new PropertiesConfiguration());
+  }
+  @VisibleForTesting
+  public static ClusterSpec withNoDefaults(Configuration conf)
+  throws ConfigurationException {
+    return new ClusterSpec(conf, false);
+  }
+
   private List<InstanceTemplate> instanceTemplates;
   private String serviceName;
   private String provider;
@@ -222,17 +261,23 @@ public class ClusterSpec {
   public ClusterSpec() throws ConfigurationException {
     this(new PropertiesConfiguration());
   }
-  
+
+  public ClusterSpec(Configuration config) throws ConfigurationException {
+      this(config, true); // load default configs
+  }
+
   /**
    * 
    * @throws ConfigurationException if something is wrong
    */
-  public ClusterSpec(Configuration config)
+  public ClusterSpec(Configuration config, boolean loadDefaults)
       throws ConfigurationException {
 
     CompositeConfiguration c = new CompositeConfiguration();
     c.addConfiguration(config);
-    c.addConfiguration(new PropertiesConfiguration(DEFAULT_PROPERTIES));
+    if (loadDefaults) {
+      c.addConfiguration(new PropertiesConfiguration(DEFAULT_PROPERTIES));
+    }
 
     setServiceName(c.getString(Property.SERVICE_NAME.getConfigName()));
     setInstanceTemplates(InstanceTemplate.parse(
@@ -249,19 +294,19 @@ public class ClusterSpec {
       String publicKeyPath = c.getString(Property.PUBLIC_KEY_FILE.getConfigName());
       publicKeyPath = (publicKeyPath == null && privateKeyPath != null) ?
                 privateKeyPath + ".pub" : publicKeyPath;
+      if(privateKeyPath != null && publicKeyPath != null) {
+        KeyPair pair = KeyPair.load(new JSch(), privateKeyPath, publicKeyPath);
+        if (pair.isEncrypted()) {
+          throw new ConfigurationException("Key pair is encrypted");
+        }
+        if (!sameKeyPair(new File(privateKeyPath), new File(publicKeyPath))) {
+          throw new ConfigurationException("Both keys should belong " +
+              "to the same key pair");
+        }
 
-      KeyPair pair = KeyPair.load(new JSch(), privateKeyPath, publicKeyPath);
-      if (pair.isEncrypted()) {
-        throw new ConfigurationException("Key pair is encrypted");
+        setPrivateKey(new File(privateKeyPath));
+        setPublicKey(new File(publicKeyPath));
       }
-      if (!sameKeyPair(new File(privateKeyPath), new File(publicKeyPath))) {
-        throw new ConfigurationException("Both keys should belong " +
-           "to the same key pair");
-      }
-
-      setPrivateKey(new File(privateKeyPath));
-      setPublicKey(new File(publicKeyPath));
-
     } catch (JSchException e) {
       throw new ConfigurationException("Invalid key pair", e);
 
@@ -279,7 +324,7 @@ public class ClusterSpec {
     setVersion(c.getString(Property.VERSION.getConfigName()));
     String runUrlBase = c.getString(Property.RUN_URL_BASE.getConfigName());
 
-    if (runUrlBase == null) {
+    if (runUrlBase == null && getVersion() != null) {
       try {
         runUrlBase = String.format("http://whirr.s3.amazonaws.com/%s/",
             URLEncoder.encode(getVersion(), "UTF-8"));

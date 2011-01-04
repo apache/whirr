@@ -33,6 +33,8 @@ import java.io.PrintStream;
 import java.util.Collections;
 import java.util.Map;
 
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.whirr.service.ClusterSpec;
 import org.apache.whirr.service.Service;
 import org.apache.whirr.service.ServiceFactory;
@@ -85,12 +87,15 @@ public class DestroyClusterCommandTest {
         "--provider", "rackspace",
         "--identity", "myusername", "--credential", "mypassword",
         "--private-key-file", keys.get("private").getAbsolutePath(),
-        "--public-key-file", keys.get("public").getAbsolutePath()
+        "--version", "version-string"
         ));
     
     assertThat(rc, is(0));
 
-    ClusterSpec expectedClusterSpec = new ClusterSpec();
+    Configuration conf = new PropertiesConfiguration();
+    conf.addProperty("whirr.version", "version-string");
+
+    ClusterSpec expectedClusterSpec = ClusterSpec.withNoDefaults(conf);
     expectedClusterSpec.setServiceName("test-service");
     expectedClusterSpec.setProvider("rackspace");
     expectedClusterSpec.setIdentity("myusername");

@@ -21,11 +21,14 @@ package org.apache.whirr.service;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
+import com.jcraft.jsch.JSchException;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.whirr.service.jclouds.TemplateBuilderStrategy;
 import org.jclouds.compute.domain.TemplateBuilder;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.io.IOException;
 
 public class TemplateBuilderStrategyTest {
   
@@ -33,8 +36,8 @@ public class TemplateBuilderStrategyTest {
   private ClusterSpec spec;
   
   @Before
-  public void setUp() throws ConfigurationException {
-    spec = new ClusterSpec();
+  public void setUp() throws ConfigurationException, JSchException, IOException {
+    spec = ClusterSpec.withTemporaryKeys();
   }
   
   @Test

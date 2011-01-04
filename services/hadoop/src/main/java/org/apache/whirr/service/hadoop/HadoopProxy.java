@@ -33,6 +33,7 @@ import java.net.InetAddress;
 import org.apache.whirr.net.DnsUtil;
 import org.apache.whirr.service.Cluster;
 import org.apache.whirr.service.ClusterSpec;
+import org.apache.whirr.ssh.KeyPair;
 
 public class HadoopProxy {
 
@@ -54,6 +55,7 @@ public class HadoopProxy {
       identity = File.createTempFile("hadoop", "key");
       identity.deleteOnExit();
       Files.write(ByteStreams.toByteArray(clusterSpec.getPrivateKey().getInput()), identity);
+      KeyPair.setPermissionsTo600(identity);
     }
     String user = Iterables.get(cluster.getInstances(), 0).getLoginCredentials().identity;
     InetAddress namenode = HadoopCluster.getNamenodePublicAddress(cluster);
