@@ -52,6 +52,9 @@ Trunk (unreleased changes)
     WHIRR-181. Add descriptions for CLI command options.
     (Andrei Savu via tomwhite)
 
+    WHIRR-161. Check that both SSH keys belong to the same pair.
+    (Andrei Savu via tomwhite)
+
   BUG FIXES
 
     WHIRR-128. Fix DNS resolution for clients running within EC2.

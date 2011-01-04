@@ -53,6 +53,11 @@
   <dependencyManagement>
     <dependencies>
       <dependency>
+        <groupId>ca.juliusdavies</groupId>
+        <artifactId>not-yet-commons-ssl</artifactId>
+        <version>0.3.11</version>
+      </dependency>
+      <dependency>
         <groupId>org.jclouds</groupId>
         <artifactId>jclouds-allcompute</artifactId>
         <version>${jclouds.version}</version>
@@ -113,6 +118,11 @@
       <dependency>
         <groupId>commons-io</groupId>
         <artifactId>commons-io</artifactId>
+        <version>1.4</version>
+      </dependency>
+      <dependency>
+        <groupId>commons-codec</groupId>
+        <artifactId>commons-codec</artifactId>
         <version>1.4</version>
       </dependency>
       <dependency>

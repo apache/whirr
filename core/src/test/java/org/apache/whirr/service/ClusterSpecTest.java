@@ -179,4 +179,15 @@ public class ClusterSpecTest {
     ClusterSpec spec = new ClusterSpec(conf);
   }
 
+  @Test(expected = ConfigurationException.class)
+  public void testNotSameKeyPair() throws JSchException, IOException, ConfigurationException {
+    Map<String, File> first = KeyPair.generateTemporaryFiles();
+    Map<String, File> second = KeyPair.generateTemporaryFiles();
+
+    Configuration conf = new PropertiesConfiguration();
+    conf.setProperty("whirr.private-key-file", first.get("private").getAbsolutePath());
+    conf.setProperty("whirr.public-key-file", second.get("public").getAbsolutePath());
+
+    ClusterSpec spec = new ClusterSpec(conf);      
+  }
 }

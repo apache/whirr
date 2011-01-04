@@ -23,6 +23,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static org.jclouds.io.Payloads.newFilePayload;
 import static org.jclouds.io.Payloads.newStringPayload;
 import static org.jclouds.util.Utils.toStringAndClose;
+import static org.apache.whirr.ssh.KeyPair.sameKeyPair;
 
 import com.google.common.base.Objects;
 import com.google.common.collect.Lists;
@@ -252,6 +253,10 @@ public class ClusterSpec {
       KeyPair pair = KeyPair.load(new JSch(), privateKeyPath, publicKeyPath);
       if (pair.isEncrypted()) {
         throw new ConfigurationException("Key pair is encrypted");
+      }
+      if (!sameKeyPair(new File(privateKeyPath), new File(publicKeyPath))) {
+        throw new ConfigurationException("Both keys should belong " +
+           "to the same key pair");
       }
 
       setPrivateKey(new File(privateKeyPath));

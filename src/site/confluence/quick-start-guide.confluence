@@ -48,6 +48,8 @@ Note that you do not need to choose a particular cloud image, since the default
 choose a particular image if you want to; see the [Configuration Guide|configuration-guide]
 for details. 
 
+Also note that you should use only RSA SSH keys, DSA keys are not accepted yet. 
+
 Run the following command to launch a cluster:
 
 {code}
