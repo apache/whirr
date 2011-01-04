@@ -21,17 +21,33 @@ package org.apache.whirr.ssh;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.FileInputStream;
+import java.io.FileReader;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.interfaces.RSAPublicKey;
+import java.security.GeneralSecurityException;
 import java.util.Map;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.io.Files;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.ssl.PKCS8Key;
+import org.apache.commons.codec.binary.Base64;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 /**
  * A convenience class for generating an RSA key pair.
  */
 public class KeyPair {
+
+  private static final Logger LOG =
+    LoggerFactory.getLogger(KeyPair.class);
 
   public static Map<String, String> generate() throws JSchException {
       return generate(null);
@@ -82,4 +98,47 @@ public class KeyPair {
     return ImmutableMap.<String, File> of("public", publicKeyFile,
               "private", privateKeyFile);
   }
+
+  public static boolean sameKeyPair(File privateKeyFile, File publicKeyFile) throws IOException {
+    try {
+      PKCS8Key decodedKey = new PKCS8Key(
+          new FileInputStream(privateKeyFile), null);
+      PrivateKey privateKey = decodedKey.getPrivateKey();
+      PublicKey publicKey = decodedKey.getPublicKey();
+
+      byte[] actual = encodePublicKey((RSAPublicKey) publicKey);
+      byte[] expected = IOUtils.toByteArray(new FileReader(publicKeyFile));
+
+      for(int i=0; i<actual.length; i += 1) {
+        if (actual[i] != expected[i]) {
+          return false;
+        }
+      }
+      return true;
+    } catch (GeneralSecurityException e) {
+      LOG.error("Key pair validation failed", e);
+      return false;
+    }
+  }
+
+  private static byte[] encodePublicKey(RSAPublicKey key) throws IOException {
+    ByteArrayOutputStream keyBlob = new ByteArrayOutputStream();
+    write("ssh-rsa".getBytes(), keyBlob);
+    write(key.getPublicExponent().toByteArray(), keyBlob);
+    write(key.getModulus().toByteArray(), keyBlob);
+
+    ByteArrayOutputStream out = new ByteArrayOutputStream();
+    out.write("ssh-rsa ".getBytes());
+    out.write(Base64.encodeBase64(keyBlob.toByteArray()));
+
+    return out.toByteArray();
+  }
+
+  private static void write(byte[] str, OutputStream os)
+  throws IOException {
+    for (int shift = 24; shift >= 0; shift -= 8)
+      os.write((str.length >>> shift) & 0xFF);
+    os.write(str);
+  }
+
 }
