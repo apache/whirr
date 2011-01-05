@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.configuration.Configuration;
 import org.apache.whirr.service.Cluster;
 import org.apache.whirr.service.Cluster.Instance;
 import org.apache.whirr.service.ClusterActionEvent;
@@ -46,6 +47,9 @@ public class CassandraClusterActionHandler extends ClusterActionHandlerSupport {
   public static final int CLIENT_PORT = 9160;
   public static final int JMX_PORT = 8080;
 
+  public static final String BIN_TARBALL = "whirr.cassandra.tarball.url";
+  public static final String MAJOR_VERSION = "whirr.cassandra.version.major";
+
   @Override
   public String getRole() {
     return CASSANDRA_ROLE;
@@ -54,7 +58,13 @@ public class CassandraClusterActionHandler extends ClusterActionHandlerSupport {
   @Override
   protected void beforeBootstrap(ClusterActionEvent event) throws IOException {
     addRunUrl(event, "sun/java/install");
-    addRunUrl(event, "apache/cassandra/install");
+    Configuration config = event.getClusterSpec().getConfiguration();
+    String tarball = config.getString(BIN_TARBALL, null);
+    String major = config.getString(MAJOR_VERSION, null);
+    if (tarball != null && major != null)
+      addRunUrl(event, String.format("apache/cassandra/install %s %s", major, tarball));
+    else
+      addRunUrl(event, "apache/cassandra/install");
   }
 
   @Override
