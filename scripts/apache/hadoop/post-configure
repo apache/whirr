@@ -371,6 +371,12 @@ function start_namenode() {
   # The following is questionable, as it allows a user to delete another user
   # It's needed to allow users to create their own user directories
   $AS_HADOOP "$HADOOP_HOME/bin/hadoop fs -chmod +w /user"
+  
+  # Create temporary directory for Pig and Hive in HDFS
+  $AS_HADOOP "$HADOOP_HOME/bin/hadoop fs -mkdir /tmp"
+  $AS_HADOOP "$HADOOP_HOME/bin/hadoop fs -chmod +w /tmp"
+  $AS_HADOOP "$HADOOP_HOME/bin/hadoop fs -mkdir /user/hive/warehouse"
+  $AS_HADOOP "$HADOOP_HOME/bin/hadoop fs -chmod +w /user/hive/warehouse"
 
 }
 
