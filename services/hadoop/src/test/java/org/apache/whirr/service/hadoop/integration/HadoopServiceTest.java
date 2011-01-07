@@ -20,6 +20,8 @@ package org.apache.whirr.service.hadoop.integration;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNull;
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThat;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -87,6 +89,15 @@ public class HadoopServiceTest {
     assertNull(reader.readLine());
     reader.close();
     
+  }
+
+  @Test
+  public void testExistsTemporaryFolderAndHiveWarehouse() throws Exception {
+    Configuration conf = controller.getConfiguration();
+    FileSystem fs = FileSystem.get(conf);
+
+    assertThat(fs.exists(new Path("/tmp")), is(true));
+    assertThat(fs.exists(new Path("/user/hive/warehouse")), is(true));
   }
 
 }

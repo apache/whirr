@@ -58,6 +58,9 @@ Trunk (unreleased changes)
     WHIRR-155. Support multiple versions of Cassandra.
     (Stu Hood via johan)
 
+    WHIRR-190. Create /tmp in HDFS for Pig. (Andrei Savu and tomwhite via
+    tomwhite)
+
   BUG FIXES
 
     WHIRR-128. Fix DNS resolution for clients running within EC2.
