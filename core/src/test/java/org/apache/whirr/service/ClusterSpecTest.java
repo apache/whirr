@@ -39,6 +39,7 @@ import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.io.IOUtils;
+import org.apache.whirr.service.ClusterSpec.InstanceTemplate;
 import org.apache.whirr.ssh.KeyPair;
 import org.junit.Assert;
 import org.junit.Test;
@@ -192,4 +193,18 @@ public class ClusterSpecTest {
 
     ClusterSpec.withNoDefaults(conf);      
   }
+  
+  @Test(expected = IllegalArgumentException.class)
+  public void testMissingCommaInInstanceTemplates() throws Exception {
+    Configuration conf = new PropertiesConfiguration();
+    conf.setProperty(ClusterSpec.Property.INSTANCE_TEMPLATES.getConfigName(),
+        "1 a+b 2 c+d"); // missing comma
+    ClusterSpec.withTemporaryKeys(conf);
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void testRoleMayNotContainSpaces() {
+    new InstanceTemplate(1, "a b");
+  }
+
 }

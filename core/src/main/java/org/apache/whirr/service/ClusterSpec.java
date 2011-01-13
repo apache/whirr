@@ -35,6 +35,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -49,6 +50,7 @@ import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.configuration.interpol.ConfigurationInterpolator;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.text.StrLookup;
 import org.jclouds.io.Payload;
 
@@ -159,6 +161,10 @@ public class ClusterSpec {
     }
 
     public InstanceTemplate(int numberOfInstances, Set<String> roles) {
+      for (String role : roles) {
+        checkArgument(!StringUtils.contains(role, " "),
+            "Role '%s' may not contain space characters.", role);
+      }
       this.numberOfInstances = numberOfInstances;
       this.roles = roles;
     }
@@ -195,6 +201,9 @@ public class ClusterSpec {
       List<InstanceTemplate> templates = Lists.newArrayList();
       for (String s : strings) {
         String[] parts = s.split(" ");
+        checkArgument(parts.length == 2, 
+            "Invalid instance template syntax for '%s'. Does not match " +
+            "'<number> <role1>+<role2>+<role3>...', e.g. '1 nn+jt'.", s);
         int num = Integer.parseInt(parts[0]);
         templates.add(new InstanceTemplate(num, parts[1].split("\\+")));
       }
