@@ -61,6 +61,8 @@ Trunk (unreleased changes)
     WHIRR-190. Create /tmp in HDFS for Pig. (Andrei Savu and tomwhite via
     tomwhite)
 
+    WHIRR-202. Improve instance template syntax checking. (tomwhite)
+
   BUG FIXES
 
     WHIRR-128. Fix DNS resolution for clients running within EC2.
