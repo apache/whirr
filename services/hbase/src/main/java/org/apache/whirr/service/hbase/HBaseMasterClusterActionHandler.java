@@ -57,11 +57,13 @@ public class HBaseMasterClusterActionHandler extends ClusterActionHandlerSupport
   @Override
   protected void beforeBootstrap(ClusterActionEvent event) throws IOException {
     ClusterSpec clusterSpec = event.getClusterSpec();
-    addRunUrl(event, "util/configure-hostnames", "-c", clusterSpec.getProvider());
+    addRunUrl(event, "util/configure-hostnames",
+      HBaseConstants.PARAM_PROVIDER, clusterSpec.getProvider());
     addRunUrl(event, "sun/java/install");
-    String hadoopInstallRunUrl = clusterSpec.getConfiguration().getString(
-      "whirr.hbase-install-runurl", "apache/hbase/install");
-    addRunUrl(event, hadoopInstallRunUrl, "-c", clusterSpec.getProvider());
+    String hbaseInstallRunUrl = clusterSpec.getConfiguration().getString(
+      HBaseConstants.KEY_INSTALL_RUNURL, HBaseConstants.SCRIPT_INSTALL);
+      addRunUrl(event, hbaseInstallRunUrl,
+        HBaseConstants.PARAM_PROVIDER, clusterSpec.getProvider());
     event.setTemplateBuilderStrategy(new HBaseTemplateBuilderStrategy());
   }
 
@@ -77,17 +79,18 @@ public class HBaseMasterClusterActionHandler extends ClusterActionHandlerSupport
     ComputeServiceContext computeServiceContext =
       ComputeServiceContextBuilder.build(clusterSpec);
     FirewallSettings.authorizeIngress(computeServiceContext, instance, clusterSpec,
-        MASTER_WEB_UI_PORT);
+      MASTER_WEB_UI_PORT);
     FirewallSettings.authorizeIngress(computeServiceContext, instance, clusterSpec,
       masterPublicAddress.getHostAddress(), MASTER_PORT);
 
     String hbaseConfigureRunUrl = clusterSpec.getConfiguration().getString(
-      "whirr.hbase-configure-runurl", "apache/hbase/post-configure");
+      HBaseConstants.KEY_CONFIGURE_RUNURL, HBaseConstants.SCRIPT_POST_CONFIGURE);
+    String master = DnsUtil.resolveAddress(masterPublicAddress.getHostAddress());
     String quorum = ZooKeeperCluster.getHosts(cluster);
-    addRunUrl(event, hbaseConfigureRunUrl, ROLE,
-      "-m", DnsUtil.resolveAddress(masterPublicAddress.getHostAddress()),
-      "-q", quorum,
-      "-c", clusterSpec.getProvider());
+      addRunUrl(event, hbaseConfigureRunUrl, ROLE,
+        HBaseConstants.PARAM_MASTER, master,
+        HBaseConstants.PARAM_QUORUM, quorum,
+        HBaseConstants.PARAM_PROVIDER, clusterSpec.getProvider());
   }
 
   @Override
@@ -112,13 +115,13 @@ public class HBaseMasterClusterActionHandler extends ClusterActionHandlerSupport
 
   private Properties createClientSideProperties(InetAddress master, String quorum) throws IOException {
     Properties config = new Properties();
-    config.setProperty("hbase.zookeeper.quorum", quorum);
+    config.setProperty(HBaseConstants.PROP_HBASE_ZOOKEEPER_QUORUM, quorum);
     return config;
   }
 
   private void createClientSideHadoopSiteFile(ClusterSpec clusterSpec, Properties config) {
     File configDir = getConfigDir(clusterSpec);
-    File hbaseSiteFile = new File(configDir, "hbase-site.xml");
+    File hbaseSiteFile = new File(configDir, HBaseConstants.FILE_HBASE_SITE_XML);
     try {
       Files.write(generateHBaseConfigurationFile(config), hbaseSiteFile, Charsets.UTF_8);
       LOG.info("Wrote HBase site file {}", hbaseSiteFile);

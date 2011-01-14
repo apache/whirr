@@ -65,6 +65,9 @@ Trunk (unreleased changes)
 
     WHIRR-203. General documentation improvements for 0.3.0. (tomwhite)
 
+    WHIRR-206. [HBase] Extract strings to a HBaseServiceConstants interface.
+    (Lars George via tomwhite)
+
   BUG FIXES
 
     WHIRR-128. Fix DNS resolution for clients running within EC2.
