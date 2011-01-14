@@ -82,6 +82,9 @@ specify the one you used at cluster launch.
 The Amazon Linux AMI requires that you login as {{ec2-user}}. If needed, you can
 become root by doing {{sudo su -}} after logging in.
 
+Different AMIs may have different login users. Check with the documentation for
+the AMI.
+
 {anchor:how-can-i-modify-the-instance-installation-and-configuration-scripts}
 h2. How can I modify the instance installation and configuration scripts?
 
@@ -93,7 +96,8 @@ use a browser to look at these scripts unless you know the URL.)
 
 If you want to change the scripts then you can place a modified copy of the
 scripts in the _scripts_ directory of the distribution on a webserver (such as
-S3) and change the base URL, by setting the {{run-url-base}} property.
+S3) and change the base URL, by setting the {{run-url-base}} property. You need
+to copy all the scripts, not just the ones you have changed.
 
 For example, by setting {{run-url-base}} to {{http://example.org/}} the scripts
 would be loaded from the {{example.org}} domain. The Java install script, for
@@ -127,45 +131,16 @@ h2. How do I run Cloudera's Distribution for Hadoop?
 You can run CDH rather than Apache Hadoop by running the {{hadoop}} service and
 setting the {{whirr.hadoop-install-runurl}} and
 {{whirr.hadoop-configure-runurl}}
-properties. Here is a sample configuration:
-
-{code}
-whirr.cluster-name=myhadoopcluster
-whirr.instance-templates=1 jt+nn,1 dn+tt
-whirr.provider=ec2
-whirr.identity=<cloud-provider-identity>
-whirr.credential=<cloud-provider-credential>
-whirr.private-key-file=${sys:user.home}/.ssh/id_rsa
-whirr.hadoop-install-runurl=cloudera/cdh/install
-whirr.hadoop-configure-runurl=cloudera/cdh/post-configure
-{code}
+properties. See the _recipes_ directory in the distribution for samples.
 
 {anchor:other-services}
 h2. How do I run a ZooKeeper cluster?
 
-Here is a sample ZooKeeper configuration for running a three-node ensemble:
-
-{code}
-whirr.cluster-name=myzkcluster
-whirr.instance-templates=3 zk
-whirr.provider=ec2
-whirr.identity=<cloud-provider-identity>
-whirr.credential=<cloud-provider-credential>
-whirr.private-key-file=${sys:user.home}/.ssh/id_rsa
-{code}
+See the _recipes_ directory in the distribution for samples.
 
 h2. How do I run a Cassandra cluster?
 
-Here is a sample Cassandra configuration for running a three-node cluster:
-
-{code}
-whirr.cluster-name=mycassandracluster
-whirr.instance-templates=3 cassandra
-whirr.provider=ec2
-whirr.identity=<cloud-provider-identity>
-whirr.credential=<cloud-provider-credential>
-whirr.private-key-file=${sys:user.home}/.ssh/id_rsa
-{code}
+See the _recipes_ directory in the distribution for samples.
 
 h2. How do I automatically tear down a cluster after a fixed time?
 

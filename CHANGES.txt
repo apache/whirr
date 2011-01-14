@@ -63,6 +63,8 @@ Trunk (unreleased changes)
     WHIRR-205. Override service.provider for integration tests.
     (Andrei Savu via tomwhite)
 
+    WHIRR-203. General documentation improvements for 0.3.0. (tomwhite)
+
   BUG FIXES
 
     WHIRR-128. Fix DNS resolution for clients running within EC2.

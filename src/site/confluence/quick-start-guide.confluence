@@ -3,7 +3,9 @@ h1. Getting Started with Whirr
 The Whirr CLI provides the most convenient way to launch clusters.
 
 h3. Pre-requisites
-You need to install Java 6 on your machine. Also, you need to have an account with a cloud provider, such as Amazon EC2.
+* Java 6
+* An account with a cloud provider, such as Amazon EC2, or Rackspace Cloud Servers
+* An SSH client 
 
 h3. Install Whirr
 
@@ -18,37 +20,58 @@ You can test that Whirr is working by running:
 
 Which will display the version of Whirr that is installed.
 
-To get usage instructions and a list of available services type:
+To get usage instructions type:
 
 {code}
 % bin/whirr
 {code}
 
-h3. Launch a Hadoop cluster
+h3. Configure a Hadoop cluster
 
 First, create a properties file to define the cluster. The name doesn't matter,
 but here we will assume it is called _hadoop.properties_ and located in your home directory.
 This file defines a cluster
 with a single machine for the namenode and jobtracker, and
 a further machine for a datanode and tasktracker. You can see how to launch
-other services in the [FAQ|faq#other-services].
+other services by consulting the sample configurations in the _recipes_
+directory of the distribution.
 
 {code}
 whirr.cluster-name=myhadoopcluster
 whirr.instance-templates=1 jt+nn,1 dn+tt
 whirr.provider=ec2
-whirr.identity=<cloud-provider-identity>
-whirr.credential=<cloud-provider-credential>
+whirr.identity=${env:AWS_ACCESS_KEY_ID}
+whirr.credential=${env:AWS_SECRET_ACCESS_KEY}
 whirr.private-key-file=${sys:user.home}/.ssh/id_rsa
 whirr.public-key-file=${sys:user.home}/.ssh/id_rsa.pub
 {code}
 
-Note that you do not need to choose a particular cloud image, since the default
-(which depends on the provider) should work well. However, it is possible to
-choose a particular image if you want to; see the [Configuration Guide|configuration-guide]
-for details. 
+Note that we haven't specified a particular cloud image, since Whirr
+provides a default for each provider which should work well enough. However, for
+larger clusters you will likely use larger hardware sizes or particular images.
+See the _recipes_ files and the [Configuration Guide|configuration-guide] for
+details.
 
-Also note that you should use only RSA SSH keys, DSA keys are not accepted yet. 
+In this configuration file the cloud identity and credential are read from
+environment variables - you can equally well put them in the configuration file
+if you wish.
+
+The {{private-key-file}} and {{public-key-file}} properties specify an SSH
+keypair. You can generate a keypair with:
+
+{code}
+% ssh-keygen -t rsa -P ''
+{code}
+
+You should use only RSA SSH keys, since DSA keys are not accepted yet. 
+
+*Note*: the keypair specified by these properties is not the same as the AWS
+keypair generated with the {{ec2-add-keypair}} command or the AWS Management
+Console (since these don't place _both_ of the keys on your local machine). The
+PEM-encoded X.509 Certificate and Private Key (e.g. pk-XXXXXX.pem) cannot be
+used as a keypair either.
+
+h3. Launch a Hadoop cluster
 
 Run the following command to launch a cluster:
 
@@ -115,7 +138,7 @@ Here's how you can run a MapReduce job:
 {code}
 hadoop fs -mkdir input
 hadoop fs -put $HADOOP_HOME/LICENSE.txt input
-hadoop jar $HADOOP_HOME/hadoop-*examples.jar wordcount input output
+hadoop jar $HADOOP_HOME/hadoop-*examples*.jar wordcount input output
 hadoop fs -cat output/part-* | head
 {code}
 
@@ -134,7 +157,8 @@ for properties is not reflected in the command line argument):
     --provider=ec2 \
     --identity=$AWS_ACCESS_KEY_ID \
     --credential=$AWS_SECRET_ACCESS_KEY \
-    --private-key-file=~/.ssh/id_rsa
+    --private-key-file=~/.ssh/id_rsa \
+    --public-key-file=~/.ssh/id_rsa.pub
 {code}
 
 Notice that here we took advantage of the fact that the AWS credentials have
