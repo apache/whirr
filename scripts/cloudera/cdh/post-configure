@@ -272,6 +272,10 @@ function configure_hadoop() {
   <value>/hadoop/system/mapred</value>
 </property>
 <property>
+  <name>mapreduce.jobtracker.staging.root.dir</name>
+  <value>/user</value>
+</property>
+<property>
   <name>mapred.tasktracker.map.tasks.maximum</name>
   <value>$MAX_MAP_TASKS</value>
   <final>true</final>
