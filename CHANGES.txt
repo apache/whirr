@@ -63,6 +63,9 @@ Trunk (unreleased changes)
 
     WHIRR-202. Improve instance template syntax checking. (tomwhite)
 
+    WHIRR-205. Override service.provider for integration tests.
+    (Andrei Savu via tomwhite)
+
   BUG FIXES
 
     WHIRR-128. Fix DNS resolution for clients running within EC2.
