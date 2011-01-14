@@ -45,11 +45,13 @@ public class HBaseRegionServerClusterActionHandler extends ClusterActionHandlerS
   @Override
   protected void beforeBootstrap(ClusterActionEvent event) throws IOException {
     ClusterSpec clusterSpec = event.getClusterSpec();
-    addRunUrl(event, "util/configure-hostnames", "-c", clusterSpec.getProvider());
-    String hbaseInstallRunUrl = clusterSpec.getConfiguration().getString(
-        "whirr.hbase-install-runurl", "apache/hbase/install");
+    addRunUrl(event, "util/configure-hostnames",
+      HBaseConstants.PARAM_PROVIDER, clusterSpec.getProvider());
     addRunUrl(event, "sun/java/install");
-    addRunUrl(event, hbaseInstallRunUrl, "-c", clusterSpec.getProvider());
+    String hbaseInstallRunUrl = clusterSpec.getConfiguration().getString(
+      HBaseConstants.KEY_INSTALL_RUNURL, HBaseConstants.SCRIPT_INSTALL);
+      addRunUrl(event, hbaseInstallRunUrl,
+        HBaseConstants.PARAM_PROVIDER, clusterSpec.getProvider());
     event.setTemplateBuilderStrategy(new HBaseTemplateBuilderStrategy());
   }
 
@@ -68,15 +70,17 @@ public class HBaseRegionServerClusterActionHandler extends ClusterActionHandlerS
     FirewallSettings.authorizeIngress(computeServiceContext, instance, clusterSpec,
       REGIONSERVER_WEB_UI_PORT);
     FirewallSettings.authorizeIngress(computeServiceContext, instance, clusterSpec,
-        masterPublicAddress.getHostAddress(), REGIONSERVER_PORT);
+      masterPublicAddress.getHostAddress(), REGIONSERVER_PORT);
 
     String hbaseConfigureRunUrl = clusterSpec.getConfiguration().getString(
-      "whirr.hbase-configure-runurl", "apache/hbase/post-configure");
+      HBaseConstants.KEY_CONFIGURE_RUNURL,
+      HBaseConstants.SCRIPT_POST_CONFIGURE);
+    String master = DnsUtil.resolveAddress(masterPublicAddress.getHostAddress());
     String quorum = ZooKeeperCluster.getHosts(cluster);
-    addRunUrl(event, hbaseConfigureRunUrl, ROLE,
-      "-m", DnsUtil.resolveAddress(masterPublicAddress.getHostAddress()),
-      "-q", quorum,
-      "-c", clusterSpec.getProvider());
+      addRunUrl(event, hbaseConfigureRunUrl, ROLE,
+        HBaseConstants.PARAM_MASTER, master,
+        HBaseConstants.PARAM_QUORUM, quorum,
+        HBaseConstants.PARAM_PROVIDER, clusterSpec.getProvider());
   }
 
 }
