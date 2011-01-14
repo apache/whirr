@@ -43,9 +43,6 @@ Trunk (unreleased changes)
     WHIRR-178. [Hadoop] Guard useradd against existing user account.
     (Lars George via tomwhite)
 
-    WHIRR-184. Add HBase service to list of dependencies.
-    (Lars George via tomwhite)
-
     WHIRR-187. [HBase] Change hbase.tmp.dir to be in line with Hadoop service.
     (Lars George via tomwhite)
 
