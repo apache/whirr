@@ -85,16 +85,16 @@
     <dependency>
       <groupId>apache</groupId>
       <artifactId>cassandra</artifactId>
-      <version>0.6.2</version>
+      <version>0.7.0</version>
       <scope>system</scope>
-      <systemPath>${basedir}/lib/apache-cassandra-0.6.2.jar</systemPath>
+      <systemPath>${basedir}/lib/apache-cassandra-0.7.0.jar</systemPath>
     </dependency>
     <dependency>
       <groupId>apache</groupId>
       <artifactId>thrift</artifactId>
-      <version>r917130</version>
+      <version>0.5</version>
       <scope>system</scope>
-      <systemPath>${basedir}/lib/libthrift-r917130.jar</systemPath>
+      <systemPath>${basedir}/lib/libthrift-0.5.jar</systemPath>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>

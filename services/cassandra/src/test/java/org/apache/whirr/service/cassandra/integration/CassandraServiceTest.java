@@ -32,7 +32,9 @@ import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.thrift.TException;
 import org.apache.thrift.protocol.TBinaryProtocol;
+import org.apache.thrift.transport.TFramedTransport;
 import org.apache.thrift.transport.TSocket;
+import org.apache.thrift.transport.TTransport;
 import org.apache.whirr.service.Cluster;
 import org.apache.whirr.service.Cluster.Instance;
 import org.apache.whirr.service.ClusterSpec;
@@ -67,17 +69,23 @@ public class CassandraServiceTest {
     waitForCassandra();
   }
 
+  private Cassandra.Client client(Instance instance) throws TException
+  {
+    TTransport trans = new TFramedTransport(new TSocket(
+        instance.getPublicAddress().getHostAddress(),
+        CassandraClusterActionHandler.CLIENT_PORT));
+    trans.open();
+    TBinaryProtocol protocol = new TBinaryProtocol(trans);
+    return new Cassandra.Client(protocol);
+  }
+
   private void waitForCassandra() {
     for (Instance instance : cluster.getInstances()) {
       while (true) {
         try {
-          TSocket socket = new TSocket(instance.getPublicAddress()
-              .getHostAddress(), CassandraClusterActionHandler.CLIENT_PORT);
-          socket.open();
-          TBinaryProtocol protocol = new TBinaryProtocol(socket);
-          Cassandra.Client client = new Cassandra.Client(protocol);
+          Cassandra.Client client = client(instance);
           client.describe_cluster_name();
-          socket.close();
+          client.getOutputProtocol().getTransport().close();
           break;
         } catch (TException e) {
           System.out.print(".");
@@ -95,16 +103,12 @@ public class CassandraServiceTest {
   public void testInstances() throws Exception {
     Set<String> endPoints = new HashSet<String>();
     for (Instance instance : cluster.getInstances()) {
-      TSocket socket = new TSocket(instance.getPublicAddress().getHostAddress(), 
-          CassandraClusterActionHandler.CLIENT_PORT);
-      socket.open();
-      TBinaryProtocol protocol = new TBinaryProtocol(socket);
-      Cassandra.Client client = new Cassandra.Client(protocol);
-      List<TokenRange> tr = client.describe_ring(KEYSPACE);
-      for (TokenRange tokenRange : tr) {
-        endPoints.addAll(tokenRange.endpoints);
+      Cassandra.Client client = client(instance);
+      Map<String,List<String>> tr = client.describe_schema_versions();
+      for (List<String> version : tr.values()) {
+        endPoints.addAll(version);
       }
-      socket.close();
+      client.getOutputProtocol().getTransport().close();
     }
     
     for (Instance instance : cluster.getInstances()) {
