@@ -116,6 +116,8 @@ Trunk (unreleased changes)
 
     WHIRR-204. CDH Hadoop integration test fails on Rackspace. (tomwhite)
 
+    WHIRR-210. Remove unneeded dependent libraries. (tomwhite)
+
 Release 0.2.0 - 2010-11-04
 
   NEW FEATURES

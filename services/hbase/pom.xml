@@ -123,12 +123,14 @@
       <groupId>com.cloudera.hbase</groupId>
       <artifactId>hbase</artifactId>
       <version>${hbase.version}</version>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>com.cloudera.hbase</groupId>
       <artifactId>hbase</artifactId>
       <version>${hbase.version}</version>
       <classifier>tests</classifier>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 </project>
