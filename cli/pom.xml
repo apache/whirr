@@ -20,13 +20,13 @@
   <parent>
     <groupId>org.apache.whirr</groupId>
     <artifactId>whirr</artifactId>
-    <version>0.3.0-incubating-SNAPSHOT</version>
+    <version>0.3.0-incubating</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <groupId>org.apache.whirr</groupId>
   <artifactId>whirr-cli</artifactId>
   <packaging>jar</packaging>
-  <version>0.3.0-incubating-SNAPSHOT</version>
+  <version>0.3.0-incubating</version>
   <name>Apache Whirr CLI</name>
   <dependencies>
     <dependency>
