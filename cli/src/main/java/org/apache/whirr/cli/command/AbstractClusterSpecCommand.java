@@ -20,7 +20,6 @@ package org.apache.whirr.cli.command;
 
 import static org.apache.whirr.service.ClusterSpec.Property.CLUSTER_NAME;
 import static org.apache.whirr.service.ClusterSpec.Property.IDENTITY;
-import static org.apache.whirr.service.ClusterSpec.Property.SERVICE_NAME;
 
 import java.util.EnumSet;
 import java.util.Map;

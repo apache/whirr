@@ -27,7 +27,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.cassandra.thrift.Cassandra;
-import org.apache.cassandra.thrift.TokenRange;
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.thrift.TException;
@@ -40,7 +39,6 @@ import org.apache.whirr.service.Cluster.Instance;
 import org.apache.whirr.service.ClusterSpec;
 import org.apache.whirr.service.Service;
 import org.apache.whirr.service.cassandra.CassandraClusterActionHandler;
-import org.apache.whirr.ssh.KeyPair;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
