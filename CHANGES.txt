@@ -118,6 +118,8 @@ Trunk (unreleased changes)
 
     WHIRR-210. Remove unneeded dependent libraries. (tomwhite)
 
+    WHIRR-211. Fix checkstyle errors for 0.3.0. (tomwhite)
+
 Release 0.2.0 - 2010-11-04
 
   NEW FEATURES

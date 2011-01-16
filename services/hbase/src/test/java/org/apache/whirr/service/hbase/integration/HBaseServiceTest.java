@@ -18,24 +18,26 @@
 
 package org.apache.whirr.service.hbase.integration;
 
+import static org.junit.Assert.assertTrue;
+
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseTestingUtility;
-import org.apache.hadoop.hbase.client.*;
+import org.apache.hadoop.hbase.client.HTable;
+import org.apache.hadoop.hbase.client.Put;
+import org.apache.hadoop.hbase.client.Result;
+import org.apache.hadoop.hbase.client.ResultScanner;
+import org.apache.hadoop.hbase.client.Scan;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-
 public class HBaseServiceTest {
 
-  private static byte [] ROW = Bytes.toBytes("testRow");
-  private static byte [] FAMILY = Bytes.toBytes("testFamily");
-  private static byte [] QUALIFIER = Bytes.toBytes("testQualifier");
-  private static byte [] VALUE = Bytes.toBytes("testValue");
+  private static final byte [] ROW = Bytes.toBytes("testRow");
+  private static final byte [] FAMILY = Bytes.toBytes("testFamily");
+  private static final byte [] QUALIFIER = Bytes.toBytes("testQualifier");
+  private static final byte [] VALUE = Bytes.toBytes("testValue");
 
   private static HBaseServiceController controller =
     HBaseServiceController.getInstance();
@@ -54,13 +56,13 @@ public class HBaseServiceTest {
   public void test() throws Exception {
     Configuration conf = controller.getConfiguration();
     HBaseTestingUtility testUtil = new HBaseTestingUtility(conf);
-    byte [] TABLE = Bytes.toBytes("testtable");
-    HTable ht = testUtil.createTable(TABLE, FAMILY);
+    byte [] table = Bytes.toBytes("testtable");
+    HTable ht = testUtil.createTable(table, FAMILY);
     Put put = new Put(ROW);
     put.add(FAMILY, QUALIFIER, VALUE);
     ht.put(put);
     Scan scan = new Scan();
-    scan.addColumn(FAMILY, TABLE);
+    scan.addColumn(FAMILY, table);
     ResultScanner scanner = ht.getScanner(scan);
     Result result = scanner.next();
     assertTrue("Expected null result", result == null);

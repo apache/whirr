@@ -18,17 +18,21 @@
 
 package org.apache.whirr.service.hbase;
 
-import org.apache.whirr.net.DnsUtil;
-import org.apache.whirr.service.*;
-import org.apache.whirr.service.Cluster.Instance;
-import org.apache.whirr.service.jclouds.FirewallSettings;
-import org.apache.whirr.service.zookeeper.ZooKeeperCluster;
-import org.jclouds.compute.ComputeServiceContext;
+import static org.apache.whirr.service.RolePredicates.role;
 
 import java.io.IOException;
 import java.net.InetAddress;
 
-import static org.apache.whirr.service.RolePredicates.role;
+import org.apache.whirr.net.DnsUtil;
+import org.apache.whirr.service.Cluster;
+import org.apache.whirr.service.Cluster.Instance;
+import org.apache.whirr.service.ClusterActionEvent;
+import org.apache.whirr.service.ClusterActionHandlerSupport;
+import org.apache.whirr.service.ClusterSpec;
+import org.apache.whirr.service.ComputeServiceContextBuilder;
+import org.apache.whirr.service.jclouds.FirewallSettings;
+import org.apache.whirr.service.zookeeper.ZooKeeperCluster;
+import org.jclouds.compute.ComputeServiceContext;
 
 public class HBaseRegionServerClusterActionHandler extends ClusterActionHandlerSupport {
 

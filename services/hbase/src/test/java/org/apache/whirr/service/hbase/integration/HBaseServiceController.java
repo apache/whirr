@@ -29,12 +29,10 @@ import org.apache.whirr.service.Cluster;
 import org.apache.whirr.service.ClusterSpec;
 import org.apache.whirr.service.Service;
 import org.apache.whirr.service.hadoop.HadoopProxy;
-import org.apache.whirr.ssh.KeyPair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.Map;
 import java.util.Map.Entry;
 
 public class HBaseServiceController {

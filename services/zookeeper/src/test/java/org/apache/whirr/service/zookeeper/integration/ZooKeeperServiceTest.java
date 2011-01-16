@@ -21,7 +21,6 @@ package org.apache.whirr.service.zookeeper.integration;
 import static junit.framework.Assert.assertEquals;
 
 import java.io.IOException;
-import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 
 import org.apache.commons.configuration.CompositeConfiguration;
@@ -30,7 +29,6 @@ import org.apache.whirr.service.Cluster;
 import org.apache.whirr.service.ClusterSpec;
 import org.apache.whirr.service.Service;
 import org.apache.whirr.service.zookeeper.ZooKeeperCluster;
-import org.apache.whirr.ssh.KeyPair;
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.WatchedEvent;
 import org.apache.zookeeper.Watcher;

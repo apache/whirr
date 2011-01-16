@@ -18,18 +18,11 @@
 
 package org.apache.whirr.service.hbase;
 
+import static org.apache.whirr.service.RolePredicates.role;
+
 import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
 import com.google.common.io.Files;
-import org.apache.whirr.net.DnsUtil;
-import org.apache.whirr.service.*;
-import org.apache.whirr.service.Cluster.Instance;
-import org.apache.whirr.service.hadoop.HadoopProxy;
-import org.apache.whirr.service.jclouds.FirewallSettings;
-import org.apache.whirr.service.zookeeper.ZooKeeperCluster;
-import org.jclouds.compute.ComputeServiceContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -37,7 +30,19 @@ import java.net.InetAddress;
 import java.util.Map.Entry;
 import java.util.Properties;
 
-import static org.apache.whirr.service.RolePredicates.role;
+import org.apache.whirr.net.DnsUtil;
+import org.apache.whirr.service.Cluster;
+import org.apache.whirr.service.Cluster.Instance;
+import org.apache.whirr.service.ClusterActionEvent;
+import org.apache.whirr.service.ClusterActionHandlerSupport;
+import org.apache.whirr.service.ClusterSpec;
+import org.apache.whirr.service.ComputeServiceContextBuilder;
+import org.apache.whirr.service.hadoop.HadoopProxy;
+import org.apache.whirr.service.jclouds.FirewallSettings;
+import org.apache.whirr.service.zookeeper.ZooKeeperCluster;
+import org.jclouds.compute.ComputeServiceContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class HBaseMasterClusterActionHandler extends ClusterActionHandlerSupport {
 
