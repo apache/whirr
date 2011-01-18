@@ -416,6 +416,14 @@
       </roles>
     </developer>
     <developer>
+      <id>larsgeorge</id>
+      <name>Lars George</name>
+      <organization>Cloudera</organization>
+      <roles>
+        <role>committer</role>
+      </roles>
+    </developer>
+    <developer>
       <id>phunt</id>
       <name>Patrick Hunt</name>
       <organization>Cloudera</organization>
