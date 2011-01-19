@@ -416,6 +416,14 @@
       </roles>
     </developer>
     <developer>
+      <id>larsgeorge</id>
+      <name>Lars George</name>
+      <organization>Cloudera</organization>
+      <roles>
+        <role>committer</role>
+      </roles>
+    </developer>
+    <developer>
       <id>phunt</id>
       <name>Patrick Hunt</name>
       <organization>Cloudera</organization>
@@ -438,6 +446,14 @@
       <organization>Cloudera</organization>
       <roles>
         <role>mentor</role>
+        <role>committer</role>
+      </roles>
+    </developer>
+    <developer>
+      <id>asavu</id>
+      <name>Andrei Savu</name>
+      <organization></organization>
+      <roles>
         <role>committer</role>
       </roles>
     </developer>
