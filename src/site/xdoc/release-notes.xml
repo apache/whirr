@@ -22,5 +22,237 @@
     </properties>
     <body>
     <!-- Paste release notes from https://issues.apache.org/jira/browse/WHIRR here. -->
+
+
+	<h1>Release Notes - Whirr - Version 0.3.0</h1>
+
+	<h2>Bug</h2>
+	<ul>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-123'>WHIRR-123</a>] - Cassandra integration tests hang if whirr's scripts bucket is missing</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-127'>WHIRR-127</a>] - binary assembly from WHIRR-100 is not generated as part of release process</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-128'>WHIRR-128</a>] - In ec2 instances instead of public dns names a public ip address is resolved for the started master node which causes workers to not be able to connect back to the master</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-137'>WHIRR-137</a>] - Allow use of an arbitrary AMI on EC2</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-146'>WHIRR-146</a>] - Changing the mapred.child.java.opts value does not change the heap size from a default one.</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-147'>WHIRR-147</a>] - Regression on launching clusters from EC2</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-151'>WHIRR-151</a>] - Credentials not set correctly for Hadoop service configure step</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-156'>WHIRR-156</a>] - Cli script doesn't launch post-modularization</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-159'>WHIRR-159</a>] - Cassandra and ZooKeeper fail on Ubuntu on Rackspace</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-162'>WHIRR-162</a>] - DnsUtilTest fails when offline or for slow connections</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-164'>WHIRR-164</a>] - Tests fail if there is no ~/.ssh/id_rsa keypair</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-165'>WHIRR-165</a>] - Hadoop integration tests fail due to WHIRR-160 changes</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-175'>WHIRR-175</a>] - ZooKeeper service does not honor instance roles</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-179'>WHIRR-179</a>] - [Hadoop] Guard $MOUNT/tmp mkdir call against existing directory</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-180'>WHIRR-180</a>] - ListClusterCommand.run throws a NullPointerException for unrecognized service names </li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-185'>WHIRR-185</a>] - [ZooKeeper] Fix selection of instances for getHosts() call</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-200'>WHIRR-200</a>] - Cassandra integration test hangs</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-201'>WHIRR-201</a>] - HBase integration test fails</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-204'>WHIRR-204</a>] - CDH Hadoop integration test fails on Rackspace</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-205'>WHIRR-205</a>] - Override service.provider for integration tests</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-209'>WHIRR-209</a>] - bin/whirr fails on a new release</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-210'>WHIRR-210</a>] - Remove unneeded dependent libraries</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-211'>WHIRR-211</a>] - Fix checkstyle errors for 0.3.0</li>
+	</ul>
+
+	<h2>Improvement</h2>
+	<ul>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-87'>WHIRR-87</a>] - Parallelize Hadoop cluster creation</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-115'>WHIRR-115</a>] - Distribution should include documentation</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-140'>WHIRR-140</a>] - include KEYS file in release artifact.</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-145'>WHIRR-145</a>] - Add Whirr recipes for common configurations</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-150'>WHIRR-150</a>] - Allow retrieval of instance roles</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-153'>WHIRR-153</a>] - Add documentation for WHIRR-87 (Parallelize Hadoop cluster creation)</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-154'>WHIRR-154</a>] - cassandra: expose RPC port, as well</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-155'>WHIRR-155</a>] - Support multiple versions of Cassandra</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-157'>WHIRR-157</a>] - Remove service name property</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-160'>WHIRR-160</a>] - Improve SSH key diagnostics</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-161'>WHIRR-161</a>] - Check that both SSH keys belong to the same pair</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-163'>WHIRR-163</a>] - Support environment variable interpolation in configuration properties</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-166'>WHIRR-166</a>] - Improve docs regarding private keys</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-174'>WHIRR-174</a>] - Fix ZooKeeper to allow stand-alone mode setups</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-178'>WHIRR-178</a>] - [Hadoop] Guard useradd against existing user account</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-181'>WHIRR-181</a>] - Add descriptions for CLI command options</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-187'>WHIRR-187</a>] - [HBase] Change hbase.tmp.dir to be in line with Hadoop service</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-190'>WHIRR-190</a>] - Create /tmp in HDFS for Pig</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-194'>WHIRR-194</a>] - Update the list of supported services on the home page </li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-202'>WHIRR-202</a>] - Improve instance template syntax checking</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-203'>WHIRR-203</a>] - General documentation improvements for 0.3.0</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-206'>WHIRR-206</a>] - [HBase] Extract strings to a HBaseServiceConstants interface</li>
+	</ul>
+
+	<h2>New Feature</h2>
+	<ul>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-25'>WHIRR-25</a>] - Add HBase service</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-117'>WHIRR-117</a>] - Composable services</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-176'>WHIRR-176</a>] - Set AWS credentials in the local site file for Hadoop S3 access</li>
+	</ul>
+
+	<h2>Task</h2>
+	<ul>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-196'>WHIRR-196</a>] - Ensure integration tests pass on all supported providers</li>
+	</ul>
+
+	<h2>Test</h2>
+	<ul>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-92'>WHIRR-92</a>] - Add a benchmark for Hadoop clusters</li>
+	</ul>
+
+
+	<h1>Release Notes - Whirr - Version 0.2.0</h1>
+
+	<h2>Bug</h2>
+	<ul>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-91'>WHIRR-91</a>] - Add DISCLAIMER file to CLI JAR</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-93'>WHIRR-93</a>] - Fail on checkstyle violation</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-97'>WHIRR-97</a>] - Lucid is not stable on EC2</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-101'>WHIRR-101</a>] - Hadoop on EC2 does not use the /mnt partition</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-102'>WHIRR-102</a>] - unknown service NPEs cli, should print the bad service to console</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-106'>WHIRR-106</a>] - improve logging in whirr cli</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-107'>WHIRR-107</a>] - Test failing due to not matching Amazon Linux AMI on EC2</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-108'>WHIRR-108</a>] - Fix checkstyle and rat violations</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-113'>WHIRR-113</a>] - Hadoop cluster instances should all start in the same location</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-114'>WHIRR-114</a>] - Support + character in version number</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-122'>WHIRR-122</a>] - whirr site has two FAQ links</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-126'>WHIRR-126</a>] - Deployment process does not deploy required test JARs</li>
+	</ul>
+
+	<h2>Improvement</h2>
+	<ul>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-52'>WHIRR-52</a>] - Allow a Hadoop MapReduce job to be run against a Hadoop Service running on Rackspace Cloud Servers</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-66'>WHIRR-66</a>] - Upgrade to jclouds 1.0-beta-7</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-89'>WHIRR-89</a>] - Support maven 3 builds</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-90'>WHIRR-90</a>] - Scripts should be versioned</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-103'>WHIRR-103</a>] - add more to .gitignore</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-104'>WHIRR-104</a>] - print available services in cli help string</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-105'>WHIRR-105</a>] - Add version command to the CLI</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-109'>WHIRR-109</a>] - Unit tests fail if there is no private key found at ~/.ssh/id_rsa </li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-110'>WHIRR-110</a>] - Create client-side Hadoop configuration file during cluster launch</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-112'>WHIRR-112</a>] - Expand documentation</li>
+	</ul>
+
+	<h2>New Feature</h2>
+	<ul>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-73'>WHIRR-73</a>] - Add a list command to the CLI</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-100'>WHIRR-100</a>] - Create a binary distribution of Whirr</li>
+	</ul>
+
+	        <h1>Release Notes - Whirr - Version 0.1.0</h1>
+
+	<h2>        Sub-task
+	</h2>
+	<ul>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-40'>WHIRR-40</a>] -         fill in getting started documentation - getting-started.confluence
+	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-77'>WHIRR-77</a>] -         Document and implement release process
+	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-78'>WHIRR-78</a>] -         Add KEYS file to distribution directory
+	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-85'>WHIRR-85</a>] -         Publish Maven artifacts to http://repository.apache.org
+	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-86'>WHIRR-86</a>] -         Update quick start documentation to work with release 0.1.0
+	</li>
+	</ul>
+
+	<h2>        Bug
+	</h2>
+	<ul>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-4'>WHIRR-4</a>] -         hadoop-cloud push command invokes proxy creation
+	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-37'>WHIRR-37</a>] -         Don't require manual installation of Apache RAT to compile
+	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-48'>WHIRR-48</a>] -         Fix RAT warnings due to site files
+	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-50'>WHIRR-50</a>] -         Cassandra POM should depend on top-level
+	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-65'>WHIRR-65</a>] -         Workaround bug 331 in jclouds (Some EC2ComputeService operations fail for stopped instances)
+	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-71'>WHIRR-71</a>] -         Only allow access to clusters from defined networks
+	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-79'>WHIRR-79</a>] -         Hadoop service is broken
+	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-82'>WHIRR-82</a>] -         Integration tests should not run on &quot;mvn install&quot;
+	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-84'>WHIRR-84</a>] -         Log4j is missing from the CLI JAR
+	</li>
+	</ul>
+
+	<h2>        Improvement
+	</h2>
+	<ul>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-8'>WHIRR-8</a>] -         Create ant build for running EC2 unit tests
+	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-9'>WHIRR-9</a>] -         Support additional security group option in hadoop-ec2 script
+	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-10'>WHIRR-10</a>] -         Create setup.py for EC2 cloud scripts
+	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-20'>WHIRR-20</a>] -         Generate RAT report
+	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-21'>WHIRR-21</a>] -         Enforce source code style
+	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-22'>WHIRR-22</a>] -         Separate unit and integration (system) tests
+	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-23'>WHIRR-23</a>] -         Upgrade to jclouds 1.0-beta-6 
+	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-26'>WHIRR-26</a>] -         Allow script locations to be overridden
+	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-31'>WHIRR-31</a>] -         Add Whirr quick start to README.txt and website (once it's live)
+	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-32'>WHIRR-32</a>] -         Update POM to point to Apache RAT 0.8-SNAPSHOT
+	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-34'>WHIRR-34</a>] -         Open up ports 50010 (JobTracker) and 50070 (NameNode) for the Hadoop Service
+	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-38'>WHIRR-38</a>] -         Add core javadoc
+	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-47'>WHIRR-47</a>] -         Create a Service factory
+	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-51'>WHIRR-51</a>] -         Allow the Hadoop service to be run on Rackspace Cloud servers
+	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-53'>WHIRR-53</a>] -         Adopt the standard Java SPI interface
+	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-54'>WHIRR-54</a>] -         Implement service/cdh
+	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-58'>WHIRR-58</a>] -         introduce naming consistency for cloud service providers
+	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-64'>WHIRR-64</a>] -         Unify ClusterSpec and ServiceSpec
+	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-70'>WHIRR-70</a>] -         decouple keypairs from the files that hold them
+	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-75'>WHIRR-75</a>] -         Use Commons Configuration to manage cluster specs
+	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-80'>WHIRR-80</a>] -         Clean up POM dependencies
+	</li>
+	</ul>
+
+	<h2>        New Feature
+	</h2>
+	<ul>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-3'>WHIRR-3</a>] -         Add support for EBS storage on EC2
+	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-5'>WHIRR-5</a>] -         Run namenode and jobtracker on separate EC2 instances
+	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-6'>WHIRR-6</a>] -         Write a Rackspace cloud provider
+	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-7'>WHIRR-7</a>] -         Add a ZooKeeper service to the cloud scripts
+	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-27'>WHIRR-27</a>] -         Add Cassandra service
+	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-33'>WHIRR-33</a>] -         Add a CLI
+	</li>
+	</ul>
+
+	<h2>        Task
+	</h2>
+	<ul>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-1'>WHIRR-1</a>] -         Import initial source code from Hadoop contrib
+	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-2'>WHIRR-2</a>] -         Import initial Java source code
+	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-19'>WHIRR-19</a>] -         Create project website
+	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-29'>WHIRR-29</a>] -         Add target directories to svn ignore
+	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-46'>WHIRR-46</a>] -         Release version 0.1.0
+	</li>
+	</ul>
+
     </body>
 </document>
