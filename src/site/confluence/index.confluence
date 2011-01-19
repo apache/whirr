@@ -14,9 +14,9 @@ h2. Which services and cloud providers are supported?
 Whirr uses [jclouds|http://code.google.com/p/jclouds/] for provisioning, so in principle it should support all the cloud providers that jclouds supports. The following table shows
 the cloud provider and service combinations that have been tested.
 
-||Cloud provider||Cassandra||Hadoop||ZooKeeper||
-|Amazon EC2|Yes|Yes|Yes|
-|Rackspace Cloud Servers|Yes|Yes|Yes|
+||Cloud provider||Cassandra||Hadoop||ZooKeeper||HBase||
+|Amazon EC2|Yes|Yes|Yes|Yes|
+|Rackspace Cloud Servers|Yes|Yes|Yes|Yes|
 
 h2. Download
 
