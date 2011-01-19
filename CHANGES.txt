@@ -68,6 +68,9 @@ Release 0.3.0 - 2011-01-15
     WHIRR-206. [HBase] Extract strings to a HBaseServiceConstants interface.
     (Lars George via tomwhite)
 
+    WHIRR-194. Update the list of supported services on the home page.
+    (asavu via tomwhite)
+
   BUG FIXES
 
     WHIRR-128. Fix DNS resolution for clients running within EC2.
