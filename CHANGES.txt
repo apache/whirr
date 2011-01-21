@@ -2,6 +2,11 @@ Apache Whirr Change Log
 
 Trunk (unreleased changes)
 
+  IMPROVEMENTS
+
+    WHIRR-139. upgrade to version 1 of the "enforcer" plugin (Jakob Homan 
+    via asavu)
+
 Release 0.3.0 - 2011-01-15
 
   NEW FEATURES
