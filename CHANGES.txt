@@ -16,6 +16,8 @@ Trunk (unreleased changes)
     WHIRR-170. Instances should be started in the order specified in 
     the template (tomwhite via asavu)
 
+    WHIRR-186. [HBase] Add version support configurable in properties file.
+
 Release 0.3.0 - 2011-01-15
 
   NEW FEATURES
