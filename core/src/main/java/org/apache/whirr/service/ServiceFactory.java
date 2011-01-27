@@ -56,7 +56,7 @@ public class ServiceFactory {
    * @return
    */
   public Set<String> availableServices() {
-    Set<String> result = Sets.newHashSet();
+    Set<String> result = Sets.newLinkedHashSet();
     for (Service s : serviceLoader) {
       result.add(s.getName());
     }

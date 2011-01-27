@@ -74,7 +74,7 @@ public class RolePredicates {
     return new Predicate<Instance>() {
       @Override
       public boolean apply(Instance instance) {
-        Set<String> copy = Sets.newHashSet(instance.getRoles());
+        Set<String> copy = Sets.newLinkedHashSet(instance.getRoles());
         copy.retainAll(roles);
         return !copy.isEmpty();
       }

@@ -20,8 +20,9 @@ package org.apache.whirr.service.cassandra.integration;
 
 import static org.junit.Assert.assertTrue;
 
+import com.google.common.collect.Sets;
+
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -99,7 +100,7 @@ public class CassandraServiceTest {
 
   @Test
   public void testInstances() throws Exception {
-    Set<String> endPoints = new HashSet<String>();
+    Set<String> endPoints = Sets.newLinkedHashSet();
     for (Instance instance : cluster.getInstances()) {
       Cassandra.Client client = client(instance);
       Map<String,List<String>> tr = client.describe_schema_versions();

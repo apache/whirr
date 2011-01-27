@@ -110,7 +110,7 @@ public class BootstrapClusterAction extends ScriptBasedClusterAction {
       futures.put(instanceTemplate, nodesFuture);
     }
     
-    Set<Instance> instances = Sets.newHashSet();
+    Set<Instance> instances = Sets.newLinkedHashSet();
     for (Entry<InstanceTemplate, Future<Set<? extends NodeMetadata>>> entry :
         futures.entrySet()) {
       Set<? extends NodeMetadata> nodes;
@@ -147,7 +147,7 @@ public class BootstrapClusterAction extends ScriptBasedClusterAction {
 
   private Set<Instance> getInstances(final Set<String> roles,
       Set<? extends NodeMetadata> nodes) {
-    return Sets.newHashSet(Collections2.transform(Sets.newHashSet(nodes),
+    return Sets.newLinkedHashSet(Collections2.transform(Sets.newLinkedHashSet(nodes),
         new Function<NodeMetadata, Instance>() {
       @Override
       public Instance apply(NodeMetadata node) {

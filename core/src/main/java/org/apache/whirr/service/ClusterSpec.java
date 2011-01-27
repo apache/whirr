@@ -20,15 +20,18 @@ package org.apache.whirr.service;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
+import static org.apache.whirr.ssh.KeyPair.sameKeyPair;
 import static org.jclouds.io.Payloads.newFilePayload;
 import static org.jclouds.io.Payloads.newStringPayload;
 import static org.jclouds.util.Utils.toStringAndClose;
-import static org.apache.whirr.ssh.KeyPair.sameKeyPair;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Objects;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import com.jcraft.jsch.JSch;
+import com.jcraft.jsch.JSchException;
+import com.jcraft.jsch.KeyPair;
 
 import java.io.File;
 import java.io.FileReader;
@@ -40,9 +43,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.jcraft.jsch.JSch;
-import com.jcraft.jsch.JSchException;
-import com.jcraft.jsch.KeyPair;
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
@@ -156,7 +156,7 @@ public class ClusterSpec {
     private int numberOfInstances;
 
     public InstanceTemplate(int numberOfInstances, String... roles) {
-      this(numberOfInstances, Sets.newHashSet(roles));
+      this(numberOfInstances, Sets.newLinkedHashSet(Lists.newArrayList(roles)));
     }
 
     public InstanceTemplate(int numberOfInstances, Set<String> roles) {
@@ -359,7 +359,7 @@ public class ClusterSpec {
   }
   
   public InstanceTemplate getInstanceTemplate(String... roles) {
-    return getInstanceTemplate(Sets.newHashSet(roles));
+    return getInstanceTemplate(Sets.newLinkedHashSet(Lists.newArrayList(roles)));
   }
   
   public String getServiceName() {
