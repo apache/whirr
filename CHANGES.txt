@@ -2,12 +2,19 @@ Apache Whirr Change Log
 
 Trunk (unreleased changes)
 
+  NEW FEATURES
+
   IMPROVEMENTS
 
     WHIRR-139. upgrade to version 1 of the "enforcer" plugin (Jakob Homan 
     via asavu)
 
     WHIRR-193. Recipe for a HBase Cluster. (asavu)
+
+  BUG FIXES
+
+    WHIRR-170. Instances should be started in the order specified in 
+    the template (tomwhite via asavu)
 
 Release 0.3.0 - 2011-01-15
 

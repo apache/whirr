@@ -26,7 +26,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.google.common.collect.Sets;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 
 import java.io.ByteArrayOutputStream;
@@ -103,8 +103,8 @@ public class LaunchClusterCommandTest {
 
     ClusterSpec expectedClusterSpec = ClusterSpec.withNoDefaults(conf);
     expectedClusterSpec.setInstanceTemplates(Lists.newArrayList(
-        new ClusterSpec.InstanceTemplate(1, Sets.newHashSet("role1", "role2")),
-        new ClusterSpec.InstanceTemplate(2, Sets.newHashSet("role3"))
+        new ClusterSpec.InstanceTemplate(1, ImmutableSet.of("role1", "role2")),
+        new ClusterSpec.InstanceTemplate(2, ImmutableSet.of("role3"))
     ));
     expectedClusterSpec.setServiceName("test-service");
     expectedClusterSpec.setProvider("rackspace");
