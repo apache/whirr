@@ -22,22 +22,21 @@
 # -q <zookeeper quorum>
 # -p <port>
 # -c <cloud provider>
+# -u <hbase tarball url>
 
 set -x
 set -e
 
-################################################################################
-# Initialize variables
-################################################################################
-
 ROLES=$1
 shift
 
+# get parameters
 MASTER_HOST=
 ZOOKEEKER_QUORUM=
-CLOUD_PROVIDER=
 PORT=
-while getopts "m:q:p:c:" OPTION; do
+CLOUD_PROVIDER=
+HBASE_TAR_URL=
+while getopts "m:q:p:c:u:" OPTION; do
   case $OPTION in
   m)
     MASTER_HOST="$OPTARG"
@@ -51,9 +50,13 @@ while getopts "m:q:p:c:" OPTION; do
   c)
     CLOUD_PROVIDER="$OPTARG"
     ;;
+  u)
+    HBASE_TAR_URL="$OPTARG"
+    ;;
   esac
 done
 
+# determine machine name
 case $CLOUD_PROVIDER in
   ec2)
     # Use public hostname for EC2
@@ -64,11 +67,22 @@ case $CLOUD_PROVIDER in
     ;;
 esac
 
-HBASE_VERSION=${HBASE_VERSION:-0.89.20100924}
-HBASE_HOME=/usr/local/hbase-$HBASE_VERSION
+# assign default URL if no other given (optional)
+HBASE_TAR_URL=${HBASE_TAR_URL:-http://archive.apache.org/dist/hbase/hbase-0.90.0/hbase-0.90.0.tar.gz}
+# derive details from the URL
+HBASE_TAR_FILE=${HBASE_TAR_URL##*/}
+# extract "version" or the name of the directory contained in the tarball,
+# but since hbase has used different namings use the directory instead.
+HBASE_VERSION=${HBASE_TAR_URL%/*.tar.gz}
+HBASE_VERSION=${HBASE_VERSION##*/}
+# simple check that we have a proper URL or default to use filename
+if [[ "${HBASE_VERSION:0:5}" != "hbase" ]]; then
+  HBASE_VERSION=${HBASE_TAR_FILE%.tar.gz}
+fi
+HBASE_HOME=/usr/local/$HBASE_VERSION
 HBASE_CONF_DIR=$HBASE_HOME/conf
 
-# Configure HBase by setting up disks and site file
+# configure hbase by setting up disks and site file
 function configure_hbase() {
   case $CLOUD_PROVIDER in
   ec2)
@@ -91,7 +105,7 @@ function configure_hbase() {
   ##############################################################################
   # Modify this section to customize your HBase cluster.
   ##############################################################################
-cat > $HBASE_HOME/conf/hbase-site.xml <<EOF
+  cat > $HBASE_CONF_DIR/hbase-site.xml <<EOF
 <?xml version="1.0"?>
 <?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
 <configuration>
@@ -125,13 +139,15 @@ cat > $HBASE_HOME/conf/hbase-site.xml <<EOF
 </property>
 </configuration>
 EOF
-# Override JVM options
-cat >> $HBASE_HOME/conf/hbase-env.sh <<EOF
+
+  # override JVM options
+  cat >> $HBASE_CONF_DIR/hbase-env.sh <<EOF
 export HBASE_MASTER_OPTS="-Xms1000m -Xmx1000m -Xmn256m -XX:+UseConcMarkSweepGC -XX:+AggressiveOpts -verbose:gc -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:/mnt/hbase/logs/hbase-master-gc.log"
 export HBASE_REGIONSERVER_OPTS="-Xms2000m -Xmx2000m -Xmn256m -XX:+UseConcMarkSweepGC -XX:CMSInitiatingOccupancyFraction=88 -XX:+AggressiveOpts -verbose:gc -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:/mnt/hbase/logs/hbase-regionserver-gc.log"
 EOF
-# Configure HBase for Ganglia
-cat > $HBASE_HOME/conf/hadoop-metrics.properties <<EOF
+
+  # configure hbase for ganglia
+  cat > $HBASE_CONF_DIR/hadoop-metrics.properties <<EOF
 dfs.class=org.apache.hadoop.metrics.ganglia.GangliaContext
 dfs.period=10
 dfs.servers=$MASTER_HOST:8649
@@ -143,11 +159,11 @@ jvm.period=10
 jvm.servers=$MASTER_HOST:8649
 EOF
 
-  # Update classpath to include HBase jars and config
+  # update classpath to include hbase jars and config
 #  cat >> $HADOOP_HOME/conf/hadoop-env.sh <<EOF
-#HADOOP_CLASSPATH="$HBASE_HOME/hbase-${HBASE_VERSION}.jar:$HBASE_HOME/lib/zookeeper-3.3.1.jar:$HBASE_HOME/conf"
+#HADOOP_CLASSPATH="$HBASE_HOME/${HBASE_VERSION}.jar:$HBASE_HOME/lib/zookeeper-3.3.1.jar:$HBASE_CONF_DIR"
 #EOF
-  # Configure Hadoop for Ganglia
+  # configure Hadoop for Ganglia
 #  cat > $HADOOP_HOME/conf/hadoop-metrics.properties <<EOF
 #dfs.class=org.apache.hadoop.metrics.ganglia.GangliaContext
 #dfs.period=10
@@ -160,21 +176,21 @@ EOF
 #mapred.servers=$MASTER_HOST:8649
 #EOF
 
-  # Keep PID files in a non-temporary directory
+  # keep PID files in a non-temporary directory
   sed -i -e "s|# export HBASE_PID_DIR=.*|export HBASE_PID_DIR=/var/run/hbase|" \
     $HBASE_CONF_DIR/hbase-env.sh
   mkdir -p /var/run/hbase
   chown -R hadoop:hadoop /var/run/hbase
 
-  # Set SSH options within the cluster
+  # set SSH options within the cluster
   sed -i -e 's|# export HBASE_SSH_OPTS=.*|export HBASE_SSH_OPTS="-o StrictHostKeyChecking=no"|' \
     $HBASE_CONF_DIR/hbase-env.sh
 
-  # Disable IPv6
+  # disable IPv6
   sed -i -e 's|# export HBASE_OPTS=.*|export HBASE_OPTS="-Djava.net.preferIPv4Stack=true"|' \
     $HBASE_CONF_DIR/hbase-env.sh
 
-  # HBase logs should be on the /mnt partition
+  # hbase logs should be on the /mnt partition
   sed -i -e 's|# export HBASE_LOG_DIR=.*|export HBASE_LOG_DIR=/var/log/hbase/logs|' \
     $HBASE_CONF_DIR/hbase-env.sh
   rm -rf /var/log/hbase
@@ -184,6 +200,7 @@ EOF
   chown -R hadoop:hadoop /var/log/hbase
 }
 
+# helper to start daemons, used below
 function start_daemon() {
   if which dpkg &> /dev/null; then
     AS_HADOOP="su -s /bin/bash - hadoop -c"

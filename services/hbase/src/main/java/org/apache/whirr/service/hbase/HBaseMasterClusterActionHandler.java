@@ -27,6 +27,8 @@ import com.google.common.io.Files;
 import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.Properties;
 
@@ -44,7 +46,7 @@ import org.jclouds.compute.ComputeServiceContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class HBaseMasterClusterActionHandler extends ClusterActionHandlerSupport {
+public class HBaseMasterClusterActionHandler extends HBaseClusterActionHandler {
 
   private static final Logger LOG =
     LoggerFactory.getLogger(HBaseMasterClusterActionHandler.class);
@@ -65,10 +67,13 @@ public class HBaseMasterClusterActionHandler extends ClusterActionHandlerSupport
     addRunUrl(event, "util/configure-hostnames",
       HBaseConstants.PARAM_PROVIDER, clusterSpec.getProvider());
     addRunUrl(event, "sun/java/install");
-    String hbaseInstallRunUrl = clusterSpec.getConfiguration().getString(
+    String hbaseInstallRunUrl = getConfiguration(clusterSpec).getString(
       HBaseConstants.KEY_INSTALL_RUNURL, HBaseConstants.SCRIPT_INSTALL);
-      addRunUrl(event, hbaseInstallRunUrl,
-        HBaseConstants.PARAM_PROVIDER, clusterSpec.getProvider());
+    String tarurl = getConfiguration(clusterSpec).getString(
+      HBaseConstants.KEY_TARBALL_URL);
+    addRunUrl(event, hbaseInstallRunUrl,
+      HBaseConstants.PARAM_PROVIDER, clusterSpec.getProvider(),
+      HBaseConstants.PARAM_TARBALL_URL, tarurl);
     event.setTemplateBuilderStrategy(new HBaseTemplateBuilderStrategy());
   }
 
@@ -86,16 +91,19 @@ public class HBaseMasterClusterActionHandler extends ClusterActionHandlerSupport
     FirewallSettings.authorizeIngress(computeServiceContext, instance, clusterSpec,
       MASTER_WEB_UI_PORT);
     FirewallSettings.authorizeIngress(computeServiceContext, instance, clusterSpec,
-      masterPublicAddress.getHostAddress(), MASTER_PORT);
+      MASTER_PORT);
 
-    String hbaseConfigureRunUrl = clusterSpec.getConfiguration().getString(
+    String hbaseConfigureRunUrl = getConfiguration(clusterSpec).getString(
       HBaseConstants.KEY_CONFIGURE_RUNURL, HBaseConstants.SCRIPT_POST_CONFIGURE);
     String master = DnsUtil.resolveAddress(masterPublicAddress.getHostAddress());
     String quorum = ZooKeeperCluster.getHosts(cluster);
-      addRunUrl(event, hbaseConfigureRunUrl, ROLE,
-        HBaseConstants.PARAM_MASTER, master,
-        HBaseConstants.PARAM_QUORUM, quorum,
-        HBaseConstants.PARAM_PROVIDER, clusterSpec.getProvider());
+    String tarurl = getConfiguration(clusterSpec).getString(
+      HBaseConstants.KEY_TARBALL_URL);
+    addRunUrl(event, hbaseConfigureRunUrl, ROLE,
+      HBaseConstants.PARAM_MASTER, master,
+      HBaseConstants.PARAM_QUORUM, quorum,
+      HBaseConstants.PARAM_PROVIDER, clusterSpec.getProvider(),
+      HBaseConstants.PARAM_TARBALL_URL, tarurl);
   }
 
   @Override
@@ -121,6 +129,7 @@ public class HBaseMasterClusterActionHandler extends ClusterActionHandlerSupport
   private Properties createClientSideProperties(InetAddress master, String quorum) throws IOException {
     Properties config = new Properties();
     config.setProperty(HBaseConstants.PROP_HBASE_ZOOKEEPER_QUORUM, quorum);
+    config.setProperty(HBaseConstants.PROP_HBASE_ZOOKEEPER_CLIENTPORT, "2181");
     return config;
   }
 

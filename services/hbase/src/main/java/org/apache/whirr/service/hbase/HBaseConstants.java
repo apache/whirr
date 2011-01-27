@@ -22,7 +22,7 @@ public final class HBaseConstants {
 
   public static final String KEY_INSTALL_RUNURL = "whirr.hbase.install-runurl";
   public static final String KEY_CONFIGURE_RUNURL = "whirr.hbase.configure-runurl";
-  public static final String KEY_VERSION = "whirr.hbase.version";
+  public static final String KEY_TARBALL_URL = "whirr.hbase.tarball.url";
 
   public static final String SCRIPT_INSTALL = "apache/hbase/install";
   public static final String SCRIPT_POST_CONFIGURE = "apache/hbase/post-configure";
@@ -31,11 +31,13 @@ public final class HBaseConstants {
   public static final String PARAM_MASTER = "-m";
   public static final String PARAM_QUORUM = "-q";
   public static final String PARAM_PORT = "-p";
-  public static final String PARAM_VERSION = "-v";
+  public static final String PARAM_TARBALL_URL = "-u";
 
   public static final String PROP_HBASE_ZOOKEEPER_QUORUM = "hbase.zookeeper.quorum";
+  public static final String PROP_HBASE_ZOOKEEPER_CLIENTPORT = "hbase.zookeeper.property.clientPort";
 
   public static final String FILE_HBASE_SITE_XML = "hbase-site.xml";
+  public static final String FILE_HBASE_DEFAULT_PROPERTIES = "whirr-hbase-default.properties";
 
   private HBaseConstants() {
   }

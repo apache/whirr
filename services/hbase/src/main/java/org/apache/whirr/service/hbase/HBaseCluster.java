@@ -26,7 +26,7 @@ import java.net.InetAddress;
 public class HBaseCluster {
   public static InetAddress getMasterPublicAddress(Cluster cluster) {
     return cluster.getInstanceMatching(
-        RolePredicates.role(HBaseMasterClusterActionHandler.ROLE))
+      RolePredicates.role(HBaseMasterClusterActionHandler.ROLE))
         .getPublicAddress();
   }
 }

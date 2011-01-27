@@ -37,7 +37,7 @@ public class HBaseTemplateBuilderStrategy extends TemplateBuilderStrategy {
     if ("ec2".equals(clusterSpec.getProvider())
         && clusterSpec.getHardwareId() == null) {
       // micro is too small for Hadoop (even for testing)
-      templateBuilder.fromHardware(EC2Hardware.M1_SMALL);
+      templateBuilder.fromHardware(EC2Hardware.M1_LARGE);
     }
   }
 }
