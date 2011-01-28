@@ -27,8 +27,6 @@ import com.google.common.io.Files;
 import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map.Entry;
 import java.util.Properties;
 
@@ -36,7 +34,6 @@ import org.apache.whirr.net.DnsUtil;
 import org.apache.whirr.service.Cluster;
 import org.apache.whirr.service.Cluster.Instance;
 import org.apache.whirr.service.ClusterActionEvent;
-import org.apache.whirr.service.ClusterActionHandlerSupport;
 import org.apache.whirr.service.ClusterSpec;
 import org.apache.whirr.service.ComputeServiceContextBuilder;
 import org.apache.whirr.service.hadoop.HadoopProxy;
@@ -130,6 +127,8 @@ public class HBaseMasterClusterActionHandler extends HBaseClusterActionHandler {
     Properties config = new Properties();
     config.setProperty(HBaseConstants.PROP_HBASE_ZOOKEEPER_QUORUM, quorum);
     config.setProperty(HBaseConstants.PROP_HBASE_ZOOKEEPER_CLIENTPORT, "2181");
+    config.setProperty("hadoop.socks.server", "localhost:6666");
+    config.setProperty("hadoop.rpc.socket.factory.class.default", "org.apache.hadoop.net.SocksSocketFactory");
     return config;
   }
 

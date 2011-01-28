@@ -17,6 +17,9 @@ Trunk (unreleased changes)
     the template (tomwhite via asavu)
 
     WHIRR-186. [HBase] Add version support configurable in properties file.
+    (largsgeorge)
+
+    WHIRR-201. [HBase] Integration test fails. (largsgeorge via tomwhite)
 
 Release 0.3.0 - 2011-01-15
 

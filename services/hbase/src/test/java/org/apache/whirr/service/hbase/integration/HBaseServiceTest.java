@@ -20,13 +20,14 @@ package org.apache.whirr.service.hbase.integration;
 
 import static org.junit.Assert.assertTrue;
 
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.hbase.HBaseTestingUtility;
-import org.apache.hadoop.hbase.client.HTable;
+import org.apache.hadoop.hbase.HColumnDescriptor;
+import org.apache.hadoop.hbase.HTableDescriptor;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.client.ResultScanner;
 import org.apache.hadoop.hbase.client.Scan;
+import org.apache.hadoop.hbase.rest.client.RemoteAdmin;
+import org.apache.hadoop.hbase.rest.client.RemoteHTable;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -34,10 +35,14 @@ import org.junit.Test;
 
 public class HBaseServiceTest {
 
+  private static final String TABLE = "testtable";
   private static final byte [] ROW = Bytes.toBytes("testRow");
-  private static final byte [] FAMILY = Bytes.toBytes("testFamily");
+  private static final byte [] FAMILY1 = Bytes.toBytes("testFamily1");
+  private static final byte [] FAMILY2 = Bytes.toBytes("testFamily2");
   private static final byte [] QUALIFIER = Bytes.toBytes("testQualifier");
   private static final byte [] VALUE = Bytes.toBytes("testValue");
+
+  private static RemoteAdmin remoteAdmin = null;
 
   private static HBaseServiceController controller =
     HBaseServiceController.getInstance();
@@ -45,6 +50,7 @@ public class HBaseServiceTest {
   @BeforeClass
   public static void setUp() throws Exception {
     controller.ensureClusterRunning();
+    remoteAdmin = controller.getRemoteAdmin();
   }
 
   @AfterClass
@@ -54,19 +60,26 @@ public class HBaseServiceTest {
 
   @Test
   public void test() throws Exception {
-    Configuration conf = controller.getConfiguration();
-    HBaseTestingUtility testUtil = new HBaseTestingUtility(conf);
-    byte [] table = Bytes.toBytes("testtable");
-    HTable ht = testUtil.createTable(table, FAMILY);
+    HTableDescriptor td = new HTableDescriptor(TABLE);
+    HColumnDescriptor cd = new HColumnDescriptor(FAMILY1);
+    td.addFamily(cd);
+    cd = new HColumnDescriptor(FAMILY2);
+    td.addFamily(cd);
+    remoteAdmin.createTable(td);
+
+    RemoteHTable table = controller.getRemoteHTable(TABLE);
+
     Put put = new Put(ROW);
-    put.add(FAMILY, QUALIFIER, VALUE);
-    ht.put(put);
+    put.add(FAMILY1, QUALIFIER, VALUE);
+    table.put(put);
+
     Scan scan = new Scan();
-    scan.addColumn(FAMILY, table);
-    ResultScanner scanner = ht.getScanner(scan);
+    scan.addColumn(FAMILY2, Bytes.toBytes("bogus"));
+    ResultScanner scanner = table.getScanner(scan);
     Result result = scanner.next();
     assertTrue("Expected null result", result == null);
     scanner.close();
+
     System.out.println("Done.");
   }
 
