@@ -18,14 +18,10 @@
 bin=`dirname "$0"`
 bin=`cd "$bin"; pwd`
 
-release_jar=$bin/../whirr-cli-*.jar
-snapshot_jar=$bin/../cli/target/whirr-cli-*-SNAPSHOT.jar
-
-if [ -f $release_jar ]; then
-  java -jar $release_jar "$@"
-elif [ -f $snapshot_jar ]; then
-  java -jar $snapshot_jar "$@"
+if [ -d $bin/../cli/target/lib ]; then
+  classpath="$bin/..:$bin/../cli/target/lib/*:$bin/../cli/target/*"
 else
-  echo "No CLI JAR found."
-  exit 1
+  classpath="$bin/..:$bin/../lib/*"
 fi
+
+java -cp $classpath org.apache.whirr.cli.Main "$@"

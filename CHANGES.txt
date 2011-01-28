@@ -11,6 +11,8 @@ Trunk (unreleased changes)
 
     WHIRR-193. Recipe for a HBase Cluster. (asavu)
 
+    WHIRR-219. Support dynamic addition of services to CLI. (tomwhite)
+
   BUG FIXES
 
     WHIRR-170. Instances should be started in the order specified in 
