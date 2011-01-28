@@ -21,18 +21,24 @@ package org.apache.whirr.service.hbase.integration;
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.HConstants;
-import org.apache.hadoop.hbase.client.HTable;
 import org.apache.hadoop.hbase.client.ResultScanner;
 import org.apache.hadoop.hbase.client.Scan;
+import org.apache.hadoop.hbase.rest.client.Client;
+import org.apache.hadoop.hbase.rest.client.RemoteAdmin;
+import org.apache.hadoop.hbase.rest.client.RemoteHTable;
 import org.apache.whirr.service.Cluster;
 import org.apache.whirr.service.ClusterSpec;
+import org.apache.whirr.service.RolePredicates;
 import org.apache.whirr.service.Service;
 import org.apache.whirr.service.hadoop.HadoopProxy;
+import org.apache.whirr.service.hbase.HBaseRestServerClusterActionHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.util.Map.Entry;
 
 public class HBaseServiceController {
@@ -52,6 +58,9 @@ public class HBaseServiceController {
   private Service service;
   private HadoopProxy proxy;
   private Cluster cluster;
+  private RemoteHTable remoteMetaTable;
+  private RemoteAdmin remoteAdmin;
+  private Client restClient;
 
   private HBaseServiceController() {
   }
@@ -81,29 +90,34 @@ public class HBaseServiceController {
     proxy.start();
 
     Configuration conf = getConfiguration();
-    waitForMaster(conf);
+
+    InetAddress restAddress = cluster.getInstanceMatching(RolePredicates.role(
+      HBaseRestServerClusterActionHandler.ROLE)).getPublicAddress();
+    restClient = new Client(new org.apache.hadoop.hbase.rest.client.Cluster()
+      .add(restAddress.getHostName(), HBaseRestServerClusterActionHandler.
+        PORT));
+    remoteAdmin = new RemoteAdmin(restClient, conf);
+    remoteMetaTable = new RemoteHTable(restClient, conf,
+      HConstants.META_TABLE_NAME, null);
+    waitForMaster();
     running = true;
   }
 
-  public Cluster getCluster() {
-    return cluster;
-  }
-
   public Configuration getConfiguration() {
-    Configuration conf = new Configuration();
+    Configuration conf = HBaseConfiguration.create();
     for (Entry<Object, Object> entry : cluster.getConfiguration().entrySet()) {
       conf.set(entry.getKey().toString(), entry.getValue().toString());
     }
     return conf;
   }
 
-  private static void waitForMaster(Configuration conf) throws IOException {
+  private void waitForMaster() throws IOException {
     LOG.info("Waiting for master...");
-    HTable t = new HTable(conf, HConstants.META_TABLE_NAME);
-    ResultScanner s = t.getScanner(new Scan());
+    ResultScanner s = remoteMetaTable.getScanner(new Scan());
     while (s.next() != null) {
       continue;
     }
+    s.close();
     LOG.info("Master reported in. Continuing.");
   }
 
@@ -112,8 +126,17 @@ public class HBaseServiceController {
     if (proxy != null) {
       proxy.stop();
     }
-    service.destroyCluster(clusterSpec);
+    if (service != null) {
+      service.destroyCluster(clusterSpec);
+    }
     running = false;
   }
 
+  public RemoteAdmin getRemoteAdmin() {
+    return remoteAdmin;
+  }
+
+  public RemoteHTable getRemoteHTable(String tableName) {
+    return new RemoteHTable(restClient, getConfiguration(), tableName, null);
+  }
 }
