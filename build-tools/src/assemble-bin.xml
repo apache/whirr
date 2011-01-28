@@ -23,9 +23,6 @@
   </formats>
   <moduleSets>
     <moduleSet>
-      <excludes>
-        <exclude>org.apache.whirr:whirr-cli</exclude>
-      </excludes>
       <binaries>
         <includeDependencies>true</includeDependencies>
         <outputDirectory>lib</outputDirectory>
@@ -33,15 +30,6 @@
         <dependencySets>
           <dependencySet/>
         </dependencySets>
-      </binaries>
-    </moduleSet>
-    <moduleSet>
-      <includes>
-        <include>org.apache.whirr:whirr-cli</include>
-      </includes>
-      <binaries>
-        <outputDirectory>.</outputDirectory>
-        <unpack>false</unpack>
       </binaries>
     </moduleSet>
   </moduleSets>
