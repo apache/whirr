@@ -23,6 +23,9 @@ Trunk (unreleased changes)
 
     WHIRR-201. [HBase] Integration test fails. (largsgeorge via tomwhite)
 
+    WHIRR-217. Log files should not be included in tarball or checked 
+    by RAT (tomwhite via asavu)
+
 Release 0.3.0 - 2011-01-15
 
   NEW FEATURES
