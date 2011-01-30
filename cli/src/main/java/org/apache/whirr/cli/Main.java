@@ -19,6 +19,12 @@
 package org.apache.whirr.cli;
 
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
+import org.apache.whirr.cli.command.DestroyClusterCommand;
+import org.apache.whirr.cli.command.LaunchClusterCommand;
+import org.apache.whirr.cli.command.ListClusterCommand;
+import org.apache.whirr.cli.command.VersionCommand;
+import org.apache.whirr.service.ClusterActionHandler;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,13 +32,8 @@ import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeSet;
-
-import org.apache.whirr.cli.command.DestroyClusterCommand;
-import org.apache.whirr.cli.command.LaunchClusterCommand;
-import org.apache.whirr.cli.command.ListClusterCommand;
-import org.apache.whirr.cli.command.VersionCommand;
-import org.apache.whirr.service.ServiceFactory;
+import java.util.ServiceLoader;
+import java.util.SortedSet;
 
 /**
  * The entry point for the Whirr CLI.
@@ -74,13 +75,23 @@ public class Main {
           command.getDescription());
     }
     stream.println();
-    stream.println("Available services:");
-    ServiceFactory serviceFactory = new ServiceFactory();
-    for (String serviceName : new TreeSet<String>(
-        serviceFactory.availableServices())) {
-      stream.println("  " + serviceName);
+    stream.println("Available roles for instances:");
+    for(String roleName : getSortedRoleNames()) {
+      stream.println("  " + roleName);
     }
   }
+
+  private static SortedSet<String> getSortedRoleNames() {
+    ServiceLoader<ClusterActionHandler> loader =
+     ServiceLoader.load(ClusterActionHandler.class);
+
+    SortedSet<String> roles = Sets.newTreeSet();
+    for(ClusterActionHandler handler : loader) {
+      roles.add(handler.getRole());
+    }
+    return roles;
+  }
+
   public static void main(String... args) throws Exception {
     Main main = new Main(
         new VersionCommand(),
