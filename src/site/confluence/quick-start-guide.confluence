@@ -38,7 +38,7 @@ directory of the distribution.
 
 {code}
 whirr.cluster-name=myhadoopcluster
-whirr.instance-templates=1 jt+nn,1 dn+tt
+whirr.instance-templates=1 hadoop-jobtracker+hadoop-namenode,1 hadoop-datanode+hadoop-tasktracker
 whirr.provider=ec2
 whirr.identity=${env:AWS_ACCESS_KEY_ID}
 whirr.credential=${env:AWS_SECRET_ACCESS_KEY}
@@ -153,7 +153,7 @@ for properties is not reflected in the command line argument):
 {code}
 % bin/whirr launch-cluster \
     --cluster-name=myhadoopcluster \
-    --instance-templates='1 jt+nn,1 dn+tt' \
+    --instance-templates='1 hadoop-jobtracker+hadoop-namenode,1 hadoop-datanode+hadoop-tasktracker' \
     --provider=ec2 \
     --identity=$AWS_ACCESS_KEY_ID \
     --credential=$AWS_SECRET_ACCESS_KEY \

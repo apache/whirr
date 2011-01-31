@@ -23,7 +23,7 @@ import org.apache.whirr.service.ClusterActionHandlerSupport;
 // Currently the jobtracker is started by HadoopNameNodeClusterActionHandler
 public class HadoopJobTrackerClusterActionHandler extends ClusterActionHandlerSupport {
 
-  public static final String ROLE = "jt";
+  public static final String ROLE = "hadoop-jobtracker";
   
   @Override
   public String getRole() {

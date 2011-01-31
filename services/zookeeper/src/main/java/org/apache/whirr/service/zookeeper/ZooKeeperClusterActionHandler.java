@@ -42,7 +42,7 @@ public class ZooKeeperClusterActionHandler extends ClusterActionHandlerSupport {
   private static final Logger LOG =
     LoggerFactory.getLogger(ZooKeeperClusterActionHandler.class);
     
-  public static final String ZOOKEEPER_ROLE = "zk";
+  public static final String ZOOKEEPER_ROLE = "zookeeper";
   private static final int CLIENT_PORT = 2181;
 
   @Override

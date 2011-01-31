@@ -32,7 +32,7 @@ import org.apache.whirr.service.ClusterSpec;
 
 public class HadoopDataNodeClusterActionHandler extends ClusterActionHandlerSupport {
 
-  public static final String ROLE = "dn";
+  public static final String ROLE = "hadoop-datanode";
   
   @Override
   public String getRole() {
@@ -64,7 +64,7 @@ public class HadoopDataNodeClusterActionHandler extends ClusterActionHandlerSupp
     String hadoopConfigureRunUrl = clusterSpec.getConfiguration().getString(
         "whirr.hadoop-configure-runurl", "apache/hadoop/post-configure");
     addRunUrl(event, hadoopConfigureRunUrl,
-        "dn,tt",
+        "hadoop-datanode,hadoop-tasktracker",
         "-n", DnsUtil.resolveAddress(namenodePublicAddress.getHostAddress()),
         "-j", DnsUtil.resolveAddress(jobtrackerPublicAddress.getHostAddress()),
         "-c", clusterSpec.getProvider());
