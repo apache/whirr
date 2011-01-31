@@ -16,6 +16,9 @@ Trunk (unreleased changes)
     WHIRR-195. Display available roles instead of service names 
     when running ./bin/whirr (asavu)
 
+    WHIRR-199. Add aliases for short role names like nn, jt, tt, dn, zk.
+    (asavu via tomwhite)
+
   BUG FIXES
 
     WHIRR-170. Instances should be started in the order specified in 

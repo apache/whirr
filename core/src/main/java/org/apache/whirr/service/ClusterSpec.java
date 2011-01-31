@@ -18,13 +18,6 @@
 
 package org.apache.whirr.service;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
-import static org.apache.whirr.ssh.KeyPair.sameKeyPair;
-import static org.jclouds.io.Payloads.newFilePayload;
-import static org.jclouds.io.Payloads.newStringPayload;
-import static org.jclouds.util.Utils.toStringAndClose;
-
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Objects;
 import com.google.common.collect.Lists;
@@ -32,17 +25,6 @@ import com.google.common.collect.Sets;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.KeyPair;
-
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
@@ -52,6 +34,27 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.text.StrLookup;
 import org.jclouds.io.Payload;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
+import static org.apache.whirr.ssh.KeyPair.sameKeyPair;
+import static org.jclouds.io.Payloads.newFilePayload;
+import static org.jclouds.io.Payloads.newStringPayload;
+import static org.jclouds.util.Utils.toStringAndClose;
+
 
 /**
  * This class represents the specification of a cluster. It is used to describe
@@ -76,10 +79,8 @@ public class ClusterSpec {
       "service to use. E.g. hadoop."),
       
     INSTANCE_TEMPLATES(String.class, false, "The number of instances " +
-      "to launch for each set of roles. E.g. 1 nn+jt,10 dn+tt means " + 
-      "one instance with the roles nn (namenode) and jt (jobtracker)," +
-      " and ten instances each with the roles dn (datanode) and tt " + 
-      "(tasktracker)."),
+      "to launch for each set of roles. E.g. 1 hadoop-namenode+" +
+      "hadoop-jobtracker, 10 hadoop-datanode+hadoop-tasktracker"),
       
     PROVIDER(String.class, false, "The name of the cloud provider. " + 
       "E.g. ec2, cloudservers"),
@@ -152,6 +153,22 @@ public class ClusterSpec {
    * This is done by specifying the number of instances in each role.
    */
   public static class InstanceTemplate {
+    private static Map<String, String> aliases = new HashMap<String, String>();
+    private static final Logger LOG = LoggerFactory.getLogger(InstanceTemplate.class);
+
+    static {
+      /*
+       * WARNING: this is not a generic aliasing mechanism. This code
+       * should be removed in the following releases and it's
+       * used only temporary to deprecate short legacy role names.
+       */
+      aliases.put("nn", "hadoop-namenode");
+      aliases.put("jt", "hadoop-jobtracker");
+      aliases.put("dn", "hadoop-datanode");
+      aliases.put("tt", "hadoop-tasktracker");
+      aliases.put("zk", "zookeeper");
+    }
+
     private Set<String> roles;
     private int numberOfInstances;
 
@@ -164,8 +181,23 @@ public class ClusterSpec {
         checkArgument(!StringUtils.contains(role, " "),
             "Role '%s' may not contain space characters.", role);
       }
+
+      this.roles = replaceAliases(roles);
       this.numberOfInstances = numberOfInstances;
-      this.roles = roles;
+    }
+
+    private Set<String> replaceAliases(Set<String> roles) {
+      Set<String> newRoles = Sets.newLinkedHashSet();
+      for(String role : roles) {
+        if (aliases.containsKey(role)) {
+          LOG.warn("Role name '{}' is deprecated, use '{}'",
+              role, aliases.get(role));
+          newRoles.add(aliases.get(role));
+        } else {
+          newRoles.add(role);
+        }
+      }
+      return newRoles;
     }
 
     public Set<String> getRoles() {

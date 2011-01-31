@@ -25,15 +25,18 @@ import static org.junit.Assert.assertThat;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.google.common.io.Files;
 import com.jcraft.jsch.JSchException;
 
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
@@ -205,6 +208,15 @@ public class ClusterSpecTest {
   @Test(expected = IllegalArgumentException.class)
   public void testRoleMayNotContainSpaces() {
     new InstanceTemplate(1, "a b");
+  }
+
+  @Test
+  public void testApplyRoleAliases() {
+    InstanceTemplate template = InstanceTemplate.parse("1 nn+jt+tt+dn+zk").get(0);
+    Set<String> expected = Sets.newLinkedHashSet(Arrays.asList(new String[]{
+        "hadoop-namenode", "hadoop-jobtracker", "hadoop-tasktracker",
+        "hadoop-datanode", "zookeeper"}));
+    assertThat(template.getRoles(), is(expected));
   }
 
 }

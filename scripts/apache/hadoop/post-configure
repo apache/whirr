@@ -393,20 +393,20 @@ configure_hadoop
 
 for role in $(echo "$ROLES" | tr "," "\n"); do
   case $role in
-  nn)
+  hadoop-namenode)
     setup_web
     start_namenode
     ;;
-  snn)
+  hadoop-secondarynamenode)
     start_daemon secondarynamenode
     ;;
-  jt)
+  hadoop-jobtracker)
     start_daemon jobtracker
     ;;
-  dn)
+  hadoop-datanode)
     start_daemon datanode
     ;;
-  tt)
+  hadoop-tasktracker)
     start_daemon tasktracker
     ;;
   esac

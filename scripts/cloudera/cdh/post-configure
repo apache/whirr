@@ -60,10 +60,10 @@ HADOOP=hadoop-${HADOOP_VERSION:-0.20}
 HADOOP_CONF_DIR=/etc/$HADOOP/conf.dist
 for role in $(echo "$ROLES" | tr "," "\n"); do
   case $role in
-  nn)
+  hadoop-namenode)
     NN_HOST=$SELF_HOST
     ;;
-  jt)
+  hadoop-jobtracker)
     JT_HOST=$SELF_HOST
     ;;
   esac
@@ -458,21 +458,21 @@ configure_hadoop
 
 for role in $(echo "$ROLES" | tr "," "\n"); do
   case $role in
-  nn)
+  hadoop-namenode)
     #install_hue
     start_namenode
     #start_hue
     ;;
-  snn)
+  hadoop-secondarynamenode)
     start_daemon secondarynamenode
     ;;
-  jt)
+  hadoop-jobtracker)
     start_daemon jobtracker
     ;;
-  dn)
+  hadoop-datanode)
     start_daemon datanode
     ;;
-  tt)
+  hadoop-tasktracker)
     start_daemon tasktracker
     ;;
   esac

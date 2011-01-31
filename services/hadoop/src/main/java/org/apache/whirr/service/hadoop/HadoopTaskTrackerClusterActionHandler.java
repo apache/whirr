@@ -23,7 +23,7 @@ import org.apache.whirr.service.ClusterActionHandlerSupport;
 // Currently the tasktracker is started by HadoopDataNodeClusterActionHandler
 public class HadoopTaskTrackerClusterActionHandler extends ClusterActionHandlerSupport {
 
-  public static final String ROLE = "tt";
+  public static final String ROLE = "hadoop-tasktracker";
   
   @Override
   public String getRole() {

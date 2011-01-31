@@ -47,7 +47,7 @@ public class HadoopNameNodeClusterActionHandler extends ClusterActionHandlerSupp
   private static final Logger LOG =
     LoggerFactory.getLogger(HadoopNameNodeClusterActionHandler.class);
   
-  public static final String ROLE = "nn";
+  public static final String ROLE = "hadoop-namenode";
   
   public static final int WEB_PORT = 80;
   public static final int NAMENODE_PORT = 8020;
@@ -103,7 +103,7 @@ public class HadoopNameNodeClusterActionHandler extends ClusterActionHandlerSupp
     String hadoopConfigureRunUrl = clusterSpec.getConfiguration().getString(
         "whirr.hadoop-configure-runurl", "apache/hadoop/post-configure");
     addRunUrl(event, hadoopConfigureRunUrl,
-        "nn,jt",
+        "hadoop-namenode,hadoop-jobtracker",
         "-n", DnsUtil.resolveAddress(namenodePublicAddress.getHostAddress()),
         "-j", DnsUtil.resolveAddress(jobtrackerPublicAddress.getHostAddress()),
         "-c", clusterSpec.getProvider());
