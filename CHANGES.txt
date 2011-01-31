@@ -19,6 +19,8 @@ Trunk (unreleased changes)
     WHIRR-199. Add aliases for short role names like nn, jt, tt, dn, zk.
     (asavu via tomwhite)
 
+    WHIRR-183. ZooKeeper Data Directory Cleanup. (asavu via tomwhite)
+
   BUG FIXES
 
     WHIRR-170. Instances should be started in the order specified in 
