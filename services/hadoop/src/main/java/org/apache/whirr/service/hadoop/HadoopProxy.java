@@ -20,8 +20,8 @@ package org.apache.whirr.service.hadoop;
 
 import static com.google.common.base.Preconditions.checkState;
 
+import com.google.common.base.Charsets;
 import com.google.common.collect.Iterables;
-import com.google.common.io.ByteStreams;
 import com.google.common.io.Files;
 
 import java.io.BufferedReader;
@@ -47,16 +47,15 @@ public class HadoopProxy {
   }
   
   public String[] getProxyCommand() throws IOException {
-    checkState(clusterSpec.getPrivateKey() != null, "privateKey is needed");
-    File identity;
-    if (clusterSpec.getPrivateKey().getRawContent() instanceof File) {
-      identity = File.class.cast(clusterSpec.getPrivateKey().getRawContent());
-    } else {
+    checkState(clusterSpec.getPrivateKeyFile() != null ||
+          clusterSpec.getPrivateKey() != null, "privateKey is needed");
+    File identity = clusterSpec.getPrivateKeyFile();
+    if (identity == null){
       identity = File.createTempFile("hadoop", "key");
       identity.deleteOnExit();
-      Files.write(ByteStreams.toByteArray(clusterSpec.getPrivateKey().getInput()), identity);
-      KeyPair.setPermissionsTo600(identity);
+      Files.write(clusterSpec.getPrivateKey(), identity, Charsets.UTF_8);
     }
+    KeyPair.setPermissionsTo600(identity);
     String user = Iterables.get(cluster.getInstances(), 0).getLoginCredentials().identity;
     InetAddress namenode = HadoopCluster.getNamenodePublicAddress(cluster);
     String server = DnsUtil.resolveAddress(namenode.getHostAddress());

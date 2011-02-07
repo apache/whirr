@@ -18,7 +18,7 @@
 
 package org.apache.whirr.cluster.actions;
 
-import static org.jclouds.compute.predicates.NodePredicates.withTag;
+import static org.jclouds.compute.predicates.NodePredicates.inGroup;
 
 import java.io.IOException;
 
@@ -51,7 +51,7 @@ public class DestroyClusterAction extends ClusterAction {
     LOG.info("Destroying " + clusterSpec.getClusterName() + " cluster");
     ComputeService computeService =
       ComputeServiceContextBuilder.build(clusterSpec).getComputeService();
-    computeService.destroyNodesMatching(withTag(clusterSpec.getClusterName()));
+    computeService.destroyNodesMatching(inGroup(clusterSpec.getClusterName()));
     LOG.info("Cluster {} destroyed", clusterSpec.getClusterName());
     return null;
   }

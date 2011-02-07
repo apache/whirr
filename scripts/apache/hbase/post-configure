@@ -58,7 +58,7 @@ done
 
 # determine machine name
 case $CLOUD_PROVIDER in
-  ec2)
+  ec2 | aws-ec2 )
     # Use public hostname for EC2
     SELF_HOST=`wget -q -O - http://169.254.169.254/latest/meta-data/public-hostname`
     ;;
@@ -85,7 +85,7 @@ HBASE_CONF_DIR=$HBASE_HOME/conf
 # configure hbase by setting up disks and site file
 function configure_hbase() {
   case $CLOUD_PROVIDER in
-  ec2)
+  ec2 | aws-ec2 )
     MOUNT=/mnt
     ;;
   *)

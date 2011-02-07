@@ -18,9 +18,6 @@
 
 package org.apache.whirr.service.jclouds;
 
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
-
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -31,10 +28,13 @@ import java.util.Set;
 import org.apache.commons.io.IOUtils;
 import org.apache.whirr.service.Cluster.Instance;
 import org.apache.whirr.service.ClusterSpec;
-import org.jclouds.aws.ec2.EC2Client;
-import org.jclouds.aws.ec2.domain.IpProtocol;
-import org.jclouds.aws.ec2.util.EC2Utils;
+import org.jclouds.aws.util.AWSUtils;
 import org.jclouds.compute.ComputeServiceContext;
+import org.jclouds.ec2.EC2Client;
+import org.jclouds.ec2.domain.IpProtocol;
+
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 
 /**
  * Utility functions for controlling firewall settings for a cluster.
@@ -78,11 +78,12 @@ public class FirewallSettings {
   private static void authorizeIngress(ComputeServiceContext computeServiceContext,
       Set<Instance> instances, ClusterSpec clusterSpec, List<String> cidrs, int... ports) {
     
-    if (clusterSpec.getProvider().equals("ec2")) {
+    if (computeServiceContext.getProviderSpecificContext().getApi() instanceof
+          EC2Client) {
       // This code (or something like it) may be added to jclouds (see
       // http://code.google.com/p/jclouds/issues/detail?id=336).
       // Until then we need this temporary workaround.
-      String region = EC2Utils.parseHandle(Iterables.get(instances, 0).getId())[0];
+      String region = AWSUtils.parseHandle(Iterables.get(instances, 0).getId())[0];
       EC2Client ec2Client = EC2Client.class.cast(
           computeServiceContext.getProviderSpecificContext().getApi());
       String groupName = "jclouds#" + clusterSpec.getClusterName() + "#" + region;

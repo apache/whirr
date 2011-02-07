@@ -41,8 +41,10 @@ import org.apache.whirr.service.ServiceFactory;
 import org.apache.whirr.ssh.KeyPair;
 import org.hamcrest.Matcher;
 import org.jclouds.compute.domain.NodeMetadata;
+import org.jclouds.compute.domain.NodeMetadataBuilder;
 import org.jclouds.compute.domain.NodeState;
 import org.jclouds.compute.domain.internal.NodeMetadataImpl;
+import org.jclouds.domain.LocationBuilder;
 import org.jclouds.domain.LocationScope;
 import org.jclouds.domain.internal.LocationImpl;
 import org.junit.Before;
@@ -82,20 +84,18 @@ public class ListClusterCommandTest {
     ServiceFactory factory = mock(ServiceFactory.class);
     Service service = mock(Service.class);
     when(factory.create((String) any())).thenReturn(service);
-    NodeMetadata node1 = new NodeMetadataImpl(null, "name1", "id1",
-        new LocationImpl(LocationScope.PROVIDER, "location-id1",
-            "location-desc1", null),
-        null, Collections.<String,String>emptyMap(), null, null, "image-id",
-        null, NodeState.RUNNING,
-        Lists.newArrayList("100.0.0.1"),
-        Lists.newArrayList("10.0.0.1"), null);
-    NodeMetadata node2 = new NodeMetadataImpl(null, "name2", "id2",
-        new LocationImpl(LocationScope.PROVIDER, "location-id2",
-            "location-desc2", null),
-        null, Collections.<String,String>emptyMap(), null, null, "image-id",
-        null, NodeState.RUNNING,
-        Lists.newArrayList("100.0.0.2"),
-        Lists.newArrayList("10.0.0.2"), null);
+    NodeMetadata node1 = new NodeMetadataBuilder().name("name1").ids("id1")
+        .location(new LocationBuilder().scope(LocationScope.PROVIDER)
+          .id("location-id1").description("location-desc1").build())
+        .imageId("image-id").state(NodeState.RUNNING)
+        .publicAddresses(Lists.newArrayList("100.0.0.1"))
+        .privateAddresses(Lists.newArrayList("10.0.0.1")).build();
+    NodeMetadata node2 = new NodeMetadataBuilder().name("name2").ids("id2")
+        .location(new LocationBuilder().scope(LocationScope.PROVIDER)
+          .id("location-id2").description("location-desc2").build())
+        .imageId("image-id").state(NodeState.RUNNING)
+        .publicAddresses(Lists.newArrayList("100.0.0.2"))
+        .privateAddresses(Lists.newArrayList("10.0.0.2")).build();
     when(service.getNodes((ClusterSpec) any())).thenReturn(
         (Set) Sets.newLinkedHashSet(Lists.newArrayList(node1, node2)));
 
