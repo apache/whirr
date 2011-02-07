@@ -121,24 +121,24 @@ public class Service {
     ComputeService computeService =
       ComputeServiceContextBuilder.build(clusterSpec).getComputeService();
     return computeService.listNodesDetailsMatching(
-        runningInGroup(clusterSpec.getClusterName()));
+        runningWithTag(clusterSpec.getClusterName()));
   }
   
-  public static Predicate<ComputeMetadata> runningInGroup(final String group) {
+  public static Predicate<ComputeMetadata> runningWithTag(final String tag) {
     return new Predicate<ComputeMetadata>() {
       @Override
       public boolean apply(ComputeMetadata computeMetadata) {
         // Not all list calls return NodeMetadata (e.g. VCloud)
         if (computeMetadata instanceof NodeMetadata) {
           NodeMetadata nodeMetadata = (NodeMetadata) computeMetadata;
-          return group.equals(nodeMetadata.getGroup())
+          return tag.equals(nodeMetadata.getTag())
             && nodeMetadata.getState() == NodeState.RUNNING;
         }
         return false;
       }
       @Override
       public String toString() {
-        return "runningInGroup(" + group + ")";
+        return "runningWithTag(" + tag + ")";
       }
     };
   }

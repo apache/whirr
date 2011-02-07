@@ -18,6 +18,8 @@
 
 package org.apache.whirr.cluster.actions;
 
+import static org.jclouds.io.Payloads.newStringPayload;
+
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
@@ -42,6 +44,7 @@ import org.jclouds.compute.RunScriptOnNodesException;
 import org.jclouds.compute.domain.NodeMetadata;
 import org.jclouds.compute.options.RunScriptOptions;
 import org.jclouds.domain.Credentials;
+import org.jclouds.io.Payload;
 import org.jclouds.scriptbuilder.domain.OsFamily;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,14 +76,14 @@ public class ConfigureClusterAction extends ScriptBasedClusterAction {
       ComputeService computeService = computeServiceContext.getComputeService();
       Credentials credentials = new Credentials(
           Iterables.get(cluster.getInstances(), 0).getLoginCredentials().identity,
-          clusterSpec.getPrivateKey());
+          clusterSpec.readPrivateKey());
       try {
         LOG.info("Running configuration script");
-        if (LOG.isDebugEnabled())
-          LOG.debug("Running script:\n{}", statementBuilder.render(OsFamily.UNIX));
+        Payload script = newStringPayload(statementBuilder.render(OsFamily.UNIX));
+        LOG.debug("Running script:\n{}", script.getRawContent());
         computeService.runScriptOnNodesMatching(
             toNodeMetadataPredicate(clusterSpec, cluster, entry.getKey().getRoles()),
-            statementBuilder,
+            script,
             RunScriptOptions.Builder.overrideCredentialsWith(credentials));
         LOG.info("Configuration script run completed");
       } catch (RunScriptOnNodesException e) {
@@ -99,7 +102,7 @@ public class ConfigureClusterAction extends ScriptBasedClusterAction {
       @Override
       public boolean apply(NodeMetadata nodeMetadata) {
         // Check it's the correct cluster
-        if (!nodeMetadata.getGroup().equals(clusterSpec.getClusterName())) {
+        if (!nodeMetadata.getTag().equals(clusterSpec.getClusterName())) {
           return false;
         }
         Instance instance = nodeIdToInstanceMap.get(nodeMetadata.getId());
