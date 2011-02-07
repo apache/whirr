@@ -54,15 +54,15 @@
       <artifactId>jclouds-core</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.jclouds</groupId>
+      <groupId>org.jclouds.driver</groupId>
       <artifactId>jclouds-enterprise</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.jclouds</groupId>
+      <groupId>org.jclouds.driver</groupId>
       <artifactId>jclouds-jsch</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.jclouds</groupId>
+      <groupId>org.jclouds.driver</groupId>
       <artifactId>jclouds-log4j</artifactId>
     </dependency>
     <dependency>
@@ -76,6 +76,10 @@
     <dependency>
       <groupId>commons-configuration</groupId>
       <artifactId>commons-configuration</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.jcraft</groupId>
+      <artifactId>jsch</artifactId>
     </dependency>
     <dependency>
       <groupId>log4j</groupId>

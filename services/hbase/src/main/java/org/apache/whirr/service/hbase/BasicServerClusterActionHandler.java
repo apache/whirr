@@ -93,7 +93,7 @@ public class BasicServerClusterActionHandler extends HBaseClusterActionHandler {
     String master = DnsUtil.resolveAddress(masterPublicAddress.getHostAddress());
     String quorum = ZooKeeperCluster.getHosts(cluster);
     String tarurl = getConfiguration(clusterSpec).getString(
-      HBaseConstants.KEY_TARBALL_URL);
+      HBaseConstants.KEY_TARBALL_URL);   
     addRunUrl(event, hbaseConfigureRunUrl, role,
       HBaseConstants.PARAM_MASTER, master,
       HBaseConstants.PARAM_QUORUM, quorum,

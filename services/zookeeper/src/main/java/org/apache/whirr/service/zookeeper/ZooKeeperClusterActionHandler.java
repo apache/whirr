@@ -69,7 +69,7 @@ public class ZooKeeperClusterActionHandler extends ClusterActionHandlerSupport {
     // Pass list of all servers in ensemble to configure script.
     // Position is significant: i-th server has id i.
     String servers = Joiner.on(' ').join(getPrivateIps(cluster.getInstancesMatching(
-      RolePredicates.role(ZooKeeperClusterActionHandler.ZOOKEEPER_ROLE))));
+      RolePredicates.role(ZooKeeperClusterActionHandler.ZOOKEEPER_ROLE)))); 
     addRunUrl(event, "apache/zookeeper/post-configure", "-c",
         clusterSpec.getProvider(),
         servers);

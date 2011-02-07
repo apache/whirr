@@ -41,7 +41,7 @@ public class HadoopDataNodeClusterActionHandler extends ClusterActionHandlerSupp
 
   @Override
   protected void beforeBootstrap(ClusterActionEvent event) throws IOException {
-    ClusterSpec clusterSpec = event.getClusterSpec();
+    ClusterSpec clusterSpec = event.getClusterSpec();   
     addRunUrl(event, "util/configure-hostnames", "-c", clusterSpec.getProvider());
     String hadoopInstallRunUrl = clusterSpec.getConfiguration().getString(
         "whirr.hadoop-install-runurl", "apache/hadoop/install");

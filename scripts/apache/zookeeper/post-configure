@@ -36,7 +36,7 @@ done
 case $CLOUD_PROVIDER in
   # Use private IP for SELF_HOST
   # ZooKeeper listens on all addresses, not just the one specified in server.<id>
-  ec2)
+  ec2 | aws-ec2 )
     SELF_HOST=`wget -q -O - http://169.254.169.254/latest/meta-data/local-ipv4`
     ;;
   *)

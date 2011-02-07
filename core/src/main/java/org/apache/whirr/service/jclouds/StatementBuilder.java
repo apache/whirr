@@ -51,7 +51,7 @@ public class StatementBuilder implements Statement {
     for (Statement statement : statements) {
       scriptBuilder.addStatement(statement);
     }
-    return scriptBuilder.build(family);
+    return scriptBuilder.render(family);
   }
 
 }

@@ -18,8 +18,7 @@
 
 package org.apache.whirr.cluster.actions;
 
-import static org.jclouds.compute.options.TemplateOptions.Builder.runScript;
-import static org.jclouds.io.Payloads.newStringPayload;
+import static org.jclouds.compute.options.TemplateOptions.Builder.*;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Collections2;
@@ -54,8 +53,11 @@ import org.jclouds.compute.ComputeServiceContext;
 import org.jclouds.compute.domain.NodeMetadata;
 import org.jclouds.compute.domain.Template;
 import org.jclouds.compute.domain.TemplateBuilder;
-import org.jclouds.io.Payload;
+import org.jclouds.scriptbuilder.domain.AuthorizeRSAPublicKey;
+import org.jclouds.scriptbuilder.domain.InstallRSAPrivateKey;
 import org.jclouds.scriptbuilder.domain.OsFamily;
+import org.jclouds.scriptbuilder.domain.Statement;
+import org.jclouds.scriptbuilder.domain.StatementList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -101,7 +103,7 @@ public class BootstrapClusterAction extends ScriptBasedClusterAction {
             LOG.info("Starting {} node(s) with roles {}", num,
                 instanceTemplate.getRoles());
             Set<? extends NodeMetadata> nodes = computeService
-                .runNodesWithTag(clusterSpec.getClusterName(), num, template);
+                .createNodesInGroup(clusterSpec.getClusterName(), num, template);
             LOG.info("Nodes started: {}", nodes);
             return nodes;
           }
@@ -135,12 +137,14 @@ public class BootstrapClusterAction extends ScriptBasedClusterAction {
       TemplateBuilderStrategy strategy)
       throws MalformedURLException {
     LOG.info("Configuring template");
-    Payload script = newStringPayload(statementBuilder.render(OsFamily.UNIX));
-    LOG.debug("Running script:\n{}", script.getRawContent());
+    if (LOG.isDebugEnabled())
+      LOG.debug("Running script:\n{}", statementBuilder.render(OsFamily.UNIX));
+    Statement runScript = new StatementList(
+          new AuthorizeRSAPublicKey(clusterSpec.getPublicKey()),
+          statementBuilder,
+          new InstallRSAPrivateKey(clusterSpec.getPrivateKey()));
     TemplateBuilder templateBuilder = computeService.templateBuilder()
-      .options(runScript(script)
-      .installPrivateKey(clusterSpec.getPrivateKey())
-      .authorizePublicKey(clusterSpec.getPublicKey()));
+      .options(runScript(runScript));
     strategy.configureTemplateBuilder(clusterSpec, templateBuilder);
     return templateBuilder.build();
   }

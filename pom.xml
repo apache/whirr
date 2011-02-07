@@ -47,7 +47,7 @@
   </modules>
 
   <properties>
-    <jclouds.version>1.0-beta-7</jclouds.version>
+    <jclouds.version>1.0-beta-9</jclouds.version>
   </properties>
 
   <dependencyManagement>
@@ -64,26 +64,26 @@
       </dependency>
       <dependency>
         <groupId>org.jclouds</groupId>
-        <artifactId>jclouds-compute</artifactId>
-        <version>${jclouds.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.jclouds</groupId>
         <artifactId>jclouds-core</artifactId>
         <version>${jclouds.version}</version>
       </dependency>
       <dependency>
         <groupId>org.jclouds</groupId>
+        <artifactId>jclouds-compute</artifactId>
+        <version>${jclouds.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.jclouds.driver</groupId>
         <artifactId>jclouds-enterprise</artifactId>
         <version>${jclouds.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.jclouds</groupId>
+        <groupId>org.jclouds.driver</groupId>
         <artifactId>jclouds-jsch</artifactId>
         <version>${jclouds.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.jclouds</groupId>
+        <groupId>org.jclouds.driver</groupId>
         <artifactId>jclouds-log4j</artifactId>
         <version>${jclouds.version}</version>
       </dependency>
@@ -157,6 +157,11 @@
             <artifactId>jmxri</artifactId>
           </exclusion>
         </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>com.jcraft</groupId>
+        <artifactId>jsch</artifactId>
+        <version>0.1.42</version>
       </dependency>
       <dependency>
         <groupId>dnsjava</groupId>
