@@ -115,6 +115,16 @@ public class Service {
     destroyer.execute(clusterSpec, null);
     Files.deleteRecursively(clusterSpec.getClusterDirectory());
   }
+
+  public void destroyInstance(ClusterSpec clusterSpec, String instanceId) throws IOException {
+    LOG.info("Destroying instance {}", instanceId);
+
+    ComputeService computeService = ComputeServiceContextBuilder
+      .build(clusterSpec).getComputeService();
+    computeService.destroyNode(instanceId);
+
+    LOG.info("Instance {} destroyed", instanceId);
+  }
   
   public Set<? extends NodeMetadata> getNodes(ClusterSpec clusterSpec)
     throws IOException, InterruptedException {

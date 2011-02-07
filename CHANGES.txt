@@ -4,6 +4,8 @@ Trunk (unreleased changes)
 
   NEW FEATURES
 
+    WHIRR-226. Add the ability to destroy a cluster instance (asavu)
+
   IMPROVEMENTS
 
     WHIRR-139. upgrade to version 1 of the "enforcer" plugin (Jakob Homan 
