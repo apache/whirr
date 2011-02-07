@@ -21,6 +21,7 @@ package org.apache.whirr.cli;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.apache.whirr.cli.command.DestroyClusterCommand;
+import org.apache.whirr.cli.command.DestroyInstanceCommand;
 import org.apache.whirr.cli.command.LaunchClusterCommand;
 import org.apache.whirr.cli.command.ListClusterCommand;
 import org.apache.whirr.cli.command.VersionCommand;
@@ -97,6 +98,7 @@ public class Main {
         new VersionCommand(),
         new LaunchClusterCommand(),
         new DestroyClusterCommand(),
+        new DestroyInstanceCommand(),
         new ListClusterCommand()
     );
     int rc = main.run(System.in, System.out, System.err, Arrays.asList(args));
