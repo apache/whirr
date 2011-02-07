@@ -47,7 +47,7 @@ public class HBaseRegionServerClusterActionHandler extends HBaseClusterActionHan
 
   @Override
   protected void beforeBootstrap(ClusterActionEvent event) throws IOException {
-    ClusterSpec clusterSpec = event.getClusterSpec();
+    ClusterSpec clusterSpec = event.getClusterSpec();   
     addRunUrl(event, "util/configure-hostnames",
       HBaseConstants.PARAM_PROVIDER, clusterSpec.getProvider());
     addRunUrl(event, "sun/java/install");
@@ -84,7 +84,7 @@ public class HBaseRegionServerClusterActionHandler extends HBaseClusterActionHan
     String master = DnsUtil.resolveAddress(masterPublicAddress.getHostAddress());
     String quorum = ZooKeeperCluster.getHosts(cluster);
     String tarurl = getConfiguration(clusterSpec).getString(
-      HBaseConstants.KEY_TARBALL_URL);
+      HBaseConstants.KEY_TARBALL_URL);   
     addRunUrl(event, hbaseConfigureRunUrl, ROLE,
       HBaseConstants.PARAM_MASTER, master,
       HBaseConstants.PARAM_QUORUM, quorum,

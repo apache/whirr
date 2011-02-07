@@ -137,7 +137,7 @@ public class HadoopNameNodeClusterActionHandler extends ClusterActionHandlerSupp
     config.setProperty("mapred.job.tracker", String.format("%s:8021", DnsUtil.resolveAddress(jobtracker.getHostAddress())));
     config.setProperty("hadoop.socks.server", "localhost:6666");
     config.setProperty("hadoop.rpc.socket.factory.class.default", "org.apache.hadoop.net.SocksSocketFactory");
-    if ("ec2".equals(clusterSpec.getProvider())) {
+    if (clusterSpec.getProvider().endsWith("ec2")) {
       config.setProperty("fs.s3.awsAccessKeyId", clusterSpec.getIdentity());
       config.setProperty("fs.s3.awsSecretAccessKey", clusterSpec.getCredential());
       config.setProperty("fs.s3n.awsAccessKeyId", clusterSpec.getIdentity());
