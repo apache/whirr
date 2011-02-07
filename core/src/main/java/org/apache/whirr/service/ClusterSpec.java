@@ -33,7 +33,6 @@ import org.apache.commons.configuration.interpol.ConfigurationInterpolator;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.text.StrLookup;
-import org.jclouds.io.Payload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,9 +50,6 @@ import java.util.Set;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.apache.whirr.ssh.KeyPair.sameKeyPair;
-import static org.jclouds.io.Payloads.newFilePayload;
-import static org.jclouds.io.Payloads.newStringPayload;
-import static org.jclouds.util.Utils.toStringAndClose;
 
 
 /**
@@ -83,7 +79,7 @@ public class ClusterSpec {
       "hadoop-jobtracker, 10 hadoop-datanode+hadoop-tasktracker"),
       
     PROVIDER(String.class, false, "The name of the cloud provider. " + 
-      "E.g. ec2, cloudservers"),
+      "E.g. aws-ec2, cloudservers-uk"),
       
     CREDENTIAL(String.class, false, "The cloud credential."),
     
@@ -255,9 +251,11 @@ public class ClusterSpec {
   @VisibleForTesting
   public static ClusterSpec withTemporaryKeys(Configuration conf) 
   throws ConfigurationException, JSchException, IOException {
-    
     if (!conf.containsKey(Property.PRIVATE_KEY_FILE.getConfigName())) {
       Map<String, File> keys = org.apache.whirr.ssh.KeyPair.generateTemporaryFiles();
+
+      LoggerFactory.getLogger(ClusterSpec.class).debug("ssh keys: " +
+            keys.toString());
       
       conf.addProperty(Property.PRIVATE_KEY_FILE.getConfigName(), 
         keys.get("private").getAbsolutePath());
@@ -287,8 +285,9 @@ public class ClusterSpec {
   private String identity;
   private String credential;
   private String clusterName;
-  private Payload privateKey;
-  private Payload publicKey;
+  private String privateKey;
+  private File privateKeyFile;
+  private String publicKey;
   private String imageId;
   private String hardwareId;
   private String locationId;
@@ -409,25 +408,14 @@ public class ClusterSpec {
   public String getClusterName() {
     return clusterName;
   }
-  public Payload getPrivateKey() {
+  public String getPrivateKey() {
     return privateKey;
   }
-  public Payload getPublicKey() {
+  public File getPrivateKeyFile() {
+     return privateKeyFile;
+   }
+  public String getPublicKey() {
     return publicKey;
-  }
-  /**
-   * @see #getPrivateKey
-   * @throws IOException if the payload cannot be read
-   */
-  public String readPrivateKey() throws IOException {
-    return toStringAndClose(getPrivateKey().getInput());
-  }
-  /**
-   * @see #getPublicKey
-   * @throws IOException if the payload cannot be read
-   */
-  public String readPublicKey() throws IOException {
-    return toStringAndClose(getPublicKey().getInput());
   }
   public String getImageId() {
     return imageId;
@@ -479,7 +467,7 @@ public class ClusterSpec {
    */
   public void setPublicKey(String publicKey) {
     checkPublicKey(publicKey);
-    this.publicKey = newStringPayload(publicKey);
+    this.publicKey = publicKey;
   }
   
   /**
@@ -489,8 +477,9 @@ public class ClusterSpec {
    * @see #setPublicKey(String)
    */
   public void setPublicKey(File publicKey) throws IOException {
-    checkPublicKey(IOUtils.toString(new FileReader(publicKey)));
-    this.publicKey = newFilePayload(publicKey);
+    String key = IOUtils.toString(new FileReader(publicKey));
+    checkPublicKey(key);
+    this.publicKey = key;
   }
 
   private void checkPublicKey(String publicKey) {
@@ -510,7 +499,7 @@ public class ClusterSpec {
    */
   public void setPrivateKey(String privateKey) {
     checkPrivateKey(privateKey);
-    this.privateKey = newStringPayload(privateKey);
+    this.privateKey = privateKey;
   }
 
   /**
@@ -520,8 +509,10 @@ public class ClusterSpec {
    * @see #setPrivateKey(String)
    */
   public void setPrivateKey(File privateKey) throws IOException {
-    checkPrivateKey(IOUtils.toString(new FileReader(privateKey)));
-    this.privateKey = newFilePayload(privateKey);
+    this.privateKeyFile = privateKey;
+    String key = IOUtils.toString(new FileReader(privateKey));
+    checkPrivateKey(key);
+    this.privateKey = key;
   }
   
   private void checkPrivateKey(String privateKey) {

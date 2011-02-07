@@ -23,6 +23,8 @@ Trunk (unreleased changes)
 
     WHIRR-183. ZooKeeper Data Directory Cleanup. (asavu via tomwhite)
 
+    WHIRR-124. Upgrade to jclouds 1.0-beta-9 (Adrian Cole via larsgeorge)
+
   BUG FIXES
 
     WHIRR-170. Instances should be started in the order specified in 

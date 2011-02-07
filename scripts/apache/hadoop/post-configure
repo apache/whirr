@@ -50,7 +50,7 @@ while getopts "n:j:c:" OPTION; do
 done
 
 case $CLOUD_PROVIDER in
-  ec2)
+  ec2 | aws-ec2 )
     # Use public hostname for EC2
     SELF_HOST=`wget -q -O - http://169.254.169.254/latest/meta-data/public-hostname`
     ;;
@@ -91,7 +91,7 @@ function make_hadoop_dirs {
 # Configure Hadoop by setting up disks and site file
 function configure_hadoop() {
   case $CLOUD_PROVIDER in
-  ec2)
+  ec2 | aws-ec2 )
     MOUNT=/mnt
     ;;
   *)

@@ -122,7 +122,7 @@ public class ClusterSpecTest {
 
     ClusterSpec spec = ClusterSpec.withNoDefaults(conf);
     Assert.assertEquals(IOUtils.toString(
-            new FileReader(keys.get("public"))), spec.readPublicKey());
+            new FileReader(keys.get("public"))), spec.getPublicKey());
   }
 
   @Test(expected = ConfigurationException.class)
