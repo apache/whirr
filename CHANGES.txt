@@ -38,6 +38,8 @@ Trunk (unreleased changes)
     WHIRR-217. Log files should not be included in tarball or checked 
     by RAT (tomwhite via asavu)
 
+    WHIRR-232. NPE for stopped instances on EC2. (tomwhite)
+
 Release 0.3.0 - 2011-01-15
 
   NEW FEATURES
