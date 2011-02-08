@@ -99,7 +99,7 @@ public class ConfigureClusterAction extends ScriptBasedClusterAction {
       @Override
       public boolean apply(NodeMetadata nodeMetadata) {
         // Check it's the correct cluster
-        if (!nodeMetadata.getGroup().equals(clusterSpec.getClusterName())) {
+        if (!clusterSpec.getClusterName().equals(nodeMetadata.getGroup())) {
           return false;
         }
         Instance instance = nodeIdToInstanceMap.get(nodeMetadata.getId());
