@@ -25,6 +25,9 @@ Trunk (unreleased changes)
 
     WHIRR-124. Upgrade to jclouds 1.0-beta-9 (Adrian Cole via larsgeorge)
 
+    WHIRR-124. Show warning messages before converting ec2->aws-ec2 and 
+    cloudservers -> clouservers-us (Adrian Cole via asavu)
+
   BUG FIXES
 
     WHIRR-170. Instances should be started in the order specified in 

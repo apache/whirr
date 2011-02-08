@@ -30,18 +30,29 @@ import org.jclouds.compute.ComputeServiceContext;
 import org.jclouds.compute.ComputeServiceContextFactory;
 import org.jclouds.logging.log4j.config.Log4JLoggingModule;
 import org.jclouds.ssh.jsch.config.JschSshClientModule;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A convenience class for building jclouds {@link ComputeServiceContext} objects.
  */
 public class ComputeServiceContextBuilder {
-
+  private static final Logger LOG =
+    LoggerFactory.getLogger(ComputeServiceContextBuilder.class);
+   
   public static ComputeServiceContext build(ClusterSpec spec) throws IOException {
     Configuration jcloudsConfig =
       spec.getConfigurationForKeysWithPrefix("jclouds");
     Set<AbstractModule> wiring = ImmutableSet.of(new JschSshClientModule(),
       new Log4JLoggingModule());
-
+    if (spec.getProvider().equals("ec2")){
+      LOG.warn("please use provider \"aws-ec2\" instead of \"ec2\"");
+      spec.setProvider("aws-ec2");
+    }
+    if (spec.getProvider().equals("cloudservers")){
+      LOG.warn("please use provider \"cloudservers-us\" instead of \"cloudservers\"");
+      spec.setProvider("cloudservers-us");
+    }
     return new ComputeServiceContextFactory().createContext(spec.getProvider(),
       spec.getIdentity(), spec.getCredential(),
       wiring, ConfigurationConverter.getProperties(jcloudsConfig));
