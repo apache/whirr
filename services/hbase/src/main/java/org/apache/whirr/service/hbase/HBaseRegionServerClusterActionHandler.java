@@ -19,6 +19,7 @@
 package org.apache.whirr.service.hbase;
 
 import static org.apache.whirr.service.RolePredicates.role;
+import static org.jclouds.scriptbuilder.domain.Statements.call;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -47,17 +48,17 @@ public class HBaseRegionServerClusterActionHandler extends HBaseClusterActionHan
 
   @Override
   protected void beforeBootstrap(ClusterActionEvent event) throws IOException {
-    ClusterSpec clusterSpec = event.getClusterSpec();   
-    addRunUrl(event, "util/configure-hostnames",
-      HBaseConstants.PARAM_PROVIDER, clusterSpec.getProvider());
-    addRunUrl(event, "sun/java/install");
-    String hbaseInstallRunUrl = getConfiguration(clusterSpec).getString(
-      HBaseConstants.KEY_INSTALL_RUNURL, HBaseConstants.SCRIPT_INSTALL);
+    ClusterSpec clusterSpec = event.getClusterSpec();    
+    addStatement(event, call("configure_hostnames",
+      HBaseConstants.PARAM_PROVIDER, clusterSpec.getProvider()));
+    addStatement(event, call("install_java"));
+    String hbaseInstallFunction = getConfiguration(clusterSpec).getString(
+      HBaseConstants.KEY_INSTALL_FUNCTION, HBaseConstants.FUNCTION_INSTALL);
     String tarurl = getConfiguration(clusterSpec).getString(
       HBaseConstants.KEY_TARBALL_URL);
-    addRunUrl(event, hbaseInstallRunUrl,
+    addStatement(event, call(hbaseInstallFunction,
       HBaseConstants.PARAM_PROVIDER, clusterSpec.getProvider(),
-      HBaseConstants.PARAM_TARBALL_URL, tarurl);
+      HBaseConstants.PARAM_TARBALL_URL, tarurl));
     event.setTemplateBuilderStrategy(new HBaseTemplateBuilderStrategy());
   }
 
@@ -78,18 +79,18 @@ public class HBaseRegionServerClusterActionHandler extends HBaseClusterActionHan
     FirewallSettings.authorizeIngress(computeServiceContext, instance, clusterSpec,
       REGIONSERVER_PORT);
 
-    String hbaseConfigureRunUrl = getConfiguration(clusterSpec).getString(
-      HBaseConstants.KEY_CONFIGURE_RUNURL,
-      HBaseConstants.SCRIPT_POST_CONFIGURE);
+    String hbaseConfigureFunction = getConfiguration(clusterSpec).getString(
+      HBaseConstants.KEY_CONFIGURE_FUNCTION,
+      HBaseConstants.FUNCTION_POST_CONFIGURE);
     String master = DnsUtil.resolveAddress(masterPublicAddress.getHostAddress());
     String quorum = ZooKeeperCluster.getHosts(cluster);
     String tarurl = getConfiguration(clusterSpec).getString(
       HBaseConstants.KEY_TARBALL_URL);   
-    addRunUrl(event, hbaseConfigureRunUrl, ROLE,
+    addStatement(event, call(hbaseConfigureFunction, ROLE,
       HBaseConstants.PARAM_MASTER, master,
       HBaseConstants.PARAM_QUORUM, quorum,
       HBaseConstants.PARAM_PROVIDER, clusterSpec.getProvider(),
-      HBaseConstants.PARAM_TARBALL_URL, tarurl);
+      HBaseConstants.PARAM_TARBALL_URL, tarurl));
   }
 
 }

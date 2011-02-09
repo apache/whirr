@@ -1,89 +1,62 @@
-#!/usr/bin/env bash
-#
-# Licensed to the Apache Software Foundation (ASF) under one or more
-# contributor license agreements.  See the NOTICE file distributed with
-# this work for additional information regarding copyright ownership.
-# The ASF licenses this file to You under the Apache License, Version 2.0
-# (the "License"); you may not use this file except in compliance with
-# the License.  You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-#
-# Configure Apache HBase after the cluster has started.
-#
-# Call with the following arguments
-# -m <master>
-# -q <zookeeper quorum>
-# -p <port>
-# -c <cloud provider>
-# -u <hbase tarball url>
-
-set -x
-set -e
-
-ROLES=$1
-shift
-
-# get parameters
-MASTER_HOST=
-ZOOKEEKER_QUORUM=
-PORT=
-CLOUD_PROVIDER=
-HBASE_TAR_URL=
-while getopts "m:q:p:c:u:" OPTION; do
-  case $OPTION in
-  m)
-    MASTER_HOST="$OPTARG"
-    ;;
-  q)
-    ZOOKEEPER_QUORUM="$OPTARG"
-    ;;
-  p)
-    PORT="$OPTARG"
-    ;;
-  c)
-    CLOUD_PROVIDER="$OPTARG"
-    ;;
-  u)
-    HBASE_TAR_URL="$OPTARG"
-    ;;
-  esac
-done
-
-# determine machine name
-case $CLOUD_PROVIDER in
-  ec2 | aws-ec2 )
-    # Use public hostname for EC2
-    SELF_HOST=`wget -q -O - http://169.254.169.254/latest/meta-data/public-hostname`
-    ;;
-  *)
-    SELF_HOST=`/sbin/ifconfig eth0 | grep 'inet addr:' | cut -d: -f2 | awk '{ print $1}'`
-    ;;
-esac
-
-# assign default URL if no other given (optional)
-HBASE_TAR_URL=${HBASE_TAR_URL:-http://archive.apache.org/dist/hbase/hbase-0.90.0/hbase-0.90.0.tar.gz}
-# derive details from the URL
-HBASE_TAR_FILE=${HBASE_TAR_URL##*/}
-# extract "version" or the name of the directory contained in the tarball,
-# but since hbase has used different namings use the directory instead.
-HBASE_VERSION=${HBASE_TAR_URL%/*.tar.gz}
-HBASE_VERSION=${HBASE_VERSION##*/}
-# simple check that we have a proper URL or default to use filename
-if [[ "${HBASE_VERSION:0:5}" != "hbase" ]]; then
-  HBASE_VERSION=${HBASE_TAR_FILE%.tar.gz}
-fi
-HBASE_HOME=/usr/local/$HBASE_VERSION
-HBASE_CONF_DIR=$HBASE_HOME/conf
-
-# configure hbase by setting up disks and site file
 function configure_hbase() {
+  local OPTIND
+  local OPTARG
+  
+  ROLES=$1
+  shift
+  
+  # get parameters
+  MASTER_HOST=
+  ZOOKEEKER_QUORUM=
+  PORT=
+  CLOUD_PROVIDER=
+  HBASE_TAR_URL=
+  while getopts "m:q:p:c:u:" OPTION; do
+    case $OPTION in
+    m)
+      MASTER_HOST="$OPTARG"
+      ;;
+    q)
+      ZOOKEEPER_QUORUM="$OPTARG"
+      ;;
+    p)
+      PORT="$OPTARG"
+      ;;
+    c)
+      CLOUD_PROVIDER="$OPTARG"
+      ;;
+    u)
+      HBASE_TAR_URL="$OPTARG"
+      ;;
+    esac
+  done
+  
+  # determine machine name
+  case $CLOUD_PROVIDER in
+    ec2 | aws-ec2 )
+      # Use public hostname for EC2
+      SELF_HOST=`wget -q -O - http://169.254.169.254/latest/meta-data/public-hostname`
+      ;;
+    *)
+      SELF_HOST=`/sbin/ifconfig eth0 | grep 'inet addr:' | cut -d: -f2 | awk '{ print $1}'`
+      ;;
+  esac
+  
+  # assign default URL if no other given (optional)
+  HBASE_TAR_URL=${HBASE_TAR_URL:-http://archive.apache.org/dist/hbase/hbase-0.90.0/hbase-0.90.0.tar.gz}
+  # derive details from the URL
+  HBASE_TAR_FILE=${HBASE_TAR_URL##*/}
+  # extract "version" or the name of the directory contained in the tarball,
+  # but since hbase has used different namings use the directory instead.
+  HBASE_VERSION=${HBASE_TAR_URL%/*.tar.gz}
+  HBASE_VERSION=${HBASE_VERSION##*/}
+  # simple check that we have a proper URL or default to use filename
+  if [[ "${HBASE_VERSION:0:5}" != "hbase" ]]; then
+    HBASE_VERSION=${HBASE_TAR_FILE%.tar.gz}
+  fi
+  HBASE_HOME=/usr/local/$HBASE_VERSION
+  HBASE_CONF_DIR=$HBASE_HOME/conf
+
   case $CLOUD_PROVIDER in
   ec2 | aws-ec2 )
     MOUNT=/mnt
@@ -198,10 +171,29 @@ EOF
   chown hadoop:hadoop $MOUNT/hbase/logs
   ln -s $MOUNT/hbase/logs /var/log/hbase
   chown -R hadoop:hadoop /var/log/hbase
+  
+  for role in $(echo "$ROLES" | tr "," "\n"); do
+    case $role in
+    hbase-master)
+      start_hbase_daemon master
+      ;;
+    hbase-regionserver)
+      start_hbase_daemon regionserver
+      ;;
+    hbase-restserver)
+      start_hbase_daemon rest -p $PORT
+      ;;
+    hbase-avroserver)
+      start_hbase_daemon avro -p $PORT
+      ;;
+    hbase-thriftserver)
+      start_hbase_daemon thrift -p $PORT
+      ;;
+    esac
+  done
 }
 
-# helper to start daemons, used below
-function start_daemon() {
+function start_hbase_daemon() {
   if which dpkg &> /dev/null; then
     AS_HADOOP="su -s /bin/bash - hadoop -c"
   elif which rpm &> /dev/null; then
@@ -210,24 +202,3 @@ function start_daemon() {
   $AS_HADOOP "$HBASE_HOME/bin/hbase-daemon.sh start $1"
 }
 
-configure_hbase
-
-for role in $(echo "$ROLES" | tr "," "\n"); do
-  case $role in
-  hbase-master)
-    start_daemon master
-    ;;
-  hbase-regionserver)
-    start_daemon regionserver
-    ;;
-  hbase-restserver)
-    start_daemon rest -p $PORT
-    ;;
-  hbase-avroserver)
-    start_daemon avro -p $PORT
-    ;;
-  hbase-thriftserver)
-    start_daemon thrift -p $PORT
-    ;;
-  esac
-done

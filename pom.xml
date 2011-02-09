@@ -328,6 +328,7 @@
             <exclude>**/src/main/resources/version-banner.txt</exclude>
             <exclude>docs/**</exclude>
             <exclude>**/*.log</exclude>
+            <exclude>**/functions/*</exclude>
           </excludes>
         </configuration>
       </plugin>

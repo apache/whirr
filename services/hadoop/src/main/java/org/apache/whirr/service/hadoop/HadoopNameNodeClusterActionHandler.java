@@ -19,6 +19,7 @@
 package org.apache.whirr.service.hadoop;
 
 import static org.apache.whirr.service.RolePredicates.role;
+import static org.jclouds.scriptbuilder.domain.Statements.call;
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
@@ -63,11 +64,11 @@ public class HadoopNameNodeClusterActionHandler extends ClusterActionHandlerSupp
   @Override
   protected void beforeBootstrap(ClusterActionEvent event) throws IOException {
     ClusterSpec clusterSpec = event.getClusterSpec();
-    addRunUrl(event, "util/configure-hostnames", "-c", clusterSpec.getProvider());
-    String hadoopInstallRunUrl = clusterSpec.getConfiguration().getString(
-        "whirr.hadoop-install-runurl", "apache/hadoop/install");
-    addRunUrl(event, "sun/java/install");
-    addRunUrl(event, hadoopInstallRunUrl, "-c", clusterSpec.getProvider());
+    addStatement(event, call("configure_hostnames", "-c", clusterSpec.getProvider()));
+    String hadoopInstallFunction = clusterSpec.getConfiguration().getString(
+        "whirr.hadoop-install-function", "install_hadoop");
+    addStatement(event, call("install_java"));
+    addStatement(event, call(hadoopInstallFunction, "-c", clusterSpec.getProvider()));
     event.setTemplateBuilderStrategy(new HadoopTemplateBuilderStrategy());
   }
   
@@ -100,13 +101,14 @@ public class HadoopNameNodeClusterActionHandler extends ClusterActionHandlerSupp
           jobtrackerPublicAddress.getHostAddress(), JOBTRACKER_PORT);
     }
     
-    String hadoopConfigureRunUrl = clusterSpec.getConfiguration().getString(
-        "whirr.hadoop-configure-runurl", "apache/hadoop/post-configure");
-    addRunUrl(event, hadoopConfigureRunUrl,
+    String hadoopConfigureFunction = clusterSpec.getConfiguration().getString(
+        "whirr.hadoop-configure-function", "configure_hadoop");
+    addStatement(event, call(hadoopConfigureFunction,
         "hadoop-namenode,hadoop-jobtracker",
         "-n", DnsUtil.resolveAddress(namenodePublicAddress.getHostAddress()),
         "-j", DnsUtil.resolveAddress(jobtrackerPublicAddress.getHostAddress()),
-        "-c", clusterSpec.getProvider());
+        "-c", clusterSpec.getProvider()
+    ));
   }
   
   @Override
