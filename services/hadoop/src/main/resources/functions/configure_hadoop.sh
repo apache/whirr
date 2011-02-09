@@ -1,95 +1,41 @@
-#!/usr/bin/env bash
-#
-# Licensed to the Apache Software Foundation (ASF) under one or more
-# contributor license agreements.  See the NOTICE file distributed with
-# this work for additional information regarding copyright ownership.
-# The ASF licenses this file to You under the Apache License, Version 2.0
-# (the "License"); you may not use this file except in compliance with
-# the License.  You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-#
-# Configure Apache Hadoop after the cluster has started.
-#
-# Call with the following arguments
-# -n <namenode-address>
-# -j <jobtracker address>
-# -c <cloud provider>
-
-set -x
-set -e
-
-################################################################################
-# Initialize variables
-################################################################################
-
-ROLES=$1
-shift
-
-NN_HOST=
-JT_HOST=
-CLOUD_PROVIDER=
-while getopts "n:j:c:" OPTION; do
-  case $OPTION in
-  n)
-    NN_HOST="$OPTARG"
-    ;;
-  j)
-    JT_HOST="$OPTARG"
-    ;;
-  c)
-    CLOUD_PROVIDER="$OPTARG"
-    ;;
-  esac
-done
-
-case $CLOUD_PROVIDER in
-  ec2 | aws-ec2 )
-    # Use public hostname for EC2
-    SELF_HOST=`wget -q -O - http://169.254.169.254/latest/meta-data/public-hostname`
-    ;;
-  *)
-    SELF_HOST=`/sbin/ifconfig eth0 | grep 'inet addr:' | cut -d: -f2 | awk '{ print $1}'`
-    ;;
-esac
-
-HADOOP_VERSION=${HADOOP_VERSION:-0.20.2}
-HADOOP_HOME=/usr/local/hadoop-$HADOOP_VERSION
-HADOOP_CONF_DIR=$HADOOP_HOME/conf
-
-function prep_disk() {
-  mount=$1
-  device=$2
-  automount=${3:-false}
-
-  echo "warning: ERASING CONTENTS OF $device"
-  mkfs.xfs -f $device
-  if [ ! -e $mount ]; then
-    mkdir $mount
-  fi
-  mount -o defaults,noatime $device $mount
-  if $automount ; then
-    echo "$device $mount xfs defaults,noatime 0 0" >> /etc/fstab
-  fi
-}
-
-function make_hadoop_dirs {
-  for mount in "$@"; do
-    if [ ! -e $mount/hadoop ]; then
-      mkdir -p $mount/hadoop
-      chown hadoop:hadoop $mount/hadoop
-    fi
-  done
-}
-
-# Configure Hadoop by setting up disks and site file
 function configure_hadoop() {
+  local OPTIND
+  local OPTARG
+  
+  ROLES=$1
+  shift
+  
+  NN_HOST=
+  JT_HOST=
+  CLOUD_PROVIDER=
+  while getopts "n:j:c:" OPTION; do
+    case $OPTION in
+    n)
+      NN_HOST="$OPTARG"
+      ;;
+    j)
+      JT_HOST="$OPTARG"
+      ;;
+    c)
+      CLOUD_PROVIDER="$OPTARG"
+      ;;
+    esac
+  done
+  
+  case $CLOUD_PROVIDER in
+    ec2 | aws-ec2 )
+      # Use public hostname for EC2
+      SELF_HOST=`wget -q -O - http://169.254.169.254/latest/meta-data/public-hostname`
+      ;;
+    *)
+      SELF_HOST=`/sbin/ifconfig eth0 | grep 'inet addr:' | cut -d: -f2 | awk '{ print $1}'`
+      ;;
+  esac
+  
+  HADOOP_VERSION=${HADOOP_VERSION:-0.20.2}
+  HADOOP_HOME=/usr/local/hadoop-$HADOOP_VERSION
+  HADOOP_CONF_DIR=$HADOOP_HOME/conf
+
   case $CLOUD_PROVIDER in
   ec2 | aws-ec2 )
     MOUNT=/mnt
@@ -310,6 +256,27 @@ EOF
   chown hadoop:hadoop $MOUNT/hadoop/logs
   ln -s $MOUNT/hadoop/logs /var/log/hadoop
   chown -R hadoop:hadoop /var/log/hadoop
+  
+  for role in $(echo "$ROLES" | tr "," "\n"); do
+    case $role in
+    hadoop-namenode)
+      setup_web
+      start_namenode
+      ;;
+    hadoop-secondarynamenode)
+      start_hadoop_daemon secondarynamenode
+      ;;
+    hadoop-jobtracker)
+      start_hadoop_daemon jobtracker
+      ;;
+    hadoop-datanode)
+      start_hadoop_daemon datanode
+      ;;
+    hadoop-tasktracker)
+      start_hadoop_daemon tasktracker
+      ;;
+    esac
+  done
 
 }
 
@@ -380,7 +347,7 @@ function start_namenode() {
 
 }
 
-function start_daemon() {
+function start_hadoop_daemon() {
   if which dpkg &> /dev/null; then
     AS_HADOOP="su -s /bin/bash - hadoop -c"
   elif which rpm &> /dev/null; then
@@ -389,25 +356,3 @@ function start_daemon() {
   $AS_HADOOP "$HADOOP_HOME/bin/hadoop-daemon.sh start $1"
 }
 
-configure_hadoop
-
-for role in $(echo "$ROLES" | tr "," "\n"); do
-  case $role in
-  hadoop-namenode)
-    setup_web
-    start_namenode
-    ;;
-  hadoop-secondarynamenode)
-    start_daemon secondarynamenode
-    ;;
-  hadoop-jobtracker)
-    start_daemon jobtracker
-    ;;
-  hadoop-datanode)
-    start_daemon datanode
-    ;;
-  hadoop-tasktracker)
-    start_daemon tasktracker
-    ;;
-  esac
-done

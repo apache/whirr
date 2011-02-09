@@ -32,7 +32,6 @@ import org.apache.whirr.service.ClusterActionHandler;
 import org.apache.whirr.service.ClusterSpec;
 import org.apache.whirr.service.ClusterSpec.InstanceTemplate;
 import org.apache.whirr.service.jclouds.StatementBuilder;
-import org.jclouds.scriptbuilder.domain.Statements;
 
 /**
  * A {@link ClusterAction} that provides the base functionality for running
@@ -57,7 +56,6 @@ public abstract class ScriptBasedClusterAction extends ClusterAction {
     Cluster newCluster = cluster;
     for (InstanceTemplate instanceTemplate : clusterSpec.getInstanceTemplates()) {
       StatementBuilder statementBuilder = new StatementBuilder();
-      statementBuilder.addStatement(Statements.call("installRunUrl"));
       ClusterActionEvent event = new ClusterActionEvent(getAction(),
           clusterSpec, newCluster, statementBuilder);
       eventMap.put(instanceTemplate, event);

@@ -6,6 +6,11 @@ Trunk (unreleased changes)
 
     WHIRR-226. Add the ability to destroy a cluster instance (asavu)
 
+    WHIRR-225. Support locally-supplied scripts.
+    With this change the properties whirr.hadoop-install-runurl and
+    whirr.hadoop-configure-runurl are replaced by whirr.hadoop-install-function
+    and whirr.hadoop-configure-function. See recipes for details. (tomwhite)
+
   IMPROVEMENTS
 
     WHIRR-139. upgrade to version 1 of the "enforcer" plugin (Jakob Homan 

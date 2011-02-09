@@ -1,114 +1,51 @@
-#!/usr/bin/env bash
-#
-# Licensed to the Apache Software Foundation (ASF) under one or more
-# contributor license agreements.  See the NOTICE file distributed with
-# this work for additional information regarding copyright ownership.
-# The ASF licenses this file to You under the Apache License, Version 2.0
-# (the "License"); you may not use this file except in compliance with
-# the License.  You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-#
-# Install CDH.
-#
-
-set -x
-set -e
-
-################################################################################
-# Initialize variables
-################################################################################
-
-ROLES=$1
-shift
-
-NN_HOST=
-JT_HOST=
-CLOUD_PROVIDER=
-while getopts "n:j:c:" OPTION; do
-  case $OPTION in
-  n)
-    NN_HOST="$OPTARG"
-    ;;
-  j)
-    JT_HOST="$OPTARG"
-    ;;
-  c)
-    CLOUD_PROVIDER="$OPTARG"
-    ;;
-  esac
-done
-
-case $CLOUD_PROVIDER in
-  ec2)
-    # Use public hostname for EC2
-    SELF_HOST=`wget -q -O - http://169.254.169.254/latest/meta-data/public-hostname`
-    ;;
-  *)
-    SELF_HOST=`/sbin/ifconfig eth0 | grep 'inet addr:' | cut -d: -f2 | awk '{ print $1}'`
-    ;;
-esac
-
-REPO=${REPO:-cdh3}
-HADOOP=hadoop-${HADOOP_VERSION:-0.20}
-HADOOP_CONF_DIR=/etc/$HADOOP/conf.dist
-for role in $(echo "$ROLES" | tr "," "\n"); do
-  case $role in
-  hadoop-namenode)
-    NN_HOST=$SELF_HOST
-    ;;
-  hadoop-jobtracker)
-    JT_HOST=$SELF_HOST
-    ;;
-  esac
-done
-
-# Install a list of packages on debian or redhat as appropriate
-function install_packages() {
-  if which dpkg &> /dev/null; then
-    apt-get update
-    apt-get -y install $@
-  elif which rpm &> /dev/null; then
-    yum install -y $@
-  else
-    echo "No package manager found."
-  fi
-}
-
-function prep_disk() {
-  mount=$1
-  device=$2
-  automount=${3:-false}
-
-  echo "warning: ERASING CONTENTS OF $device"
-  mkfs.xfs -f $device
-  if [ ! -e $mount ]; then
-    mkdir $mount
-  fi
-  mount -o defaults,noatime $device $mount
-  if $automount ; then
-    echo "$device $mount xfs defaults,noatime 0 0" >> /etc/fstab
-  fi
-}
-
-function make_hadoop_dirs {
-  for mount in "$@"; do
-    if [ ! -e $mount/hadoop ]; then
-      mkdir -p $mount/hadoop
-      chgrp hadoop $mount/hadoop
-      chmod g+w $mount/hadoop
-    fi
+function configure_cdh_hadoop() {
+  local OPTIND
+  local OPTARG
+  
+  ROLES=$1
+  shift
+  
+  NN_HOST=
+  JT_HOST=
+  CLOUD_PROVIDER=
+  while getopts "n:j:c:" OPTION; do
+    case $OPTION in
+    n)
+      NN_HOST="$OPTARG"
+      ;;
+    j)
+      JT_HOST="$OPTARG"
+      ;;
+    c)
+      CLOUD_PROVIDER="$OPTARG"
+      ;;
+    esac
   done
-}
-
-# Configure Hadoop by setting up disks and site file
-function configure_hadoop() {
+  
+  case $CLOUD_PROVIDER in
+    ec2 | aws-ec2 )
+      # Use public hostname for EC2
+      SELF_HOST=`wget -q -O - http://169.254.169.254/latest/meta-data/public-hostname`
+      ;;
+    *)
+      SELF_HOST=`/sbin/ifconfig eth0 | grep 'inet addr:' | cut -d: -f2 | awk '{ print $1}'`
+      ;;
+  esac
+  
+  REPO=${REPO:-cdh3}
+  HADOOP=hadoop-${HADOOP_VERSION:-0.20}
+  HADOOP_CONF_DIR=/etc/$HADOOP/conf.dist
+  for role in $(echo "$ROLES" | tr "," "\n"); do
+    case $role in
+    hadoop-namenode)
+      NN_HOST=$SELF_HOST
+      ;;
+    hadoop-jobtracker)
+      JT_HOST=$SELF_HOST
+      ;;
+    esac
+  done
+  
   case $CLOUD_PROVIDER in
   ec2)
     MOUNT=/mnt
@@ -371,44 +308,25 @@ EOF
   ln -s $MOUNT/hadoop/logs /var/log/hadoop-0.20
   chgrp -R hadoop /var/log/hadoop /var/log/hadoop-0.20
 
-}
-
-function install_hue() {
-  if which dpkg &> /dev/null; then
-    apt-get -y install hue-common
-    apt-get -y install hue-useradmin hue-jobsub hue-beeswax
-  elif which rpm &> /dev/null; then
-    yum install -y hue-common
-    yum install -y hue-useradmin hue-jobsub hue-beeswax
-  fi
-  
-  # Configure hue
-  sed -i -e "s|http_port=8088|http_port=80|" /etc/hue/hue.ini
-  
-  # Hue logs should be on the /mnt partition
-  mv /var/log/hue /var/log/hue.tmp
-  mkdir -p $MOUNT/hue/logs
-  chown hue:hue $MOUNT/hue/logs
-  ln -s $MOUNT/hue/logs /var/log/hue
-  chown -R hue:hue /var/log/hue
-  for files in /var/log/hue.tmp/*; do
-    if [ -a $files ]; then
-     mv $files /var/log/hue
-    fi
+  for role in $(echo "$ROLES" | tr "," "\n"); do
+    case $role in
+    hadoop-namenode)
+      start_namenode
+      ;;
+    hadoop-secondarynamenode)
+      start_hadoop_daemon secondarynamenode
+      ;;
+    hadoop-jobtracker)
+      start_hadoop_daemon jobtracker
+      ;;
+    hadoop-datanode)
+      start_hadoop_daemon datanode
+      ;;
+    hadoop-tasktracker)
+      start_hadoop_daemon tasktracker
+      ;;
+    esac
   done
-  rm -rf /var/log/hue.tmp
-}
-
-function install_hue_plugins() {
-  if which dpkg &> /dev/null; then
-    apt-get -y install hue-plugins
-  elif which rpm &> /dev/null; then
-    yum install -y hue-plugins
-  fi
-}
-
-function start_hue() {
-  /etc/init.d/hue start
 }
 
 function start_namenode() {
@@ -443,7 +361,7 @@ function start_namenode() {
   $AS_HDFS "/usr/bin/$HADOOP fs -chmod +w /user/hive/warehouse"
 }
 
-function start_daemon() {
+function start_hadoop_daemon() {
   daemon=$1
   if which dpkg &> /dev/null; then
     apt-get -y install $HADOOP-$daemon
@@ -452,29 +370,4 @@ function start_daemon() {
   fi
   service $HADOOP-$daemon start
 }
-
-configure_hadoop
-#install_hue_plugins
-
-for role in $(echo "$ROLES" | tr "," "\n"); do
-  case $role in
-  hadoop-namenode)
-    #install_hue
-    start_namenode
-    #start_hue
-    ;;
-  hadoop-secondarynamenode)
-    start_daemon secondarynamenode
-    ;;
-  hadoop-jobtracker)
-    start_daemon jobtracker
-    ;;
-  hadoop-datanode)
-    start_daemon datanode
-    ;;
-  hadoop-tasktracker)
-    start_daemon tasktracker
-    ;;
-  esac
-done
 

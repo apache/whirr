@@ -18,6 +18,8 @@
 
 package org.apache.whirr.service.cassandra;
 
+import static org.jclouds.scriptbuilder.domain.Statements.call;
+
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
@@ -57,14 +59,15 @@ public class CassandraClusterActionHandler extends ClusterActionHandlerSupport {
   
   @Override
   protected void beforeBootstrap(ClusterActionEvent event) throws IOException {
-    addRunUrl(event, "sun/java/install");
+    addStatement(event, call("install_java"));
     Configuration config = event.getClusterSpec().getConfiguration();
     String tarball = config.getString(BIN_TARBALL, null);
     String major = config.getString(MAJOR_VERSION, null);
-    if (tarball != null && major != null)
-      addRunUrl(event, String.format("apache/cassandra/install %s %s", major, tarball));
-    else
-      addRunUrl(event, "apache/cassandra/install");
+    if (tarball != null && major != null) {
+      addStatement(event, call("install_cassandra", major, tarball));
+    } else {
+      addStatement(event, call("install_cassandra"));
+    }
   }
 
   @Override
@@ -82,8 +85,8 @@ public class CassandraClusterActionHandler extends ClusterActionHandlerSupport {
     
     List<Instance> seeds = getSeeds(cluster.getInstances());
     String servers = Joiner.on(' ').join(getPrivateIps(seeds));
-    addRunUrl(event, "apache/cassandra/post-configure",
-        "-c", clusterSpec.getProvider(), servers);
+    addStatement(event, call("configure_cassandra", "-c",
+        clusterSpec.getProvider(), servers));
   }
 
   private List<String> getPrivateIps(List<Instance> instances) {

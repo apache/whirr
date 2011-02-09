@@ -17,6 +17,8 @@ package org.apache.whirr.service.zookeeper;
  * limitations under the License.
  */
 
+import static org.jclouds.scriptbuilder.domain.Statements.call;
+
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
@@ -52,8 +54,8 @@ public class ZooKeeperClusterActionHandler extends ClusterActionHandlerSupport {
 
   @Override
   protected void beforeBootstrap(ClusterActionEvent event) throws IOException {
-    addRunUrl(event, "sun/java/install");
-    addRunUrl(event, "apache/zookeeper/install");
+    addStatement(event, call("install_java"));
+    addStatement(event, call("install_zookeeper"));
   }
 
   @Override
@@ -69,10 +71,9 @@ public class ZooKeeperClusterActionHandler extends ClusterActionHandlerSupport {
     // Pass list of all servers in ensemble to configure script.
     // Position is significant: i-th server has id i.
     String servers = Joiner.on(' ').join(getPrivateIps(cluster.getInstancesMatching(
-      RolePredicates.role(ZooKeeperClusterActionHandler.ZOOKEEPER_ROLE)))); 
-    addRunUrl(event, "apache/zookeeper/post-configure", "-c",
-        clusterSpec.getProvider(),
-        servers);
+      RolePredicates.role(ZooKeeperClusterActionHandler.ZOOKEEPER_ROLE))));
+    addStatement(event, call("configure_zookeeper", "-c",
+        clusterSpec.getProvider(), servers));
   }
   
   @Override

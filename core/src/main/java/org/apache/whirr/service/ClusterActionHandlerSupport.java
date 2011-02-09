@@ -86,6 +86,10 @@ public abstract class ClusterActionHandlerSupport extends ClusterActionHandler {
       throws IOException {
     Statement statement = new RunUrlStatement(
         event.getClusterSpec().getRunUrlBase(), runUrl, args);
+    addStatement(event, statement);
+  }
+
+  public static void addStatement(ClusterActionEvent event, Statement statement) {
     event.getStatementBuilder().addStatement(statement);
   }
 }
