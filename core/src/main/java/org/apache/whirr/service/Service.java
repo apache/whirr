@@ -25,6 +25,7 @@ import com.google.common.io.Files;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.whirr.cluster.actions.BootstrapClusterAction;
@@ -33,6 +34,7 @@ import org.apache.whirr.cluster.actions.DestroyClusterAction;
 import org.apache.whirr.net.DnsUtil;
 import org.apache.whirr.service.Cluster.Instance;
 import org.jclouds.compute.ComputeService;
+import org.jclouds.compute.ComputeServiceContextFactory;
 import org.jclouds.compute.domain.ComputeMetadata;
 import org.jclouds.compute.domain.NodeMetadata;
 import org.jclouds.compute.domain.NodeState;
@@ -67,20 +69,23 @@ public class Service {
   public Cluster launchCluster(ClusterSpec clusterSpec)
       throws IOException, InterruptedException {
     
-    BootstrapClusterAction bootstrapper = new BootstrapClusterAction();
+    ComputeServiceContextFactory computeServiceFactory = new ComputeServiceContextFactory();
+    Map<String, ClusterActionHandler> handlerMap = new HandlerMapFactory().create();
+
+    BootstrapClusterAction bootstrapper = new BootstrapClusterAction(computeServiceFactory, handlerMap);
     Cluster cluster = bootstrapper.execute(clusterSpec, null);
 
-    ConfigureClusterAction configurer = new ConfigureClusterAction();
+    ConfigureClusterAction configurer = new ConfigureClusterAction(computeServiceFactory, handlerMap);
     cluster = configurer.execute(clusterSpec, cluster);
-    
+
     createInstancesFile(clusterSpec, cluster);
-    
+
     return cluster;
   }
   
   private void createInstancesFile(ClusterSpec clusterSpec, Cluster cluster)
       throws IOException {
-    
+
     File clusterDir = clusterSpec.getClusterDirectory();
     File instancesFile = new File(clusterDir, "instances");
     StringBuilder sb = new StringBuilder();
@@ -111,7 +116,7 @@ public class Service {
    */
   public void destroyCluster(ClusterSpec clusterSpec) throws IOException,
       InterruptedException {
-    DestroyClusterAction destroyer = new DestroyClusterAction();
+    DestroyClusterAction destroyer = new DestroyClusterAction(new ComputeServiceContextFactory());
     destroyer.execute(clusterSpec, null);
     Files.deleteRecursively(clusterSpec.getClusterDirectory());
   }
@@ -129,7 +134,7 @@ public class Service {
   public Set<? extends NodeMetadata> getNodes(ClusterSpec clusterSpec)
     throws IOException, InterruptedException {
     ComputeService computeService =
-      ComputeServiceContextBuilder.build(clusterSpec).getComputeService();
+      ComputeServiceContextBuilder.build(new ComputeServiceContextFactory(), clusterSpec).getComputeService();
     return computeService.listNodesDetailsMatching(
         runningInGroup(clusterSpec.getClusterName()));
   }

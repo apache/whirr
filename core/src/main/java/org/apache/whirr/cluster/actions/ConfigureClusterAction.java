@@ -38,6 +38,7 @@ import org.apache.whirr.service.RolePredicates;
 import org.apache.whirr.service.jclouds.StatementBuilder;
 import org.jclouds.compute.ComputeService;
 import org.jclouds.compute.ComputeServiceContext;
+import org.jclouds.compute.ComputeServiceContextFactory;
 import org.jclouds.compute.RunScriptOnNodesException;
 import org.jclouds.compute.domain.NodeMetadata;
 import org.jclouds.compute.options.RunScriptOptions;
@@ -55,6 +56,11 @@ public class ConfigureClusterAction extends ScriptBasedClusterAction {
   private static final Logger LOG =
     LoggerFactory.getLogger(ConfigureClusterAction.class);
 
+  public ConfigureClusterAction(final ComputeServiceContextFactory computeServiceContextFactory,
+      final Map<String, ClusterActionHandler> handlerMap) {
+    super(computeServiceContextFactory, handlerMap);
+  }
+  
   @Override
   protected String getAction() {
     return ClusterActionHandler.CONFIGURE_ACTION;
@@ -69,7 +75,7 @@ public class ConfigureClusterAction extends ScriptBasedClusterAction {
       Cluster cluster = entry.getValue().getCluster();
       StatementBuilder statementBuilder = entry.getValue().getStatementBuilder();
       ComputeServiceContext computeServiceContext =
-        ComputeServiceContextBuilder.build(clusterSpec);
+        ComputeServiceContextBuilder.build(getComputeServiceContextFactory(), clusterSpec);
       ComputeService computeService = computeServiceContext.getComputeService();
       Credentials credentials = new Credentials(
           Iterables.get(cluster.getInstances(), 0).getLoginCredentials().identity,

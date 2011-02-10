@@ -28,6 +28,7 @@ import static org.mockito.Mockito.when;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -120,5 +121,54 @@ public class LaunchClusterCommandTest {
     
     assertThat(outBytes.toString(), containsString("Started cluster of 0 instances"));
     
+  }
+  
+  @Test
+  public void testMaxPercentFailure() throws Exception {
+    
+    ServiceFactory factory = mock(ServiceFactory.class);
+    Service service = mock(Service.class);
+    Cluster cluster = mock(Cluster.class);
+    when(factory.create((String) any())).thenReturn(service);
+    when(service.launchCluster((ClusterSpec) any())).thenReturn(cluster);
+    
+    LaunchClusterCommand command = new LaunchClusterCommand(factory);
+    Map<String, File> keys = KeyPair.generateTemporaryFiles();
+    
+    int rc = command.run(null, out, null, Lists.newArrayList(
+        "--service-name", "hadoop",
+        "--cluster-name", "test-cluster",
+        "--instance-templates", "1 jt+nn,3 dn+tt",
+        "--instance-templates-max-percent-failures", "60 dn+tt",
+        "--provider", "ec2",
+        "--identity", "myusername", "--credential", "mypassword",
+        "--private-key-file", keys.get("private").getAbsolutePath(),
+        "--version", "version-string"
+        ));
+    
+    assertThat(rc, is(0));
+
+    Configuration conf = new PropertiesConfiguration();
+    conf.addProperty("whirr.version", "version-string");
+    conf.addProperty("whirr.instance-templates-max-percent-failure", "60 dn+tt");
+
+    ClusterSpec expectedClusterSpec = ClusterSpec.withNoDefaults(conf);
+    expectedClusterSpec.setInstanceTemplates(Lists.newArrayList(
+        new ClusterSpec.InstanceTemplate(1, 1, Sets.newHashSet("jt", "nn")),
+        new ClusterSpec.InstanceTemplate(3, 2, Sets.newHashSet("dn", "tt"))
+    ));
+    expectedClusterSpec.setServiceName("hadoop");
+    expectedClusterSpec.setProvider("ec2");
+    expectedClusterSpec.setIdentity("myusername");
+    expectedClusterSpec.setCredential("mypassword");
+    expectedClusterSpec.setClusterName("test-cluster");
+    expectedClusterSpec.setPrivateKey(keys.get("private"));
+    expectedClusterSpec.setPublicKey(keys.get("public"));
+    
+    verify(factory).create("hadoop");
+    
+    verify(service).launchCluster(expectedClusterSpec);
+    
+    assertThat(outBytes.toString(), containsString("Started cluster of 0 instances")); 
   }
 }

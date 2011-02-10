@@ -40,7 +40,11 @@ public class ComputeServiceContextBuilder {
   private static final Logger LOG =
     LoggerFactory.getLogger(ComputeServiceContextBuilder.class);
    
-  public static ComputeServiceContext build(ClusterSpec spec) throws IOException {
+  public static ComputeServiceContext build(final ClusterSpec spec) throws IOException {
+    return build(new ComputeServiceContextFactory(), spec);
+  }
+
+  public static ComputeServiceContext build(final ComputeServiceContextFactory factory, final ClusterSpec spec) throws IOException {
     Configuration jcloudsConfig =
       spec.getConfigurationForKeysWithPrefix("jclouds");
     Set<AbstractModule> wiring = ImmutableSet.of(new JschSshClientModule(),
@@ -53,7 +57,7 @@ public class ComputeServiceContextBuilder {
       LOG.warn("please use provider \"cloudservers-us\" instead of \"cloudservers\"");
       spec.setProvider("cloudservers-us");
     }
-    return new ComputeServiceContextFactory().createContext(spec.getProvider(),
+    return factory.createContext(spec.getProvider(),
       spec.getIdentity(), spec.getCredential(),
       wiring, ConfigurationConverter.getProperties(jcloudsConfig));
   }
