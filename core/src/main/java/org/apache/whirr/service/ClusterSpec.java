@@ -21,10 +21,24 @@ package org.apache.whirr.service;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Objects;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.KeyPair;
+
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
@@ -36,27 +50,19 @@ import org.apache.commons.lang.text.StrLookup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.apache.whirr.ssh.KeyPair.sameKeyPair;
-
 
 /**
  * This class represents the specification of a cluster. It is used to describe
  * the properties of a cluster before it is launched.
  */
 public class ClusterSpec {
+  
+  private static final Logger LOG = LoggerFactory.getLogger(ClusterSpec.class);
   
   static {
     // Environment variable interpolation (e.g. {env:MY_VAR}) is supported
@@ -78,6 +84,22 @@ public class ClusterSpec {
       "to launch for each set of roles. E.g. 1 hadoop-namenode+" +
       "hadoop-jobtracker, 10 hadoop-datanode+hadoop-tasktracker"),
       
+    INSTANCE_TEMPLATES_MAX_PERCENT_FAILURES(String.class, false, "The percentage " +
+      "of successfully started instances for each set of roles. E.g. " + 
+      "100 hadoop-namenode+hadoop-jobtracker,60 hadoop-datanode+hadoop-tasktracker means " + 
+      "all instances with the roles hadoop-namenode and hadoop-jobtracker " + 
+      "has to be successfully started, and 60% of instances has to be succcessfully " + 
+      "started each with the roles hadoop-datanode and hadoop-tasktracker."),
+
+    INSTANCE_TEMPLATES_MINIMUM_NUMBER_OF_INSTANCES(String.class, false, "The minimum number" +
+      "of successfully started instances for each set of roles. E.g. " +
+      "1 hadoop-namenode+hadoop-jobtracker,6 hadoop-datanode+hadoop-tasktracker means " + 
+      "1 instance with the roles hadoop-namenode and hadoop-jobtracker has to be successfully started," +
+      " and 6 instances has to be successfully started each with the roles hadoop-datanode and hadoop-tasktracker."),
+
+    MAX_STARTUP_RETRIES(Integer.class, false, "The number of retries in case of insufficient " + 
+        "successfully started instances. Default value is 1."),
+    
     PROVIDER(String.class, false, "The name of the cloud provider. " + 
       "E.g. aws-ec2, cloudservers-uk"),
       
@@ -167,12 +189,21 @@ public class ClusterSpec {
 
     private Set<String> roles;
     private int numberOfInstances;
+    private int minNumberOfInstances;  // some instances may fail, at least a minimum number is required
 
     public InstanceTemplate(int numberOfInstances, String... roles) {
-      this(numberOfInstances, Sets.newLinkedHashSet(Lists.newArrayList(roles)));
+      this(numberOfInstances, numberOfInstances, Sets.newLinkedHashSet(Lists.newArrayList(roles)));
     }
 
     public InstanceTemplate(int numberOfInstances, Set<String> roles) {
+      this(numberOfInstances, numberOfInstances, roles);      
+    }
+
+    public InstanceTemplate(int numberOfInstances, int minNumberOfInstances, String... roles) {
+      this(numberOfInstances, minNumberOfInstances, Sets.newLinkedHashSet(Lists.newArrayList(roles)));
+    }
+
+    public InstanceTemplate(int numberOfInstances, int minNumberOfInstances, Set<String> roles) {
       for (String role : roles) {
         checkArgument(!StringUtils.contains(role, " "),
             "Role '%s' may not contain space characters.", role);
@@ -180,9 +211,10 @@ public class ClusterSpec {
 
       this.roles = replaceAliases(roles);
       this.numberOfInstances = numberOfInstances;
+      this.minNumberOfInstances = minNumberOfInstances;
     }
 
-    private Set<String> replaceAliases(Set<String> roles) {
+    private static Set<String> replaceAliases(Set<String> roles) {
       Set<String> newRoles = Sets.newLinkedHashSet();
       for(String role : roles) {
         if (aliases.containsKey(role)) {
@@ -204,35 +236,76 @@ public class ClusterSpec {
       return numberOfInstances;
     }
     
+    public int getMinNumberOfInstances() {
+      return minNumberOfInstances;
+    }
+    
     public boolean equals(Object o) {
       if (o instanceof InstanceTemplate) {
         InstanceTemplate that = (InstanceTemplate) o;
         return Objects.equal(numberOfInstances, that.numberOfInstances)
+          && Objects.equal(minNumberOfInstances, that.minNumberOfInstances)
           && Objects.equal(roles, that.roles);
       }
       return false;
     }
     
     public int hashCode() {
-      return Objects.hashCode(numberOfInstances, roles);
+      return Objects.hashCode(numberOfInstances, minNumberOfInstances, roles);
     }
     
     public String toString() {
       return Objects.toStringHelper(this)
         .add("numberOfInstances", numberOfInstances)
+        .add("minNumberOfInstances", minNumberOfInstances)
         .add("roles", roles)
         .toString();
     }
     
-    public static List<InstanceTemplate> parse(String... strings) {
+    public static Map<String, String> parse(String... strings) {
+      Set<String> roles = Sets.newLinkedHashSet(Lists.newArrayList(strings));
+      roles = replaceAliases(roles);
+      Map<String, String> templates = Maps.newHashMap();
+      for (String s : roles) {
+        String[] parts = s.split(" ");
+        checkArgument(parts.length == 2, 
+            "Invalid instance template syntax for '%s'. Does not match " +
+            "'<number> <role1>+<role2>+<role3>...', e.g. '1 hadoop-namenode+hadoop-jobtracker'.", s);
+        templates.put(parts[1], parts[0]);
+      }
+      return templates;
+    }    
+    
+    public static List<InstanceTemplate> parse(CompositeConfiguration cconf) {
+      final String[] strings = cconf.getStringArray(Property.INSTANCE_TEMPLATES.getConfigName());
+      Map<String, String> maxPercentFailures = parse(cconf.getStringArray(Property.INSTANCE_TEMPLATES_MAX_PERCENT_FAILURES.getConfigName()));
+      Map<String, String> minInstances = parse(cconf.getStringArray(Property.INSTANCE_TEMPLATES_MINIMUM_NUMBER_OF_INSTANCES.getConfigName()));
       List<InstanceTemplate> templates = Lists.newArrayList();
       for (String s : strings) {
         String[] parts = s.split(" ");
         checkArgument(parts.length == 2, 
             "Invalid instance template syntax for '%s'. Does not match " +
-            "'<number> <role1>+<role2>+<role3>...', e.g. '1 nn+jt'.", s);
+            "'<number> <role1>+<role2>+<role3>...', e.g. '1 hadoop-namenode+hadoop-jobtracker'.", s);
         int num = Integer.parseInt(parts[0]);
-        templates.add(new InstanceTemplate(num, parts[1].split("\\+")));
+        int minNumberOfInstances = 0;
+        final String maxPercentFail = maxPercentFailures.get(parts[1]);
+        if (maxPercentFail != null) {
+          // round up integer division (a + b -1) / b
+          minNumberOfInstances = (Integer.parseInt(maxPercentFail) * num + 99) / 100;
+        }
+        String minNumberOfInst = minInstances.get(parts[1]);
+        if (minNumberOfInst != null) {
+          int minExplicitlySet = Integer.parseInt(minNumberOfInst);
+          if (minNumberOfInstances > 0) { // maximum between two minims
+            minNumberOfInstances = Math.max(minNumberOfInstances, minExplicitlySet);
+          } else {
+            minNumberOfInstances = minExplicitlySet; 
+          }              
+        }
+        if (minNumberOfInstances == 0 || minNumberOfInstances > num) {
+          minNumberOfInstances = num;
+        }
+        templates.add(new InstanceTemplate(num, minNumberOfInstances, parts[1].split("\\+")));
       }
       return templates;
     }
@@ -281,6 +354,7 @@ public class ClusterSpec {
 
   private List<InstanceTemplate> instanceTemplates;
   private String serviceName;
+  private int maxStartupRetries;
   private String provider;
   private String identity;
   private String credential;
@@ -319,8 +393,8 @@ public class ClusterSpec {
     }
 
     setServiceName(c.getString(Property.SERVICE_NAME.getConfigName()));
-    setInstanceTemplates(InstanceTemplate.parse(
-        c.getStringArray(Property.INSTANCE_TEMPLATES.getConfigName())));
+    setInstanceTemplates(InstanceTemplate.parse(c));
+    setMaxStartupRetries(c.getInt(Property.MAX_STARTUP_RETRIES.getConfigName(), 1));
     setProvider(c.getString(Property.PROVIDER.getConfigName()));
     setIdentity(c.getString(Property.IDENTITY.getConfigName()));
     setCredential(c.getString(Property.CREDENTIAL.getConfigName()));
@@ -396,6 +470,9 @@ public class ClusterSpec {
   public String getServiceName() {
     return serviceName;
   }
+  public int getMaxStartupRetries() {
+    return maxStartupRetries;
+  }
   public String getProvider() {
     return provider;
   }
@@ -442,6 +519,10 @@ public class ClusterSpec {
 
   public void setServiceName(String serviceName) {
     this.serviceName = serviceName;
+  }
+  
+  public void setMaxStartupRetries(int maxStartupRetries) {
+    this.maxStartupRetries = maxStartupRetries;
   }
 
   public void setProvider(String provider) {
@@ -577,6 +658,7 @@ public class ClusterSpec {
       ClusterSpec that = (ClusterSpec) o;
       return Objects.equal(instanceTemplates, that.instanceTemplates)
         && Objects.equal(serviceName, that.serviceName)
+        && Objects.equal(maxStartupRetries, that.maxStartupRetries)
         && Objects.equal(provider, that.provider)
         && Objects.equal(identity, that.identity)
         && Objects.equal(credential, that.credential)
@@ -594,7 +676,7 @@ public class ClusterSpec {
   
   public int hashCode() {
     return Objects.hashCode(instanceTemplates, serviceName,
-        provider, identity, credential, clusterName, publicKey,
+        maxStartupRetries, provider, identity, credential, clusterName, publicKey,
         privateKey, imageId, hardwareId, locationId, clientCidrs, version,
         runUrlBase);
   }
@@ -603,6 +685,7 @@ public class ClusterSpec {
     return Objects.toStringHelper(this)
       .add("instanceTemplates", instanceTemplates)
       .add("serviceName", serviceName)
+      .add("maxStartupRetries", maxStartupRetries)
       .add("provider", provider)
       .add("identity", identity)
       .add("credential", credential)
@@ -617,5 +700,5 @@ public class ClusterSpec {
       .add("runUrlBase", runUrlBase)
       .toString();
   }
-  
+
 }

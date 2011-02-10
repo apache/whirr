@@ -23,7 +23,6 @@ import com.google.common.collect.Maps;
 
 import java.io.IOException;
 import java.util.Map;
-import java.util.ServiceLoader;
 
 import org.apache.whirr.service.Cluster;
 import org.apache.whirr.service.ClusterAction;
@@ -32,6 +31,8 @@ import org.apache.whirr.service.ClusterActionHandler;
 import org.apache.whirr.service.ClusterSpec;
 import org.apache.whirr.service.ClusterSpec.InstanceTemplate;
 import org.apache.whirr.service.jclouds.StatementBuilder;
+import org.jclouds.compute.ComputeServiceContextFactory;
+import org.jclouds.scriptbuilder.domain.Statements;
 
 /**
  * A {@link ClusterAction} that provides the base functionality for running
@@ -39,23 +40,24 @@ import org.apache.whirr.service.jclouds.StatementBuilder;
  */
 public abstract class ScriptBasedClusterAction extends ClusterAction {
 
-  private ServiceLoader<ClusterActionHandler> clusterActionHandlerLoader =
-    ServiceLoader.load(ClusterActionHandler.class);
-
+  private final Map<String, ClusterActionHandler> handlerMap;
+  
+  protected ScriptBasedClusterAction(final ComputeServiceContextFactory computeServiceContextFactory,
+      final Map<String, ClusterActionHandler> handlerMap) {
+    super(computeServiceContextFactory);
+    this.handlerMap = handlerMap;
+  }
+  
   protected abstract void doAction(Map<InstanceTemplate, ClusterActionEvent> eventMap)
       throws IOException, InterruptedException;
 
   public Cluster execute(ClusterSpec clusterSpec, Cluster cluster) throws IOException, InterruptedException {
     
-    Map<String, ClusterActionHandler> handlerMap = Maps.newHashMap();
-    for (ClusterActionHandler handler : clusterActionHandlerLoader) {
-      handlerMap.put(handler.getRole(), handler);
-    }
-
     Map<InstanceTemplate, ClusterActionEvent> eventMap = Maps.newHashMap();
     Cluster newCluster = cluster;
     for (InstanceTemplate instanceTemplate : clusterSpec.getInstanceTemplates()) {
       StatementBuilder statementBuilder = new StatementBuilder();
+      statementBuilder.addStatement(Statements.call("install_runurl"));
       ClusterActionEvent event = new ClusterActionEvent(getAction(),
           clusterSpec, newCluster, statementBuilder);
       eventMap.put(instanceTemplate, event);

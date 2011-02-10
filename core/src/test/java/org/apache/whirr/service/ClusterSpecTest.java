@@ -38,9 +38,13 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.ConfigurationUtils;
+import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.configuration.PropertiesConfiguration;
+import org.apache.commons.configuration.SubnodeConfiguration;
 import org.apache.commons.io.IOUtils;
 import org.apache.whirr.service.ClusterSpec.InstanceTemplate;
 import org.apache.whirr.ssh.KeyPair;
@@ -212,11 +216,77 @@ public class ClusterSpecTest {
 
   @Test
   public void testApplyRoleAliases() {
-    InstanceTemplate template = InstanceTemplate.parse("1 nn+jt+tt+dn+zk").get(0);
+    CompositeConfiguration c = new CompositeConfiguration();
+    Configuration config = new PropertiesConfiguration();
+    config.addProperty("whirr.instance-templates", "1 nn+jt+tt+dn+zk");
+    c.addConfiguration(config);    
+    InstanceTemplate template = InstanceTemplate.parse(c).get(0);
     Set<String> expected = Sets.newLinkedHashSet(Arrays.asList(new String[]{
         "hadoop-namenode", "hadoop-jobtracker", "hadoop-tasktracker",
         "hadoop-datanode", "zookeeper"}));
     assertThat(template.getRoles(), is(expected));
   }
 
+  @Test(expected = IllegalArgumentException.class)
+  public void testIllegalArgumentExceptionOnInstancesTemplates() throws Exception {
+    Configuration conf = new PropertiesConfiguration();
+    conf.addProperty("whirr.instance-templates", "1 hadoop-namenode+hadoop-jobtracker,3 hadoop-datanode+hadoop-tasktracker");
+    conf.addProperty("whirr.instance-templates-max-percent-failures", "60 % hadoop-datanode+hadoop-tasktracker");
+    ClusterSpec expectedClusterSpec = ClusterSpec.withNoDefaults(conf);
+    List<InstanceTemplate> templates = expectedClusterSpec.getInstanceTemplates();
+    InstanceTemplate t1 = templates.get(0);
+    assertThat(t1.getMinNumberOfInstances(), is(1));
+    InstanceTemplate t2 = templates.get(1);
+    assertThat(t2.getMinNumberOfInstances(), is(2));
+  }
+  
+  @Test(expected = NumberFormatException.class)
+  public void testNumberFormatExceptionOnInstancesTemplates() throws Exception {
+    Configuration conf = new PropertiesConfiguration();
+    conf.addProperty("whirr.instance-templates", "1 hadoop-namenode+hadoop-jobtracker,3 hadoop-datanode+hadoop-tasktracker");
+    conf.addProperty("whirr.instance-templates-max-percent-failures", "60% hadoop-datanode+hadoop-tasktracker");
+    ClusterSpec expectedClusterSpec = ClusterSpec.withNoDefaults(conf);
+    List<InstanceTemplate> templates = expectedClusterSpec.getInstanceTemplates();
+    InstanceTemplate t1 = templates.get(0);
+    assertThat(t1.getMinNumberOfInstances(), is(1));
+    InstanceTemplate t2 = templates.get(1);
+    assertThat(t2.getMinNumberOfInstances(), is(2));
+  }
+  
+  @Test
+  public void testNumberOfInstancesPerTemplate() throws Exception {
+    Configuration conf = new PropertiesConfiguration();
+    conf.addProperty("whirr.instance-templates", "1 hadoop-namenode+hadoop-jobtracker,3 hadoop-datanode+hadoop-tasktracker");
+    conf.addProperty("whirr.instance-templates-max-percent-failures", "100 hadoop-namenode+hadoop-jobtracker,60 hadoop-datanode+hadoop-tasktracker");
+    ClusterSpec expectedClusterSpec = ClusterSpec.withNoDefaults(conf);
+    List<InstanceTemplate> templates = expectedClusterSpec.getInstanceTemplates();
+    InstanceTemplate t1 = templates.get(0);
+    assertThat(t1.getMinNumberOfInstances(), is(1));
+    InstanceTemplate t2 = templates.get(1);
+    assertThat(t2.getMinNumberOfInstances(), is(2));
+    
+    conf.setProperty("whirr.instance-templates-max-percent-failures", "60 hadoop-datanode+hadoop-tasktracker");
+    expectedClusterSpec = ClusterSpec.withNoDefaults(conf);
+    templates = expectedClusterSpec.getInstanceTemplates();
+    t1 = templates.get(0);
+    assertThat(t1.getMinNumberOfInstances(), is(1));
+    t2 = templates.get(1);
+    assertThat(t2.getMinNumberOfInstances(), is(2));
+
+    conf.addProperty("whirr.instance-templates-minumum-number-of-instances", "1 hadoop-datanode+hadoop-tasktracker");
+    expectedClusterSpec = ClusterSpec.withNoDefaults(conf);
+    templates = expectedClusterSpec.getInstanceTemplates();
+    t1 = templates.get(0);
+    assertThat(t1.getMinNumberOfInstances(), is(1));
+    t2 = templates.get(1);
+    assertThat(t2.getMinNumberOfInstances(), is(2));
+
+    conf.setProperty("whirr.instance-templates-minimum-number-of-instances", "3 hadoop-datanode+hadoop-tasktracker");
+    expectedClusterSpec = ClusterSpec.withNoDefaults(conf);
+    templates = expectedClusterSpec.getInstanceTemplates();
+    t1 = templates.get(0);
+    assertThat(t1.getMinNumberOfInstances(), is(1));
+    t2 = templates.get(1);
+    assertThat(t2.getMinNumberOfInstances(), is(3));
+  }  
 }

@@ -28,6 +28,7 @@ import org.apache.whirr.service.ClusterActionHandler;
 import org.apache.whirr.service.ClusterSpec;
 import org.apache.whirr.service.ComputeServiceContextBuilder;
 import org.jclouds.compute.ComputeService;
+import org.jclouds.compute.ComputeServiceContextFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,6 +40,10 @@ public class DestroyClusterAction extends ClusterAction {
 
   private static final Logger LOG =
     LoggerFactory.getLogger(DestroyClusterAction.class);
+  
+  public DestroyClusterAction(final ComputeServiceContextFactory computeServiceContextFactory) {
+    super(computeServiceContextFactory);
+  }
 
   @Override
   protected String getAction() {
@@ -50,7 +55,7 @@ public class DestroyClusterAction extends ClusterAction {
       throws IOException, InterruptedException {
     LOG.info("Destroying " + clusterSpec.getClusterName() + " cluster");
     ComputeService computeService =
-      ComputeServiceContextBuilder.build(clusterSpec).getComputeService();
+    ComputeServiceContextBuilder.build(getComputeServiceContextFactory(), clusterSpec).getComputeService();
     computeService.destroyNodesMatching(inGroup(clusterSpec.getClusterName()));
     LOG.info("Cluster {} destroyed", clusterSpec.getClusterName());
     return null;

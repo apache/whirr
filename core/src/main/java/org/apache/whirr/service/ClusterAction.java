@@ -20,12 +20,24 @@ package org.apache.whirr.service;
 
 import java.io.IOException;
 
+import org.jclouds.compute.ComputeServiceContextFactory;
+
 /**
  * Performs an action on a cluster. Example actions include bootstrapping
  * (launching, creating), configuring, or running an arbitrary command on the
  * cluster.
  */
 public abstract class ClusterAction {
+  
+  private final ComputeServiceContextFactory computeServiceContextFactory;
+
+  protected ClusterAction(final ComputeServiceContextFactory computeServiceContextFactory) {
+    this.computeServiceContextFactory = computeServiceContextFactory;
+  }
+  
+  protected ComputeServiceContextFactory getComputeServiceContextFactory() {
+    return computeServiceContextFactory;
+  }
   
   protected abstract String getAction();
 

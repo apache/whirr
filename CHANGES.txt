@@ -33,6 +33,9 @@ Trunk (unreleased changes)
     WHIRR-124. Show warning messages before converting ec2->aws-ec2 and 
     cloudservers -> clouservers-us (Adrian Cole via asavu)
 
+    WHIRR-167. Improve bootstrapping and configuration to be able to 
+    isolate and repair or evict failing nodes on EC2 (Tibor Kiss via asavu)
+
   BUG FIXES
 
     WHIRR-170. Instances should be started in the order specified in 
