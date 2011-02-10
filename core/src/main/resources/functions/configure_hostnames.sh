@@ -13,7 +13,7 @@ function configure_hostnames() {
   done
   
   case $CLOUD_PROVIDER in
-    cloudservers)
+    cloudservers | cloudservers-uk | cloudservers-us )
       if which dpkg &> /dev/null; then
         PRIVATE_IP=`/sbin/ifconfig eth0 | grep 'inet addr:' | cut -d: -f2 | awk '{ print $1}'`
         HOSTNAME=`echo $PRIVATE_IP | tr . -`.static.cloud-ips.com

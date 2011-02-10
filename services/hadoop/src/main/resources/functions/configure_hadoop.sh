@@ -5,17 +5,9 @@ function configure_hadoop() {
   ROLES=$1
   shift
   
-  NN_HOST=
-  JT_HOST=
   CLOUD_PROVIDER=
-  while getopts "n:j:c:" OPTION; do
+  while getopts "c:" OPTION; do
     case $OPTION in
-    n)
-      NN_HOST="$OPTARG"
-      ;;
-    j)
-      JT_HOST="$OPTARG"
-      ;;
     c)
       CLOUD_PROVIDER="$OPTARG"
       ;;
@@ -24,11 +16,10 @@ function configure_hadoop() {
   
   case $CLOUD_PROVIDER in
     ec2 | aws-ec2 )
-      # Use public hostname for EC2
-      SELF_HOST=`wget -q -O - http://169.254.169.254/latest/meta-data/public-hostname`
+      # Alias /mnt as /data
+      ln -s /mnt /data
       ;;
     *)
-      SELF_HOST=`/sbin/ifconfig eth0 | grep 'inet addr:' | cut -d: -f2 | awk '{ print $1}'`
       ;;
   esac
   
@@ -36,203 +27,17 @@ function configure_hadoop() {
   HADOOP_HOME=/usr/local/hadoop-$HADOOP_VERSION
   HADOOP_CONF_DIR=$HADOOP_HOME/conf
 
-  case $CLOUD_PROVIDER in
-  ec2 | aws-ec2 )
-    MOUNT=/mnt
-    ;;
-  *)
-    MOUNT=/data
-    ;;
-  esac
-  FIRST_MOUNT=$MOUNT
-  DFS_NAME_DIR=$MOUNT/hadoop/hdfs/name
-  FS_CHECKPOINT_DIR=$MOUNT/hadoop/hdfs/secondary
-  DFS_DATA_DIR=$MOUNT/hadoop/hdfs/data
-  MAPRED_LOCAL_DIR=$MOUNT/hadoop/mapred/local
-  MAX_MAP_TASKS=2
-  MAX_REDUCE_TASKS=1
-  CHILD_OPTS=-Xmx550m
-  CHILD_ULIMIT=1126400
-
-  mkdir -p $MOUNT/hadoop
-  chown hadoop:hadoop $MOUNT/hadoop
-  if [ ! -e $MOUNT/tmp ]; then
-    mkdir $MOUNT/tmp
-    chmod a+rwxt $MOUNT/tmp
+  mkdir -p /data/hadoop
+  chown hadoop:hadoop /data/hadoop
+  if [ ! -e /data/tmp ]; then
+    mkdir /data/tmp
+    chmod a+rwxt /data/tmp
   fi
   mkdir /etc/hadoop
   ln -s $HADOOP_CONF_DIR /etc/hadoop/conf
 
-  ##############################################################################
-  # Modify this section to customize your Hadoop cluster.
-  ##############################################################################
-  cat > $HADOOP_CONF_DIR/hadoop-site.xml <<EOF
-<?xml version="1.0"?>
-<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
-<configuration>
-<property>
-  <name>dfs.block.size</name>
-  <value>134217728</value>
-  <final>true</final>
-</property>
-<property>
-  <name>dfs.data.dir</name>
-  <value>$DFS_DATA_DIR</value>
-  <final>true</final>
-</property>
-<property>
-  <name>dfs.datanode.du.reserved</name>
-  <value>1073741824</value>
-  <final>true</final>
-</property>
-<property>
-  <name>dfs.datanode.handler.count</name>
-  <value>3</value>
-  <final>true</final>
-</property>
-<!--property>
-  <name>dfs.hosts</name>
-  <value>$HADOOP_CONF_DIR/dfs.hosts</value>
-  <final>true</final>
-</property-->
-<!--property>
-  <name>dfs.hosts.exclude</name>
-  <value>$HADOOP_CONF_DIR/dfs.hosts.exclude</value>
-  <final>true</final>
-</property-->
-<property>
-  <name>dfs.name.dir</name>
-  <value>$DFS_NAME_DIR</value>
-  <final>true</final>
-</property>
-<property>
-  <name>dfs.namenode.handler.count</name>
-  <value>5</value>
-  <final>true</final>
-</property>
-<property>
-  <name>dfs.permissions</name>
-  <value>true</value>
-  <final>true</final>
-</property>
-<property>
-  <name>dfs.replication</name>
-  <value>$DFS_REPLICATION</value>
-</property>
-<property>
-  <name>fs.checkpoint.dir</name>
-  <value>$FS_CHECKPOINT_DIR</value>
-  <final>true</final>
-</property>
-<property>
-  <name>fs.default.name</name>
-  <value>hdfs://$NN_HOST:8020/</value>
-</property>
-<property>
-  <name>fs.trash.interval</name>
-  <value>1440</value>
-  <final>true</final>
-</property>
-<property>
-  <name>hadoop.tmp.dir</name>
-  <value>$MOUNT/tmp/hadoop-\${user.name}</value>
-  <final>true</final>
-</property>
-<property>
-  <name>io.file.buffer.size</name>
-  <value>65536</value>
-</property>
-<property>
-  <name>mapred.child.java.opts</name>
-  <value>$CHILD_OPTS</value>
-</property>
-<property>
-  <name>mapred.child.ulimit</name>
-  <value>$CHILD_ULIMIT</value>
-  <final>true</final>
-</property>
-<property>
-  <name>mapred.job.tracker</name>
-  <value>$JT_HOST:8021</value>
-</property>
-<property>
-  <name>mapred.job.tracker.handler.count</name>
-  <value>5</value>
-  <final>true</final>
-</property>
-<property>
-  <name>mapred.local.dir</name>
-  <value>$MAPRED_LOCAL_DIR</value>
-  <final>true</final>
-</property>
-<property>
-  <name>mapred.map.tasks.speculative.execution</name>
-  <value>true</value>
-</property>
-<property>
-  <name>mapred.reduce.parallel.copies</name>
-  <value>10</value>
-</property>
-<property>
-  <name>mapred.reduce.tasks</name>
-  <value>10</value>
-</property>
-<property>
-  <name>mapred.reduce.tasks.speculative.execution</name>
-  <value>false</value>
-</property>
-<property>
-  <name>mapred.submit.replication</name>
-  <value>10</value>
-</property>
-<property>
-  <name>mapred.system.dir</name>
-  <value>/hadoop/system/mapred</value>
-</property>
-<property>
-  <name>mapred.tasktracker.map.tasks.maximum</name>
-  <value>$MAX_MAP_TASKS</value>
-  <final>true</final>
-</property>
-<property>
-  <name>mapred.tasktracker.reduce.tasks.maximum</name>
-  <value>$MAX_REDUCE_TASKS</value>
-  <final>true</final>
-</property>
-<property>
-  <name>tasktracker.http.threads</name>
-  <value>46</value>
-  <final>true</final>
-</property>
-<property>
-  <name>mapred.compress.map.output</name>
-  <value>true</value>
-</property>
-<property>
-  <name>mapred.output.compression.type</name>
-  <value>BLOCK</value>
-</property>
-<property>
-  <name>hadoop.rpc.socket.factory.class.default</name>
-  <value>org.apache.hadoop.net.StandardSocketFactory</value>
-  <final>true</final>
-</property>
-<property>
-  <name>hadoop.rpc.socket.factory.class.ClientProtocol</name>
-  <value></value>
-  <final>true</final>
-</property>
-<property>
-  <name>hadoop.rpc.socket.factory.class.JobSubmissionProtocol</name>
-  <value></value>
-  <final>true</final>
-</property>
-<property>
-  <name>io.compression.codecs</name>
-  <value>org.apache.hadoop.io.compress.DefaultCodec,org.apache.hadoop.io.compress.GzipCodec</value>
-</property>
-</configuration>
-EOF
+  # Copy generated configuration files in place
+  cp /tmp/{core,hdfs,mapred}-site.xml $HADOOP_CONF_DIR
 
   # Keep PID files in a non-temporary directory
   sed -i -e "s|# export HADOOP_PID_DIR=.*|export HADOOP_PID_DIR=/var/run/hadoop|" \
@@ -248,19 +53,18 @@ EOF
   sed -i -e 's|# export HADOOP_OPTS=.*|export HADOOP_OPTS="-Djava.net.preferIPv4Stack=true"|' \
     $HADOOP_CONF_DIR/hadoop-env.sh
 
-  # Hadoop logs should be on the /mnt partition
+  # Hadoop logs should be on the /data partition
   sed -i -e 's|# export HADOOP_LOG_DIR=.*|export HADOOP_LOG_DIR=/var/log/hadoop/logs|' \
     $HADOOP_CONF_DIR/hadoop-env.sh
   rm -rf /var/log/hadoop
-  mkdir $MOUNT/hadoop/logs
-  chown hadoop:hadoop $MOUNT/hadoop/logs
-  ln -s $MOUNT/hadoop/logs /var/log/hadoop
+  mkdir /data/hadoop/logs
+  chown hadoop:hadoop /data/hadoop/logs
+  ln -s /data/hadoop/logs /var/log/hadoop
   chown -R hadoop:hadoop /var/log/hadoop
   
   for role in $(echo "$ROLES" | tr "," "\n"); do
     case $role in
     hadoop-namenode)
-      setup_web
       start_namenode
       ;;
     hadoop-secondarynamenode)
@@ -280,47 +84,6 @@ EOF
 
 }
 
-# Sets up small website on cluster.
-function setup_web() {
-
-  if which dpkg &> /dev/null; then
-    apt-get -y install thttpd
-    WWW_BASE=/var/www
-  elif which rpm &> /dev/null; then
-    # enable EPEL for thttpd package
-    rpm -Uvh http://download.fedora.redhat.com/pub/epel/5/i386/epel-release-5-4.noarch.rpm
-    sed -i -e 's/enabled=1/enabled=0/' /etc/yum.repos.d/epel.repo
-    yum install -y --enablerepo=epel thttpd
-    chkconfig --add thttpd
-    WWW_BASE=/var/www/thttpd/html
-  fi
-
-  cat > $WWW_BASE/index.html << END
-<html>
-<head>
-<title>Hadoop Cloud Cluster</title>
-</head>
-<body>
-<h1>Hadoop Cloud Cluster</h1>
-To browse the cluster you need to have a proxy configured.
-Start the proxy with <tt>hadoop-cloud proxy &lt;cluster_name&gt;</tt>,
-and point your browser to
-<a href="http://apache-hadoop-ec2.s3.amazonaws.com/proxy.pac">this Proxy
-Auto-Configuration (PAC)</a> file.  To manage multiple proxy configurations,
-you may wish to use
-<a href="https://addons.mozilla.org/en-US/firefox/addon/2464">FoxyProxy</a>.
-<ul>
-<li><a href="http://$NN_HOST:50070/">NameNode</a>
-<li><a href="http://$JT_HOST:50030/">JobTracker</a>
-</ul>
-</body>
-</html>
-END
-
-  service thttpd restart
-
-}
-
 function start_namenode() {
   if which dpkg &> /dev/null; then
     AS_HADOOP="su -s /bin/bash - hadoop -c"
@@ -329,7 +92,7 @@ function start_namenode() {
   fi
 
   # Format HDFS
-  [ ! -e $FIRST_MOUNT/hadoop/hdfs ] && $AS_HADOOP "$HADOOP_HOME/bin/hadoop namenode -format"
+  [ ! -e /data/hadoop/hdfs ] && $AS_HADOOP "$HADOOP_HOME/bin/hadoop namenode -format"
 
   $AS_HADOOP "$HADOOP_HOME/bin/hadoop-daemon.sh start namenode"
 

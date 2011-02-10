@@ -19,6 +19,9 @@
 package org.apache.whirr.service.hadoop;
 
 import static org.apache.whirr.service.RolePredicates.role;
+import static org.apache.whirr.service.hadoop.HadoopConfigurationBuilder.buildCommon;
+import static org.apache.whirr.service.hadoop.HadoopConfigurationBuilder.buildHdfs;
+import static org.apache.whirr.service.hadoop.HadoopConfigurationBuilder.buildMapReduce;
 import static org.jclouds.scriptbuilder.domain.Statements.call;
 
 import com.google.common.base.Charsets;
@@ -31,6 +34,7 @@ import java.net.InetAddress;
 import java.util.Map.Entry;
 import java.util.Properties;
 
+import org.apache.commons.configuration.ConfigurationException;
 import org.apache.whirr.net.DnsUtil;
 import org.apache.whirr.service.Cluster;
 import org.apache.whirr.service.Cluster.Instance;
@@ -50,7 +54,6 @@ public class HadoopNameNodeClusterActionHandler extends ClusterActionHandlerSupp
   
   public static final String ROLE = "hadoop-namenode";
   
-  public static final int WEB_PORT = 80;
   public static final int NAMENODE_PORT = 8020;
   public static final int JOBTRACKER_PORT = 8021;
   public static final int NAMENODE_WEB_UI_PORT = 50070;
@@ -85,8 +88,6 @@ public class HadoopNameNodeClusterActionHandler extends ClusterActionHandlerSupp
     ComputeServiceContext computeServiceContext =
       ComputeServiceContextBuilder.build(clusterSpec);
     FirewallSettings.authorizeIngress(computeServiceContext, instance, clusterSpec,
-        WEB_PORT);
-    FirewallSettings.authorizeIngress(computeServiceContext, instance, clusterSpec,
         NAMENODE_WEB_UI_PORT);
     FirewallSettings.authorizeIngress(computeServiceContext, instance, clusterSpec,
         JOBTRACKER_WEB_UI_PORT);
@@ -101,12 +102,20 @@ public class HadoopNameNodeClusterActionHandler extends ClusterActionHandlerSupp
           jobtrackerPublicAddress.getHostAddress(), JOBTRACKER_PORT);
     }
     
+    try {
+      event.getStatementBuilder().addStatements(
+        buildCommon("/tmp/core-site.xml", clusterSpec, cluster),
+        buildHdfs("/tmp/hdfs-site.xml", clusterSpec, cluster),
+        buildMapReduce("/tmp/mapred-site.xml", clusterSpec, cluster)
+      );
+    } catch (ConfigurationException e) {
+      throw new IOException(e);
+    }
+    
     String hadoopConfigureFunction = clusterSpec.getConfiguration().getString(
         "whirr.hadoop-configure-function", "configure_hadoop");
     addStatement(event, call(hadoopConfigureFunction,
         "hadoop-namenode,hadoop-jobtracker",
-        "-n", DnsUtil.resolveAddress(namenodePublicAddress.getHostAddress()),
-        "-j", DnsUtil.resolveAddress(jobtrackerPublicAddress.getHostAddress()),
         "-c", clusterSpec.getProvider()
     ));
   }
@@ -123,8 +132,12 @@ public class HadoopNameNodeClusterActionHandler extends ClusterActionHandlerSupp
     InetAddress namenodePublicAddress = instance.getPublicAddress();
     InetAddress jobtrackerPublicAddress = namenodePublicAddress;
 
-    LOG.info("Web UI available at http://{}",
-      DnsUtil.resolveAddress(namenodePublicAddress.getHostAddress()));
+    LOG.info("Namenode web UI available at http://{}:{}",
+      DnsUtil.resolveAddress(namenodePublicAddress.getHostAddress()),
+      NAMENODE_WEB_UI_PORT);
+    LOG.info("Jobtracker web UI available at http://{}:{}",
+      DnsUtil.resolveAddress(jobtrackerPublicAddress.getHostAddress()),
+      JOBTRACKER_WEB_UI_PORT);
     Properties config = createClientSideProperties(clusterSpec, namenodePublicAddress, jobtrackerPublicAddress);
     createClientSideHadoopSiteFile(clusterSpec, config);
     createProxyScript(clusterSpec, cluster);
