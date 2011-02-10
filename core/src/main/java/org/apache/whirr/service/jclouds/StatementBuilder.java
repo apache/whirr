@@ -36,6 +36,12 @@ public class StatementBuilder implements Statement {
     }
   }
   
+  public void addStatements(Statement... statements) {
+    for (Statement statement : statements) {
+      addStatement(statement);
+    }
+  }
+  
   @Override
   public Iterable<String> functionDependecies(OsFamily family) {
      List<String> functions = Lists.newArrayList();

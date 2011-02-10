@@ -36,6 +36,9 @@ Trunk (unreleased changes)
     WHIRR-167. Improve bootstrapping and configuration to be able to 
     isolate and repair or evict failing nodes on EC2 (Tibor Kiss via asavu)
 
+    WHIRR-55. Users should be able to override an arbitrary Hadoop property
+    before launch. (tomwhite)
+
   BUG FIXES
 
     WHIRR-170. Instances should be started in the order specified in 

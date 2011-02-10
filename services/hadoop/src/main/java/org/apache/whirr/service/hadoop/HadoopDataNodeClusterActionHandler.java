@@ -19,11 +19,15 @@
 package org.apache.whirr.service.hadoop;
 
 import static org.apache.whirr.service.RolePredicates.role;
+import static org.apache.whirr.service.hadoop.HadoopConfigurationBuilder.buildCommon;
+import static org.apache.whirr.service.hadoop.HadoopConfigurationBuilder.buildHdfs;
+import static org.apache.whirr.service.hadoop.HadoopConfigurationBuilder.buildMapReduce;
 import static org.jclouds.scriptbuilder.domain.Statements.call;
 
 import java.io.IOException;
 import java.net.InetAddress;
 
+import org.apache.commons.configuration.ConfigurationException;
 import org.apache.whirr.net.DnsUtil;
 import org.apache.whirr.service.Cluster;
 import org.apache.whirr.service.Cluster.Instance;
@@ -61,13 +65,21 @@ public class HadoopDataNodeClusterActionHandler extends ClusterActionHandlerSupp
         role(HadoopNameNodeClusterActionHandler.ROLE));
     InetAddress namenodePublicAddress = instance.getPublicAddress();
     InetAddress jobtrackerPublicAddress = namenodePublicAddress;
+    
+    try {
+      event.getStatementBuilder().addStatements(
+        buildCommon("/tmp/core-site.xml", clusterSpec, cluster),
+        buildHdfs("/tmp/hdfs-site.xml", clusterSpec, cluster),
+        buildMapReduce("/tmp/mapred-site.xml", clusterSpec, cluster)
+      );
+    } catch (ConfigurationException e) {
+      throw new IOException(e);
+    }
 
     String hadoopConfigureFunction = clusterSpec.getConfiguration().getString(
         "whirr.hadoop-configure-function", "configure_hadoop");
     addStatement(event, call(hadoopConfigureFunction,
         "hadoop-datanode,hadoop-tasktracker",
-        "-n", DnsUtil.resolveAddress(namenodePublicAddress.getHostAddress()),
-        "-j", DnsUtil.resolveAddress(jobtrackerPublicAddress.getHostAddress()),
         "-c", clusterSpec.getProvider()
     ));
   }
