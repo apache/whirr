@@ -41,6 +41,11 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
+      <artifactId>whirr-cdh</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
       <artifactId>whirr-hadoop</artifactId>
       <version>${project.version}</version>
     </dependency>
