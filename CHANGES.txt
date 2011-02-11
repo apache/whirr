@@ -54,6 +54,9 @@ Trunk (unreleased changes)
 
     WHIRR-232. NPE for stopped instances on EC2. (tomwhite)
 
+    WHIRR-234. Resource functions/install_cdh_hadoop.sh not found when 
+    running from the CLI (tomwhite via asavu)
+
 Release 0.3.0 - 2011-01-15
 
   NEW FEATURES
