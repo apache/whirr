@@ -57,6 +57,8 @@ Trunk (unreleased changes)
     WHIRR-234. Resource functions/install_cdh_hadoop.sh not found when 
     running from the CLI (tomwhite via asavu)
 
+    WHIRR-235. fix whirr.provider in recipes/* (Eugene Koontz via asavu)
+
 Release 0.3.0 - 2011-01-15
 
   NEW FEATURES
