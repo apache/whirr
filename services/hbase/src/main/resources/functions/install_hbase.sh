@@ -58,49 +58,7 @@ function install_hbase() {
   # if there is no hosts file then provide a minimal one
   [ ! -f /etc/hosts ] && echo "127.0.0.1 localhost" > /etc/hosts
 
-  # Reformat sdb as xfs
-  #umount /mnt
-  #mkfs.xfs -f /dev/sdb
-  #mount -o noatime /dev/sdb /mnt
-  # Probe for additional instance volumes
-  # /dev/sdb as /mnt is always set up by base image
-  #DFS_NAME_DIR="/mnt/hadoop/dfs/name"
-  #DFS_DATA_DIR="/mnt/hadoop/dfs/data"
-  #i=2
-  #for d in c d e f g h i j k l m n o p q r s t u v w x y z; do
-  # m="/mnt${i}"
-  # mkdir -p $m
-  # mkfs.xfs -f /dev/sd${d}
-  # if [ $? -eq 0 ] ; then
-  #  mount -o noatime /dev/sd${d} $m > /dev/null 2>&1
-  #  if [ $i -lt 3 ] ; then # no more than two namedirs
-  #   DFS_NAME_DIR="${DFS_NAME_DIR},${m}/hadoop/dfs/name"
-  #  fi
-  #  DFS_DATA_DIR="${DFS_DATA_DIR},${m}/hadoop/dfs/data"
-  #  i=$(( i + 1 ))
-  # fi
-  #done
-
-  # install HBase tarball
-  curl="curl --retry 3 --silent --show-error --fail"
-  for i in `seq 1 3`;
-  do
-    $curl -O $HBASE_TAR_URL
-    $curl -O $HBASE_TAR_URL.md5
-    if md5sum -c $HBASE_TAR_MD5_FILE; then
-      break;
-    else
-      rm -f $HBASE_TAR_FILE $HBASE_TAR_MD5_FILE
-    fi
-  done
-
-  if [ ! -e $HBASE_TAR_FILE ]; then
-    echo "Failed to download $HBASE_TAR_URL. Aborting."
-    exit 1
-  fi
-
-  tar zxf $HBASE_TAR_FILE -C /usr/local
-  rm -f $HBASE_TAR_FILE $HBASE_TAR_MD5_FILE
+  install_tarball $HBASE_TAR_URL
 
   echo "export HBASE_HOME=$HBASE_HOME" >> ~root/.bashrc
   echo 'export PATH=$JAVA_HOME/bin:$HBASE_HOME/bin:$PATH' >> ~root/.bashrc

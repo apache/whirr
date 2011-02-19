@@ -10,22 +10,7 @@ function install_cassandra() {
   C_CONF_DIR=/etc/cassandra/conf
   C_LOG_DIR=/var/log/cassandra
   
-  curl="curl --retry 3 --silent --show-error --fail"
-  for i in `seq 1 3`;
-  do
-    $curl -O $C_TAR_URL
-    if tar zxf $c_tar_file -C /usr/local ; then
-      break;
-    else
-      rm -f $c_tar_file
-    fi
-  done
-  
-  if [ ! -e $c_tar_file ]; then
-    echo "Failed to download $C_TAR_URL. Aborting."
-    exit 1
-  fi
-  
+  install_tarball $C_TAR_URL
   
   echo "export CASSANDRA_HOME=$CASSANDRA_HOME" >> /etc/profile
   echo "export CASSANDRA_CONF=$C_CONF_DIR" >> /etc/profile

@@ -6,29 +6,7 @@ function install_zookeeper() {
   ZK_LOG_DIR=/var/log/zookeeper
   ZK_DATA_DIR=$ZK_LOG_DIR/txlog
   
-  zk_tar_url=http://www.apache.org/dist/hadoop/zookeeper/zookeeper-$ZK_VERSION/zookeeper-$ZK_VERSION.tar.gz
-  zk_tar_file=`basename $zk_tar_url`
-  zk_tar_md5_file=`basename $zk_tar_url.md5`
-  
-  curl="curl --retry 3 --silent --show-error --fail"
-  for i in `seq 1 3`;
-  do
-    $curl -O $zk_tar_url
-    $curl -O $zk_tar_url.md5
-    if md5sum -c $zk_tar_md5_file; then
-      break;
-    else
-      rm -f $zk_tar_file $zk_tar_md5_file
-    fi
-  done
-  
-  if [ ! -e $zk_tar_file ]; then
-    echo "Failed to download $zk_tar_url. Aborting."
-    exit 1
-  fi
-  
-  tar zxf $zk_tar_file -C /usr/local
-  rm -f $zk_tar_file $zk_tar_md5_file
+  install_tarball http://www.apache.org/dist/hadoop/zookeeper/zookeeper-$ZK_VERSION/zookeeper-$ZK_VERSION.tar.gz
   
   echo "export ZOOKEEPER_HOME=$ZOOKEEPER_HOME" >> /etc/profile
   echo 'export PATH=$ZOOKEEPER_HOME/bin:$PATH' >> /etc/profile

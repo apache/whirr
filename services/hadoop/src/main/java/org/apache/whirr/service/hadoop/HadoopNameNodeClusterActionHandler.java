@@ -71,6 +71,7 @@ public class HadoopNameNodeClusterActionHandler extends ClusterActionHandlerSupp
     String hadoopInstallFunction = clusterSpec.getConfiguration().getString(
         "whirr.hadoop-install-function", "install_hadoop");
     addStatement(event, call("install_java"));
+    addStatement(event, call("install_tarball"));
     addStatement(event, call(hadoopInstallFunction, "-c", clusterSpec.getProvider()));
     event.setTemplateBuilderStrategy(new HadoopTemplateBuilderStrategy());
   }

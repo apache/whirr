@@ -27,30 +27,8 @@ function install_hadoop() {
   if ! id hadoop &> /dev/null; then
     useradd hadoop
   fi
-
-  hadoop_tar_url=http://archive.apache.org/dist/hadoop/core/hadoop-$HADOOP_VERSION/hadoop-$HADOOP_VERSION.tar.gz
-  hadoop_tar_file=`basename $hadoop_tar_url`
-  hadoop_tar_md5_file=`basename $hadoop_tar_url.md5`
-
-  curl="curl --retry 3 --silent --show-error --fail"
-  for i in `seq 1 3`;
-  do
-    $curl -O $hadoop_tar_url
-    $curl -O $hadoop_tar_url.md5
-    if md5sum -c $hadoop_tar_md5_file; then
-      break;
-    else
-      rm -f $hadoop_tar_file $hadoop_tar_md5_file
-    fi
-  done
-
-  if [ ! -e $hadoop_tar_file ]; then
-    echo "Failed to download $hadoop_tar_url. Aborting."
-    exit 1
-  fi
-
-  tar zxf $hadoop_tar_file -C /usr/local
-  rm -f $hadoop_tar_file $hadoop_tar_md5_file
+  
+  install_tarball http://archive.apache.org/dist/hadoop/core/hadoop-$HADOOP_VERSION/hadoop-$HADOOP_VERSION.tar.gz
 
   echo "export HADOOP_HOME=$HADOOP_HOME" >> ~root/.bashrc
   echo 'export PATH=$JAVA_HOME/bin:$HADOOP_HOME/bin:$PATH' >> ~root/.bashrc

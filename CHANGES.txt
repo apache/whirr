@@ -59,6 +59,8 @@ Trunk (unreleased changes)
 
     WHIRR-235. fix whirr.provider in recipes/* (Eugene Koontz via asavu)
 
+    WHIRR-207. Handle curl timeouts better (asavu)
+
 Release 0.3.0 - 2011-01-15
 
   NEW FEATURES
