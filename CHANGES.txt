@@ -11,6 +11,8 @@ Trunk (unreleased changes)
     whirr.hadoop-configure-runurl are replaced by whirr.hadoop-install-function
     and whirr.hadoop-configure-function. See recipes for details. (tomwhite)
 
+    WHIRR-198. Support user-defined images (Adrian Cole via asavu)
+
   IMPROVEMENTS
 
     WHIRR-139. upgrade to version 1 of the "enforcer" plugin (Jakob Homan 

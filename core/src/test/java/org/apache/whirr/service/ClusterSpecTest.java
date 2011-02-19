@@ -72,6 +72,16 @@ public class ClusterSpecTest {
   }
 
   @Test
+  public void testLoginUserSetsSystemProperty()
+  throws ConfigurationException {
+    Configuration conf = new PropertiesConfiguration();
+    conf.setProperty(ClusterSpec.Property.LOGIN_USER.getConfigName(),
+        "ubuntu");
+    ClusterSpec.withNoDefaults(conf);
+    assertThat(System.getProperty("whirr.login-user"), is("ubuntu"));
+  }
+  
+  @Test
   public void testVersionInRunUrlbaseIsUrlEncoded()
   throws ConfigurationException, JSchException, IOException {
     Configuration conf = new PropertiesConfiguration();

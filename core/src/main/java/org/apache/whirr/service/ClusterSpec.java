@@ -133,7 +133,10 @@ public class ClusterSpec {
     VERSION(String.class, false, ""),
     
     RUN_URL_BASE(String.class, false, "The base URL for forming run " + 
-      "urls from. Change this to host your own set of launch scripts.");
+      "urls from. Change this to host your own set of launch scripts."),
+    
+    LOGIN_USER(String.class, false,  "Override the default login user "+
+      "used to bootstrap whirr. E.g. ubuntu or myuser:mypass.");
     
     private Class<?> type;
     private boolean multipleArguments;
@@ -447,6 +450,11 @@ public class ClusterSpec {
     }
     setRunUrlBase(runUrlBase);
 
+    String loginUser = c.getString(Property.LOGIN_USER.getConfigName());
+    if (loginUser != null) {
+      // patch until jclouds 1.0-beta-10
+      System.setProperty("whirr.login-user", loginUser);
+    }
     this.config = c;
   }
 
