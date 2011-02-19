@@ -60,6 +60,7 @@ public class CassandraClusterActionHandler extends ClusterActionHandlerSupport {
   @Override
   protected void beforeBootstrap(ClusterActionEvent event) throws IOException {
     addStatement(event, call("install_java"));
+    addStatement(event, call("install_tarball"));
     Configuration config = event.getClusterSpec().getConfiguration();
     String tarball = config.getString(BIN_TARBALL, null);
     String major = config.getString(MAJOR_VERSION, null);

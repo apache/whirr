@@ -52,6 +52,7 @@ public class HBaseRegionServerClusterActionHandler extends HBaseClusterActionHan
     addStatement(event, call("configure_hostnames",
       HBaseConstants.PARAM_PROVIDER, clusterSpec.getProvider()));
     addStatement(event, call("install_java"));
+    addStatement(event, call("install_tarball"));
     String hbaseInstallFunction = getConfiguration(clusterSpec).getString(
       HBaseConstants.KEY_INSTALL_FUNCTION, HBaseConstants.FUNCTION_INSTALL);
     String tarurl = getConfiguration(clusterSpec).getString(

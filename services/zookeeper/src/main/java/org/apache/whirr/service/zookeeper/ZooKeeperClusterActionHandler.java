@@ -55,6 +55,7 @@ public class ZooKeeperClusterActionHandler extends ClusterActionHandlerSupport {
   @Override
   protected void beforeBootstrap(ClusterActionEvent event) throws IOException {
     addStatement(event, call("install_java"));
+    addStatement(event, call("install_tarball"));
     addStatement(event, call("install_zookeeper"));
   }
 
