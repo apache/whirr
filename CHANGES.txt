@@ -63,6 +63,8 @@ Trunk (unreleased changes)
 
     WHIRR-207. Handle curl timeouts better (asavu)
 
+    WHIRR-241. Update to use CDH3B4. (tomwhite)
+
 Release 0.3.0 - 2011-01-15
 
   NEW FEATURES
