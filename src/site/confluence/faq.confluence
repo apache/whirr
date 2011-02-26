@@ -88,37 +88,52 @@ the AMI.
 {anchor:how-can-i-modify-the-instance-installation-and-configuration-scripts}
 h2. How can I modify the instance installation and configuration scripts?
 
-The scripts to install and configure cloud instances are downloaded from an S3
-bucket by the instances at, or after, boot time. The base URL defaults to
-{{http://whirr.s3.amazonaws.com/VERSION/}}, where {{VERSION}} is the
-version of Whirr. (Note that S3 buckets are not browsable, so you can't
-use a browser to look at these scripts unless you know the URL.)
+The scripts to install and configure cloud instances are searched for on the
+classpath.
+
+(Note that in versions prior to 0.4.0 scripts were downloaded from S3
+by default, and could be overridden by setting {{run-url-base}}. This property
+no longer has any effect, so you should instead use the approach explained
+below.)
 
 If you want to change the scripts then you can place a modified copy of the
-scripts in the _scripts_ directory of the distribution on a webserver (such as
-S3) and change the base URL, by setting the {{run-url-base}} property. You need
-to copy all the scripts, not just the ones you have changed.
+scripts in a _functions_ directory in Whirr's installation directory. The
+original versions of the scripts can be found in _functions_ directories in the
+source trees.
 
-For example, by setting {{run-url-base}} to {{http://example.org/}} the scripts
-would be loaded from the {{example.org}} domain. The Java install script, for
-instance, would be requested from {{http://example.org/sun/java/install}}.
+For example, to override the Hadoop scripts, do the following:
 
-Scripts have to be publicly readable, so on S3 you have to set the ACL to give
-everyone read access. [S3Fox|http://www.s3fox.net/] is a useful Firefox
-extension for uploading and managing script files on S3.
+{code}
+cd $WHIRR_HOME
+mkdir functions
+cp services/hadoop/src/main/resources/functions/* functions
+{code}
 
-You can debug the scripts that run on a cloud instance without having to log
-into the instance, since the output is
-sent to _whirr.log_ in the directory from which you launched the _whirr_ CLI.
+Then make your changes to the copies in _functions_.
+
+The first port of call for debugging the scripts that run on on a cloud instance
+is the _whirr.log_ in the directory from which you launched the _whirr_ CLI.
+
+The script output in this log file may be truncated, but you can see the
+complete output by logging into the node on which the script ran
+(see "How do I log in to a node in the cluster?" above) and looking in the
+_/tmp/bootstrap_ or _/tmp/jclouds-script-*_ directories for the script itself,
+and the standard output and standard error logs.
 
 h2. How do I specify the service version and other service properties?
 
-Currently the only way to do this is to modify the scripts to install a
-particular version of the service, or to change the service properties from
-the defaults.
+Some services have a property to control the version number of the software to
+be installed. This is typically achieved by setting the property
+{{whirr.<service-name>.tarball.url}}. Similarly, some services can have
+arbitrary service properties set.
 
-See "How to modify the instance installation and configuration scripts" above
-for details on how to do this.
+See the samples in the _recipes_ directory for details for a particular service.
+
+In cases where neither of these configuration controls are supported, you
+may modify the scripts to install a particular version of the service, or to
+change the service properties from the defaults. See
+"How to modify the instance installation and configuration scripts" above
+for details on how to override the scripts.
 
 h2. How can I install custom packages?
 
@@ -128,17 +143,13 @@ configuration scripts" above.
 
 h2. How do I run Cloudera's Distribution for Hadoop?
 
-You can run CDH rather than Apache Hadoop by running the {{hadoop}} service and
+You can run CDH rather than Apache Hadoop by running the Hadoop service and
 setting the {{whirr.hadoop-install-function}} and
 {{whirr.hadoop-configure-function}}
 properties. See the _recipes_ directory in the distribution for samples.
 
 {anchor:other-services}
-h2. How do I run a ZooKeeper cluster?
-
-See the _recipes_ directory in the distribution for samples.
-
-h2. How do I run a Cassandra cluster?
+h2. How do I run a Cassandra/HBase/ZooKeeper cluster?
 
 See the _recipes_ directory in the distribution for samples.
 

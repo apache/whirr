@@ -20,7 +20,7 @@ Whirr is configured using a properties file, and optionally using command line a
 | {{whirr.hardware-id}} | {{\--hardware-id}} | none | The type of hardware to use for the instance. This must be compatible with the image ID. |
 | {{whirr.location-id}} | {{\--location-id}} | none | The location to launch instances in. If not specified then an arbitrary location will be chosen. |
 | {{whirr.client-cidrs}} | {{\--client-cidrs}} | none | A comma-separated list of [CIDR |http://en.wikipedia.org/wiki/Classless\_Inter-Domain\_Routing] blocks. E.g. {{208.128.0.0/11,108.128.0.0/11}} |
-| {{whirr.run-url-base}} | {{\--run-url-base}} | {{http://whirr.s3.amazonaws.com/VERSION/}} | The base URL for forming run urls from. Change this to host your own set of launch scripts, as explained in the [FAQ|faq#how-can-i-modify-the-instance-installation-and-configuration-scripts]. |
+| {{whirr.run-url-base}} | {{\--run-url-base}} | {{http://whirr.s3.amazonaws.com/VERSION/}} | Deprecated. The base URL for forming run urls from. Change this to host your own set of launch scripts, as explained in the [FAQ|faq#how-can-i-modify-the-instance-installation-and-configuration-scripts]. |
 
 {anchor:cloud-provider-config}
 h2. Cloud provider specific configuration
