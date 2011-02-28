@@ -1,5 +1,7 @@
 Apache Whirr Change Log
 
+Trunk (unreleased changes)
+
 Release 0.4.0 - 2011-02-28
 
   NEW FEATURES
