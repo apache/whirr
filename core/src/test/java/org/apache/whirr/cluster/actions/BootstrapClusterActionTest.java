@@ -283,7 +283,7 @@ public class BootstrapClusterActionTest {
       Map<String, String> userMetadata = Maps.newHashMap();
       Map<String, Object> locationMetadata = Maps.newHashMap();
       Location location = new LocationImpl(LocationScope.ZONE, "loc", "test location", 
-	      null, new ArrayList<String>(), locationMetadata);
+        null, new ArrayList<String>(), locationMetadata);
       Set<String> addresses = Sets.newHashSet();
       addresses.add("10.0.0.1");
       Credentials loginCredentials = new Credentials("id", "cred");
