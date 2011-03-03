@@ -56,7 +56,6 @@ import org.jclouds.compute.RunNodesException;
 import org.jclouds.compute.domain.NodeMetadata;
 import org.jclouds.compute.domain.Template;
 import org.jclouds.compute.domain.TemplateBuilder;
-import org.jclouds.io.Payload;
 import org.jclouds.scriptbuilder.domain.AuthorizeRSAPublicKey;
 import org.jclouds.scriptbuilder.domain.InstallRSAPrivateKey;
 import org.jclouds.scriptbuilder.domain.OsFamily;
@@ -348,7 +347,7 @@ class NodeStarter implements Callable<Set<NodeMetadata>> {
     LOG.info("Starting {} node(s) with roles {}", num,
         roles);
     Set<NodeMetadata> nodes = (Set<NodeMetadata>)computeService
-    	.createNodesInGroup(clusterName, num, template);
+      .createNodesInGroup(clusterName, num, template);
     LOG.info("Nodes started: {}", nodes);
     return nodes;
   }

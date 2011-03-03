@@ -26,6 +26,9 @@ import java.util.Set;
 
 import org.apache.whirr.service.Cluster.Instance;
 
+/**
+ * {@link Predicate}s for matching {@link Instance}s with certain cluster roles.
+ */
 public class RolePredicates {
 
   /**
