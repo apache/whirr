@@ -10,6 +10,9 @@ Trunk (unreleased changes)
 
   BUG FIXES
 
+    WHIRR-247. Add license headers to service install and configure 
+    scripts (asavu)
+
 Release 0.4.0 - 2011-02-28
 
   NEW FEATURES
