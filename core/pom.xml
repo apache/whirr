@@ -47,19 +47,11 @@
     </dependency>
     <dependency>
       <groupId>org.jclouds.driver</groupId>
-      <artifactId>jclouds-enterprise</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.jclouds.driver</groupId>
       <artifactId>jclouds-jsch</artifactId>
     </dependency>
     <dependency>
       <groupId>org.jclouds.driver</groupId>
       <artifactId>jclouds-log4j</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.jclouds</groupId>
-      <artifactId>jclouds-scriptbuilder</artifactId>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
