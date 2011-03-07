@@ -452,6 +452,14 @@
         <role>committer</role>
       </roles>
     </developer>
+    <developer>
+      <id>adriancole</id>
+      <name>Adrian Cole</name>
+      <organization>Cloud Conscious</organization>
+      <roles>
+        <role>committer</role>
+      </roles>
+    </developer>
   </developers>
   <issueManagement>
     <system>JIRA</system>
