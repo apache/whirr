@@ -6,6 +6,8 @@ Trunk (unreleased changes)
 
   IMPROVEMENTS
 
+    WHIRR-248. Upgrade to jclouds 1.0-beta-9b (adriancole)
+
     WHIRR-244. Add package-level javadoc. (tomwhite)
 
   BUG FIXES
