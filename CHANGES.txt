@@ -4,21 +4,6 @@ Trunk (unreleased changes)
 
   NEW FEATURES
 
-  IMPROVEMENTS
-
-    WHIRR-248. Upgrade to jclouds 1.0-beta-9b (adriancole)
-
-    WHIRR-244. Add package-level javadoc. (tomwhite)
-
-  BUG FIXES
-
-    WHIRR-247. Add license headers to service install and configure 
-    scripts (asavu)
-
-Release 0.4.0 - 2011-02-28
-
-  NEW FEATURES
-
     WHIRR-226. Add the ability to destroy a cluster instance (asavu)
 
     WHIRR-225. Support locally-supplied scripts.
@@ -59,6 +44,10 @@ Release 0.4.0 - 2011-02-28
     WHIRR-242. Update documentation for overriding locally supplied 
     scripts (tomwhite via asavu)
 
+    WHIRR-248. Upgrade to jclouds 1.0-beta-9b (adriancole)
+
+    WHIRR-244. Add package-level javadoc. (tomwhite)
+
   BUG FIXES
 
     WHIRR-170. Instances should be started in the order specified in 
@@ -82,6 +71,9 @@ Release 0.4.0 - 2011-02-28
     WHIRR-207. Handle curl timeouts better (asavu)
 
     WHIRR-241. Update to use CDH3B4. (tomwhite)
+
+    WHIRR-247. Add license headers to service install and configure 
+    scripts (asavu)
 
 Release 0.3.0 - 2011-01-15
 
