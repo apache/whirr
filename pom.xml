@@ -59,11 +59,6 @@
       </dependency>
       <dependency>
         <groupId>org.jclouds</groupId>
-        <artifactId>jclouds-allcompute</artifactId>
-        <version>${jclouds.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.jclouds</groupId>
         <artifactId>jclouds-core</artifactId>
         <version>${jclouds.version}</version>
       </dependency>
@@ -82,6 +77,24 @@
         <artifactId>jclouds-log4j</artifactId>
         <version>${jclouds.version}</version>
       </dependency>
+      <!-- Supported cloud providers. When adding a dependency here
+           be sure to add a corresponding LICENSE file in lib. -->
+      <dependency>
+        <groupId>org.jclouds.provider</groupId>
+        <artifactId>aws-ec2</artifactId>
+        <version>${jclouds.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.jclouds.provider</groupId>
+        <artifactId>cloudservers-us</artifactId>
+        <version>${jclouds.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.jclouds.provider</groupId>
+        <artifactId>cloudservers-uk</artifactId>
+        <version>${jclouds.version}</version>
+      </dependency>
+      <!-- End supported cloud providers. -->
       <dependency>
         <groupId>junit</groupId>
         <artifactId>junit</artifactId>
