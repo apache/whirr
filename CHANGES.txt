@@ -78,6 +78,9 @@ Trunk (unreleased changes)
     WHIRR-251. Handle Apache cryptography requirements for release 
     (tomwhite via asavu)
 
+    WHIRR-250. Ensure all libraries in binary distribution have 
+    associated licenses where stipulated (tomwhite via asavu)
+
 Release 0.3.0 - 2011-01-15
 
   NEW FEATURES

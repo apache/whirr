@@ -61,10 +61,6 @@
     </dependency>
     <dependency>
       <groupId>org.jclouds</groupId>
-      <artifactId>jclouds-allcompute</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.jclouds</groupId>
       <artifactId>jclouds-compute</artifactId>
     </dependency>
     <dependency>
