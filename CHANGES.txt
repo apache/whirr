@@ -75,6 +75,9 @@ Trunk (unreleased changes)
     WHIRR-247. Add license headers to service install and configure 
     scripts (asavu)
 
+    WHIRR-251. Handle Apache cryptography requirements for release 
+    (tomwhite via asavu)
+
 Release 0.3.0 - 2011-01-15
 
   NEW FEATURES
