@@ -51,6 +51,9 @@ Trunk (unreleased changes)
     WHIRR-254. Document limitation that a role may only appear in 
     one instance template group (tomwhite via asavu)
 
+    WHIRR-259. Disable configuration list handling for Hadoop 
+    properties (asavu)
+
   BUG FIXES
 
     WHIRR-170. Instances should be started in the order specified in 
