@@ -26,8 +26,10 @@ import java.util.Set;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationConverter;
+import org.apache.whirr.service.jclouds.TakeLoginCredentialsFromWhirrProperties;
 import org.jclouds.compute.ComputeServiceContext;
 import org.jclouds.compute.ComputeServiceContextFactory;
+import org.jclouds.ec2.compute.strategy.EC2PopulateDefaultLoginCredentialsForImageStrategy;
 import org.jclouds.logging.log4j.config.Log4JLoggingModule;
 import org.jclouds.ssh.jsch.config.JschSshClientModule;
 import org.slf4j.Logger;
@@ -48,7 +50,7 @@ public class ComputeServiceContextBuilder {
     Configuration jcloudsConfig =
       spec.getConfigurationForKeysWithPrefix("jclouds");
     Set<AbstractModule> wiring = ImmutableSet.of(new JschSshClientModule(),
-      new Log4JLoggingModule());
+      new Log4JLoggingModule(), new BindLoginCredentialsPatchForEC2());
     if (spec.getProvider().equals("ec2")){
       LOG.warn("please use provider \"aws-ec2\" instead of \"ec2\"");
       spec.setProvider("aws-ec2");
@@ -60,5 +62,15 @@ public class ComputeServiceContextBuilder {
     return factory.createContext(spec.getProvider(),
       spec.getIdentity(), spec.getCredential(),
       wiring, ConfigurationConverter.getProperties(jcloudsConfig));
+  }
+  
+  //patch until jclouds 1.0-beta-10
+  private static class BindLoginCredentialsPatchForEC2 extends AbstractModule {
+
+    @Override
+    protected void configure() {
+      bind(EC2PopulateDefaultLoginCredentialsForImageStrategy.class).to(TakeLoginCredentialsFromWhirrProperties.class);
+    }
+     
   }
 }

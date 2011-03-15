@@ -20,22 +20,18 @@
   <parent>
     <groupId>org.apache.whirr</groupId>
     <artifactId>whirr</artifactId>
-    <version>0.4.0-incubating</version>
+    <version>0.5.0-incubating-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <groupId>org.apache.whirr</groupId>
   <artifactId>whirr-core</artifactId>
   <packaging>jar</packaging>
-  <version>0.4.0-incubating</version>
+  <version>0.5.0-incubating-SNAPSHOT</version>
   <name>Apache Whirr Core</name>
   <dependencies>
     <dependency>
       <groupId>ca.juliusdavies</groupId>
       <artifactId>not-yet-commons-ssl</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.jclouds</groupId>
-      <artifactId>jclouds-allcompute</artifactId>
     </dependency>
     <dependency>
       <groupId>org.jclouds</groupId>
@@ -47,10 +43,6 @@
     </dependency>
     <dependency>
       <groupId>org.jclouds.driver</groupId>
-      <artifactId>jclouds-enterprise</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.jclouds.driver</groupId>
       <artifactId>jclouds-jsch</artifactId>
     </dependency>
     <dependency>
@@ -58,8 +50,16 @@
       <artifactId>jclouds-log4j</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.jclouds</groupId>
-      <artifactId>jclouds-scriptbuilder</artifactId>
+      <groupId>org.jclouds.provider</groupId>
+      <artifactId>aws-ec2</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.jclouds.provider</groupId>
+      <artifactId>cloudservers-us</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.jclouds.provider</groupId>
+      <artifactId>cloudservers-uk</artifactId>
     </dependency>
     <dependency>
       <groupId>junit</groupId>

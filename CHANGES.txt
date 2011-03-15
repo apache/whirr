@@ -1,6 +1,6 @@
 Apache Whirr Change Log
 
-Release 0.4.0 - 2011-02-28
+Release 0.4.0 - 2011-03-15
 
   NEW FEATURES
 
@@ -44,6 +44,16 @@ Release 0.4.0 - 2011-02-28
     WHIRR-242. Update documentation for overriding locally supplied 
     scripts (tomwhite via asavu)
 
+    WHIRR-248. Upgrade to jclouds 1.0-beta-9b (adriancole)
+
+    WHIRR-244. Add package-level javadoc. (tomwhite)
+
+    WHIRR-254. Document limitation that a role may only appear in 
+    one instance template group (tomwhite via asavu)
+
+    WHIRR-259. Disable configuration list handling for Hadoop 
+    properties (asavu)
+
   BUG FIXES
 
     WHIRR-170. Instances should be started in the order specified in 
@@ -67,6 +77,15 @@ Release 0.4.0 - 2011-02-28
     WHIRR-207. Handle curl timeouts better (asavu)
 
     WHIRR-241. Update to use CDH3B4. (tomwhite)
+
+    WHIRR-247. Add license headers to service install and configure 
+    scripts (asavu)
+
+    WHIRR-251. Handle Apache cryptography requirements for release 
+    (tomwhite via asavu)
+
+    WHIRR-250. Ensure all libraries in binary distribution have 
+    associated licenses where stipulated (tomwhite via asavu)
 
 Release 0.3.0 - 2011-01-15
 

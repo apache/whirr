@@ -34,18 +34,18 @@ public class HadoopConfigurationConverterTest {
   @Test
   public void testConversion() {
     Configuration conf = new PropertiesConfiguration();
-    conf.setProperty("p1", "v1");
-    conf.setProperty("p2", "v2");
+    conf.setProperty("p1", "v1,v2");
+    conf.setProperty("p2", "v3");
     List<String> lines = HadoopConfigurationConverter.asLinesInFile(conf);
     assertThat(lines, is((List<String>) Lists.newArrayList(
         "<configuration>",
         "  <property>",
         "    <name>p1</name>",
-        "    <value>v1</value>",
+        "    <value>v1,v2</value>",
         "  </property>",
         "  <property>",
         "    <name>p2</name>",
-        "    <value>v2</value>",
+        "    <value>v3</value>",
         "  </property>",
         "</configuration>"
     )));

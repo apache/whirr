@@ -20,13 +20,13 @@
   <parent>
     <groupId>org.apache.whirr</groupId>
     <artifactId>whirr</artifactId>
-    <version>0.4.0-incubating</version>
+    <version>0.5.0-incubating-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <groupId>org.apache.whirr</groupId>
   <artifactId>whirr-hbase</artifactId>
   <packaging>jar</packaging>
-  <version>0.4.0-incubating</version>
+  <version>0.5.0-incubating-SNAPSHOT</version>
   <name>Apache Whirr HBase</name>
   <properties>
     <hadoop.version>0.20.2</hadoop.version>
@@ -57,19 +57,11 @@
     </dependency>
     <dependency>
       <groupId>org.jclouds</groupId>
-      <artifactId>jclouds-allcompute</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.jclouds</groupId>
       <artifactId>jclouds-compute</artifactId>
     </dependency>
     <dependency>
       <groupId>org.jclouds</groupId>
       <artifactId>jclouds-core</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.jclouds.driver</groupId>
-      <artifactId>jclouds-enterprise</artifactId>
     </dependency>
     <dependency>
       <groupId>org.jclouds.driver</groupId>

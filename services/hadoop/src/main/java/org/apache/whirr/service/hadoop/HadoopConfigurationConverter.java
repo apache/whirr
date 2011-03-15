@@ -24,7 +24,9 @@ import com.google.common.collect.Lists;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.commons.configuration.AbstractConfiguration;
 import org.apache.commons.configuration.Configuration;
+import org.apache.commons.lang.StringUtils;
 import org.jclouds.scriptbuilder.domain.Statement;
 import org.jclouds.scriptbuilder.domain.Statements;
 
@@ -45,7 +47,10 @@ public class HadoopConfigurationConverter {
       if (key.endsWith(FINAL_SUFFIX)) {
         continue;
       }
-      Object value = hadoopConfig.getProperty(key);
+
+      // rebuild the original value by joining all of them with the default separator
+      String value = StringUtils.join(hadoopConfig.getStringArray(key),
+          AbstractConfiguration.getDefaultListDelimiter());
       lines.add("  <property>");
       lines.add(String.format("    <name>%s</name>", key));
       lines.add(String.format("    <value>%s</value>", value));

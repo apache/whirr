@@ -37,7 +37,8 @@ public class ServiceFactory {
 
   /**
    * Create an instance of a {@link Service} according to the given
-   * name.
+   * name. If the name is <code>null</code> then the default {@link Service}
+   * is returned.
    */
   public Service create(String serviceName) {
     if (serviceName == null) {
@@ -53,7 +54,7 @@ public class ServiceFactory {
 
   /**
    * Return a collection of available services.
-   * @return
+   * @return the available service names
    */
   public Set<String> availableServices() {
     Set<String> result = Sets.newLinkedHashSet();
