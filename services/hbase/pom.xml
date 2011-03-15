@@ -20,13 +20,13 @@
   <parent>
     <groupId>org.apache.whirr</groupId>
     <artifactId>whirr</artifactId>
-    <version>0.5.0-incubating-SNAPSHOT</version>
+    <version>0.4.0-incubating</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <groupId>org.apache.whirr</groupId>
   <artifactId>whirr-hbase</artifactId>
   <packaging>jar</packaging>
-  <version>0.5.0-incubating-SNAPSHOT</version>
+  <version>0.4.0-incubating</version>
   <name>Apache Whirr HBase</name>
   <properties>
     <hadoop.version>0.20.2</hadoop.version>
