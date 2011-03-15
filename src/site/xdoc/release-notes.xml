@@ -24,7 +24,7 @@
     <!-- Paste release notes from https://issues.apache.org/jira/browse/WHIRR here. -->
 
     <h1>Release Notes - Whirr - Version 0.4.0</h1>
-        
+
     <h2>        Sub-task
     </h2>
     <ul>
@@ -52,6 +52,12 @@
     <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-235'>WHIRR-235</a>] -         fix whirr.provider in recipes/*
     </li>
     <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-241'>WHIRR-241</a>] -         Update to use CDH3B4
+    </li>
+    <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-247'>WHIRR-247</a>] -         Add license headers to service install and configure scripts
+    </li>
+    <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-250'>WHIRR-250</a>] -         Ensure all libraries in binary distribution have associated licenses where stipulated
+    </li>
+    <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-251'>WHIRR-251</a>] -         Handle Apache cryptography requirements for release
     </li>
     </ul>
             
@@ -82,6 +88,12 @@
     </li>
     <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-242'>WHIRR-242</a>] -         Update documentation for overriding locally supplied scripts
     </li>
+    <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-244'>WHIRR-244</a>] -         Add package-level javadoc
+    </li>
+    <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-254'>WHIRR-254</a>] -         Document limitation that a role may only appear in one instance template group
+    </li>
+    <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-259'>WHIRR-259</a>] -         Disable configuration list handling for Hadoop properties
+    </li>
     </ul>
         
     <h2>        New Feature
@@ -94,8 +106,15 @@
     <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-226'>WHIRR-226</a>] -         Add the ability to destroy a cluster instance
     </li>
     </ul>
-                                            
-
+                            
+    <h2>        Task
+    </h2>
+    <ul>
+    <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-129'>WHIRR-129</a>] -         Add Adrian Cole as a committer in the whirr pom.xml and site.
+    </li>
+    <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-248'>WHIRR-248</a>] -         Update to jclouds-1.0-beta9b
+    </li>
+    </ul>
 
 	<h1>Release Notes - Whirr - Version 0.3.0</h1>
 
