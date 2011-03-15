@@ -16,19 +16,20 @@
  * limitations under the License.
  */
 
-package org.jclouds.ec2.compute.strategy;
+package org.apache.whirr.service.jclouds;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertThat;
 
 import java.io.IOException;
 
+import org.apache.whirr.service.jclouds.TakeLoginCredentialsFromWhirrProperties;
 import org.jclouds.domain.Credentials;
 import org.junit.Test;
 
-public class EC2PopulateDefaultLoginCredentialsForImageStrategyTest {
-  EC2PopulateDefaultLoginCredentialsForImageStrategy strat = 
-     new EC2PopulateDefaultLoginCredentialsForImageStrategy();
+public class TakeLoginCredentialsFromWhirrPropertiesTest {
+  TakeLoginCredentialsFromWhirrProperties strat = 
+     new TakeLoginCredentialsFromWhirrProperties();
 
   @Test
   public synchronized void testNotSetIsDefault() throws IOException {
