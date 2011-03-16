@@ -87,6 +87,9 @@ Release 0.4.0 - 2011-03-15
     WHIRR-250. Ensure all libraries in binary distribution have 
     associated licenses where stipulated (tomwhite via asavu)
 
+    WHIRR-263. Default tarball not found for Cassandra (broken link 
+    in install_cassandra.sh) (asavu)
+
 Release 0.3.0 - 2011-01-15
 
   NEW FEATURES

@@ -17,7 +17,7 @@
 function install_cassandra() {
 
   C_MAJOR_VERSION=${1:-0.7}
-  C_TAR_URL=${2:-http://www.apache.org/dist/cassandra/0.7.0/apache-cassandra-0.7.0-bin.tar.gz}
+  C_TAR_URL=${2:-http://archive.apache.org/dist/cassandra/0.7.0/apache-cassandra-0.7.0-bin.tar.gz}
   
   c_tar_file=`basename $C_TAR_URL`
   c_tar_dir=`echo $c_tar_file | awk -F '-bin' '{print $1}'`
