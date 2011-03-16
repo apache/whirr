@@ -59,6 +59,8 @@
     </li>
     <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-251'>WHIRR-251</a>] -         Handle Apache cryptography requirements for release
     </li>
+    <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-263'>WHIRR-263</a>] -         Default tarball not found for Cassandra (broken link in install_cassandra.sh)
+    </li>
     </ul>
             
     <h2>        Improvement
