@@ -19,7 +19,6 @@
 package org.apache.whirr.cluster.actions;
 
 import com.google.common.base.Predicate;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 
 import java.io.IOException;
@@ -78,7 +77,7 @@ public class ConfigureClusterAction extends ScriptBasedClusterAction {
         ComputeServiceContextBuilder.build(getComputeServiceContextFactory(), clusterSpec);
       ComputeService computeService = computeServiceContext.getComputeService();
       Credentials credentials = new Credentials(
-          Iterables.get(cluster.getInstances(), 0).getLoginCredentials().identity,
+          clusterSpec.getClusterUser(),
           clusterSpec.getPrivateKey());
       try {
         LOG.info("Running configuration script");
