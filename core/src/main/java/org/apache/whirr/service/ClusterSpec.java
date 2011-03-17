@@ -135,7 +135,11 @@ public class ClusterSpec {
       "urls from. Change this to host your own set of launch scripts."),
     
     LOGIN_USER(String.class, false,  "Override the default login user "+
-      "used to bootstrap whirr. E.g. ubuntu or myuser:mypass.");
+      "used to bootstrap whirr. E.g. ubuntu or myuser:mypass."),
+
+    CLUSTER_USER(String.class, false, "The name of the user that Whirr " +
+            "will create on all the cluster instances. You have to use " +
+            "this user to login to nodes.");
     
     private Class<?> type;
     private boolean multipleArguments;
@@ -370,6 +374,7 @@ public class ClusterSpec {
   private List<String> clientCidrs;
   private String version;
   private String runUrlBase;
+  private String clusterUser;
   
   private Configuration config;
   
@@ -454,6 +459,7 @@ public class ClusterSpec {
       // patch until jclouds 1.0-beta-10
       System.setProperty("whirr.login-user", loginUser);
     }
+    clusterUser = c.getString(Property.CLUSTER_USER.getConfigName());
     this.config = c;
   }
 
@@ -516,9 +522,15 @@ public class ClusterSpec {
   public String getVersion() {
     return version;
   }
+  @Deprecated
   public String getRunUrlBase() {
     return runUrlBase;
   }
+
+  public String getClusterUser() {
+    return clusterUser;
+  }
+
   
   public void setInstanceTemplates(List<InstanceTemplate> instanceTemplates) {
     this.instanceTemplates = instanceTemplates;
@@ -629,12 +641,15 @@ public class ClusterSpec {
     this.version = version;
   }
 
+  @Deprecated
   public void setRunUrlBase(String runUrlBase) {
     this.runUrlBase = runUrlBase;
   }
-  
-  //
-  
+
+  public void setClusterUser(String user) {
+    this.clusterUser = user;
+  }
+
   public Configuration getConfiguration() {
     return config;
   }
@@ -675,7 +690,6 @@ public class ClusterSpec {
         && Objects.equal(locationId, that.locationId)
         && Objects.equal(clientCidrs, that.clientCidrs)
         && Objects.equal(version, that.version)
-        && Objects.equal(runUrlBase, that.runUrlBase)
         ;
     }
     return false;
@@ -704,7 +718,6 @@ public class ClusterSpec {
       .add("locationId", locationId)
       .add("clientCidrs", clientCidrs)
       .add("version", version)
-      .add("runUrlBase", runUrlBase)
       .toString();
   }
 

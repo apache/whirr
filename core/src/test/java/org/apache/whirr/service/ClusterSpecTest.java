@@ -295,5 +295,12 @@ public class ClusterSpecTest {
     assertThat(t1.getMinNumberOfInstances(), is(1));
     t2 = templates.get(1);
     assertThat(t2.getMinNumberOfInstances(), is(3));
-  }  
+  }
+
+  @Test
+  public void testClusterUserShouldBeCurrentUser() throws Exception {
+    ClusterSpec spec = ClusterSpec.withTemporaryKeys();
+    assertThat(spec.getClusterUser(), is(System.getProperty("user.name")));
+  }
+
 }

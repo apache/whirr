@@ -13,6 +13,9 @@ Release 0.4.0 - 2011-03-15
 
     WHIRR-198. Support user-defined images (Adrian Cole via asavu)
 
+    WHIRR-158. Allow users to log into clusters as themselves 
+    (Adrian Cole and asavu)
+
   IMPROVEMENTS
 
     WHIRR-139. upgrade to version 1 of the "enforcer" plugin (Jakob Homan 
