@@ -56,7 +56,7 @@ public class HadoopProxy {
       Files.write(clusterSpec.getPrivateKey(), identity, Charsets.UTF_8);
     }
     KeyPair.setPermissionsTo600(identity);
-    String user = Iterables.get(cluster.getInstances(), 0).getLoginCredentials().identity;
+    String user = clusterSpec.getClusterUser();
     InetAddress namenode = HadoopCluster.getNamenodePublicAddress(cluster);
     String server = DnsUtil.resolveAddress(namenode.getHostAddress());
     return new String[] { "ssh",

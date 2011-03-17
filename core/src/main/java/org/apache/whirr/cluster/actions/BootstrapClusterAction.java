@@ -19,9 +19,16 @@
 package org.apache.whirr.cluster.actions;
 
 import static org.jclouds.compute.options.TemplateOptions.Builder.runScript;
+import static org.jclouds.scriptbuilder.domain.Statements.appendFile;
+import static org.jclouds.scriptbuilder.domain.Statements.interpret;
+import static org.jclouds.scriptbuilder.domain.Statements.newStatementList;
 
 import com.google.common.base.Function;
+import com.google.common.base.Splitter;
 import com.google.common.collect.Collections2;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -56,11 +63,9 @@ import org.jclouds.compute.RunNodesException;
 import org.jclouds.compute.domain.NodeMetadata;
 import org.jclouds.compute.domain.Template;
 import org.jclouds.compute.domain.TemplateBuilder;
-import org.jclouds.scriptbuilder.domain.AuthorizeRSAPublicKey;
-import org.jclouds.scriptbuilder.domain.InstallRSAPrivateKey;
+import org.jclouds.scriptbuilder.InitBuilder;
 import org.jclouds.scriptbuilder.domain.OsFamily;
 import org.jclouds.scriptbuilder.domain.Statement;
-import org.jclouds.scriptbuilder.domain.StatementList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -151,17 +156,50 @@ public class BootstrapClusterAction extends ScriptBasedClusterAction {
     LOG.info("Configuring template");
     if (LOG.isDebugEnabled())
       LOG.debug("Running script:\n{}", statementBuilder.render(OsFamily.UNIX));
-    Statement runScript = new StatementList(
-          new AuthorizeRSAPublicKey(clusterSpec.getPublicKey()),
-          statementBuilder,
-          new InstallRSAPrivateKey(clusterSpec.getPrivateKey()));
+    Statement runScript = addUserAndAuthorizeSudo(
+        clusterSpec.getClusterUser(),
+        clusterSpec.getPublicKey(),
+        clusterSpec.getPrivateKey(),
+        statementBuilder);
     TemplateBuilder templateBuilder = computeService.templateBuilder()
       .options(runScript(runScript));
     strategy.configureTemplateBuilder(clusterSpec, templateBuilder);
     return templateBuilder.build();
     
   }
+  
+  private static Statement addUserAndAuthorizeSudo(String user,
+      String publicKey, String privateKey, Statement statement) {
+    return new InitBuilder("setup-" + user,// name of the script
+        "/tmp",// working directory
+        "/tmp/logs",// location of stdout.log and stderr.log
+        ImmutableMap.of("newUser", user, "defaultHome", "/home/users"), // variables
+        ImmutableList.<Statement> of(
+            createUserWithPublicAndPrivateKey(user, publicKey, privateKey),
+            makeSudoersOnlyPermitting(user),
+            statement));
+  }
 
+  // must be used inside InitBuilder, as this sets the shell variables used in this statement
+  static Statement createUserWithPublicAndPrivateKey(String username,
+      String publicKey, String privateKey) {
+    // note directory must be created first
+    return newStatementList(interpret("mkdir -p $DEFAULT_HOME/$NEW_USER/.ssh",
+        "useradd --shell /bin/bash -d $DEFAULT_HOME/$NEW_USER $NEW_USER\n"), appendFile(
+        "$DEFAULT_HOME/$NEW_USER/.ssh/authorized_keys", Splitter.on('\n').split(publicKey)),
+        appendFile(
+            "$DEFAULT_HOME/$NEW_USER/.ssh/id_rsa", Splitter.on('\n').split(privateKey)),
+        interpret("chmod 400 $DEFAULT_HOME/$NEW_USER/.ssh/*",
+            "chown -R $NEW_USER $DEFAULT_HOME/$NEW_USER\n"));
+  }
+
+  // must be used inside InitBuilder, as this sets the shell variables used in this statement
+  static Statement makeSudoersOnlyPermitting(String username) {
+    return newStatementList(interpret("rm /etc/sudoers", "touch /etc/sudoers", "chmod 0440 /etc/sudoers",
+        "chown root /etc/sudoers\n"), appendFile("/etc/sudoers", ImmutableSet.of("root ALL = (ALL) ALL",
+        "%adm ALL = (ALL) ALL", username + " ALL = (ALL) NOPASSWD: ALL")));
+  }
+  
   private Set<Instance> getInstances(final Set<String> roles,
       Set<? extends NodeMetadata> nodes) {
     return Sets.newLinkedHashSet(Collections2.transform(Sets.newLinkedHashSet(nodes),
