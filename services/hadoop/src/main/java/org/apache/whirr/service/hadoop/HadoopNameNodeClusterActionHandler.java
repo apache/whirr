@@ -73,7 +73,6 @@ public class HadoopNameNodeClusterActionHandler extends ClusterActionHandlerSupp
     addStatement(event, call("install_java"));
     addStatement(event, call("install_tarball"));
     addStatement(event, call(hadoopInstallFunction, "-c", clusterSpec.getProvider()));
-    event.setTemplateBuilderStrategy(new HadoopTemplateBuilderStrategy());
   }
   
   @Override
