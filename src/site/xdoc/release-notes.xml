@@ -41,7 +41,7 @@
   </li>
   <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-207'>WHIRR-207</a>] -         Handle curl timeouts better
   </li>
-  li>[<a href='https://issues.apache.org/jira/browse/WHIRR-217'>WHIRR-217</a>] -         Log files should not be included in tarball or checked by RAT
+  <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-217'>WHIRR-217</a>] -         Log files should not be included in tarball or checked by RAT
   </li>
   <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-227'>WHIRR-227</a>] -         CDH and Hadoop integration tests are failing 
   </li>
