@@ -57,6 +57,9 @@ Release 0.4.0 - 2011-03-15
     WHIRR-259. Disable configuration list handling for Hadoop 
     properties (asavu)
 
+    WHIRR-233. Change test properties to be less provider bound and 
+    improve TemplateBuilder defaults (asavu)
+
   BUG FIXES
 
     WHIRR-170. Instances should be started in the order specified in 

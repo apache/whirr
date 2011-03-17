@@ -73,7 +73,6 @@ public class HBaseMasterClusterActionHandler extends HBaseClusterActionHandler {
     addStatement(event, call(hbaseInstallFunction,
       HBaseConstants.PARAM_PROVIDER, clusterSpec.getProvider(),
       HBaseConstants.PARAM_TARBALL_URL, tarurl));
-    event.setTemplateBuilderStrategy(new HBaseTemplateBuilderStrategy());
   }
 
   @Override
