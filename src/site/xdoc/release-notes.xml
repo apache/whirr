@@ -23,100 +23,106 @@
     <body>
     <!-- Paste release notes from https://issues.apache.org/jira/browse/WHIRR here. -->
 
-    <h1>Release Notes - Whirr - Version 0.4.0</h1>
-
-    <h2>        Sub-task
-    </h2>
-    <ul>
-    <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-139'>WHIRR-139</a>] -         upgrade to version 1 of the &quot;enforcer&quot; plugin
-    </li>
-    </ul>
-                
-    <h2>        Bug
-    </h2>
-    <ul>
-    <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-170'>WHIRR-170</a>] -         Instances should be started in the order specified in the template
-    </li>
-    <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-201'>WHIRR-201</a>] -         [HBase] Integration test fails
-    </li>
-    <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-207'>WHIRR-207</a>] -         Handle curl timeouts better
-    </li>
-    <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-217'>WHIRR-217</a>] -         Log files should not be included in tarball or checked by RAT
-    </li>
-    <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-227'>WHIRR-227</a>] -         CDH and Hadoop integration tests are failing 
-    </li>
-    <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-232'>WHIRR-232</a>] -         NPE for stopped instances on EC2
-    </li>
-    <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-234'>WHIRR-234</a>] -         Resource functions/install_cdh_hadoop.sh not found when running from the CLI
-    </li>
-    <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-235'>WHIRR-235</a>] -         fix whirr.provider in recipes/*
-    </li>
-    <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-241'>WHIRR-241</a>] -         Update to use CDH3B4
-    </li>
-    <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-247'>WHIRR-247</a>] -         Add license headers to service install and configure scripts
-    </li>
-    <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-250'>WHIRR-250</a>] -         Ensure all libraries in binary distribution have associated licenses where stipulated
-    </li>
-    <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-251'>WHIRR-251</a>] -         Handle Apache cryptography requirements for release
-    </li>
-    <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-263'>WHIRR-263</a>] -         Default tarball not found for Cassandra (broken link in install_cassandra.sh)
-    </li>
-    </ul>
-            
-    <h2>        Improvement
-    </h2>
-    <ul>
-    <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-55'>WHIRR-55</a>] -         Users should be able to override an arbitrary Hadoop property before launch
-    </li>
-    <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-124'>WHIRR-124</a>] -         Upgrade to jclouds 1.0-beta-9
-    </li>
-    <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-167'>WHIRR-167</a>] -         Improve bootstrapping and configuration to be able to isolate and repair or evict failing nodes on EC2
-    </li>
-    <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-183'>WHIRR-183</a>] -         ZooKeeper Data Directory Cleanup
-    </li>
-    <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-186'>WHIRR-186</a>] -         [HBase] Add version support configurable in properties file
-    </li>
-    <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-193'>WHIRR-193</a>] -         Recipe for a HBase Cluster
-    </li>
-    <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-195'>WHIRR-195</a>] -         Display available roles instead of service names when running ./bin/whirr
-    </li>
-    <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-199'>WHIRR-199</a>] -         Add aliases for short role names like nn, jt, tt, dn, zk 
-    </li>
-    <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-215'>WHIRR-215</a>] -         Add builder pattern to addRunUrl() call
-    </li>
-    <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-219'>WHIRR-219</a>] -         Support dynamic addition of services to CLI
-    </li>
-    <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-231'>WHIRR-231</a>] -         Update documentation after upgrade to jclouds 1.0-beta-9 
-    </li>
-    <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-242'>WHIRR-242</a>] -         Update documentation for overriding locally supplied scripts
-    </li>
-    <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-244'>WHIRR-244</a>] -         Add package-level javadoc
-    </li>
-    <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-254'>WHIRR-254</a>] -         Document limitation that a role may only appear in one instance template group
-    </li>
-    <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-259'>WHIRR-259</a>] -         Disable configuration list handling for Hadoop properties
-    </li>
-    </ul>
-        
-    <h2>        New Feature
-    </h2>
-    <ul>
-    <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-198'>WHIRR-198</a>] -         support user-defined images
-    </li>
-    <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-225'>WHIRR-225</a>] -         Support locally-supplied scripts
-    </li>
-    <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-226'>WHIRR-226</a>] -         Add the ability to destroy a cluster instance
-    </li>
-    </ul>
-                            
-    <h2>        Task
-    </h2>
-    <ul>
-    <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-129'>WHIRR-129</a>] -         Add Adrian Cole as a committer in the whirr pom.xml and site.
-    </li>
-    <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-248'>WHIRR-248</a>] -         Update to jclouds-1.0-beta9b
-    </li>
-    </ul>
+  <h1>Release Notes - Whirr - Version 0.4.0</h1>
+    
+  <h2>        Sub-task
+  </h2>
+  <ul>
+  <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-139'>WHIRR-139</a>] -         upgrade to version 1 of the &quot;enforcer&quot; plugin
+  </li>
+  </ul>
+              
+  <h2>        Bug
+  </h2>
+  <ul>
+  <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-170'>WHIRR-170</a>] -         Instances should be started in the order specified in the template
+  </li>
+  <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-201'>WHIRR-201</a>] -         [HBase] Integration test fails
+  </li>
+  <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-207'>WHIRR-207</a>] -         Handle curl timeouts better
+  </li>
+  li>[<a href='https://issues.apache.org/jira/browse/WHIRR-217'>WHIRR-217</a>] -         Log files should not be included in tarball or checked by RAT
+  </li>
+  <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-227'>WHIRR-227</a>] -         CDH and Hadoop integration tests are failing 
+  </li>
+  <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-232'>WHIRR-232</a>] -         NPE for stopped instances on EC2
+  </li>
+  <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-234'>WHIRR-234</a>] -         Resource functions/install_cdh_hadoop.sh not found when running from the CLI
+  </li>
+  <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-235'>WHIRR-235</a>] -         fix whirr.provider in recipes/*
+  </li>
+  <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-241'>WHIRR-241</a>] -         Update to use CDH3B4
+  </li>
+  <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-247'>WHIRR-247</a>] -         Add license headers to service install and configure scripts
+  </li>
+  <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-250'>WHIRR-250</a>] -         Ensure all libraries in binary distribution have associated licenses where stipulated
+  </li>
+  <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-251'>WHIRR-251</a>] -         Handle Apache cryptography requirements for release
+  </li>
+  <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-263'>WHIRR-263</a>] -         Default tarball not found for Cassandra (broken link in install_cassandra.sh)
+  </li>
+  <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-264'>WHIRR-264</a>] -         JClouds is unable to do SSH on automatically selected images
+  </li>
+  </ul>
+          
+  <h2>        Improvement
+  </h2>
+  <ul>
+  <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-55'>WHIRR-55</a>] -         Users should be able to override an arbitrary Hadoop property before launch
+  </li>
+  <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-124'>WHIRR-124</a>] -         Upgrade to jclouds 1.0-beta-9
+  </li>
+  <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-167'>WHIRR-167</a>] -         Improve bootstrapping and configuration to be able to isolate and repair or evict failing nodes on EC2
+  </li>
+  <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-183'>WHIRR-183</a>] -         ZooKeeper Data Directory Cleanup
+  </li>
+  <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-186'>WHIRR-186</a>] -         [HBase] Add version support configurable in properties file
+  </li>
+  <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-193'>WHIRR-193</a>] -         Recipe for a HBase Cluster
+  </li>
+  <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-195'>WHIRR-195</a>] -         Display available roles instead of service names when running ./bin/whirr
+  </li>
+  <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-199'>WHIRR-199</a>] -         Add aliases for short role names like nn, jt, tt, dn, zk 
+  </li>
+  <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-215'>WHIRR-215</a>] -         Add builder pattern to addRunUrl() call
+  </li>
+  <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-219'>WHIRR-219</a>] -         Support dynamic addition of services to CLI
+  </li>
+  <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-231'>WHIRR-231</a>] -         Update documentation after upgrade to jclouds 1.0-beta-9 
+  </li>
+  <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-233'>WHIRR-233</a>] -         Change test properties to be less provider bound and improve TemplateBuilder defaults
+  </li>
+  <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-242'>WHIRR-242</a>] -         Update documentation for overriding locally supplied scripts
+  </li>
+  <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-244'>WHIRR-244</a>] -         Add package-level javadoc
+  </li>
+  <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-254'>WHIRR-254</a>] -         Document limitation that a role may only appear in one instance template group
+  </li>
+  <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-259'>WHIRR-259</a>] -         Disable configuration list handling for Hadoop properties
+  </li>
+  </ul>
+      
+  <h2>        New Feature
+  </h2>
+  <ul>
+  <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-158'>WHIRR-158</a>] -         Allow users to log into clusters as themselves
+  </li>
+  <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-198'>WHIRR-198</a>] -         support user-defined images
+  </li>
+  <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-225'>WHIRR-225</a>] -         Support locally-supplied scripts
+  </li>
+  <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-226'>WHIRR-226</a>] -         Add the ability to destroy a cluster instance
+  </li>
+  </ul>
+                          
+  <h2>        Task
+  </h2>
+  <ul>
+  <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-129'>WHIRR-129</a>] -         Add Adrian Cole as a committer in the whirr pom.xml and site.
+  </li>
+  <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-248'>WHIRR-248</a>] -         Update to jclouds-1.0-beta9b
+  </li>
+  </ul>
 
 	<h1>Release Notes - Whirr - Version 0.3.0</h1>
 
