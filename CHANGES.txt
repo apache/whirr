@@ -60,6 +60,8 @@ Release 0.4.0 - 2011-03-15
     WHIRR-233. Change test properties to be less provider bound and 
     improve TemplateBuilder defaults (asavu)
 
+    WHIRR-265. Missing SVN EOL properties (Sebb via asavu)
+
   BUG FIXES
 
     WHIRR-170. Instances should be started in the order specified in 
