@@ -18,6 +18,7 @@ package org.apache.whirr.service.zookeeper;
  */
 
 import static org.jclouds.scriptbuilder.domain.Statements.call;
+import static org.apache.whirr.service.RolePredicates.role;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
@@ -33,7 +34,6 @@ import org.apache.whirr.service.ClusterActionEvent;
 import org.apache.whirr.service.ClusterActionHandlerSupport;
 import org.apache.whirr.service.ClusterSpec;
 import org.apache.whirr.service.ComputeServiceContextBuilder;
-import org.apache.whirr.service.RolePredicates;
 import org.apache.whirr.service.jclouds.FirewallSettings;
 import org.jclouds.compute.ComputeServiceContext;
 import org.slf4j.Logger;
@@ -63,16 +63,16 @@ public class ZooKeeperClusterActionHandler extends ClusterActionHandlerSupport {
   protected void beforeConfigure(ClusterActionEvent event) throws IOException, InterruptedException {
     ClusterSpec clusterSpec = event.getClusterSpec();
     Cluster cluster = event.getCluster();
+    Set<Instance> ensemble = cluster.getInstancesMatching(role(ZOOKEEPER_ROLE));
     LOG.info("Authorizing firewall");
     ComputeServiceContext computeServiceContext =
       ComputeServiceContextBuilder.build(clusterSpec);
     FirewallSettings.authorizeIngress(computeServiceContext,
-        cluster.getInstances(), clusterSpec, CLIENT_PORT);
+        ensemble, clusterSpec, CLIENT_PORT);
     
     // Pass list of all servers in ensemble to configure script.
     // Position is significant: i-th server has id i.
-    String servers = Joiner.on(' ').join(getPrivateIps(cluster.getInstancesMatching(
-      RolePredicates.role(ZooKeeperClusterActionHandler.ZOOKEEPER_ROLE))));
+    String servers = Joiner.on(' ').join(getPrivateIps(ensemble));
     addStatement(event, call("configure_zookeeper", "-c",
         clusterSpec.getProvider(), servers));
   }
@@ -83,7 +83,7 @@ public class ZooKeeperClusterActionHandler extends ClusterActionHandlerSupport {
     Cluster cluster = event.getCluster();
     LOG.info("Completed configuration of {}", clusterSpec.getClusterName());
     String hosts = Joiner.on(',').join(getHosts(cluster.getInstancesMatching(
-      RolePredicates.role(ZooKeeperClusterActionHandler.ZOOKEEPER_ROLE))));
+      role(ZOOKEEPER_ROLE))));
     LOG.info("Hosts: {}", hosts);
   }
 
