@@ -23,7 +23,7 @@
     <body>
     <!-- Paste release notes from https://issues.apache.org/jira/browse/WHIRR here. -->
 
-  <h1>Release Notes - Whirr - Version 0.4.0</h1>
+      <h1>Release Notes - Whirr - Version 0.4.0</h1>
     
   <h2>        Sub-task
   </h2>
@@ -63,6 +63,8 @@
   </li>
   <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-264'>WHIRR-264</a>] -         JClouds is unable to do SSH on automatically selected images
   </li>
+  <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-267'>WHIRR-267</a>] -         Update NOTICE and LICENSE files to mention 3rd party products
+  </li>
   </ul>
           
   <h2>        Improvement
@@ -99,6 +101,8 @@
   <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-254'>WHIRR-254</a>] -         Document limitation that a role may only appear in one instance template group
   </li>
   <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-259'>WHIRR-259</a>] -         Disable configuration list handling for Hadoop properties
+  </li>
+  <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-265'>WHIRR-265</a>] -         Missing SVN EOL properties
   </li>
   </ul>
       
