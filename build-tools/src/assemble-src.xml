@@ -26,6 +26,7 @@
       <directory>${project.basedir}</directory>
       <useDefaultExcludes>true</useDefaultExcludes>
       <excludes>
+        <exclude>NOTICE*.txt</exclude>
         <exclude>**/.project</exclude>
         <exclude>**/.gitignore</exclude>
         <exclude>**/${project.build.directory}/**</exclude>
@@ -34,4 +35,10 @@
       </excludes>
     </fileSet>
   </fileSets>
+  <files>
+    <file>
+      <source>NOTICE-src.txt</source>
+      <destName>NOTICE.txt</destName>
+    </file>
+  </files>
 </assembly>
