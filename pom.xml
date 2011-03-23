@@ -47,7 +47,7 @@
   </modules>
 
   <properties>
-    <jclouds.version>1.0-beta-9</jclouds.version>
+    <jclouds.version>1.0-beta-9b</jclouds.version>
   </properties>
 
   <dependencyManagement>
@@ -56,11 +56,6 @@
         <groupId>ca.juliusdavies</groupId>
         <artifactId>not-yet-commons-ssl</artifactId>
         <version>0.3.11</version>
-      </dependency>
-      <dependency>
-        <groupId>org.jclouds</groupId>
-        <artifactId>jclouds-allcompute</artifactId>
-        <version>${jclouds.version}</version>
       </dependency>
       <dependency>
         <groupId>org.jclouds</groupId>
@@ -74,11 +69,6 @@
       </dependency>
       <dependency>
         <groupId>org.jclouds.driver</groupId>
-        <artifactId>jclouds-enterprise</artifactId>
-        <version>${jclouds.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.jclouds.driver</groupId>
         <artifactId>jclouds-jsch</artifactId>
         <version>${jclouds.version}</version>
       </dependency>
@@ -87,11 +77,24 @@
         <artifactId>jclouds-log4j</artifactId>
         <version>${jclouds.version}</version>
       </dependency>
+      <!-- Supported cloud providers. When adding a dependency here
+           be sure to add a corresponding LICENSE file in lib. -->
       <dependency>
-        <groupId>org.jclouds</groupId>
-        <artifactId>jclouds-scriptbuilder</artifactId>
+        <groupId>org.jclouds.provider</groupId>
+        <artifactId>aws-ec2</artifactId>
         <version>${jclouds.version}</version>
       </dependency>
+      <dependency>
+        <groupId>org.jclouds.provider</groupId>
+        <artifactId>cloudservers-us</artifactId>
+        <version>${jclouds.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.jclouds.provider</groupId>
+        <artifactId>cloudservers-uk</artifactId>
+        <version>${jclouds.version}</version>
+      </dependency>
+      <!-- End supported cloud providers. -->
       <dependency>
         <groupId>junit</groupId>
         <artifactId>junit</artifactId>
@@ -138,7 +141,7 @@
       <dependency>
         <groupId>log4j</groupId>
         <artifactId>log4j</artifactId>
-        <version>1.2.15</version>
+        <version>1.2.16</version>
         <exclusions>
           <exclusion>
             <groupId>javax.mail</groupId>
@@ -161,7 +164,7 @@
       <dependency>
         <groupId>com.jcraft</groupId>
         <artifactId>jsch</artifactId>
-        <version>0.1.42</version>
+        <version>0.1.44-1</version>
       </dependency>
       <dependency>
         <groupId>dnsjava</groupId>
@@ -328,7 +331,6 @@
             <exclude>**/src/main/resources/version-banner.txt</exclude>
             <exclude>docs/**</exclude>
             <exclude>**/*.log</exclude>
-            <exclude>**/functions/*</exclude>
           </excludes>
         </configuration>
       </plugin>
@@ -463,6 +465,14 @@
         <role>committer</role>
       </roles>
     </developer>
+    <developer>
+      <id>adriancole</id>
+      <name>Adrian Cole</name>
+      <organization>Cloud Conscious</organization>
+      <roles>
+        <role>committer</role>
+      </roles>
+    </developer>
   </developers>
   <issueManagement>
     <system>JIRA</system>
@@ -514,10 +524,6 @@
       <releases>
         <enabled>false</enabled>
       </releases>
-    </repository>
-    <repository>
-      <id>jclouds</id>
-      <url>http://jclouds.googlecode.com/svn/repo</url>
     </repository>
     <repository>
       <id>cloudera</id>

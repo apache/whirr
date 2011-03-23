@@ -21,6 +21,9 @@ package org.apache.whirr.service;
 import org.apache.whirr.service.jclouds.StatementBuilder;
 import org.apache.whirr.service.jclouds.TemplateBuilderStrategy;
 
+/**
+ * An event object which is fired when a {@link ClusterAction} occurs. 
+ */
 public class ClusterActionEvent {
   
   private String action;

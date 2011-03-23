@@ -41,10 +41,7 @@ import java.util.Set;
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
-import org.apache.commons.configuration.ConfigurationUtils;
-import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.configuration.PropertiesConfiguration;
-import org.apache.commons.configuration.SubnodeConfiguration;
 import org.apache.commons.io.IOUtils;
 import org.apache.whirr.service.ClusterSpec.InstanceTemplate;
 import org.apache.whirr.ssh.KeyPair;
@@ -298,5 +295,12 @@ public class ClusterSpecTest {
     assertThat(t1.getMinNumberOfInstances(), is(1));
     t2 = templates.get(1);
     assertThat(t2.getMinNumberOfInstances(), is(3));
-  }  
+  }
+
+  @Test
+  public void testClusterUserShouldBeCurrentUser() throws Exception {
+    ClusterSpec spec = ClusterSpec.withTemporaryKeys();
+    assertThat(spec.getClusterUser(), is(System.getProperty("user.name")));
+  }
+
 }

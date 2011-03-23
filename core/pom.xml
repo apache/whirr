@@ -35,19 +35,11 @@
     </dependency>
     <dependency>
       <groupId>org.jclouds</groupId>
-      <artifactId>jclouds-allcompute</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.jclouds</groupId>
       <artifactId>jclouds-compute</artifactId>
     </dependency>
     <dependency>
       <groupId>org.jclouds</groupId>
       <artifactId>jclouds-core</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.jclouds.driver</groupId>
-      <artifactId>jclouds-enterprise</artifactId>
     </dependency>
     <dependency>
       <groupId>org.jclouds.driver</groupId>
@@ -58,8 +50,16 @@
       <artifactId>jclouds-log4j</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.jclouds</groupId>
-      <artifactId>jclouds-scriptbuilder</artifactId>
+      <groupId>org.jclouds.provider</groupId>
+      <artifactId>aws-ec2</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.jclouds.provider</groupId>
+      <artifactId>cloudservers-us</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.jclouds.provider</groupId>
+      <artifactId>cloudservers-uk</artifactId>
     </dependency>
     <dependency>
       <groupId>junit</groupId>

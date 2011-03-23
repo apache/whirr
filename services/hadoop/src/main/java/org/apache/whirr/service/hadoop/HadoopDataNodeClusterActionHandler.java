@@ -28,7 +28,6 @@ import java.io.IOException;
 import java.net.InetAddress;
 
 import org.apache.commons.configuration.ConfigurationException;
-import org.apache.whirr.net.DnsUtil;
 import org.apache.whirr.service.Cluster;
 import org.apache.whirr.service.Cluster.Instance;
 import org.apache.whirr.service.ClusterActionEvent;
@@ -53,7 +52,6 @@ public class HadoopDataNodeClusterActionHandler extends ClusterActionHandlerSupp
     addStatement(event, call("install_java"));
     addStatement(event, call("install_tarball"));
     addStatement(event, call(hadoopInstallFunction, "-c", clusterSpec.getProvider()));
-    event.setTemplateBuilderStrategy(new HadoopTemplateBuilderStrategy());
   }
   
   @Override

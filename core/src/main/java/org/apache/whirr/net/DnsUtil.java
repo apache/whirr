@@ -30,13 +30,16 @@ import org.xbill.DNS.ReverseMap;
 import org.xbill.DNS.Section;
 import org.xbill.DNS.Type;
 
+/**
+ * Utility functions for DNS.
+ */
 public class DnsUtil {
 
   /**
    * resolve the reverse dns name for the given IP address
    * 
    * @param hostIp
-   * @return
+   * @return The resolved DNS name.
    * @throws IOException
    */
   public static String resolveAddress(String hostIp) throws IOException {

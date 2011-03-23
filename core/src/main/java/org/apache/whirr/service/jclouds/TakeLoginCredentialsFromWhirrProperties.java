@@ -16,52 +16,33 @@
  * limitations under the License.
  */
 
-package org.jclouds.ec2.compute.strategy;
-
-import static com.google.common.base.Preconditions.checkArgument;
+package org.apache.whirr.service.jclouds;
 
 import java.util.List;
 
 import javax.inject.Singleton;
 
-import org.jclouds.ec2.domain.Image;
-import org.jclouds.compute.strategy.PopulateDefaultLoginCredentialsForImageStrategy;
+import org.jclouds.ec2.compute.strategy.EC2PopulateDefaultLoginCredentialsForImageStrategy;
 import org.jclouds.domain.Credentials;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 
 @Singleton
-public class EC2PopulateDefaultLoginCredentialsForImageStrategy implements
-        PopulateDefaultLoginCredentialsForImageStrategy {
+// patch until jclouds 1.0-beta-10
+public class TakeLoginCredentialsFromWhirrProperties extends
+    EC2PopulateDefaultLoginCredentialsForImageStrategy {
 
   @Override
   public Credentials execute(Object resourceToAuthenticate) {
     if (System.getProperties().containsKey("whirr.login-user") &&
        !"".equals(System.getProperty("whirr.login-user").trim())) {
-      // patch until jclouds 1.0-beta-10
       List<String> creds = Lists.newArrayList(Splitter.on(':').split(System.getProperty("whirr.login-user")));
       if (creds.size() == 2)
          return new Credentials(creds.get(0), creds.get(1));
       return new Credentials(creds.get(0), null);
+    } else {
+       return super.execute(resourceToAuthenticate);
     }
-    Credentials credentials = new Credentials("root", null);
-    if (resourceToAuthenticate != null) {
-      String owner = null;
-      if (resourceToAuthenticate instanceof Image) {
-        owner = Image.class.cast(resourceToAuthenticate).getImageOwnerId();
-      } else if (resourceToAuthenticate instanceof org.jclouds.compute.domain.Image) {
-        owner = org.jclouds.compute.domain.Image.class.cast(resourceToAuthenticate).getUserMetadata().get("owner");
-      }
-      checkArgument(owner != null, "Resource must be an image (for EC2)");
-      // canonical/alestic images use the ubuntu user to login
-      if (owner.matches("063491364108|099720109477")) {
-        credentials = new Credentials("ubuntu", null);
-        // http://typepad.com/2010/09/introducing-amazon-linux-ami.html
-      } else if (owner.equals("137112412989")) {
-        credentials = new Credentials("ec2-user", null);
-      }
-    }
-    return credentials;
   }
 }

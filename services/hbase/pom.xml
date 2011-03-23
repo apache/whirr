@@ -57,19 +57,11 @@
     </dependency>
     <dependency>
       <groupId>org.jclouds</groupId>
-      <artifactId>jclouds-allcompute</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.jclouds</groupId>
       <artifactId>jclouds-compute</artifactId>
     </dependency>
     <dependency>
       <groupId>org.jclouds</groupId>
       <artifactId>jclouds-core</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.jclouds.driver</groupId>
-      <artifactId>jclouds-enterprise</artifactId>
     </dependency>
     <dependency>
       <groupId>org.jclouds.driver</groupId>

@@ -23,6 +23,11 @@ import java.io.IOException;
 import org.apache.whirr.service.jclouds.RunUrlStatement;
 import org.jclouds.scriptbuilder.domain.Statement;
 
+/**
+ * This is a utility class to make it easier to implement
+ * {@link ClusterActionHandler}. For each 'before' and 'after' action type there
+ * is a corresponding method that implementations may override.
+ */
 public abstract class ClusterActionHandlerSupport extends ClusterActionHandler {
 
   @Override

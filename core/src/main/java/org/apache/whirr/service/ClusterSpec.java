@@ -32,7 +32,6 @@ import java.net.URLEncoder;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import com.jcraft.jsch.JSch;
@@ -122,6 +121,9 @@ public class ClusterSpec {
       
     HARDWARE_ID(String.class, false, "The type of hardware to use for" + 
       " the instance. This must be compatible with the image ID."),
+
+    HARDWARE_MIN_RAM(Integer.class, false, "The minimum amount of " +
+      "instance memory. E.g. 1024"),
       
     LOCATION_ID(String.class, false, "The location to launch " + 
       "instances in. If not specified then an arbitrary location " + 
@@ -136,7 +138,11 @@ public class ClusterSpec {
       "urls from. Change this to host your own set of launch scripts."),
     
     LOGIN_USER(String.class, false,  "Override the default login user "+
-      "used to bootstrap whirr. E.g. ubuntu or myuser:mypass.");
+      "used to bootstrap whirr. E.g. ubuntu or myuser:mypass."),
+
+    CLUSTER_USER(String.class, false, "The name of the user that Whirr " +
+            "will create on all the cluster instances. You have to use " +
+            "this user to login to nodes.");
     
     private Class<?> type;
     private boolean multipleArguments;
@@ -367,10 +373,12 @@ public class ClusterSpec {
   private String publicKey;
   private String imageId;
   private String hardwareId;
+  private int hardwareMinRam;
   private String locationId;
   private List<String> clientCidrs;
   private String version;
   private String runUrlBase;
+  private String clusterUser;
   
   private Configuration config;
   
@@ -435,6 +443,7 @@ public class ClusterSpec {
 
     setImageId(config.getString(Property.IMAGE_ID.getConfigName()));
     setHardwareId(config.getString(Property.HARDWARE_ID.getConfigName()));
+    setHardwareMinRam(c.getInteger(Property.HARDWARE_MIN_RAM.getConfigName(), 1024));
     setLocationId(config.getString(Property.LOCATION_ID.getConfigName()));
     setClientCidrs(c.getList(Property.CLIENT_CIDRS.getConfigName()));
     setVersion(c.getString(Property.VERSION.getConfigName()));
@@ -455,6 +464,7 @@ public class ClusterSpec {
       // patch until jclouds 1.0-beta-10
       System.setProperty("whirr.login-user", loginUser);
     }
+    clusterUser = c.getString(Property.CLUSTER_USER.getConfigName());
     this.config = c;
   }
 
@@ -508,6 +518,9 @@ public class ClusterSpec {
   public String getHardwareId() {
     return hardwareId;
   }
+  public int getHardwareMinRam() {
+    return hardwareMinRam;
+  }
   public String getLocationId() {
     return locationId;
   }
@@ -517,9 +530,15 @@ public class ClusterSpec {
   public String getVersion() {
     return version;
   }
+  @Deprecated
   public String getRunUrlBase() {
     return runUrlBase;
   }
+
+  public String getClusterUser() {
+    return clusterUser;
+  }
+
   
   public void setInstanceTemplates(List<InstanceTemplate> instanceTemplates) {
     this.instanceTemplates = instanceTemplates;
@@ -617,6 +636,10 @@ public class ClusterSpec {
   public void setHardwareId(String hardwareId) {
     this.hardwareId = hardwareId;
   }
+
+  public void setHardwareMinRam(int minRam) {
+    this.hardwareMinRam = minRam;
+  }
   
   public void setLocationId(String locationId) {
     this.locationId = locationId;
@@ -630,12 +653,15 @@ public class ClusterSpec {
     this.version = version;
   }
 
+  @Deprecated
   public void setRunUrlBase(String runUrlBase) {
     this.runUrlBase = runUrlBase;
   }
-  
-  //
-  
+
+  public void setClusterUser(String user) {
+    this.clusterUser = user;
+  }
+
   public Configuration getConfiguration() {
     return config;
   }
@@ -673,10 +699,10 @@ public class ClusterSpec {
         && Objects.equal(clusterName, that.clusterName)
         && Objects.equal(imageId, that.imageId)
         && Objects.equal(hardwareId, that.hardwareId)
+        && Objects.equal(hardwareMinRam, that.hardwareMinRam)
         && Objects.equal(locationId, that.locationId)
         && Objects.equal(clientCidrs, that.clientCidrs)
         && Objects.equal(version, that.version)
-        && Objects.equal(runUrlBase, that.runUrlBase)
         ;
     }
     return false;
@@ -702,10 +728,10 @@ public class ClusterSpec {
       .add("privateKey", privateKey)
       .add("imageId", imageId)
       .add("instanceSizeId", hardwareId)
+      .add("instanceMinRam", hardwareMinRam)
       .add("locationId", locationId)
       .add("clientCidrs", clientCidrs)
       .add("version", version)
-      .add("runUrlBase", runUrlBase)
       .toString();
   }
 
