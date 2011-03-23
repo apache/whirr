@@ -38,6 +38,7 @@
       <directory>${project.basedir}</directory>
       <useDefaultExcludes>true</useDefaultExcludes>
       <excludes>
+        <exclude>NOTICE-src.txt</exclude>
         <exclude>**/.project</exclude>
         <exclude>**/.gitignore</exclude>
         <exclude>**/${project.build.directory}/**</exclude>

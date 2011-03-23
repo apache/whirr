@@ -98,6 +98,9 @@ Release 0.4.0 - 2011-03-15
     WHIRR-263. Default tarball not found for Cassandra (broken link 
     in install_cassandra.sh) (asavu)
 
+    WHIRR-267. Update NOTICE and LICENSE files to mention 3rd party 
+    products (tomwhite via asavu)
+
 Release 0.3.0 - 2011-01-15
 
   NEW FEATURES
