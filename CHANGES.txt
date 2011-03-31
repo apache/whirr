@@ -11,6 +11,10 @@ Trunk (unreleased changes)
     WHIRR-253. ZooKeeper service should only authorize ingress to ZooKeeper 
     instances (tomwhite via asavu)
 
+    WHIRR-268. whirr hangs when the file '$HOME/.ssh/known_hosts' includes 
+    an obsolete identifier for a certain ip address host. 
+    (Hyunsik Choi via asavu)
+
 Release 0.4.0 - 2011-03-15
 
   NEW FEATURES
