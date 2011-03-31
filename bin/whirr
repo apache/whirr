@@ -18,10 +18,11 @@
 bin=`dirname "$0"`
 bin=`cd "$bin"; pwd`
 
-if [ -d $bin/../cli/target/lib ]; then
+if [ -d "$bin/../cli/target/lib" ]; then
   classpath="$bin/..:$bin/../cli/target/lib/*:$bin/../cli/target/*"
 else
   classpath="$bin/..:$bin/../lib/*"
 fi
 
-java -cp $classpath org.apache.whirr.cli.Main "$@"
+java -cp "$classpath" org.apache.whirr.cli.Main "$@"
+
