@@ -64,6 +64,8 @@ public class HadoopProxy {
         "-o", "ConnectTimeout=10",
         "-o", "ServerAliveInterval=60",
         "-o", "StrictHostKeyChecking=no",
+        "-o", "UserKnownHostsFile=/dev/null",
+        "-o", "StrictHostKeyChecking=no",
         "-N",
         "-D 6666",
         String.format("%s@%s", user, server)};
