@@ -20,6 +20,8 @@ package org.apache.whirr.service;
 
 import java.io.IOException;
 
+import org.apache.commons.configuration.CompositeConfiguration;
+import org.apache.commons.configuration.Configuration;
 import org.apache.whirr.service.jclouds.RunUrlStatement;
 import org.jclouds.scriptbuilder.domain.Statement;
 
@@ -81,6 +83,22 @@ public abstract class ClusterActionHandlerSupport extends ClusterActionHandler {
 
   protected void afterOtherAction(ClusterActionEvent event)
     throws IOException, InterruptedException { }
+  
+  /**
+   * Returns a composite configuration that is made up from the global
+   * configuration coming from the Whirr core with the service default
+   * properties.
+   *
+   * @param clusterSpec  The cluster specification instance.
+   * @return The composite configuration.
+   */
+  protected synchronized Configuration getConfiguration(
+      ClusterSpec clusterSpec, Configuration defaults) {
+    CompositeConfiguration cc = new CompositeConfiguration();
+    cc.addConfiguration(clusterSpec.getConfiguration());
+    cc.addConfiguration(defaults);
+    return cc;
+  }
   
   /**
    * A convenience method for adding a {@link RunUrlStatement} to a

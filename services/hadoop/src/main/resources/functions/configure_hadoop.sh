@@ -39,8 +39,7 @@ function configure_hadoop() {
       ;;
   esac
   
-  HADOOP_VERSION=${HADOOP_VERSION:-0.20.2}
-  HADOOP_HOME=/usr/local/hadoop-$HADOOP_VERSION
+  HADOOP_HOME=/usr/local/hadoop
   HADOOP_CONF_DIR=$HADOOP_HOME/conf
 
   mkdir -p /data/hadoop

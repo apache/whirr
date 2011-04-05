@@ -39,7 +39,6 @@ import org.apache.whirr.net.DnsUtil;
 import org.apache.whirr.service.Cluster;
 import org.apache.whirr.service.Cluster.Instance;
 import org.apache.whirr.service.ClusterActionEvent;
-import org.apache.whirr.service.ClusterActionHandlerSupport;
 import org.apache.whirr.service.ClusterSpec;
 import org.apache.whirr.service.ComputeServiceContextBuilder;
 import org.apache.whirr.service.jclouds.FirewallSettings;
@@ -47,7 +46,7 @@ import org.jclouds.compute.ComputeServiceContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class HadoopNameNodeClusterActionHandler extends ClusterActionHandlerSupport {
+public class HadoopNameNodeClusterActionHandler extends HadoopClusterActionHandler {
 
   private static final Logger LOG =
     LoggerFactory.getLogger(HadoopNameNodeClusterActionHandler.class);
@@ -62,17 +61,6 @@ public class HadoopNameNodeClusterActionHandler extends ClusterActionHandlerSupp
   @Override
   public String getRole() {
     return ROLE;
-  }
-  
-  @Override
-  protected void beforeBootstrap(ClusterActionEvent event) throws IOException {
-    ClusterSpec clusterSpec = event.getClusterSpec();
-    addStatement(event, call("configure_hostnames", "-c", clusterSpec.getProvider()));
-    String hadoopInstallFunction = clusterSpec.getConfiguration().getString(
-        "whirr.hadoop-install-function", "install_hadoop");
-    addStatement(event, call("install_java"));
-    addStatement(event, call("install_tarball"));
-    addStatement(event, call(hadoopInstallFunction, "-c", clusterSpec.getProvider()));
   }
   
   @Override

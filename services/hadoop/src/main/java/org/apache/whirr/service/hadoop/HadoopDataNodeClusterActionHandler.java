@@ -18,23 +18,19 @@
 
 package org.apache.whirr.service.hadoop;
 
-import static org.apache.whirr.service.RolePredicates.role;
 import static org.apache.whirr.service.hadoop.HadoopConfigurationBuilder.buildCommon;
 import static org.apache.whirr.service.hadoop.HadoopConfigurationBuilder.buildHdfs;
 import static org.apache.whirr.service.hadoop.HadoopConfigurationBuilder.buildMapReduce;
 import static org.jclouds.scriptbuilder.domain.Statements.call;
 
 import java.io.IOException;
-import java.net.InetAddress;
 
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.whirr.service.Cluster;
-import org.apache.whirr.service.Cluster.Instance;
 import org.apache.whirr.service.ClusterActionEvent;
-import org.apache.whirr.service.ClusterActionHandlerSupport;
 import org.apache.whirr.service.ClusterSpec;
 
-public class HadoopDataNodeClusterActionHandler extends ClusterActionHandlerSupport {
+public class HadoopDataNodeClusterActionHandler extends HadoopClusterActionHandler {
 
   public static final String ROLE = "hadoop-datanode";
   
@@ -42,28 +38,12 @@ public class HadoopDataNodeClusterActionHandler extends ClusterActionHandlerSupp
   public String getRole() {
     return ROLE;
   }
-
-  @Override
-  protected void beforeBootstrap(ClusterActionEvent event) throws IOException {
-    ClusterSpec clusterSpec = event.getClusterSpec();   
-    addStatement(event, call("configure_hostnames", "-c", clusterSpec.getProvider()));
-    String hadoopInstallFunction = clusterSpec.getConfiguration().getString(
-        "whirr.hadoop-install-function", "install_hadoop");
-    addStatement(event, call("install_java"));
-    addStatement(event, call("install_tarball"));
-    addStatement(event, call(hadoopInstallFunction, "-c", clusterSpec.getProvider()));
-  }
   
   @Override
   protected void beforeConfigure(ClusterActionEvent event)
       throws IOException, InterruptedException {
     ClusterSpec clusterSpec = event.getClusterSpec();
     Cluster cluster = event.getCluster();
-    
-    Instance instance = cluster.getInstanceMatching(
-        role(HadoopNameNodeClusterActionHandler.ROLE));
-    InetAddress namenodePublicAddress = instance.getPublicAddress();
-    InetAddress jobtrackerPublicAddress = namenodePublicAddress;
     
     try {
       event.getStatementBuilder().addStatements(

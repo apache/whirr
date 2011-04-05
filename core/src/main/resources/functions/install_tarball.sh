@@ -30,7 +30,10 @@ function install_tarball() {
       $curl -O $tar_url || true
       $curl -O $tar_url.md5 || true
 
-      if md5sum -c $tar_file_md5; then
+      if [ ! -e $tar_file_md5 ]; then
+        echo "Could not download  $tar_url.md5. Continuing."
+        break;
+      elif md5sum -c $tar_file_md5; then
         break;
       else
         # workaround for cassandra broken .md5 files

@@ -23,7 +23,6 @@ import static org.junit.Assert.assertThat;
 
 import java.io.IOException;
 
-import org.apache.whirr.service.jclouds.TakeLoginCredentialsFromWhirrProperties;
 import org.jclouds.domain.Credentials;
 import org.junit.Test;
 
