@@ -21,7 +21,6 @@ package org.apache.whirr.service.hadoop;
 import static com.google.common.base.Preconditions.checkState;
 
 import com.google.common.base.Charsets;
-import com.google.common.collect.Iterables;
 import com.google.common.io.Files;
 
 import java.io.BufferedReader;

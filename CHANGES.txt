@@ -6,6 +6,8 @@ Trunk (unreleased changes)
 
     WHIRR-261. Add ElasticSearch as a service (asavu)
 
+    WHIRR-222. Support multiple versions of Hadoop. (tomwhite)
+
   BUG FIXES
 
     WHIRR-253. ZooKeeper service should only authorize ingress to ZooKeeper 
@@ -15,9 +17,9 @@ Trunk (unreleased changes)
     an obsolete identifier for a certain ip address host. 
     (Hyunsik Choi via asavu)
 
-    WHIRR-271. Classpath needs to be quoted in whirr script
+    WHIRR-271. Classpath needs to be quoted in whirr script. (asavu)
 
-    WHIRR-274. Add wagon-ssh-external as a maven build extension
+    WHIRR-274. Add wagon-ssh-external as a maven build extension. (asavu)
 
 Release 0.4.0 - 2011-03-15
 

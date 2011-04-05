@@ -16,25 +16,24 @@
  * limitations under the License.
  */
 
-package org.apache.whirr.service.hbase;
+package org.apache.whirr.service.hadoop;
+
+import static org.jclouds.scriptbuilder.domain.Statements.call;
 
 import java.io.IOException;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
+import org.apache.whirr.service.ClusterActionEvent;
 import org.apache.whirr.service.ClusterActionHandlerSupport;
 import org.apache.whirr.service.ClusterSpec;
 
-/**
- * Base class for HBase service handlers.
- */
-public abstract class HBaseClusterActionHandler
-       extends ClusterActionHandlerSupport {
+public abstract class HadoopClusterActionHandler extends ClusterActionHandlerSupport {
 
   /**
    * Returns a composite configuration that is made up from the global
-   * configuration coming from the Whirr core with a hbase defaults
+   * configuration coming from the Whirr core with a hadoop defaults
    * properties.
    *
    * @param clusterSpec  The cluster specification instance.
@@ -44,10 +43,24 @@ public abstract class HBaseClusterActionHandler
       ClusterSpec clusterSpec) throws IOException {
     try {
       Configuration defaults = new PropertiesConfiguration(
-        HBaseConstants.FILE_HBASE_DEFAULT_PROPERTIES);
+        "whirr-hadoop-default.properties");
       return super.getConfiguration(clusterSpec, defaults);
     } catch (ConfigurationException e) {
-      throw new IOException("Error loading HBase default properties.", e);
+      throw new IOException("Error loading Hadoop default properties.", e);
     }
+  }
+  
+  @Override
+  protected void beforeBootstrap(ClusterActionEvent event) throws IOException {
+    ClusterSpec clusterSpec = event.getClusterSpec();
+    Configuration conf = getConfiguration(clusterSpec);
+    addStatement(event, call("configure_hostnames", "-c", clusterSpec.getProvider()));
+    String hadoopInstallFunction = conf.getString(
+        "whirr.hadoop-install-function", "install_hadoop");
+    addStatement(event, call("install_java"));
+    addStatement(event, call("install_tarball"));
+    String tarball = conf.getString("whirr.hadoop.tarball.url");
+    addStatement(event, call(hadoopInstallFunction, "-c", clusterSpec.getProvider(),
+        "-u", tarball));
   }
 }

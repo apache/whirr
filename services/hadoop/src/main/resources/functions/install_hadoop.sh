@@ -27,16 +27,19 @@ function install_hadoop() {
   local OPTARG
   
   CLOUD_PROVIDER=
-  while getopts "c:" OPTION; do
+  HADOOP_TAR_URL=
+  while getopts "c:u:" OPTION; do
     case $OPTION in
     c)
       CLOUD_PROVIDER="$OPTARG"
       ;;
+    u)
+      HADOOP_TAR_URL="$OPTARG"
+      ;;
     esac
   done
 
-  HADOOP_VERSION=${HADOOP_VERSION:-0.20.2}
-  HADOOP_HOME=/usr/local/hadoop-$HADOOP_VERSION
+  HADOOP_HOME=/usr/local/$(basename $HADOOP_TAR_URL .tar.gz)
 
   update_repo
 
@@ -44,7 +47,8 @@ function install_hadoop() {
     useradd hadoop
   fi
   
-  install_tarball http://archive.apache.org/dist/hadoop/core/hadoop-$HADOOP_VERSION/hadoop-$HADOOP_VERSION.tar.gz
+  install_tarball $HADOOP_TAR_URL
+  ln -s $HADOOP_HOME /usr/local/hadoop
 
   echo "export HADOOP_HOME=$HADOOP_HOME" >> ~root/.bashrc
   echo 'export PATH=$JAVA_HOME/bin:$HADOOP_HOME/bin:$PATH' >> ~root/.bashrc

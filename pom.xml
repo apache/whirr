@@ -327,6 +327,7 @@
             <exclude>**/BUILD.txt</exclude>
             <exclude>**/CHANGES.txt</exclude>
             <exclude>**/DISCLAIMER.txt</exclude>
+            <exclude>**/NOTICE-src.txt</exclude>
             <exclude>**/.svn/**</exclude>
             <exclude>.git/**</exclude>
             <exclude>.gitignore</exclude>
