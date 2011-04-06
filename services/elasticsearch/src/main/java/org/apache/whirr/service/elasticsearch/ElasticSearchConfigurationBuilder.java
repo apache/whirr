@@ -104,7 +104,7 @@ public class ElasticSearchConfigurationBuilder {
   private static void addDefaultsForUnicast(Cluster cluster, CompositeConfiguration config) {
     List<String> hosts = Lists.newLinkedList();
     for(Cluster.Instance instance : cluster.getInstancesMatching(role(ElasticSearchHandler.ROLE))) {
-      hosts.add(String.format("\"%s:9300\"", instance.getPrivateAddress().getHostAddress()));
+      hosts.add(String.format("\"%s:9300\"", instance.getPrivateIp()));
     }
     config.addProperty("es.discovery.zen.ping.multicast.enabled", "false");
     config.addProperty("es.discovery.zen.ping.unicast.hosts", StringUtils.join(hosts, ","));

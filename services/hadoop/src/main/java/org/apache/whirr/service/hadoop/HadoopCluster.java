@@ -18,13 +18,14 @@
 
 package org.apache.whirr.service.hadoop;
 
+import java.io.IOException;
 import java.net.InetAddress;
 
 import org.apache.whirr.service.Cluster;
 import org.apache.whirr.service.RolePredicates;
 
 public class HadoopCluster {
-  public static InetAddress getNamenodePublicAddress(Cluster cluster) {
+  public static InetAddress getNamenodePublicAddress(Cluster cluster) throws IOException {
     return cluster.getInstanceMatching(
         RolePredicates.role(HadoopNameNodeClusterActionHandler.ROLE))
         .getPublicAddress();

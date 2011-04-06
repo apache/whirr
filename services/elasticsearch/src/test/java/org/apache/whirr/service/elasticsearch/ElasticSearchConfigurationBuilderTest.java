@@ -27,7 +27,6 @@ import org.apache.whirr.service.Cluster;
 import org.apache.whirr.service.ClusterSpec;
 import org.junit.Test;
 
-import java.net.InetAddress;
 import java.util.Set;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -82,7 +81,7 @@ public class ElasticSearchConfigurationBuilderTest {
     Set<Cluster.Instance> instances = Sets.newLinkedHashSet();
     for(String host : Lists.newArrayList("10.0.0.1", "10.0.0.2")) {
       Cluster.Instance instance = mock(Cluster.Instance.class);
-      when(instance.getPrivateAddress()).thenReturn(InetAddress.getByName(host));
+      when(instance.getPrivateIp()).thenReturn(host);
       instances.add(instance);
     }
     when(cluster.getInstancesMatching((Predicate<Cluster.Instance>)any()))

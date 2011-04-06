@@ -95,7 +95,7 @@ public class CassandraClusterActionHandler extends ClusterActionHandlerSupport {
         new Function<Instance, String>() {
       @Override
       public String apply(Instance instance) {
-        return instance.getPrivateAddress().getHostAddress();
+        return instance.getPrivateIp();
       }
     });
   }

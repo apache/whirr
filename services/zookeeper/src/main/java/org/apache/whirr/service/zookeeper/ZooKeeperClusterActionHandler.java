@@ -92,7 +92,7 @@ public class ZooKeeperClusterActionHandler extends ClusterActionHandlerSupport {
         new Function<Instance, String>() {
       @Override
       public String apply(Instance instance) {
-        return instance.getPrivateAddress().getHostAddress();
+        return instance.getPrivateIp();
       }
     });
   }
@@ -102,8 +102,12 @@ public class ZooKeeperClusterActionHandler extends ClusterActionHandlerSupport {
         new Function<Instance, String>() {
       @Override
       public String apply(Instance instance) {
-        String publicIp = instance.getPublicAddress().getHostName();
-        return String.format("%s:%d", publicIp, CLIENT_PORT);
+        try {
+          String publicIp = instance.getPublicHostName();
+          return String.format("%s:%d", publicIp, CLIENT_PORT);
+        } catch (IOException e) {
+          throw new IllegalArgumentException(e);
+        }
       }
     });
   }

@@ -34,9 +34,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 import java.io.IOException;
-import java.net.InetAddress;
 import java.net.MalformedURLException;
-import java.net.UnknownHostException;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -206,18 +204,14 @@ public class BootstrapClusterAction extends ScriptBasedClusterAction {
         new Function<NodeMetadata, Instance>() {
       @Override
       public Instance apply(NodeMetadata node) {
-        try {
         return new Instance(node.getCredentials(), roles,
-            InetAddress.getByName(Iterables.get(node.getPublicAddresses(), 0)),
-            InetAddress.getByName(Iterables.get(node.getPrivateAddresses(), 0)),
+            Iterables.get(node.getPublicAddresses(), 0),
+            Iterables.get(node.getPrivateAddresses(), 0),
             node.getId());
-        } catch (UnknownHostException e) {
-            throw new RuntimeException(e);
-        }
       }
     }));
   }
-
+  
   class StartupProcess implements Callable<Set<? extends NodeMetadata>> {
    
     final private String clusterName;

@@ -31,7 +31,6 @@ import java.util.Set;
 import org.apache.whirr.cluster.actions.BootstrapClusterAction;
 import org.apache.whirr.cluster.actions.ConfigureClusterAction;
 import org.apache.whirr.cluster.actions.DestroyClusterAction;
-import org.apache.whirr.net.DnsUtil;
 import org.apache.whirr.service.Cluster.Instance;
 import org.jclouds.compute.ComputeService;
 import org.jclouds.compute.ComputeServiceContextFactory;
@@ -92,13 +91,12 @@ public class Service {
     for (Instance instance : cluster.getInstances()) {
       String id = instance.getId();
       String roles = Joiner.on(',').join(instance.getRoles());
-      String publicAddress = DnsUtil.resolveAddress(instance.getPublicAddress()
-          .getHostAddress());
-      String privateAddress = instance.getPrivateAddress().getHostAddress();
+      String publicIp = instance.getPublicIp();
+      String privateIp = instance.getPrivateIp();
       sb.append(id).append("\t");
       sb.append(roles).append("\t");
-      sb.append(publicAddress).append("\t");
-      sb.append(privateAddress).append("\n");
+      sb.append(publicIp).append("\t");
+      sb.append(privateIp).append("\n");
     }
     try {
       Files.write(sb.toString(), instancesFile, Charsets.UTF_8);
