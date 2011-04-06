@@ -31,7 +31,6 @@ import java.net.InetAddress;
 import java.util.Map.Entry;
 import java.util.Properties;
 
-import org.apache.whirr.net.DnsUtil;
 import org.apache.whirr.service.Cluster;
 import org.apache.whirr.service.Cluster.Instance;
 import org.apache.whirr.service.ClusterActionEvent;
@@ -93,7 +92,7 @@ public class HBaseMasterClusterActionHandler extends HBaseClusterActionHandler {
 
     String hbaseConfigureFunction = getConfiguration(clusterSpec).getString(
       HBaseConstants.KEY_CONFIGURE_FUNCTION, HBaseConstants.FUNCTION_POST_CONFIGURE);
-    String master = DnsUtil.resolveAddress(masterPublicAddress.getHostAddress());
+    String master = masterPublicAddress.getHostName();
     String quorum = ZooKeeperCluster.getHosts(cluster);
     String tarurl = getConfiguration(clusterSpec).getString(
       HBaseConstants.KEY_TARBALL_URL);  
@@ -115,8 +114,7 @@ public class HBaseMasterClusterActionHandler extends HBaseClusterActionHandler {
     Instance instance = cluster.getInstanceMatching(role(ROLE));
     InetAddress masterPublicAddress = instance.getPublicAddress();
 
-    LOG.info("Web UI available at http://{}",
-      DnsUtil.resolveAddress(masterPublicAddress.getHostAddress()));
+    LOG.info("Web UI available at http://{}", masterPublicAddress.getHostName());
     String quorum = ZooKeeperCluster.getHosts(cluster);
     Properties config = createClientSideProperties(masterPublicAddress, quorum);
     createClientSideHadoopSiteFile(clusterSpec, config);
@@ -173,8 +171,7 @@ public class HBaseMasterClusterActionHandler extends HBaseClusterActionHandler {
       HadoopProxy proxy = new HadoopProxy(clusterSpec, cluster);
       InetAddress master = HBaseCluster.getMasterPublicAddress(cluster);
       String script = String.format("echo 'Running proxy to HBase cluster at %s. " +
-        "Use Ctrl-c to quit.'\n",
-        DnsUtil.resolveAddress(master.getHostAddress()))
+        "Use Ctrl-c to quit.'\n", master.getHostName())
         + Joiner.on(" ").join(proxy.getProxyCommand());
       Files.write(script, hbaseProxyFile, Charsets.UTF_8);
       LOG.info("Wrote HBase proxy script {}", hbaseProxyFile);

@@ -22,7 +22,6 @@ import static org.junit.Assert.assertEquals;
 
 import com.google.common.collect.Sets;
 
-import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.List;
 import java.util.Set;
@@ -35,7 +34,7 @@ public class CassandraClusterActionHandlerTest {
 
   private Instance getInstance(String id) throws UnknownHostException {
     return new Instance(new Credentials("", ""), Sets.newHashSet(""),
-        InetAddress.getLocalHost(), InetAddress.getLocalHost(), id); 
+        "127.0.0.1", "127.0.0.1", id); 
   }
   
   @Test()

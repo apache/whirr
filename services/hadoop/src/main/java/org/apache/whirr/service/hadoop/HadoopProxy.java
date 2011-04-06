@@ -29,7 +29,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.InetAddress;
 
-import org.apache.whirr.net.DnsUtil;
 import org.apache.whirr.service.Cluster;
 import org.apache.whirr.service.ClusterSpec;
 import org.apache.whirr.ssh.KeyPair;
@@ -57,7 +56,7 @@ public class HadoopProxy {
     KeyPair.setPermissionsTo600(identity);
     String user = clusterSpec.getClusterUser();
     InetAddress namenode = HadoopCluster.getNamenodePublicAddress(cluster);
-    String server = DnsUtil.resolveAddress(namenode.getHostAddress());
+    String server = namenode.getHostName();
     return new String[] { "ssh",
         "-i", identity.getAbsolutePath(),
         "-o", "ConnectTimeout=10",

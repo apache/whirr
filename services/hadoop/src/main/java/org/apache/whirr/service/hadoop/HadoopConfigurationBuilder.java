@@ -28,7 +28,6 @@ import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
-import org.apache.whirr.net.DnsUtil;
 import org.apache.whirr.service.Cluster;
 import org.apache.whirr.service.Cluster.Instance;
 import org.apache.whirr.service.ClusterSpec;
@@ -79,7 +78,7 @@ public class HadoopConfigurationBuilder {
     Instance namenode = cluster
         .getInstanceMatching(role(HadoopNameNodeClusterActionHandler.ROLE));
     config.setProperty("fs.default.name", String.format("hdfs://%s:8020/",
-        DnsUtil.resolveAddress(namenode.getPublicAddress().getHostAddress())));
+        namenode.getPublicAddress().getHostName()));
     return config;
   }
   
@@ -98,7 +97,7 @@ public class HadoopConfigurationBuilder {
     Instance jobtracker = cluster
         .getInstanceMatching(role(HadoopJobTrackerClusterActionHandler.ROLE));
     config.setProperty("mapred.job.tracker", String.format("%s:8021",
-        DnsUtil.resolveAddress(jobtracker.getPublicAddress().getHostAddress())));
+        jobtracker.getPublicAddress().getHostName()));
     return config;
   }
 

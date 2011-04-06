@@ -24,7 +24,6 @@ import static org.jclouds.scriptbuilder.domain.Statements.call;
 import java.io.IOException;
 import java.net.InetAddress;
 
-import org.apache.whirr.net.DnsUtil;
 import org.apache.whirr.service.Cluster;
 import org.apache.whirr.service.ClusterActionEvent;
 import org.apache.whirr.service.ClusterSpec;
@@ -91,7 +90,7 @@ public class BasicServerClusterActionHandler extends HBaseClusterActionHandler {
     String hbaseConfigureFunction = getConfiguration(clusterSpec).getString(
       HBaseConstants.KEY_CONFIGURE_FUNCTION,
       HBaseConstants.FUNCTION_POST_CONFIGURE);
-    String master = DnsUtil.resolveAddress(masterPublicAddress.getHostAddress());
+    String master = masterPublicAddress.getHostName();
     String quorum = ZooKeeperCluster.getHosts(cluster);
     String tarurl = getConfiguration(clusterSpec).getString(
       HBaseConstants.KEY_TARBALL_URL);   

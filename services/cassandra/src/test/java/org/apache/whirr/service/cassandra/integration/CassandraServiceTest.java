@@ -71,7 +71,7 @@ public class CassandraServiceTest {
   private Cassandra.Client client(Instance instance) throws TException
   {
     TTransport trans = new TFramedTransport(new TSocket(
-        instance.getPublicAddress().getHostAddress(),
+        instance.getPublicIp(),
         CassandraClusterActionHandler.CLIENT_PORT));
     trans.open();
     TBinaryProtocol protocol = new TBinaryProtocol(trans);

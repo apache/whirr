@@ -24,8 +24,6 @@ import static org.junit.Assert.assertThat;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Sets;
 
-import java.net.InetAddress;
-
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.whirr.service.Cluster;
@@ -73,12 +71,10 @@ public class HadoopConfigurationBuilderTest {
     defaults.addProperty("hadoop-mapreduce.p1", "mapred1");
 
     clusterSpec = ClusterSpec.withTemporaryKeys();
-    InetAddress publicAddress = InetAddress.getLocalHost();
-    InetAddress privateAddress = publicAddress;
     Instance master = new Instance(new Credentials("", ""),
         Sets.newHashSet(HadoopNameNodeClusterActionHandler.ROLE,
             HadoopJobTrackerClusterActionHandler.ROLE),
-        publicAddress, privateAddress, "id");
+            "10.0.0.1", "10.0.0.1", "id");
     cluster = new Cluster(Sets.newHashSet(master));
   }
 

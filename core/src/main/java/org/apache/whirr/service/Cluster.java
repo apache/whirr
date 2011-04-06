@@ -17,18 +17,21 @@
  */
 
 package org.apache.whirr.service;
-import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.*;
 
+import java.io.IOException;
 import java.net.InetAddress;
 import java.util.Properties;
 import java.util.Set;
 
+import org.apache.whirr.net.DnsUtil;
 import org.jclouds.domain.Credentials;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
+import com.google.common.net.InetAddresses;
 
 /**
  * This class represents a real cluster of {@link Instance}s.
@@ -44,16 +47,22 @@ public class Cluster {
   public static class Instance {
     private final Credentials loginCredentials;
     private final Set<String> roles;
-    private final InetAddress publicAddress;
-    private final InetAddress privateAddress;
+    private final String publicIp;
+    private String publicHostName;
+    private final String privateIp;
+    private String privateHostName;
     private final String id;
 
-    public Instance(Credentials loginCredentials, Set<String> roles, InetAddress publicAddress,
-        InetAddress privateAddress, String id) {
+    public Instance(Credentials loginCredentials, Set<String> roles, String publicIp,
+        String privateIp, String id) {
       this.loginCredentials = checkNotNull(loginCredentials, "loginCredentials");
       this.roles = checkNotNull(roles, "roles");
-      this.publicAddress = checkNotNull(publicAddress, "publicAddress");
-      this.privateAddress = checkNotNull(privateAddress, "privateAddress");
+      this.publicIp = checkNotNull(publicIp, "publicIp");
+      checkArgument(InetAddresses.isInetAddress(publicIp),
+          "invalid IP address: %s", publicIp);
+      this.privateIp = checkNotNull(privateIp, "privateIp");
+      checkArgument(InetAddresses.isInetAddress(privateIp),
+          "invalid IP address: %s", privateIp);
       this.id = checkNotNull(id, "id");
     }
 
@@ -65,12 +74,39 @@ public class Cluster {
       return roles;
     }
 
-    public InetAddress getPublicAddress() {
-      return publicAddress;
+    public InetAddress getPublicAddress() throws IOException {
+      return resolveIpAddress(getPublicIp(), getPublicHostName());
     }
 
-    public InetAddress getPrivateAddress() {
-      return privateAddress;
+    public InetAddress getPrivateAddress() throws IOException {
+      return resolveIpAddress(getPrivateIp(), getPrivateHostName());
+    }
+    
+    private InetAddress resolveIpAddress(String ip, String host) throws IOException {
+      byte[] addr = InetAddresses.forString(ip).getAddress();
+      return InetAddress.getByAddress(host, addr);
+    }
+    
+    public String getPublicIp() {
+      return publicIp;
+    }
+    
+    public synchronized String getPublicHostName() throws IOException {
+      if (publicHostName == null) {
+        publicHostName = DnsUtil.resolveAddress(publicIp);
+      }
+      return publicHostName;
+    }
+    
+    public String getPrivateIp() {
+      return privateIp;
+    }
+    
+    public synchronized String getPrivateHostName() throws IOException {
+      if (privateHostName == null) {
+        privateHostName = DnsUtil.resolveAddress(privateIp);
+      }
+      return privateHostName;
     }
     
     public String getId() {
@@ -80,8 +116,8 @@ public class Cluster {
     public String toString() {
       return Objects.toStringHelper(this)
         .add("roles", roles)
-        .add("publicAddress", publicAddress)
-        .add("privateAddress", privateAddress)
+        .add("publicIp", publicIp)
+        .add("privateIp", privateIp)
         .add("id", id)
         .toString();
     }
