@@ -12,6 +12,8 @@ Trunk (unreleased changes)
 
     WHIRR-262. Services should not have to do reverse DNS lookups. (tomwhite)
 
+    WHIRR-275. Improve firewall API for services. (tomwhite)
+
   BUG FIXES
 
     WHIRR-253. ZooKeeper service should only authorize ingress to ZooKeeper 

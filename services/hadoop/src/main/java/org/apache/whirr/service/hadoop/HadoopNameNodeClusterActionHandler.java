@@ -39,9 +39,7 @@ import org.apache.whirr.service.Cluster;
 import org.apache.whirr.service.Cluster.Instance;
 import org.apache.whirr.service.ClusterActionEvent;
 import org.apache.whirr.service.ClusterSpec;
-import org.apache.whirr.service.ComputeServiceContextBuilder;
-import org.apache.whirr.service.jclouds.FirewallSettings;
-import org.jclouds.compute.ComputeServiceContext;
+import org.apache.whirr.service.FirewallManager.Rule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,27 +65,16 @@ public class HadoopNameNodeClusterActionHandler extends HadoopClusterActionHandl
     ClusterSpec clusterSpec = event.getClusterSpec();
     Cluster cluster = event.getCluster();
     
-    LOG.info("Authorizing firewall");
-    Instance instance = cluster.getInstanceMatching(role(ROLE));
-    InetAddress namenodePublicAddress = instance.getPublicAddress();
-    InetAddress jobtrackerPublicAddress = namenodePublicAddress;
-    
-    ComputeServiceContext computeServiceContext =
-      ComputeServiceContextBuilder.build(clusterSpec);
-    FirewallSettings.authorizeIngress(computeServiceContext, instance, clusterSpec,
-        NAMENODE_WEB_UI_PORT);
-    FirewallSettings.authorizeIngress(computeServiceContext, instance, clusterSpec,
-        JOBTRACKER_WEB_UI_PORT);
-    FirewallSettings.authorizeIngress(computeServiceContext, instance, clusterSpec,
-        namenodePublicAddress.getHostAddress(), NAMENODE_PORT);
-    FirewallSettings.authorizeIngress(computeServiceContext, instance, clusterSpec,
-        namenodePublicAddress.getHostAddress(), JOBTRACKER_PORT);
-    if (!namenodePublicAddress.equals(jobtrackerPublicAddress)) {
-      FirewallSettings.authorizeIngress(computeServiceContext, instance, clusterSpec,
-          jobtrackerPublicAddress.getHostAddress(), NAMENODE_PORT);
-      FirewallSettings.authorizeIngress(computeServiceContext, instance, clusterSpec,
-          jobtrackerPublicAddress.getHostAddress(), JOBTRACKER_PORT);
-    }
+    Instance namenode = cluster.getInstanceMatching(role(ROLE));
+    event.getFirewallManager().addRules(
+        Rule.create()
+          .destination(namenode)
+          .ports(NAMENODE_WEB_UI_PORT, JOBTRACKER_WEB_UI_PORT),
+        Rule.create()
+          .source(namenode.getPublicAddress().getHostAddress())
+          .destination(namenode)
+          .ports(NAMENODE_PORT, JOBTRACKER_PORT)
+    );
     
     try {
       event.getStatementBuilder().addStatements(

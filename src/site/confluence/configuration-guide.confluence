@@ -27,7 +27,7 @@ h2. Cloud provider specific configuration
 
 || Compute Service Provider || {{whirr.provider}} || {{whirr.identity}} || {{whirr.credential}} || Notes ||
 | Amazon EC2 | {{aws-ec2}} | Access Key ID | Secret Access Key | Used to form security Group (via jclouds tag) |
-| Rackspace Cloud Servers | {{cloudservers-us}} | Username | API Key | |
+| Rackspace Cloud Servers | {{cloudservers-us}} | Username | API Key | Warning: clusters do not run behind a firewall. |
 
 {anchor:comparison-with-python}
 h1. Comparison with Python

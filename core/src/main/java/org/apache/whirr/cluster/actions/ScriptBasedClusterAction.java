@@ -29,8 +29,11 @@ import org.apache.whirr.service.ClusterAction;
 import org.apache.whirr.service.ClusterActionEvent;
 import org.apache.whirr.service.ClusterActionHandler;
 import org.apache.whirr.service.ClusterSpec;
+import org.apache.whirr.service.ComputeServiceContextBuilder;
+import org.apache.whirr.service.FirewallManager;
 import org.apache.whirr.service.ClusterSpec.InstanceTemplate;
 import org.apache.whirr.service.jclouds.StatementBuilder;
+import org.jclouds.compute.ComputeServiceContext;
 import org.jclouds.compute.ComputeServiceContextFactory;
 import org.jclouds.scriptbuilder.domain.Statements;
 
@@ -58,8 +61,12 @@ public abstract class ScriptBasedClusterAction extends ClusterAction {
     for (InstanceTemplate instanceTemplate : clusterSpec.getInstanceTemplates()) {
       StatementBuilder statementBuilder = new StatementBuilder();
       statementBuilder.addStatement(Statements.call("install_runurl"));
+      ComputeServiceContext computServiceContext = // TODO: shouldn't create lots of these
+        ComputeServiceContextBuilder.build(getComputeServiceContextFactory(), clusterSpec);
+      FirewallManager firewallManager = new FirewallManager(computServiceContext,
+          clusterSpec, newCluster);
       ClusterActionEvent event = new ClusterActionEvent(getAction(),
-          clusterSpec, newCluster, statementBuilder);
+          clusterSpec, newCluster, statementBuilder, firewallManager);
       eventMap.put(instanceTemplate, event);
       for (String role : instanceTemplate.getRoles()) {
         ClusterActionHandler handler = handlerMap.get(role);

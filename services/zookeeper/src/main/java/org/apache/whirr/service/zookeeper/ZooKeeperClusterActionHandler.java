@@ -17,8 +17,8 @@ package org.apache.whirr.service.zookeeper;
  * limitations under the License.
  */
 
-import static org.jclouds.scriptbuilder.domain.Statements.call;
 import static org.apache.whirr.service.RolePredicates.role;
+import static org.jclouds.scriptbuilder.domain.Statements.call;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
@@ -33,9 +33,7 @@ import org.apache.whirr.service.Cluster.Instance;
 import org.apache.whirr.service.ClusterActionEvent;
 import org.apache.whirr.service.ClusterActionHandlerSupport;
 import org.apache.whirr.service.ClusterSpec;
-import org.apache.whirr.service.ComputeServiceContextBuilder;
-import org.apache.whirr.service.jclouds.FirewallSettings;
-import org.jclouds.compute.ComputeServiceContext;
+import org.apache.whirr.service.FirewallManager.Rule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,11 +62,9 @@ public class ZooKeeperClusterActionHandler extends ClusterActionHandlerSupport {
     ClusterSpec clusterSpec = event.getClusterSpec();
     Cluster cluster = event.getCluster();
     Set<Instance> ensemble = cluster.getInstancesMatching(role(ZOOKEEPER_ROLE));
-    LOG.info("Authorizing firewall");
-    ComputeServiceContext computeServiceContext =
-      ComputeServiceContextBuilder.build(clusterSpec);
-    FirewallSettings.authorizeIngress(computeServiceContext,
-        ensemble, clusterSpec, CLIENT_PORT);
+    event.getFirewallManager().addRule(
+        Rule.create().destination(role(ZOOKEEPER_ROLE)).port(CLIENT_PORT)
+    );
     
     // Pass list of all servers in ensemble to configure script.
     // Position is significant: i-th server has id i.
