@@ -28,6 +28,7 @@ import java.util.Set;
 import org.apache.commons.io.IOUtils;
 import org.apache.whirr.service.Cluster.Instance;
 import org.apache.whirr.service.ClusterSpec;
+import org.apache.whirr.service.FirewallManager;
 import org.jclouds.aws.util.AWSUtils;
 import org.jclouds.compute.ComputeServiceContext;
 import org.jclouds.ec2.EC2Client;
@@ -38,7 +39,9 @@ import com.google.common.collect.Lists;
 
 /**
  * Utility functions for controlling firewall settings for a cluster.
+ * @deprecated Use {@link FirewallManager} instead.
  */
+@Deprecated
 public class FirewallSettings {
   
   /**
@@ -75,7 +78,7 @@ public class FirewallSettings {
     authorizeIngress(computeServiceContext, instances, clusterSpec, cidrs, ports);
   }
 
-  private static void authorizeIngress(ComputeServiceContext computeServiceContext,
+  public static void authorizeIngress(ComputeServiceContext computeServiceContext,
       Set<Instance> instances, ClusterSpec clusterSpec, List<String> cidrs, int... ports) {
     
     if (computeServiceContext.getProviderSpecificContext().getApi() instanceof

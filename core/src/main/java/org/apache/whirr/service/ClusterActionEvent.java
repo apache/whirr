@@ -32,18 +32,21 @@ public class ClusterActionEvent {
   private StatementBuilder statementBuilder;
   private TemplateBuilderStrategy templateBuilderStrategy =
     new TemplateBuilderStrategy();
+  private FirewallManager firewallManager;
   
   public ClusterActionEvent(String action, ClusterSpec clusterSpec,
-      Cluster cluster) {
-    this(action, clusterSpec, cluster, null);
+      Cluster cluster, FirewallManager firewallManager) {
+    this(action, clusterSpec, cluster, null, firewallManager);
   }
   
   public ClusterActionEvent(String action, ClusterSpec clusterSpec,
-      Cluster cluster, StatementBuilder statementBuilder) {
+      Cluster cluster, StatementBuilder statementBuilder,
+      FirewallManager firewallManager) {
     this.action = action;
     this.clusterSpec = clusterSpec;
     this.cluster = cluster;
     this.statementBuilder = statementBuilder;
+    this.firewallManager = firewallManager;
   }
   
   public Cluster getCluster() {
@@ -73,6 +76,10 @@ public class ClusterActionEvent {
   public void setTemplateBuilderStrategy(
       TemplateBuilderStrategy templateBuilderStrategy) {
     this.templateBuilderStrategy = templateBuilderStrategy;
+  }
+  
+  public FirewallManager getFirewallManager() {
+    return firewallManager;
   }
 
 }
