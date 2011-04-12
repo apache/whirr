@@ -43,7 +43,6 @@ import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.io.IOUtils;
-import org.apache.whirr.service.ClusterSpec.InstanceTemplate;
 import org.apache.whirr.ssh.KeyPair;
 import org.junit.Assert;
 import org.junit.Test;
@@ -54,8 +53,9 @@ public class ClusterSpecTest {
   public void testDefaultsAreSet()
   throws ConfigurationException, JSchException, IOException {
     ClusterSpec spec = ClusterSpec.withTemporaryKeys();
-    assertThat(spec.getRunUrlBase(),
-        startsWith("http://whirr.s3.amazonaws.com/"));
+    assertThat(spec.getClusterUser(),
+      is(System.getProperty("user.name")));
+    assertThat(spec.getMaxStartupRetries(), is(1));
   }
 
   @Test
@@ -76,16 +76,6 @@ public class ClusterSpecTest {
         "ubuntu");
     ClusterSpec.withNoDefaults(conf);
     assertThat(System.getProperty("whirr.login-user"), is("ubuntu"));
-  }
-  
-  @Test
-  public void testVersionInRunUrlbaseIsUrlEncoded()
-  throws ConfigurationException, JSchException, IOException {
-    Configuration conf = new PropertiesConfiguration();
-    conf.setProperty(ClusterSpec.Property.VERSION.getConfigName(), "0.1.0+1");
-    ClusterSpec spec = ClusterSpec.withNoDefaults(conf);
-    assertThat(spec.getRunUrlBase(),
-        is("http://whirr.s3.amazonaws.com/0.1.0%2B1/"));
   }
   
   @Test

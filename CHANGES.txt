@@ -16,6 +16,8 @@ Trunk (unreleased changes)
 
     WHIRR-275. Improve firewall API for services. (tomwhite)
 
+    WHIRR-278. Refactor ClusterSpec and extract InstanceTemplate class
+
   BUG FIXES
 
     WHIRR-253. ZooKeeper service should only authorize ingress to ZooKeeper 

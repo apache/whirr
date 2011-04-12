@@ -42,7 +42,7 @@ public class Cluster {
   /**
    * This class represents a real node running in a cluster. An instance has
    * one or more roles.
-   * @see org.apache.whirr.service.ClusterSpec.InstanceTemplate
+   * @see InstanceTemplate
    */
   public static class Instance {
     private final Credentials loginCredentials;
