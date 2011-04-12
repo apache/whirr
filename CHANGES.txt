@@ -8,6 +8,8 @@ Trunk (unreleased changes)
 
     WHIRR-222. Support multiple versions of Hadoop. (tomwhite)
 
+    WHIRR-237. Add Voldemort as a service. (Kirk True via asavu)
+
   IMPROVEMENTS
 
     WHIRR-262. Services should not have to do reverse DNS lookups. (tomwhite)
