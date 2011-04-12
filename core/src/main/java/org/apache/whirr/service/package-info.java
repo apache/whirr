@@ -33,7 +33,7 @@
  * required.
  * </p>
  * <p>
- * An <i>instance template</i> ({@link org.apache.whirr.service.ClusterSpec.InstanceTemplate}) is a specification of the role sets and
+ * An <i>instance template</i> ({@link InstanceTemplate}) is a specification of the role sets and
  * cardinalities that make up a cluster. For example,
  * <tt>1 role-a+role-b,4 role-c</tt>
  * specifies a cluster in which one node is in roles <tt>role-a</tt> and

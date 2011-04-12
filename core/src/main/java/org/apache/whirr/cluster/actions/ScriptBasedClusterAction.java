@@ -31,7 +31,7 @@ import org.apache.whirr.service.ClusterActionHandler;
 import org.apache.whirr.service.ClusterSpec;
 import org.apache.whirr.service.ComputeServiceContextBuilder;
 import org.apache.whirr.service.FirewallManager;
-import org.apache.whirr.service.ClusterSpec.InstanceTemplate;
+import org.apache.whirr.service.InstanceTemplate;
 import org.apache.whirr.service.jclouds.StatementBuilder;
 import org.jclouds.compute.ComputeServiceContext;
 import org.jclouds.compute.ComputeServiceContextFactory;

@@ -31,7 +31,7 @@ import org.apache.whirr.service.Cluster.Instance;
 import org.apache.whirr.service.ClusterActionEvent;
 import org.apache.whirr.service.ClusterActionHandler;
 import org.apache.whirr.service.ClusterSpec;
-import org.apache.whirr.service.ClusterSpec.InstanceTemplate;
+import org.apache.whirr.service.InstanceTemplate;
 import org.apache.whirr.service.ComputeServiceContextBuilder;
 import org.apache.whirr.service.RolePredicates;
 import org.apache.whirr.service.jclouds.StatementBuilder;

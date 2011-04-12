@@ -95,7 +95,7 @@ public class DestroyClusterCommandTest {
     Configuration conf = new PropertiesConfiguration();
     conf.addProperty("whirr.version", "version-string");
 
-    ClusterSpec expectedClusterSpec = ClusterSpec.withNoDefaults(conf);
+    ClusterSpec expectedClusterSpec = ClusterSpec.withTemporaryKeys(conf);
     expectedClusterSpec.setServiceName("test-service");
     expectedClusterSpec.setProvider("rackspace");
     expectedClusterSpec.setIdentity("myusername");

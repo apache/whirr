@@ -21,14 +21,11 @@ package org.apache.whirr.service;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Objects;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -41,15 +38,13 @@ import com.jcraft.jsch.KeyPair;
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.ConfigurationUtils;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.configuration.interpol.ConfigurationInterpolator;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.text.StrLookup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.HashMap;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -76,9 +71,9 @@ public class ClusterSpec {
   }
   
   public enum Property {
-    SERVICE_NAME(String.class, false, "(optional) The name of the " + 
+    SERVICE_NAME(String.class, false, "(optional) The name of the " +
       "service to use. E.g. hadoop."),
-      
+
     INSTANCE_TEMPLATES(String.class, false, "The number of instances " +
       "to launch for each set of roles. E.g. 1 hadoop-namenode+" +
       "hadoop-jobtracker, 10 hadoop-datanode+hadoop-tasktracker"),
@@ -174,151 +169,6 @@ public class ClusterSpec {
       return description;
     }
   }
-  
-  /**
-   * This class describes the type of instances that should be in the cluster.
-   * This is done by specifying the number of instances in each role.
-   */
-  public static class InstanceTemplate {
-    private static Map<String, String> aliases = new HashMap<String, String>();
-    private static final Logger LOG = LoggerFactory.getLogger(InstanceTemplate.class);
-
-    static {
-      /*
-       * WARNING: this is not a generic aliasing mechanism. This code
-       * should be removed in the following releases and it's
-       * used only temporary to deprecate short legacy role names.
-       */
-      aliases.put("nn", "hadoop-namenode");
-      aliases.put("jt", "hadoop-jobtracker");
-      aliases.put("dn", "hadoop-datanode");
-      aliases.put("tt", "hadoop-tasktracker");
-      aliases.put("zk", "zookeeper");
-    }
-
-    private Set<String> roles;
-    private int numberOfInstances;
-    private int minNumberOfInstances;  // some instances may fail, at least a minimum number is required
-
-    public InstanceTemplate(int numberOfInstances, String... roles) {
-      this(numberOfInstances, numberOfInstances, Sets.newLinkedHashSet(Lists.newArrayList(roles)));
-    }
-
-    public InstanceTemplate(int numberOfInstances, Set<String> roles) {
-      this(numberOfInstances, numberOfInstances, roles);      
-    }
-
-    public InstanceTemplate(int numberOfInstances, int minNumberOfInstances, String... roles) {
-      this(numberOfInstances, minNumberOfInstances, Sets.newLinkedHashSet(Lists.newArrayList(roles)));
-    }
-
-    public InstanceTemplate(int numberOfInstances, int minNumberOfInstances, Set<String> roles) {
-      for (String role : roles) {
-        checkArgument(!StringUtils.contains(role, " "),
-            "Role '%s' may not contain space characters.", role);
-      }
-
-      this.roles = replaceAliases(roles);
-      this.numberOfInstances = numberOfInstances;
-      this.minNumberOfInstances = minNumberOfInstances;
-    }
-
-    private static Set<String> replaceAliases(Set<String> roles) {
-      Set<String> newRoles = Sets.newLinkedHashSet();
-      for(String role : roles) {
-        if (aliases.containsKey(role)) {
-          LOG.warn("Role name '{}' is deprecated, use '{}'",
-              role, aliases.get(role));
-          newRoles.add(aliases.get(role));
-        } else {
-          newRoles.add(role);
-        }
-      }
-      return newRoles;
-    }
-
-    public Set<String> getRoles() {
-      return roles;
-    }
-
-    public int getNumberOfInstances() {
-      return numberOfInstances;
-    }
-    
-    public int getMinNumberOfInstances() {
-      return minNumberOfInstances;
-    }
-    
-    public boolean equals(Object o) {
-      if (o instanceof InstanceTemplate) {
-        InstanceTemplate that = (InstanceTemplate) o;
-        return Objects.equal(numberOfInstances, that.numberOfInstances)
-          && Objects.equal(minNumberOfInstances, that.minNumberOfInstances)
-          && Objects.equal(roles, that.roles);
-      }
-      return false;
-    }
-    
-    public int hashCode() {
-      return Objects.hashCode(numberOfInstances, minNumberOfInstances, roles);
-    }
-    
-    public String toString() {
-      return Objects.toStringHelper(this)
-        .add("numberOfInstances", numberOfInstances)
-        .add("minNumberOfInstances", minNumberOfInstances)
-        .add("roles", roles)
-        .toString();
-    }
-    
-    public static Map<String, String> parse(String... strings) {
-      Set<String> roles = Sets.newLinkedHashSet(Lists.newArrayList(strings));
-      roles = replaceAliases(roles);
-      Map<String, String> templates = Maps.newHashMap();
-      for (String s : roles) {
-        String[] parts = s.split(" ");
-        checkArgument(parts.length == 2, 
-            "Invalid instance template syntax for '%s'. Does not match " +
-            "'<number> <role1>+<role2>+<role3>...', e.g. '1 hadoop-namenode+hadoop-jobtracker'.", s);
-        templates.put(parts[1], parts[0]);
-      }
-      return templates;
-    }    
-    
-    public static List<InstanceTemplate> parse(CompositeConfiguration cconf) {
-      final String[] strings = cconf.getStringArray(Property.INSTANCE_TEMPLATES.getConfigName());
-      Map<String, String> maxPercentFailures = parse(cconf.getStringArray(Property.INSTANCE_TEMPLATES_MAX_PERCENT_FAILURES.getConfigName()));
-      Map<String, String> minInstances = parse(cconf.getStringArray(Property.INSTANCE_TEMPLATES_MINIMUM_NUMBER_OF_INSTANCES.getConfigName()));
-      List<InstanceTemplate> templates = Lists.newArrayList();
-      for (String s : strings) {
-        String[] parts = s.split(" ");
-        checkArgument(parts.length == 2, 
-            "Invalid instance template syntax for '%s'. Does not match " +
-            "'<number> <role1>+<role2>+<role3>...', e.g. '1 hadoop-namenode+hadoop-jobtracker'.", s);
-        int num = Integer.parseInt(parts[0]);
-        int minNumberOfInstances = 0;
-        final String maxPercentFail = maxPercentFailures.get(parts[1]);
-        if (maxPercentFail != null) {
-          // round up integer division (a + b -1) / b
-          minNumberOfInstances = (Integer.parseInt(maxPercentFail) * num + 99) / 100;
-        }
-        String minNumberOfInst = minInstances.get(parts[1]);
-        if (minNumberOfInst != null) {
-          int minExplicitlySet = Integer.parseInt(minNumberOfInst);
-          if (minNumberOfInstances > 0) { // maximum between two minims
-            minNumberOfInstances = Math.max(minNumberOfInstances, minExplicitlySet);
-          } else {
-            minNumberOfInstances = minExplicitlySet; 
-          }              
-        }
-        if (minNumberOfInstances == 0 || minNumberOfInstances > num) {
-          minNumberOfInstances = num;
-        }
-        templates.add(new InstanceTemplate(num, minNumberOfInstances, parts[1].split("\\+")));
-      }
-      return templates;
-    }
-  }
 
   private static final String DEFAULT_PROPERTIES = "whirr-default.properties";
 
@@ -361,25 +211,33 @@ public class ClusterSpec {
     return new ClusterSpec(conf, false);
   }
 
-  private List<InstanceTemplate> instanceTemplates;
+  private String clusterName;
   private String serviceName;
+
+  private String clusterUser;
+  private String loginUser;
+
+  private List<InstanceTemplate> instanceTemplates;
   private int maxStartupRetries;
+
   private String provider;
   private String identity;
   private String credential;
-  private String clusterName;
+
   private String privateKey;
   private File privateKeyFile;
   private String publicKey;
+
+  private String locationId;
   private String imageId;
+
   private String hardwareId;
   private int hardwareMinRam;
-  private String locationId;
+
   private List<String> clientCidrs;
   private String version;
   private String runUrlBase;
-  private String clusterUser;
-  
+
   private Configuration config;
   
   public ClusterSpec() throws ConfigurationException {
@@ -391,31 +249,69 @@ public class ClusterSpec {
   }
 
   /**
-   * 
    * @throws ConfigurationException if something is wrong
    */
-  public ClusterSpec(Configuration config, boolean loadDefaults)
+  public ClusterSpec(Configuration userConfig, boolean loadDefaults)
       throws ConfigurationException {
 
-    CompositeConfiguration c = new CompositeConfiguration();
-    c.addConfiguration(config);
     if (loadDefaults) {
-      c.addConfiguration(new PropertiesConfiguration(DEFAULT_PROPERTIES));
+      config = composeWithDefaults(userConfig);
+    } else {
+      config = ConfigurationUtils.cloneConfiguration(userConfig);
     }
 
-    setServiceName(c.getString(Property.SERVICE_NAME.getConfigName()));
-    setInstanceTemplates(InstanceTemplate.parse(c));
-    setMaxStartupRetries(c.getInt(Property.MAX_STARTUP_RETRIES.getConfigName(), 1));
-    setProvider(c.getString(Property.PROVIDER.getConfigName()));
-    setIdentity(c.getString(Property.IDENTITY.getConfigName()));
-    setCredential(c.getString(Property.CREDENTIAL.getConfigName()));
-    setClusterName(c.getString(Property.CLUSTER_NAME.getConfigName()));
+    setClusterName(getString(Property.CLUSTER_NAME));
+    setServiceName(getString(Property.SERVICE_NAME));
 
+    setLoginUser(getString(Property.LOGIN_USER));
+    setClusterUser(getString(Property.CLUSTER_USER));
+
+    setInstanceTemplates(InstanceTemplate.parse(config));
+    setMaxStartupRetries(getInt(Property.MAX_STARTUP_RETRIES, 1));
+
+    setProvider(getString(Property.PROVIDER));
+    setIdentity(getString(Property.IDENTITY));
+    setCredential(getString(Property.CREDENTIAL));
+
+    checkAndSetKeyPair();
+
+    setImageId(getString(Property.IMAGE_ID));
+    setHardwareId(getString(Property.HARDWARE_ID));
+    setHardwareMinRam(getInt(Property.HARDWARE_MIN_RAM, 1024));
+
+    setLocationId(getString(Property.LOCATION_ID));
+    setClientCidrs(getList(Property.CLIENT_CIDRS));
+
+    setVersion(getString(Property.VERSION));
+    setRunUrlBase(getString(Property.RUN_URL_BASE));
+  }
+
+  private String getString(Property key) {
+    return config.getString(key.getConfigName());
+  }
+
+  private int getInt(Property key, int defaultValue) {
+    return config.getInt(key.getConfigName(), defaultValue);
+  }
+
+  private List<String> getList(Property key) {
+    return config.getList(key.getConfigName());
+  }
+
+  private Configuration composeWithDefaults(Configuration userConfig)
+      throws ConfigurationException {
+    CompositeConfiguration composed = new CompositeConfiguration();
+    composed.addConfiguration(userConfig);
+    composed.addConfiguration(
+      new PropertiesConfiguration(DEFAULT_PROPERTIES));
+    return composed;
+  }
+
+  private void checkAndSetKeyPair() throws ConfigurationException {
     try {
-      String privateKeyPath = c.getString(
-          Property.PRIVATE_KEY_FILE.getConfigName());
+      String privateKeyPath = getString(Property.PRIVATE_KEY_FILE);
 
-      String publicKeyPath = c.getString(Property.PUBLIC_KEY_FILE.getConfigName());
+      String publicKeyPath = getString(Property.PUBLIC_KEY_FILE);
       publicKeyPath = (publicKeyPath == null && privateKeyPath != null) ?
                 privateKeyPath + ".pub" : publicKeyPath;
       if(privateKeyPath != null && publicKeyPath != null) {
@@ -440,97 +336,85 @@ public class ClusterSpec {
     } catch (IOException e) {
       throw new ConfigurationException("Error reading one of key file", e);
     }
-
-    setImageId(config.getString(Property.IMAGE_ID.getConfigName()));
-    setHardwareId(config.getString(Property.HARDWARE_ID.getConfigName()));
-    setHardwareMinRam(c.getInteger(Property.HARDWARE_MIN_RAM.getConfigName(), 1024));
-    setLocationId(config.getString(Property.LOCATION_ID.getConfigName()));
-    setClientCidrs(c.getList(Property.CLIENT_CIDRS.getConfigName()));
-    setVersion(c.getString(Property.VERSION.getConfigName()));
-    String runUrlBase = c.getString(Property.RUN_URL_BASE.getConfigName());
-
-    if (runUrlBase == null && getVersion() != null) {
-      try {
-        runUrlBase = String.format("http://whirr.s3.amazonaws.com/%s/",
-            URLEncoder.encode(getVersion(), "UTF-8"));
-      } catch (UnsupportedEncodingException e) {
-        throw new ConfigurationException(e);
-      }
-    }
-    setRunUrlBase(runUrlBase);
-
-    String loginUser = c.getString(Property.LOGIN_USER.getConfigName());
-    if (loginUser != null) {
-      // patch until jclouds 1.0-beta-10
-      System.setProperty("whirr.login-user", loginUser);
-    }
-    clusterUser = c.getString(Property.CLUSTER_USER.getConfigName());
-    this.config = c;
   }
 
   public List<InstanceTemplate> getInstanceTemplates() {
     return instanceTemplates;
   }
-  
+
   public InstanceTemplate getInstanceTemplate(final Set<String> roles) {
     for (InstanceTemplate template : instanceTemplates) {
-      if (roles.equals(template.roles)) {
+      if (roles.equals(template.getRoles())) {
         return template;
       }
     }
     return null;
   }
-  
+
   public InstanceTemplate getInstanceTemplate(String... roles) {
     return getInstanceTemplate(Sets.newLinkedHashSet(Lists.newArrayList(roles)));
   }
-  
-  public String getServiceName() {
-    return serviceName;
-  }
+
   public int getMaxStartupRetries() {
     return maxStartupRetries;
   }
+
   public String getProvider() {
     return provider;
   }
+
   public String getIdentity() {
     return identity;
   }
+
   public String getCredential() {
     return credential;
   }
+
   public String getClusterName() {
     return clusterName;
   }
+
+  public String getServiceName() {
+    return serviceName;
+  }
+
   public String getPrivateKey() {
     return privateKey;
   }
+
   public File getPrivateKeyFile() {
      return privateKeyFile;
-   }
+  }
+
   public String getPublicKey() {
     return publicKey;
   }
+
   public String getImageId() {
     return imageId;
   }
+
   public String getHardwareId() {
     return hardwareId;
   }
+
   public int getHardwareMinRam() {
     return hardwareMinRam;
   }
+
   public String getLocationId() {
     return locationId;
   }
+
   public List<String> getClientCidrs() {
     return clientCidrs;
   }
+
   public String getVersion() {
     return version;
   }
-  @Deprecated
+
   public String getRunUrlBase() {
     return runUrlBase;
   }
@@ -539,15 +423,14 @@ public class ClusterSpec {
     return clusterUser;
   }
 
-  
+  public String getLoginUser() {
+    return loginUser;
+  }
+
   public void setInstanceTemplates(List<InstanceTemplate> instanceTemplates) {
     this.instanceTemplates = instanceTemplates;
   }
 
-  public void setServiceName(String serviceName) {
-    this.serviceName = serviceName;
-  }
-  
   public void setMaxStartupRetries(int maxStartupRetries) {
     this.maxStartupRetries = maxStartupRetries;
   }
@@ -566,6 +449,10 @@ public class ClusterSpec {
 
   public void setClusterName(String clusterName) {
     this.clusterName = clusterName;
+  }
+
+  public void setServiceName(String serviceName) {
+    this.serviceName = serviceName;
   }
 
   /**
@@ -653,13 +540,20 @@ public class ClusterSpec {
     this.version = version;
   }
 
-  @Deprecated
   public void setRunUrlBase(String runUrlBase) {
     this.runUrlBase = runUrlBase;
   }
 
   public void setClusterUser(String user) {
     this.clusterUser = user;
+  }
+
+  public void setLoginUser(String user) {
+    loginUser = config.getString(Property.LOGIN_USER.getConfigName());
+    if (loginUser != null) {
+      // patch until jclouds 1.0-beta-10
+      System.setProperty("whirr.login-user", loginUser);
+    }
   }
 
   public Configuration getConfiguration() {
@@ -691,12 +585,14 @@ public class ClusterSpec {
     if (o instanceof ClusterSpec) {
       ClusterSpec that = (ClusterSpec) o;
       return Objects.equal(instanceTemplates, that.instanceTemplates)
-        && Objects.equal(serviceName, that.serviceName)
         && Objects.equal(maxStartupRetries, that.maxStartupRetries)
         && Objects.equal(provider, that.provider)
         && Objects.equal(identity, that.identity)
         && Objects.equal(credential, that.credential)
         && Objects.equal(clusterName, that.clusterName)
+        && Objects.equal(serviceName, that.serviceName)
+        && Objects.equal(clusterUser, that.clusterUser)
+        && Objects.equal(loginUser, that.loginUser)
         && Objects.equal(imageId, that.imageId)
         && Objects.equal(hardwareId, that.hardwareId)
         && Objects.equal(hardwareMinRam, that.hardwareMinRam)
@@ -709,21 +605,23 @@ public class ClusterSpec {
   }
   
   public int hashCode() {
-    return Objects.hashCode(instanceTemplates, serviceName,
-        maxStartupRetries, provider, identity, credential, clusterName, publicKey,
-        privateKey, imageId, hardwareId, locationId, clientCidrs, version,
-        runUrlBase);
+    return Objects.hashCode(instanceTemplates, maxStartupRetries, provider,
+      identity, credential, clusterName, serviceName, clusterUser, loginUser,
+      publicKey, privateKey, imageId, hardwareId, locationId, clientCidrs,
+      version, runUrlBase);
   }
   
   public String toString() {
     return Objects.toStringHelper(this)
       .add("instanceTemplates", instanceTemplates)
-      .add("serviceName", serviceName)
       .add("maxStartupRetries", maxStartupRetries)
       .add("provider", provider)
       .add("identity", identity)
       .add("credential", credential)
       .add("clusterName", clusterName)
+      .add("serviceName", serviceName)
+      .add("clusterUser", clusterUser)
+      .add("loginUser", loginUser)
       .add("publicKey", publicKey)
       .add("privateKey", privateKey)
       .add("imageId", imageId)
@@ -734,5 +632,4 @@ public class ClusterSpec {
       .add("version", version)
       .toString();
   }
-
 }

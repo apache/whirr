@@ -40,6 +40,7 @@ import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.whirr.service.Cluster;
 import org.apache.whirr.service.ClusterSpec;
+import org.apache.whirr.service.InstanceTemplate;
 import org.apache.whirr.service.Service;
 import org.apache.whirr.service.ServiceFactory;
 import org.apache.whirr.ssh.KeyPair;
@@ -102,10 +103,10 @@ public class LaunchClusterCommandTest {
     Configuration conf = new PropertiesConfiguration();
     conf.addProperty("whirr.version", "version-string");
 
-    ClusterSpec expectedClusterSpec = ClusterSpec.withNoDefaults(conf);
+    ClusterSpec expectedClusterSpec = ClusterSpec.withTemporaryKeys(conf);
     expectedClusterSpec.setInstanceTemplates(Lists.newArrayList(
-        new ClusterSpec.InstanceTemplate(1, ImmutableSet.of("role1", "role2")),
-        new ClusterSpec.InstanceTemplate(2, ImmutableSet.of("role3"))
+        new InstanceTemplate(1, ImmutableSet.of("role1", "role2")),
+        new InstanceTemplate(2, ImmutableSet.of("role3"))
     ));
     expectedClusterSpec.setServiceName("test-service");
     expectedClusterSpec.setProvider("rackspace");
@@ -152,10 +153,10 @@ public class LaunchClusterCommandTest {
     conf.addProperty("whirr.version", "version-string");
     conf.addProperty("whirr.instance-templates-max-percent-failure", "60 dn+tt");
 
-    ClusterSpec expectedClusterSpec = ClusterSpec.withNoDefaults(conf);
+    ClusterSpec expectedClusterSpec = ClusterSpec.withTemporaryKeys(conf);
     expectedClusterSpec.setInstanceTemplates(Lists.newArrayList(
-        new ClusterSpec.InstanceTemplate(1, 1, Sets.newHashSet("jt", "nn")),
-        new ClusterSpec.InstanceTemplate(3, 2, Sets.newHashSet("dn", "tt"))
+        new InstanceTemplate(1, 1, Sets.newHashSet("jt", "nn")),
+        new InstanceTemplate(3, 2, Sets.newHashSet("dn", "tt"))
     ));
     expectedClusterSpec.setServiceName("hadoop");
     expectedClusterSpec.setProvider("ec2");
