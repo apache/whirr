@@ -44,6 +44,7 @@
     <module>services/hadoop</module>
     <module>services/zookeeper</module>
     <module>services/hbase</module>
+    <module>services/voldemort</module>
     <module>services/elasticsearch</module>
   </modules>
 
