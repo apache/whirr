@@ -33,6 +33,7 @@ public class TakeLoginCredentialsFromWhirrPropertiesTest {
   @Test
   public synchronized void testNotSetIsDefault() throws IOException {
     try {
+      System.getProperties().remove("whirr.login-user");
       assertThat(
           strat.execute(null),
           equalTo(new Credentials("root", null)));

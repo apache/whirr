@@ -17,22 +17,24 @@
  */
 package org.apache.whirr.service.elasticsearch;
 
-import com.google.common.base.Predicate;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.configuration.PropertiesConfiguration;
-import org.apache.commons.lang.StringUtils;
-import org.apache.whirr.service.Cluster;
-import org.apache.whirr.service.ClusterSpec;
-import org.junit.Test;
-
-import java.util.Set;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
+import com.google.common.base.Predicate;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
+
+import java.util.Set;
+
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration.PropertiesConfiguration;
+import org.apache.commons.lang.StringUtils;
+import org.apache.whirr.Cluster;
+import org.apache.whirr.ClusterSpec;
+import org.junit.Test;
 
 public class ElasticSearchConfigurationBuilderTest {
 

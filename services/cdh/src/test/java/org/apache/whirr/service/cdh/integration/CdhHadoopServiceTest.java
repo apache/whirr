@@ -20,8 +20,6 @@ package org.apache.whirr.service.cdh.integration;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNull;
-import static org.hamcrest.Matchers.instanceOf;
-import static org.junit.Assert.assertThat;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -29,7 +27,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
-import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.commons.configuration.CompositeConfiguration;
@@ -47,12 +44,10 @@ import org.apache.hadoop.mapred.JobClient;
 import org.apache.hadoop.mapred.JobConf;
 import org.apache.hadoop.mapred.lib.LongSumReducer;
 import org.apache.hadoop.mapred.lib.TokenCountMapper;
-import org.apache.whirr.service.Cluster;
-import org.apache.whirr.service.ClusterSpec;
-import org.apache.whirr.service.Service;
-import org.apache.whirr.service.ServiceFactory;
+import org.apache.whirr.Cluster;
+import org.apache.whirr.ClusterController;
+import org.apache.whirr.ClusterSpec;
 import org.apache.whirr.service.hadoop.HadoopProxy;
-import org.apache.whirr.ssh.KeyPair;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -60,7 +55,7 @@ import org.junit.Test;
 public class CdhHadoopServiceTest {
   
   private ClusterSpec clusterSpec;
-  private Service service;
+  private ClusterController controller;
   private HadoopProxy proxy;
   private Cluster cluster;
   
@@ -72,9 +67,9 @@ public class CdhHadoopServiceTest {
     }
     config.addConfiguration(new PropertiesConfiguration("whirr-hadoop-test.properties"));
     clusterSpec = ClusterSpec.withTemporaryKeys(config);
-    service = new Service();
+    controller = new ClusterController();
     
-    cluster = service.launchCluster(clusterSpec);
+    cluster = controller.launchCluster(clusterSpec);
     proxy = new HadoopProxy(clusterSpec, cluster);
     proxy.start();
   }
@@ -141,7 +136,7 @@ public class CdhHadoopServiceTest {
     if (proxy != null) {
       proxy.stop();
     }
-    service.destroyCluster(clusterSpec);
+    controller.destroyCluster(clusterSpec);
   }
 
 }

@@ -30,9 +30,9 @@ import java.util.Set;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 
-import org.apache.whirr.service.ClusterSpec;
-import org.apache.whirr.service.Service;
-import org.apache.whirr.service.ServiceFactory;
+import org.apache.whirr.ClusterController;
+import org.apache.whirr.ClusterControllerFactory;
+import org.apache.whirr.ClusterSpec;
 import org.jclouds.compute.domain.NodeMetadata;
 
 /**
@@ -41,10 +41,10 @@ import org.jclouds.compute.domain.NodeMetadata;
 public class ListClusterCommand extends AbstractClusterSpecCommand {
 
   public ListClusterCommand() throws IOException {
-    this(new ServiceFactory());
+    this(new ClusterControllerFactory());
   }
 
-  public ListClusterCommand(ServiceFactory factory) {
+  public ListClusterCommand(ClusterControllerFactory factory) {
     super("list-cluster", "List the nodes in a cluster.", factory);
   }
   
@@ -61,8 +61,8 @@ public class ListClusterCommand extends AbstractClusterSpecCommand {
     try {
       ClusterSpec clusterSpec = getClusterSpec(optionSet);
 
-      Service service = createService(clusterSpec.getServiceName());
-      Set<? extends NodeMetadata> nodes = service.getNodes(clusterSpec);
+      ClusterController controller = createClusterController(clusterSpec.getServiceName());
+      Set<? extends NodeMetadata> nodes = controller.getNodes(clusterSpec);
       for (NodeMetadata node : nodes) {
         out.println(Joiner.on('\t').join(node.getId(), node.getImageId(),
             getFirstAddress(node.getPublicAddresses()),

@@ -18,7 +18,7 @@
 
 package org.apache.whirr.service.hadoop;
 
-import static org.apache.whirr.service.RolePredicates.role;
+import static org.apache.whirr.RolePredicates.role;
 
 import com.google.common.annotations.VisibleForTesting;
 
@@ -28,9 +28,9 @@ import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
-import org.apache.whirr.service.Cluster;
-import org.apache.whirr.service.Cluster.Instance;
-import org.apache.whirr.service.ClusterSpec;
+import org.apache.whirr.Cluster;
+import org.apache.whirr.Cluster.Instance;
+import org.apache.whirr.ClusterSpec;
 import org.jclouds.scriptbuilder.domain.Statement;
 
 public class HadoopConfigurationBuilder {

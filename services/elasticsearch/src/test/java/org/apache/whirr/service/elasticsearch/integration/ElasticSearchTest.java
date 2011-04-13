@@ -17,18 +17,9 @@
  */
 package org.apache.whirr.service.elasticsearch.integration;
 
+import static org.apache.whirr.RolePredicates.role;
+
 import com.google.common.collect.Iterables;
-import org.apache.commons.configuration.CompositeConfiguration;
-import org.apache.commons.configuration.PropertiesConfiguration;
-import org.apache.whirr.service.Cluster;
-import org.apache.whirr.service.ClusterSpec;
-import org.apache.whirr.service.Service;
-import org.apache.whirr.service.elasticsearch.ElasticSearchHandler;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -37,7 +28,17 @@ import java.net.URL;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static org.apache.whirr.service.RolePredicates.role;
+import org.apache.commons.configuration.CompositeConfiguration;
+import org.apache.commons.configuration.PropertiesConfiguration;
+import org.apache.whirr.Cluster;
+import org.apache.whirr.ClusterController;
+import org.apache.whirr.ClusterSpec;
+import org.apache.whirr.service.elasticsearch.ElasticSearchHandler;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ElasticSearchTest {
 
@@ -45,7 +46,7 @@ public class ElasticSearchTest {
     LoggerFactory.getLogger(ElasticSearchHandler.class);
 
   private ClusterSpec clusterSpec;
-  private Service service;
+  private ClusterController controller;
   private Cluster cluster;
 
   @Before
@@ -56,8 +57,8 @@ public class ElasticSearchTest {
       config.addConfiguration(new PropertiesConfiguration(System.getProperty("config")));
     }
     clusterSpec = ClusterSpec.withTemporaryKeys(config);
-    service = new Service();
-    cluster = service.launchCluster(clusterSpec);
+    controller = new ClusterController();
+    cluster = controller.launchCluster(clusterSpec);
   }
 
   @Test
@@ -115,7 +116,7 @@ public class ElasticSearchTest {
 
   @After
   public void tearDown() throws IOException, InterruptedException {
-    service.destroyCluster(clusterSpec);
+    controller.destroyCluster(clusterSpec);
   }
 
 }

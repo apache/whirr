@@ -28,10 +28,10 @@ import java.util.Set;
 
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.PropertiesConfiguration;
-import org.apache.whirr.service.Cluster;
-import org.apache.whirr.service.ClusterSpec;
-import org.apache.whirr.service.Service;
-import org.apache.whirr.service.Cluster.Instance;
+import org.apache.whirr.Cluster;
+import org.apache.whirr.Cluster.Instance;
+import org.apache.whirr.ClusterController;
+import org.apache.whirr.ClusterSpec;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -45,7 +45,7 @@ public class VoldemortServiceTest {
 
   private ClusterSpec clusterSpec;
 
-  private Service service;
+  private ClusterController controller;
 
   private Cluster cluster;
 
@@ -58,8 +58,8 @@ public class VoldemortServiceTest {
     config.addConfiguration(new PropertiesConfiguration("whirr-voldemort-test.properties"));
     clusterSpec = ClusterSpec.withTemporaryKeys(config);
 
-    service = new Service();
-    cluster = service.launchCluster(clusterSpec);
+    controller = new ClusterController();
+    cluster = controller.launchCluster(clusterSpec);
 
     waitForBootstrap();
   }
@@ -109,8 +109,8 @@ public class VoldemortServiceTest {
 
   @After
   public void tearDown() throws IOException, InterruptedException {
-    if (service != null) {
-      service.destroyCluster(clusterSpec);
+    if (controller != null) {
+      controller.destroyCluster(clusterSpec);
     }
   }
 

@@ -18,21 +18,21 @@
 
 package org.apache.whirr.service.elasticsearch;
 
+import static org.apache.whirr.RolePredicates.role;
+import static org.jclouds.scriptbuilder.domain.Statements.call;
+
+import java.io.IOException;
+
 import org.apache.commons.configuration.Configuration;
-import org.apache.whirr.service.Cluster;
+import org.apache.whirr.Cluster;
+import org.apache.whirr.ClusterSpec;
 import org.apache.whirr.service.ClusterActionEvent;
 import org.apache.whirr.service.ClusterActionHandlerSupport;
-import org.apache.whirr.service.ClusterSpec;
 import org.apache.whirr.service.ComputeServiceContextBuilder;
 import org.apache.whirr.service.jclouds.FirewallSettings;
 import org.jclouds.compute.ComputeServiceContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
-
-import static org.apache.whirr.service.RolePredicates.role;
-import static org.jclouds.scriptbuilder.domain.Statements.call;
 
 public class ElasticSearchHandler extends ClusterActionHandlerSupport {
 

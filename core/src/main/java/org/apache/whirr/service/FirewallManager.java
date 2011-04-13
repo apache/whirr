@@ -27,7 +27,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.whirr.service.Cluster.Instance;
+import org.apache.whirr.Cluster;
+import org.apache.whirr.Cluster.Instance;
+import org.apache.whirr.ClusterSpec;
 import org.apache.whirr.service.jclouds.FirewallSettings;
 import org.jclouds.compute.ComputeServiceContext;
 import org.slf4j.Logger;

@@ -35,10 +35,10 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.whirr.service.ClusterSpec;
-import org.apache.whirr.service.Service;
-import org.apache.whirr.service.ServiceFactory;
-import org.apache.whirr.ssh.KeyPair;
+import org.apache.whirr.ClusterController;
+import org.apache.whirr.ClusterControllerFactory;
+import org.apache.whirr.ClusterSpec;
+import org.apache.whirr.util.KeyPair;
 import org.hamcrest.Matcher;
 import org.jclouds.compute.domain.NodeMetadata;
 import org.jclouds.compute.domain.NodeMetadataBuilder;
@@ -79,9 +79,9 @@ public class ListClusterCommandTest {
   @Test
   public void testAllOptions() throws Exception {
     
-    ServiceFactory factory = mock(ServiceFactory.class);
-    Service service = mock(Service.class);
-    when(factory.create((String) any())).thenReturn(service);
+    ClusterControllerFactory factory = mock(ClusterControllerFactory.class);
+    ClusterController controller = mock(ClusterController.class);
+    when(factory.create((String) any())).thenReturn(controller);
     NodeMetadata node1 = new NodeMetadataBuilder().name("name1").ids("id1")
         .location(new LocationBuilder().scope(LocationScope.PROVIDER)
           .id("location-id1").description("location-desc1").build())
@@ -94,7 +94,7 @@ public class ListClusterCommandTest {
         .imageId("image-id").state(NodeState.RUNNING)
         .publicAddresses(Lists.newArrayList("100.0.0.2"))
         .privateAddresses(Lists.newArrayList("10.0.0.2")).build();
-    when(service.getNodes((ClusterSpec) any())).thenReturn(
+    when(controller.getNodes((ClusterSpec) any())).thenReturn(
         (Set) Sets.newLinkedHashSet(Lists.newArrayList(node1, node2)));
 
     ListClusterCommand command = new ListClusterCommand(factory);

@@ -20,8 +20,8 @@ package org.apache.whirr.service.zookeeper;
 
 import com.google.common.base.Joiner;
 
-import org.apache.whirr.service.Cluster;
-import org.apache.whirr.service.RolePredicates;
+import org.apache.whirr.Cluster;
+import org.apache.whirr.RolePredicates;
 
 public class ZooKeeperCluster {
   public static String getHosts(Cluster cluster) {

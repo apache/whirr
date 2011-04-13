@@ -16,7 +16,16 @@ Trunk (unreleased changes)
 
     WHIRR-275. Improve firewall API for services. (tomwhite)
 
-    WHIRR-278. Refactor ClusterSpec and extract InstanceTemplate class
+    WHIRR-278. Refactor ClusterSpec and extract InstanceTemplate class. (asavu)
+
+    WHIRR-245. Clearly demarcate the user and service provider APIs. There
+    are some incompatible API changes which affect clients and service writers:
+    * The client API has moved from the org.apache.whirr.service package to the
+      org.apache.whirr package.
+    * Service(Factory) has been renamed to ClusterController(Factory).
+    * org.apache.whirr.cluster.actions has been renamed to
+      org.apache.whirr.actions.
+    (tomwhite)
 
   BUG FIXES
 

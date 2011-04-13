@@ -33,14 +33,14 @@
  * required.
  * </p>
  * <p>
- * An <i>instance template</i> ({@link InstanceTemplate}) is a specification of the role sets and
+ * An <i>instance template</i> ({@link org.apache.whirr.InstanceTemplate}) is a specification of the role sets and
  * cardinalities that make up a cluster. For example,
  * <tt>1 role-a+role-b,4 role-c</tt>
  * specifies a cluster in which one node is in roles <tt>role-a</tt> and
  * <tt>role-b</tt>, and four nodes are in role <tt>role-c</tt>.
  * </p>
  * <p>
- * A <i>cluster action</i> ({@link org.apache.whirr.service.ClusterAction}) is an action that is performed on a set of machines
+ * A <i>cluster action</i> ({@link org.apache.whirr.ClusterAction}) is an action that is performed on a set of machines
  * in a cluster. Examples of cluster actions include 'bootstrap' and 'configure'.
  * </p>
  * 
@@ -48,11 +48,11 @@
  * 
  * <p>
  * You can launch or destroy clusters using an instance of
- * {@link org.apache.whirr.service.Service}.
+ * {@link org.apache.whirr.ClusterController}.
  * </p>
  * 
  * <p>
- * Whirr {@link org.apache.whirr.service.Service#launchCluster(ClusterSpec) launches a cluster} by running the bootstrap action, followed by the
+ * Whirr {@link org.apache.whirr.ClusterController#launchCluster(ClusterSpec) launches a cluster} by running the bootstrap action, followed by the
  * configure action. For each of these actions Whirr follows these rules:
  * </p>
  * 
@@ -76,7 +76,7 @@
  * </p>
  * 
  * <p>
- * A cluster is {@link org.apache.whirr.service.Service#destroyCluster(ClusterSpec) destroyed} by running the destroy action.
+ * A cluster is {@link org.apache.whirr.ClusterController#destroyCluster(ClusterSpec) destroyed} by running the destroy action.
  * </p>
  * 
  * <h3>Writing a New Service</h3>

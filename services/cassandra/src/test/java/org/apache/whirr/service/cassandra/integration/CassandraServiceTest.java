@@ -35,10 +35,10 @@ import org.apache.thrift.protocol.TBinaryProtocol;
 import org.apache.thrift.transport.TFramedTransport;
 import org.apache.thrift.transport.TSocket;
 import org.apache.thrift.transport.TTransport;
-import org.apache.whirr.service.Cluster;
-import org.apache.whirr.service.Cluster.Instance;
-import org.apache.whirr.service.ClusterSpec;
-import org.apache.whirr.service.Service;
+import org.apache.whirr.Cluster;
+import org.apache.whirr.Cluster.Instance;
+import org.apache.whirr.ClusterController;
+import org.apache.whirr.ClusterSpec;
 import org.apache.whirr.service.cassandra.CassandraClusterActionHandler;
 import org.junit.After;
 import org.junit.Before;
@@ -49,7 +49,7 @@ public class CassandraServiceTest {
   private static final String KEYSPACE = "Keyspace1";
 
   private ClusterSpec clusterSpec;
-  private Service service;
+  private ClusterController controller;
   private Cluster cluster;
 
   @Before
@@ -61,8 +61,8 @@ public class CassandraServiceTest {
     config.addConfiguration(new PropertiesConfiguration("whirr-cassandra-test.properties"));
     clusterSpec = ClusterSpec.withTemporaryKeys(config);
     
-    service = new Service();
-    cluster = service.launchCluster(clusterSpec);
+    controller = new ClusterController();
+    cluster = controller.launchCluster(clusterSpec);
 
     // give it a sec to boot up the cluster
     waitForCassandra();
@@ -119,8 +119,8 @@ public class CassandraServiceTest {
   
   @After
   public void tearDown() throws IOException, InterruptedException {
-    if (service != null) {
-      service.destroyCluster(clusterSpec);      
+    if (controller != null) {
+      controller.destroyCluster(clusterSpec);      
     }
   }
 

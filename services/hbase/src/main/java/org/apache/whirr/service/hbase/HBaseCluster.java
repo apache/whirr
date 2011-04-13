@@ -18,11 +18,11 @@
 
 package org.apache.whirr.service.hbase;
 
-import org.apache.whirr.service.Cluster;
-import org.apache.whirr.service.RolePredicates;
-
 import java.io.IOException;
 import java.net.InetAddress;
+
+import org.apache.whirr.Cluster;
+import org.apache.whirr.RolePredicates;
 
 public class HBaseCluster {
   public static InetAddress getMasterPublicAddress(Cluster cluster) throws IOException {

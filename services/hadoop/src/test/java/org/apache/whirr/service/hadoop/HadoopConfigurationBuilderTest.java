@@ -26,9 +26,9 @@ import com.google.common.collect.Sets;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.PropertiesConfiguration;
-import org.apache.whirr.service.Cluster;
-import org.apache.whirr.service.Cluster.Instance;
-import org.apache.whirr.service.ClusterSpec;
+import org.apache.whirr.Cluster;
+import org.apache.whirr.Cluster.Instance;
+import org.apache.whirr.ClusterSpec;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.jclouds.domain.Credentials;

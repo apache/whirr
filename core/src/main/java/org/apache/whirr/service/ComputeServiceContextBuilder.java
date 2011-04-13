@@ -26,6 +26,7 @@ import java.util.Set;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationConverter;
+import org.apache.whirr.ClusterSpec;
 import org.apache.whirr.service.jclouds.TakeLoginCredentialsFromWhirrProperties;
 import org.jclouds.compute.ComputeServiceContext;
 import org.jclouds.compute.ComputeServiceContextFactory;

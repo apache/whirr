@@ -18,13 +18,16 @@
 
 package org.apache.whirr.cli.command;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.is;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import com.google.common.collect.Lists;
-import org.apache.whirr.service.ClusterSpec;
-import org.apache.whirr.service.Service;
-import org.apache.whirr.service.ServiceFactory;
-import org.apache.whirr.ssh.KeyPair;
-import org.junit.Before;
-import org.junit.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -32,14 +35,12 @@ import java.io.PrintStream;
 import java.util.Collections;
 import java.util.Map;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.hamcrest.Matchers.is;
+import org.apache.whirr.ClusterController;
+import org.apache.whirr.ClusterControllerFactory;
+import org.apache.whirr.ClusterSpec;
+import org.apache.whirr.util.KeyPair;
+import org.junit.Before;
+import org.junit.Test;
 
 public class DestroyInstanceCommandTest {
 
@@ -73,9 +74,9 @@ public class DestroyInstanceCommandTest {
 
   @Test
   public void testDestroyInstanceById() throws Exception {
-    ServiceFactory factory = mock(ServiceFactory.class);
-    Service service = mock(Service.class);
-    when(factory.create((String) any())).thenReturn(service);
+    ClusterControllerFactory factory = mock(ClusterControllerFactory.class);
+    ClusterController controller = mock(ClusterController.class);
+    when(factory.create((String) any())).thenReturn(controller);
 
     DestroyInstanceCommand command = new DestroyInstanceCommand(factory);
         Map<String, File> keys = KeyPair.generateTemporaryFiles();
@@ -91,7 +92,7 @@ public class DestroyInstanceCommandTest {
         ));
     assertThat(rc, is(0));
 
-    verify(service).destroyInstance((ClusterSpec) any(),
+    verify(controller).destroyInstance((ClusterSpec) any(),
         eq("region/instanceid"));
   }
 }

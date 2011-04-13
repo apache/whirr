@@ -26,9 +26,9 @@ import java.util.List;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 
-import org.apache.whirr.service.ClusterSpec;
-import org.apache.whirr.service.Service;
-import org.apache.whirr.service.ServiceFactory;
+import org.apache.whirr.ClusterController;
+import org.apache.whirr.ClusterControllerFactory;
+import org.apache.whirr.ClusterSpec;
 
 /**
  * A command to destroy a running cluster (terminate and cleanup).
@@ -36,10 +36,10 @@ import org.apache.whirr.service.ServiceFactory;
 public class DestroyClusterCommand extends AbstractClusterSpecCommand {
 
   public DestroyClusterCommand() throws IOException {
-    this(new ServiceFactory());
+    this(new ClusterControllerFactory());
   }
 
-  public DestroyClusterCommand(ServiceFactory factory) {
+  public DestroyClusterCommand(ClusterControllerFactory factory) {
     super("destroy-cluster", "Terminate and cleanup resources for a running cluster.", factory);
   }
   
@@ -56,8 +56,8 @@ public class DestroyClusterCommand extends AbstractClusterSpecCommand {
     try {
       ClusterSpec clusterSpec = getClusterSpec(optionSet);
 
-      Service service = createService(clusterSpec.getServiceName());
-      service.destroyCluster(clusterSpec);
+      ClusterController controller = createClusterController(clusterSpec.getServiceName());
+      controller.destroyCluster(clusterSpec);
       return 0;
     } catch (IllegalArgumentException e) {
       err.println(e.getMessage());
