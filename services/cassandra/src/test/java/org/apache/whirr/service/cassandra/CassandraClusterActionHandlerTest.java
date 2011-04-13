@@ -26,7 +26,7 @@ import java.net.UnknownHostException;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.whirr.service.Cluster.Instance;
+import org.apache.whirr.Cluster.Instance;
 import org.jclouds.domain.Credentials;
 import org.junit.Test;
 

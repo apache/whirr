@@ -18,7 +18,7 @@
 
 package org.apache.whirr.service.hadoop;
 
-import static org.apache.whirr.service.RolePredicates.role;
+import static org.apache.whirr.RolePredicates.role;
 import static org.apache.whirr.service.hadoop.HadoopConfigurationBuilder.buildCommon;
 import static org.apache.whirr.service.hadoop.HadoopConfigurationBuilder.buildHdfs;
 import static org.apache.whirr.service.hadoop.HadoopConfigurationBuilder.buildMapReduce;
@@ -35,10 +35,10 @@ import java.util.Map.Entry;
 import java.util.Properties;
 
 import org.apache.commons.configuration.ConfigurationException;
-import org.apache.whirr.service.Cluster;
-import org.apache.whirr.service.Cluster.Instance;
+import org.apache.whirr.Cluster;
+import org.apache.whirr.Cluster.Instance;
+import org.apache.whirr.ClusterSpec;
 import org.apache.whirr.service.ClusterActionEvent;
-import org.apache.whirr.service.ClusterSpec;
 import org.apache.whirr.service.FirewallManager.Rule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

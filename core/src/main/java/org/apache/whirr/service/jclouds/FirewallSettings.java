@@ -18,6 +18,9 @@
 
 package org.apache.whirr.service.jclouds;
 
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
+
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -26,20 +29,16 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.whirr.service.Cluster.Instance;
-import org.apache.whirr.service.ClusterSpec;
-import org.apache.whirr.service.FirewallManager;
+import org.apache.whirr.Cluster.Instance;
+import org.apache.whirr.ClusterSpec;
 import org.jclouds.aws.util.AWSUtils;
 import org.jclouds.compute.ComputeServiceContext;
 import org.jclouds.ec2.EC2Client;
 import org.jclouds.ec2.domain.IpProtocol;
 
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
-
 /**
  * Utility functions for controlling firewall settings for a cluster.
- * @deprecated Use {@link FirewallManager} instead.
+ * @deprecated Use {@link org.apache.whirr.service.FirewallManager} instead.
  */
 @Deprecated
 public class FirewallSettings {

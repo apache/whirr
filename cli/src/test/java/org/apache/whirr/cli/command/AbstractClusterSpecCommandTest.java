@@ -29,9 +29,9 @@ import java.util.Map;
 
 import joptsimple.OptionSet;
 
-import org.apache.whirr.service.ClusterSpec;
-import org.apache.whirr.service.ServiceFactory;
-import org.apache.whirr.ssh.KeyPair;
+import org.apache.whirr.ClusterControllerFactory;
+import org.apache.whirr.ClusterSpec;
+import org.apache.whirr.util.KeyPair;
 import org.junit.Test;
 
 public class AbstractClusterSpecCommandTest {
@@ -39,7 +39,7 @@ public class AbstractClusterSpecCommandTest {
   @Test
   public void testOverrides() throws Exception {
     AbstractClusterSpecCommand clusterSpecCommand = new AbstractClusterSpecCommand("name",
-        "description", new ServiceFactory()) {
+        "description", new ClusterControllerFactory()) {
       @Override
       public int run(InputStream in, PrintStream out, PrintStream err,
           List<String> args) throws Exception {
@@ -62,9 +62,9 @@ public class AbstractClusterSpecCommandTest {
    * Ensure that an invalid service name causes failure
    */
   @Test(expected=IllegalArgumentException.class)
-  public void testCreateServerWithInvalidServiceName() throws Exception {
+  public void testCreateServerWithInvalidClusterControllerName() throws Exception {
     AbstractClusterSpecCommand clusterSpecCommand = new AbstractClusterSpecCommand("name",
-        "description", new ServiceFactory()) {
+        "description", new ClusterControllerFactory()) {
       @Override
       public int run(InputStream in, PrintStream out, PrintStream err,
           List<String> args) throws Exception {
@@ -80,6 +80,6 @@ public class AbstractClusterSpecCommandTest {
     );
     ClusterSpec clusterSpec = clusterSpecCommand.getClusterSpec(optionSet);
     // this should fail - non-existent service
-    clusterSpecCommand.createService("bar");
+    clusterSpecCommand.createClusterController("bar");
   }
 }

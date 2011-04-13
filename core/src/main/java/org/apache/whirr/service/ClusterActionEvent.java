@@ -18,11 +18,13 @@
 
 package org.apache.whirr.service;
 
+import org.apache.whirr.Cluster;
+import org.apache.whirr.ClusterSpec;
 import org.apache.whirr.service.jclouds.StatementBuilder;
 import org.apache.whirr.service.jclouds.TemplateBuilderStrategy;
 
 /**
- * An event object which is fired when a {@link ClusterAction} occurs. 
+ * An event object which is fired when a {@link org.apache.whirr.ClusterAction} occurs. 
  */
 public class ClusterActionEvent {
   

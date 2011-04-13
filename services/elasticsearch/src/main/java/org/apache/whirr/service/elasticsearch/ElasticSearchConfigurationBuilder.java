@@ -18,25 +18,26 @@
 
 package org.apache.whirr.service.elasticsearch;
 
+import static org.apache.whirr.RolePredicates.role;
+
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import org.apache.commons.configuration.CompositeConfiguration;
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.configuration.ConfigurationException;
-import org.apache.commons.configuration.PropertiesConfiguration;
-import org.apache.commons.lang.StringUtils;
-import org.apache.whirr.service.Cluster;
-import org.apache.whirr.service.ClusterSpec;
-import org.jclouds.scriptbuilder.domain.Statement;
-import org.jclouds.scriptbuilder.domain.Statements;
-import org.slf4j.LoggerFactory;
 
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import static org.apache.whirr.service.RolePredicates.role;
+import org.apache.commons.configuration.CompositeConfiguration;
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.PropertiesConfiguration;
+import org.apache.commons.lang.StringUtils;
+import org.apache.whirr.Cluster;
+import org.apache.whirr.ClusterSpec;
+import org.jclouds.scriptbuilder.domain.Statement;
+import org.jclouds.scriptbuilder.domain.Statements;
+import org.slf4j.LoggerFactory;
 
 public class ElasticSearchConfigurationBuilder {
 

@@ -18,8 +18,10 @@
 
 package org.apache.whirr.cli.command;
 
-import static org.apache.whirr.service.ClusterSpec.Property.CLUSTER_NAME;
-import static org.apache.whirr.service.ClusterSpec.Property.IDENTITY;
+import static org.apache.whirr.ClusterSpec.Property.CLUSTER_NAME;
+import static org.apache.whirr.ClusterSpec.Property.IDENTITY;
+
+import com.google.common.collect.Maps;
 
 import java.util.EnumSet;
 import java.util.Map;
@@ -33,20 +35,18 @@ import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
+import org.apache.whirr.ClusterController;
+import org.apache.whirr.ClusterControllerFactory;
+import org.apache.whirr.ClusterSpec;
+import org.apache.whirr.ClusterSpec.Property;
 import org.apache.whirr.cli.Command;
-import org.apache.whirr.service.ClusterSpec;
-import org.apache.whirr.service.ClusterSpec.Property;
-import org.apache.whirr.service.Service;
-import org.apache.whirr.service.ServiceFactory;
-
-import com.google.common.collect.Maps;
 
 /**
  * An abstract command for interacting with clusters.
  */
 public abstract class AbstractClusterSpecCommand extends Command {
 
-  protected ServiceFactory factory;
+  protected ClusterControllerFactory factory;
 
   protected OptionParser parser = new OptionParser();
   private Map<Property, OptionSpec> optionSpecs;
@@ -57,7 +57,7 @@ public abstract class AbstractClusterSpecCommand extends Command {
     .describedAs("config.properties")
     .ofType(String.class);
 
-  public AbstractClusterSpecCommand(String name, String description, ServiceFactory factory) {
+  public AbstractClusterSpecCommand(String name, String description, ClusterControllerFactory factory) {
     super(name, description);
     this.factory = factory;
 
@@ -105,17 +105,15 @@ public abstract class AbstractClusterSpecCommand extends Command {
 
   /**
    * Create the specified service
-   * @param serviceName
-   * @return
    * @throws IllegalArgumentException if serviceName is not found
    */
-  protected Service createService(String serviceName) {
-    Service service = factory.create(serviceName);
-    if (service == null) {
+  protected ClusterController createClusterController(String serviceName) {
+    ClusterController controller = factory.create(serviceName);
+    if (controller == null) {
       throw new IllegalArgumentException("Unable to find service "
           + serviceName + ", exiting");
     }
-    return service;
+    return controller;
   }
 
 }

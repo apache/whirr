@@ -18,7 +18,7 @@
 
 package org.apache.whirr.service.jclouds;
 
-import org.apache.whirr.service.ClusterSpec;
+import org.apache.whirr.ClusterSpec;
 import org.jclouds.compute.domain.OsFamily;
 import org.jclouds.compute.domain.TemplateBuilder;
 

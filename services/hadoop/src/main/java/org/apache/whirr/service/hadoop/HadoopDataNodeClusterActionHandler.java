@@ -26,9 +26,9 @@ import static org.jclouds.scriptbuilder.domain.Statements.call;
 import java.io.IOException;
 
 import org.apache.commons.configuration.ConfigurationException;
-import org.apache.whirr.service.Cluster;
+import org.apache.whirr.Cluster;
+import org.apache.whirr.ClusterSpec;
 import org.apache.whirr.service.ClusterActionEvent;
-import org.apache.whirr.service.ClusterSpec;
 
 public class HadoopDataNodeClusterActionHandler extends HadoopClusterActionHandler {
 

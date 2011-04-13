@@ -18,6 +18,10 @@
 
 package org.apache.whirr.service.hbase.integration;
 
+import java.io.IOException;
+import java.net.InetAddress;
+import java.util.Map.Entry;
+
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.hadoop.conf.Configuration;
@@ -28,18 +32,14 @@ import org.apache.hadoop.hbase.client.Scan;
 import org.apache.hadoop.hbase.rest.client.Client;
 import org.apache.hadoop.hbase.rest.client.RemoteAdmin;
 import org.apache.hadoop.hbase.rest.client.RemoteHTable;
-import org.apache.whirr.service.Cluster;
-import org.apache.whirr.service.ClusterSpec;
-import org.apache.whirr.service.RolePredicates;
-import org.apache.whirr.service.Service;
+import org.apache.whirr.Cluster;
+import org.apache.whirr.ClusterController;
+import org.apache.whirr.ClusterSpec;
+import org.apache.whirr.RolePredicates;
 import org.apache.whirr.service.hadoop.HadoopProxy;
 import org.apache.whirr.service.hbase.HBaseRestServerClusterActionHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
-import java.net.InetAddress;
-import java.util.Map.Entry;
 
 public class HBaseServiceController {
 
@@ -55,7 +55,7 @@ public class HBaseServiceController {
 
   private boolean running;
   private ClusterSpec clusterSpec;
-  private Service service;
+  private ClusterController controller;
   private HadoopProxy proxy;
   private Cluster cluster;
   private RemoteHTable remoteMetaTable;
@@ -83,9 +83,9 @@ public class HBaseServiceController {
     }
     config.addConfiguration(new PropertiesConfiguration("whirr-hbase-test.properties"));
     clusterSpec = ClusterSpec.withTemporaryKeys(config);
-    service = new Service();
+    controller = new ClusterController();
 
-    cluster = service.launchCluster(clusterSpec);
+    cluster = controller.launchCluster(clusterSpec);
     proxy = new HadoopProxy(clusterSpec, cluster);
     proxy.start();
 
@@ -126,8 +126,8 @@ public class HBaseServiceController {
     if (proxy != null) {
       proxy.stop();
     }
-    if (service != null) {
-      service.destroyCluster(clusterSpec);
+    if (controller != null) {
+      controller.destroyCluster(clusterSpec);
     }
     running = false;
   }

@@ -18,15 +18,15 @@
 
 package org.apache.whirr.service.jclouds;
 
+import com.google.common.base.Splitter;
+import com.google.common.collect.Lists;
+
 import java.util.List;
 
 import javax.inject.Singleton;
 
-import org.jclouds.ec2.compute.strategy.EC2PopulateDefaultLoginCredentialsForImageStrategy;
 import org.jclouds.domain.Credentials;
-
-import com.google.common.base.Splitter;
-import com.google.common.collect.Lists;
+import org.jclouds.ec2.compute.strategy.EC2PopulateDefaultLoginCredentialsForImageStrategy;
 
 @Singleton
 // patch until jclouds 1.0-beta-10

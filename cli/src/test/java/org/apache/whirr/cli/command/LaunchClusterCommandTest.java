@@ -38,12 +38,12 @@ import java.util.Map;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.PropertiesConfiguration;
-import org.apache.whirr.service.Cluster;
-import org.apache.whirr.service.ClusterSpec;
-import org.apache.whirr.service.InstanceTemplate;
-import org.apache.whirr.service.Service;
-import org.apache.whirr.service.ServiceFactory;
-import org.apache.whirr.ssh.KeyPair;
+import org.apache.whirr.Cluster;
+import org.apache.whirr.ClusterController;
+import org.apache.whirr.ClusterControllerFactory;
+import org.apache.whirr.ClusterSpec;
+import org.apache.whirr.InstanceTemplate;
+import org.apache.whirr.util.KeyPair;
 import org.hamcrest.Matcher;
 import org.junit.Before;
 import org.junit.Test;
@@ -79,11 +79,11 @@ public class LaunchClusterCommandTest {
   @Test
   public void testAllOptions() throws Exception {
     
-    ServiceFactory factory = mock(ServiceFactory.class);
-    Service service = mock(Service.class);
+    ClusterControllerFactory factory = mock(ClusterControllerFactory.class);
+    ClusterController controller = mock(ClusterController.class);
     Cluster cluster = mock(Cluster.class);
-    when(factory.create((String) any())).thenReturn(service);
-    when(service.launchCluster((ClusterSpec) any())).thenReturn(cluster);
+    when(factory.create((String) any())).thenReturn(controller);
+    when(controller.launchCluster((ClusterSpec) any())).thenReturn(cluster);
     
     LaunchClusterCommand command = new LaunchClusterCommand(factory);
     Map<String, File> keys = KeyPair.generateTemporaryFiles();
@@ -118,7 +118,7 @@ public class LaunchClusterCommandTest {
     
     verify(factory).create("test-service");
     
-    verify(service).launchCluster(expectedClusterSpec);
+    verify(controller).launchCluster(expectedClusterSpec);
     
     assertThat(outBytes.toString(), containsString("Started cluster of 0 instances"));
     
@@ -127,11 +127,11 @@ public class LaunchClusterCommandTest {
   @Test
   public void testMaxPercentFailure() throws Exception {
     
-    ServiceFactory factory = mock(ServiceFactory.class);
-    Service service = mock(Service.class);
+    ClusterControllerFactory factory = mock(ClusterControllerFactory.class);
+    ClusterController controller = mock(ClusterController.class);
     Cluster cluster = mock(Cluster.class);
-    when(factory.create((String) any())).thenReturn(service);
-    when(service.launchCluster((ClusterSpec) any())).thenReturn(cluster);
+    when(factory.create((String) any())).thenReturn(controller);
+    when(controller.launchCluster((ClusterSpec) any())).thenReturn(cluster);
     
     LaunchClusterCommand command = new LaunchClusterCommand(factory);
     Map<String, File> keys = KeyPair.generateTemporaryFiles();
@@ -168,7 +168,7 @@ public class LaunchClusterCommandTest {
     
     verify(factory).create("hadoop");
     
-    verify(service).launchCluster(expectedClusterSpec);
+    verify(controller).launchCluster(expectedClusterSpec);
     
     assertThat(outBytes.toString(), containsString("Started cluster of 0 instances")); 
   }

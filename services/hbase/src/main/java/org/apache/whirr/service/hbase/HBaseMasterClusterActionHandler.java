@@ -18,7 +18,7 @@
 
 package org.apache.whirr.service.hbase;
 
-import static org.apache.whirr.service.RolePredicates.role;
+import static org.apache.whirr.RolePredicates.role;
 import static org.jclouds.scriptbuilder.domain.Statements.call;
 
 import com.google.common.base.Charsets;
@@ -31,10 +31,10 @@ import java.net.InetAddress;
 import java.util.Map.Entry;
 import java.util.Properties;
 
-import org.apache.whirr.service.Cluster;
-import org.apache.whirr.service.Cluster.Instance;
+import org.apache.whirr.Cluster;
+import org.apache.whirr.Cluster.Instance;
+import org.apache.whirr.ClusterSpec;
 import org.apache.whirr.service.ClusterActionEvent;
-import org.apache.whirr.service.ClusterSpec;
 import org.apache.whirr.service.ComputeServiceContextBuilder;
 import org.apache.whirr.service.hadoop.HadoopProxy;
 import org.apache.whirr.service.jclouds.FirewallSettings;

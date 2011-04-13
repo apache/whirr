@@ -25,9 +25,9 @@ import java.io.IOException;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
+import org.apache.whirr.ClusterSpec;
 import org.apache.whirr.service.ClusterActionEvent;
 import org.apache.whirr.service.ClusterActionHandlerSupport;
-import org.apache.whirr.service.ClusterSpec;
 
 public abstract class HadoopClusterActionHandler extends ClusterActionHandlerSupport {
 

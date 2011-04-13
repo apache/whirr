@@ -26,10 +26,10 @@ import java.util.List;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 
-import org.apache.whirr.service.Cluster;
-import org.apache.whirr.service.ClusterSpec;
-import org.apache.whirr.service.Service;
-import org.apache.whirr.service.ServiceFactory;
+import org.apache.whirr.Cluster;
+import org.apache.whirr.ClusterController;
+import org.apache.whirr.ClusterControllerFactory;
+import org.apache.whirr.ClusterSpec;
 
 /**
  * A command to launch a new cluster.
@@ -37,10 +37,10 @@ import org.apache.whirr.service.ServiceFactory;
 public class LaunchClusterCommand extends AbstractClusterSpecCommand {
 
   public LaunchClusterCommand() throws IOException {
-    this(new ServiceFactory());
+    this(new ClusterControllerFactory());
   }
 
-  public LaunchClusterCommand(ServiceFactory factory) {
+  public LaunchClusterCommand(ClusterControllerFactory factory) {
     super("launch-cluster", "Launch a new cluster running a service.", factory);
   }
 
@@ -57,8 +57,8 @@ public class LaunchClusterCommand extends AbstractClusterSpecCommand {
     
     try {
       ClusterSpec clusterSpec = getClusterSpec(optionSet);
-      Service service = createService(clusterSpec.getServiceName());
-      Cluster cluster = service.launchCluster(clusterSpec);
+      ClusterController controller = createClusterController(clusterSpec.getServiceName());
+      Cluster cluster = controller.launchCluster(clusterSpec);
       out.printf("Started cluster of %s instances\n",
           cluster.getInstances().size());
       out.println(cluster);

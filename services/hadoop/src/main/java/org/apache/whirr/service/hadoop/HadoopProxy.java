@@ -29,9 +29,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.InetAddress;
 
-import org.apache.whirr.service.Cluster;
-import org.apache.whirr.service.ClusterSpec;
-import org.apache.whirr.ssh.KeyPair;
+import org.apache.whirr.Cluster;
+import org.apache.whirr.ClusterSpec;
+import org.apache.whirr.util.KeyPair;
 
 public class HadoopProxy {
 

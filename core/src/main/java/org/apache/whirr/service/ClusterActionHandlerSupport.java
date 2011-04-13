@@ -22,6 +22,7 @@ import java.io.IOException;
 
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.Configuration;
+import org.apache.whirr.ClusterSpec;
 import org.apache.whirr.service.jclouds.RunUrlStatement;
 import org.jclouds.scriptbuilder.domain.Statement;
 

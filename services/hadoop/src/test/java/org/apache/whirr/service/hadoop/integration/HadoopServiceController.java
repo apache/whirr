@@ -30,9 +30,9 @@ import org.apache.hadoop.hdfs.protocol.FSConstants;
 import org.apache.hadoop.mapred.ClusterStatus;
 import org.apache.hadoop.mapred.JobClient;
 import org.apache.hadoop.mapred.JobConf;
-import org.apache.whirr.service.Cluster;
-import org.apache.whirr.service.ClusterSpec;
-import org.apache.whirr.service.Service;
+import org.apache.whirr.Cluster;
+import org.apache.whirr.ClusterController;
+import org.apache.whirr.ClusterSpec;
 import org.apache.whirr.service.hadoop.HadoopProxy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,7 +51,7 @@ public class HadoopServiceController {
   
   private boolean running;
   private ClusterSpec clusterSpec;
-  private Service service;
+  private ClusterController controller;
   private HadoopProxy proxy;
   private Cluster cluster;
   
@@ -76,9 +76,9 @@ public class HadoopServiceController {
     }
     config.addConfiguration(new PropertiesConfiguration("whirr-hadoop-test.properties"));
     clusterSpec = ClusterSpec.withTemporaryKeys(config);
-    service = new Service();
+    controller = new ClusterController();
     
-    cluster = service.launchCluster(clusterSpec);
+    cluster = controller.launchCluster(clusterSpec);
     proxy = new HadoopProxy(clusterSpec, cluster);
     proxy.start();
     
@@ -146,7 +146,7 @@ public class HadoopServiceController {
     if (proxy != null) {
       proxy.stop();
     }
-    service.destroyCluster(clusterSpec);
+    controller.destroyCluster(clusterSpec);
     running = false;
   }
 

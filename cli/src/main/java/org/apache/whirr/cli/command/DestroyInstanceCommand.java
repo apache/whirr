@@ -18,13 +18,6 @@
 
 package org.apache.whirr.cli.command;
 
-import joptsimple.OptionParser;
-import joptsimple.OptionSet;
-import joptsimple.OptionSpec;
-import org.apache.whirr.service.ClusterSpec;
-import org.apache.whirr.service.Service;
-import org.apache.whirr.service.ServiceFactory;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -34,6 +27,14 @@ import java.io.InputStream;
 import java.io.PrintStream;
 import java.io.Writer;
 import java.util.List;
+
+import joptsimple.OptionParser;
+import joptsimple.OptionSet;
+import joptsimple.OptionSpec;
+
+import org.apache.whirr.ClusterController;
+import org.apache.whirr.ClusterControllerFactory;
+import org.apache.whirr.ClusterSpec;
 
 /**
  * A command to destroy an instance from a cluster
@@ -46,10 +47,10 @@ public class DestroyInstanceCommand extends AbstractClusterSpecCommand {
       .ofType(String.class);
 
   public DestroyInstanceCommand() throws IOException {
-    this(new ServiceFactory());
+    this(new ClusterControllerFactory());
   }
 
-  public DestroyInstanceCommand(ServiceFactory factory) {
+  public DestroyInstanceCommand(ClusterControllerFactory factory) {
     super("destroy-instance", "Terminate and cleanup resources " +
         "for a single instance.", factory);
   }
@@ -68,10 +69,10 @@ public class DestroyInstanceCommand extends AbstractClusterSpecCommand {
         throw new IllegalArgumentException("You need to specify an instance ID.");
       }
       ClusterSpec clusterSpec = getClusterSpec(optionSet);
-      Service service = createService(clusterSpec.getServiceName());
+      ClusterController controller = createClusterController(clusterSpec.getServiceName());
 
       String instanceId = optionSet.valueOf(instanceOption);
-      service.destroyInstance(clusterSpec, instanceId);
+      controller.destroyInstance(clusterSpec, instanceId);
       updateInstancesFile(clusterSpec, instanceId);
 
       return 0;

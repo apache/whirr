@@ -18,8 +18,7 @@
 
 package org.apache.whirr.service.voldemort;
 
-import static org.apache.whirr.service.FirewallManager.Rule;
-import static org.apache.whirr.service.RolePredicates.role;
+import static org.apache.whirr.RolePredicates.role;
 import static org.apache.whirr.service.voldemort.VoldemortConstants.ADMIN_PORT;
 import static org.apache.whirr.service.voldemort.VoldemortConstants.CLIENT_PORT;
 import static org.apache.whirr.service.voldemort.VoldemortConstants.FUNCTION_CONFIGURE;
@@ -35,27 +34,24 @@ import static org.apache.whirr.service.voldemort.VoldemortConstants.PARAM_TARBAL
 import static org.apache.whirr.service.voldemort.VoldemortConstants.ROLE;
 import static org.jclouds.scriptbuilder.domain.Statements.call;
 
+import com.google.common.base.Function;
+import com.google.common.base.Joiner;
+import com.google.common.collect.Lists;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.configuration.Configuration;
-import org.apache.whirr.service.Cluster;
+import org.apache.whirr.Cluster;
+import org.apache.whirr.Cluster.Instance;
+import org.apache.whirr.ClusterSpec;
 import org.apache.whirr.service.ClusterActionEvent;
 import org.apache.whirr.service.ClusterActionHandlerSupport;
-import org.apache.whirr.service.ClusterSpec;
-import org.apache.whirr.service.ComputeServiceContextBuilder;
-import org.apache.whirr.service.Cluster.Instance;
-import org.apache.whirr.service.FirewallManager;
-import org.apache.whirr.service.jclouds.FirewallSettings;
-import org.jclouds.compute.ComputeServiceContext;
+import org.apache.whirr.service.FirewallManager.Rule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.common.base.Function;
-import com.google.common.base.Joiner;
-import com.google.common.collect.Lists;
 
 public class VoldemortClusterActionHandler extends ClusterActionHandlerSupport {
 
