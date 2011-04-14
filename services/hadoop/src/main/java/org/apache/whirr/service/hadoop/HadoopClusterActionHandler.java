@@ -35,19 +35,10 @@ public abstract class HadoopClusterActionHandler extends ClusterActionHandlerSup
    * Returns a composite configuration that is made up from the global
    * configuration coming from the Whirr core with a hadoop defaults
    * properties.
-   *
-   * @param clusterSpec  The cluster specification instance.
-   * @return The composite configuration.
    */
-  protected synchronized Configuration getConfiguration(
+  protected Configuration getConfiguration(
       ClusterSpec clusterSpec) throws IOException {
-    try {
-      Configuration defaults = new PropertiesConfiguration(
-        "whirr-hadoop-default.properties");
-      return super.getConfiguration(clusterSpec, defaults);
-    } catch (ConfigurationException e) {
-      throw new IOException("Error loading Hadoop default properties.", e);
-    }
+    return getConfiguration(clusterSpec, "whirr-hadoop-default.properties");
   }
   
   @Override
