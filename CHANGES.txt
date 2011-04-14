@@ -44,6 +44,8 @@ Trunk (unreleased changes)
 
     WHIRR-274. Add wagon-ssh-external as a maven build extension. (asavu)
 
+    WHIRR-172. Log warning for unrecognized service names. (tomwhite)
+
 Release 0.4.0 - 2011-03-15
 
   NEW FEATURES

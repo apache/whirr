@@ -39,12 +39,18 @@ import org.apache.whirr.ClusterController;
 import org.apache.whirr.ClusterControllerFactory;
 import org.apache.whirr.ClusterSpec;
 import org.apache.whirr.ClusterSpec.Property;
+import org.apache.whirr.actions.BootstrapClusterAction;
 import org.apache.whirr.cli.Command;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * An abstract command for interacting with clusters.
  */
 public abstract class AbstractClusterSpecCommand extends Command {
+  
+  private static final Logger LOG =
+    LoggerFactory.getLogger(AbstractClusterSpecCommand.class);
 
   protected ClusterControllerFactory factory;
 
@@ -105,13 +111,12 @@ public abstract class AbstractClusterSpecCommand extends Command {
 
   /**
    * Create the specified service
-   * @throws IllegalArgumentException if serviceName is not found
    */
   protected ClusterController createClusterController(String serviceName) {
     ClusterController controller = factory.create(serviceName);
     if (controller == null) {
-      throw new IllegalArgumentException("Unable to find service "
-          + serviceName + ", exiting");
+      LOG.warn("Unable to find service {}, using default.", serviceName);
+      controller = factory.create(null);
     }
     return controller;
   }

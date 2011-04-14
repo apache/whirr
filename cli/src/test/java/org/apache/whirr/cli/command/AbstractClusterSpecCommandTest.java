@@ -59,9 +59,9 @@ public class AbstractClusterSpecCommandTest {
   }
 
   /**
-   * Ensure that an invalid service name causes failure
+   * Ensure that an invalid service name uses the default (after logging a
+   * warning).
    */
-  @Test(expected=IllegalArgumentException.class)
   public void testCreateServerWithInvalidClusterControllerName() throws Exception {
     AbstractClusterSpecCommand clusterSpecCommand = new AbstractClusterSpecCommand("name",
         "description", new ClusterControllerFactory()) {
@@ -79,7 +79,7 @@ public class AbstractClusterSpecCommandTest {
         "--private-key-file", keys.get("private").getAbsolutePath()
     );
     ClusterSpec clusterSpec = clusterSpecCommand.getClusterSpec(optionSet);
-    // this should fail - non-existent service
+    // following should not fail
     clusterSpecCommand.createClusterController("bar");
   }
 }
