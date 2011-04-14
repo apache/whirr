@@ -36,18 +36,10 @@ public abstract class HBaseClusterActionHandler
    * Returns a composite configuration that is made up from the global
    * configuration coming from the Whirr core with a hbase defaults
    * properties.
-   *
-   * @param clusterSpec  The cluster specification instance.
-   * @return The composite configuration.
    */
   protected synchronized Configuration getConfiguration(
       ClusterSpec clusterSpec) throws IOException {
-    try {
-      Configuration defaults = new PropertiesConfiguration(
-        HBaseConstants.FILE_HBASE_DEFAULT_PROPERTIES);
-      return super.getConfiguration(clusterSpec, defaults);
-    } catch (ConfigurationException e) {
-      throw new IOException("Error loading HBase default properties.", e);
-    }
+    return getConfiguration(clusterSpec,
+      HBaseConstants.FILE_HBASE_DEFAULT_PROPERTIES);
   }
 }

@@ -22,6 +22,8 @@ import java.io.IOException;
 
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.whirr.ClusterSpec;
 import org.apache.whirr.service.jclouds.RunUrlStatement;
 import org.jclouds.scriptbuilder.domain.Statement;
@@ -93,12 +95,22 @@ public abstract class ClusterActionHandlerSupport extends ClusterActionHandler {
    * @param clusterSpec  The cluster specification instance.
    * @return The composite configuration.
    */
-  protected synchronized Configuration getConfiguration(
+  protected Configuration getConfiguration(
       ClusterSpec clusterSpec, Configuration defaults) {
     CompositeConfiguration cc = new CompositeConfiguration();
     cc.addConfiguration(clusterSpec.getConfiguration());
     cc.addConfiguration(defaults);
     return cc;
+  }
+
+  protected Configuration getConfiguration(ClusterSpec clusterSpec,
+      String defaultsPropertiesFile) throws IOException {
+    try {
+      return getConfiguration(clusterSpec,
+          new PropertiesConfiguration(defaultsPropertiesFile));
+    } catch(ConfigurationException e) {
+      throw new IOException("Error loading " + defaultsPropertiesFile, e);
+    }
   }
   
   /**

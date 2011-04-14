@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.configuration.Configuration;
 import org.apache.whirr.Cluster;
 import org.apache.whirr.Cluster.Instance;
 import org.apache.whirr.ClusterSpec;
@@ -50,11 +51,18 @@ public class ZooKeeperClusterActionHandler extends ClusterActionHandlerSupport {
     return ZOOKEEPER_ROLE;
   }
 
+  protected Configuration getConfiguration(ClusterSpec spec)
+    throws IOException {
+    return getConfiguration(spec, "whirr-zookeeper-default.properties");
+  }
+
   @Override
   protected void beforeBootstrap(ClusterActionEvent event) throws IOException {
+    Configuration config = getConfiguration(event.getClusterSpec());
     addStatement(event, call("install_java"));
     addStatement(event, call("install_tarball"));
-    addStatement(event, call("install_zookeeper"));
+    addStatement(event, call("install_zookeeper",
+      config.getString("whirr.zookeeper.tarball.url")));
   }
 
   @Override

@@ -16,13 +16,14 @@
 #
 function install_zookeeper() {
 
-  ZK_VERSION=${1:-3.3.0}
-  ZOOKEEPER_HOME=/usr/local/zookeeper-$ZK_VERSION
+  ZK_TARBALL_URL=$1
+  ZOOKEEPER_HOME=/usr/local/$(basename $ZK_TARBALL_URL '.tar.gz')
+
   ZK_CONF_DIR=/etc/zookeeper/conf
   ZK_LOG_DIR=/var/log/zookeeper
   ZK_DATA_DIR=$ZK_LOG_DIR/txlog
   
-  install_tarball http://www.apache.org/dist/hadoop/zookeeper/zookeeper-$ZK_VERSION/zookeeper-$ZK_VERSION.tar.gz
+  install_tarball $ZK_TARBALL_URL
   
   echo "export ZOOKEEPER_HOME=$ZOOKEEPER_HOME" >> /etc/profile
   echo 'export PATH=$ZOOKEEPER_HOME/bin:$PATH' >> /etc/profile
@@ -38,7 +39,7 @@ function install_zookeeper() {
       $ZK_CONF_DIR/log4j.properties
   
   # Install a CRON task for data directory cleanup
-  ZK_JAR=$ZOOKEEPER_HOME/zookeeper-$ZK_VERSION.jar
+  ZK_JAR=$ZOOKEEPER_HOME/$(basename $ZK_TARBALL_URL '.tar.gz').jar
   ZK_LOG4J_JAR=`echo $ZOOKEEPER_HOME/lib/log4j-*.jar`
   
   CRON="0 0 * * * java -cp $ZK_JAR:$ZK_LOG4J_JAR:$ZK_CONF_DIR org.apache.zookeeper.server.PurgeTxnLog $ZK_DATA_DIR $ZK_DATA_DIR -n 10"

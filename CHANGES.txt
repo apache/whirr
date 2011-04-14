@@ -29,6 +29,8 @@ Trunk (unreleased changes)
 
     WHIRR-269. Improve error msg "Key pair is encrypted" (tomwhite via asavu)
 
+    WHIRR-277. Support multiple versions of ZooKeeper (asavu)
+
   BUG FIXES
 
     WHIRR-253. ZooKeeper service should only authorize ingress to ZooKeeper 
