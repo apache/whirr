@@ -307,6 +307,7 @@ public class ClusterSpec {
   }
 
   private void checkAndSetKeyPair() throws ConfigurationException {
+    String pairRepresentation = "";
     try {
       String privateKeyPath = getString(Property.PRIVATE_KEY_FILE);
 
@@ -314,26 +315,33 @@ public class ClusterSpec {
       publicKeyPath = (publicKeyPath == null && privateKeyPath != null) ?
                 privateKeyPath + ".pub" : publicKeyPath;
       if(privateKeyPath != null && publicKeyPath != null) {
+        pairRepresentation = "(" + privateKeyPath + ", " +
+            publicKeyPath + ")";
         KeyPair pair = KeyPair.load(new JSch(), privateKeyPath, publicKeyPath);
         if (pair.isEncrypted()) {
-          throw new ConfigurationException("Key pair is encrypted");
+          throw new ConfigurationException("Key pair " + pairRepresentation +
+              " is encrypted. Try generating a new passwordless SSH keypair " +
+              "(e.g. with ssh-keygen).");
         }
         if (!sameKeyPair(new File(privateKeyPath), new File(publicKeyPath))) {
           throw new ConfigurationException("Both keys should belong " +
-              "to the same key pair");
+              "to the same key pair: " + pairRepresentation);
         }
 
         setPrivateKey(new File(privateKeyPath));
         setPublicKey(new File(publicKeyPath));
       }
     } catch (JSchException e) {
-      throw new ConfigurationException("Invalid key pair", e);
+      throw new ConfigurationException("Invalid key pair: " +
+          pairRepresentation, e);
 
     } catch (IllegalArgumentException e) {
-      throw new ConfigurationException("Invalid key", e);
+      throw new ConfigurationException("Invalid key: " +
+          pairRepresentation, e);
 
     } catch (IOException e) {
-      throw new ConfigurationException("Error reading one of key file", e);
+      throw new ConfigurationException("Error reading one of key file: " +
+          pairRepresentation, e);
     }
   }
 
