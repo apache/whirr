@@ -34,7 +34,7 @@ public class CassandraClusterActionHandlerTest {
 
   private Instance getInstance(String id) throws UnknownHostException {
     return new Instance(new Credentials("", ""), Sets.newHashSet(""),
-        "127.0.0.1", "127.0.0.1", id); 
+        "127.0.0.1", "127.0.0.1", id, null); 
   }
   
   @Test()

@@ -31,6 +31,8 @@ Trunk (unreleased changes)
 
     WHIRR-277. Support multiple versions of ZooKeeper (asavu)
 
+    WHIRR-282. Set number of Hadoop slots based on hardware (tomwhite via asavu)
+
   BUG FIXES
 
     WHIRR-253. ZooKeeper service should only authorize ingress to ZooKeeper 
