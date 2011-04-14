@@ -27,6 +27,8 @@ Trunk (unreleased changes)
       org.apache.whirr.actions.
     (tomwhite)
 
+    WHIRR-269. Improve error msg "Key pair is encrypted" (tomwhite via asavu)
+
   BUG FIXES
 
     WHIRR-253. ZooKeeper service should only authorize ingress to ZooKeeper 
