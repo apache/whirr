@@ -21,8 +21,11 @@ package org.apache.whirr.service.hadoop;
 import static org.apache.whirr.RolePredicates.role;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Functions;
+import com.google.common.collect.Iterables;
 
 import java.io.IOException;
+import java.util.Set;
 
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.Configuration;
@@ -31,6 +34,8 @@ import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.whirr.Cluster;
 import org.apache.whirr.Cluster.Instance;
 import org.apache.whirr.ClusterSpec;
+import org.jclouds.compute.domain.Hardware;
+import org.jclouds.compute.domain.Processor;
 import org.jclouds.scriptbuilder.domain.Statement;
 
 public class HadoopConfigurationBuilder {
@@ -87,18 +92,46 @@ public class HadoopConfigurationBuilder {
       Cluster cluster, Configuration defaults) throws ConfigurationException {
     return build(clusterSpec, cluster, defaults, "hadoop-hdfs");
   }
-
+  
   @VisibleForTesting
   static Configuration buildMapReduceConfiguration(ClusterSpec clusterSpec,
       Cluster cluster, Configuration defaults) throws ConfigurationException, IOException {
     Configuration config = build(clusterSpec, cluster, defaults,
         "hadoop-mapreduce");
+    
+    Set<Instance> taskTrackers = cluster
+      .getInstancesMatching(role(HadoopTaskTrackerClusterActionHandler.ROLE));
+    
+    if (!taskTrackers.isEmpty()) {
+      
+      Hardware hardware = Iterables.getFirst(taskTrackers, null)
+        .getNodeMetadata().getHardware();
+      int coresPerNode = 0;
+      for (Processor processor : hardware.getProcessors()) {
+        coresPerNode += processor.getCores();
+      }
+      int mapTasksPerNode = (int) Math.ceil(coresPerNode * 1.0);
+      int reduceTasksPerNode = (int) Math.ceil(coresPerNode * 0.75);
+      
+      setIfAbsent(config, "mapred.tasktracker.map.tasks.maximum", mapTasksPerNode + "");
+      setIfAbsent(config, "mapred.tasktracker.reduce.tasks.maximum", reduceTasksPerNode + "");
+  
+      int clusterReduceSlots = taskTrackers.size() * reduceTasksPerNode;
+      setIfAbsent(config, "mapred.reduce.tasks", clusterReduceSlots + "");
+      
+    }
 
     Instance jobtracker = cluster
         .getInstanceMatching(role(HadoopJobTrackerClusterActionHandler.ROLE));
     config.setProperty("mapred.job.tracker", String.format("%s:8021",
         jobtracker.getPublicAddress().getHostName()));
     return config;
+  }
+  
+  private static void setIfAbsent(Configuration config, String property, String value) {
+    if (!config.containsKey(property)) {
+      config.setProperty(property, value);
+    }
   }
 
 }

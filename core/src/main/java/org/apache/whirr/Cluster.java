@@ -34,6 +34,7 @@ import java.util.Set;
 
 import org.apache.whirr.Cluster.Instance;
 import org.apache.whirr.util.DnsUtil;
+import org.jclouds.compute.domain.NodeMetadata;
 import org.jclouds.domain.Credentials;
 
 /**
@@ -55,9 +56,10 @@ public class Cluster {
     private final String privateIp;
     private String privateHostName;
     private final String id;
+    private final NodeMetadata nodeMetadata;
 
     public Instance(Credentials loginCredentials, Set<String> roles, String publicIp,
-        String privateIp, String id) {
+        String privateIp, String id, NodeMetadata nodeMetadata) {
       this.loginCredentials = checkNotNull(loginCredentials, "loginCredentials");
       this.roles = checkNotNull(roles, "roles");
       this.publicIp = checkNotNull(publicIp, "publicIp");
@@ -67,6 +69,7 @@ public class Cluster {
       checkArgument(InetAddresses.isInetAddress(privateIp),
           "invalid IP address: %s", privateIp);
       this.id = checkNotNull(id, "id");
+      this.nodeMetadata = nodeMetadata;
     }
 
     public Credentials getLoginCredentials() {
@@ -116,12 +119,17 @@ public class Cluster {
       return id;
     }
     
+    public NodeMetadata getNodeMetadata() {
+      return nodeMetadata;
+    }
+    
     public String toString() {
       return Objects.toStringHelper(this)
         .add("roles", roles)
         .add("publicIp", publicIp)
         .add("privateIp", privateIp)
         .add("id", id)
+        .add("nodeMetadata", nodeMetadata)
         .toString();
     }
     

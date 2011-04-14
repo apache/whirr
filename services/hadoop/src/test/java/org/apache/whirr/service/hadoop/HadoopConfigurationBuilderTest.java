@@ -20,9 +20,17 @@ package org.apache.whirr.service.hadoop;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import com.google.common.collect.Iterators;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.PropertiesConfiguration;
@@ -31,6 +39,11 @@ import org.apache.whirr.Cluster.Instance;
 import org.apache.whirr.ClusterSpec;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
+import org.jclouds.compute.domain.Hardware;
+import org.jclouds.compute.domain.NodeMetadata;
+import org.jclouds.compute.domain.Processor;
+import org.jclouds.compute.domain.Volume;
+import org.jclouds.compute.domain.internal.HardwareImpl;
 import org.jclouds.domain.Credentials;
 import org.junit.Before;
 import org.junit.Test;
@@ -71,11 +84,31 @@ public class HadoopConfigurationBuilderTest {
     defaults.addProperty("hadoop-mapreduce.p1", "mapred1");
 
     clusterSpec = ClusterSpec.withTemporaryKeys();
+    cluster = newCluster(1);
+  }
+  
+  private Cluster newCluster(int numberOfWorkers) {
+    NodeMetadata node = mock(NodeMetadata.class);
+    List<Processor> processors = Lists.newArrayList(new Processor(4, 1.0));
+    Hardware hardware = new HardwareImpl(null, null, "id", null, null,
+        Maps.<String,String>newHashMap(), processors, 1024,
+        Lists.<Volume>newArrayList(), null);
+    when(node.getHardware()).thenReturn(hardware);
+    
+    Set<Instance> instances = Sets.newLinkedHashSet();
     Instance master = new Instance(new Credentials("", ""),
         Sets.newHashSet(HadoopNameNodeClusterActionHandler.ROLE,
             HadoopJobTrackerClusterActionHandler.ROLE),
-            "10.0.0.1", "10.0.0.1", "id");
-    cluster = new Cluster(Sets.newHashSet(master));
+            "10.0.0.1", "10.0.0.1", "1", node);
+    instances.add(master);
+    for (int i = 0; i < numberOfWorkers; i++) {
+      int id = i + 2;
+      instances.add(new Instance(new Credentials("", ""),
+          Sets.newHashSet(HadoopDataNodeClusterActionHandler.ROLE,
+              HadoopTaskTrackerClusterActionHandler.ROLE),
+              "10.0.0." + id, "10.0.0." + id, id + "", node));
+    }
+    return new Cluster(instances);
   }
 
   @Test
@@ -114,11 +147,25 @@ public class HadoopConfigurationBuilderTest {
 
   @Test
   public void testMapReduce() throws Exception {
+    Cluster cluster = newCluster(5);
     Configuration conf = HadoopConfigurationBuilder
-        .buildMapReduceConfiguration(clusterSpec, cluster, defaults);
-    assertThat(Iterators.size(conf.getKeys()), is(2));
+      .buildMapReduceConfiguration(clusterSpec, cluster, defaults);
     assertThat(conf.getString("p1"), is("mapred1"));
     assertThat(conf.getString("mapred.job.tracker"), matches(".+:8021"));
+    assertThat(conf.getString("mapred.tasktracker.map.tasks.maximum"), is("4"));
+    assertThat(conf.getString("mapred.tasktracker.reduce.tasks.maximum"), is("3"));
+    assertThat(conf.getString("mapred.reduce.tasks"), is("15"));
   }
+  
+  @Test
+  public void testOverridesNumberOfReducers() throws Exception {
+    Configuration overrides = new PropertiesConfiguration();
+    overrides.addProperty("hadoop-mapreduce.mapred.reduce.tasks", "7");
+    clusterSpec = ClusterSpec.withNoDefaults(overrides);
+    Configuration conf = HadoopConfigurationBuilder.buildMapReduceConfiguration(
+        clusterSpec, cluster, defaults);
+    assertThat(conf.getString("mapred.reduce.tasks"), is("7"));
+  }
+
 
 }
