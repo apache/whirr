@@ -1,6 +1,10 @@
 h1. Getting Started with Whirr
 
-The Whirr CLI provides the most convenient way to launch clusters.
+The Whirr CLI provides the most convenient way to launch clusters. For the
+programmatic interface, see the [javadoc|apidocs/index.html].
+
+Also see [Whirr in 5 Minutes|whirr-in-5-minutes] for the condensed instructions
+for getting started (with ZooKeeper as the example).
 
 h3. Pre-requisites
 * Java 6

@@ -66,7 +66,8 @@
       <item name="License" href="license.html" />
     </menu>
 
-    <menu name="Java Documentation">
+    <menu name="Documentation">
+      <item name="Whirr in 5 Minutes" href="whirr-in-5-minutes.html"/>
       <item name="Quick Start Guide" href="quick-start-guide.html"/>
       <item name="Configuration Guide" href="configuration-guide.html"/>
       <item name="API Guide" href="api-guide.html"/>
