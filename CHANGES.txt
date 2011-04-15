@@ -35,6 +35,8 @@ Trunk (unreleased changes)
 
     WHIRR-284. Runurl should only be installed when needed (tomwhite via asavu)
 
+    WHIRR-283. Whirr in 5 minutes. (tomwhite)
+
   BUG FIXES
 
     WHIRR-253. ZooKeeper service should only authorize ingress to ZooKeeper 
