@@ -33,6 +33,8 @@ Trunk (unreleased changes)
 
     WHIRR-282. Set number of Hadoop slots based on hardware (tomwhite via asavu)
 
+    WHIRR-284. Runurl should only be installed when needed (tomwhite via asavu)
+
   BUG FIXES
 
     WHIRR-253. ZooKeeper service should only authorize ingress to ZooKeeper 
