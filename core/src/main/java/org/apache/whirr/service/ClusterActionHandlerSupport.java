@@ -18,7 +18,10 @@
 
 package org.apache.whirr.service;
 
+import java.io.File;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.Configuration;
@@ -26,6 +29,7 @@ import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.whirr.ClusterSpec;
 import org.apache.whirr.service.jclouds.RunUrlStatement;
+import org.apache.whirr.util.BlobCache;
 import org.jclouds.scriptbuilder.domain.Statement;
 
 /**
@@ -128,4 +132,29 @@ public abstract class ClusterActionHandlerSupport extends ClusterActionHandler {
   public static void addStatement(ClusterActionEvent event, Statement statement) {
     event.getStatementBuilder().addStatement(statement);
   }
+
+  /**
+   * Prepare the file url for the remote machine. For public urls this function
+   * does nothing. For local urls it uploads the files to a temporary blob cache.
+   */
+  public String prepareRemoteFileUrl(ClusterActionEvent event, String rawUrl)
+      throws IOException {
+    if (rawUrl != null && rawUrl.startsWith("file://")) {
+      try {
+        URI uri = new URI(rawUrl);
+
+        BlobCache cache = BlobCache.getInstance(event.getClusterSpec());
+        cache.putIfAbsent(uri);
+
+        String basePath = "/tmp/whirr/cache/files/";
+        addStatement(event, cache.getAsSaveToStatement(basePath, uri));
+        return "file://" + basePath + (new File(uri)).getName();
+
+      } catch (URISyntaxException e) {
+        throw new IOException(e);
+      }
+    }
+    return rawUrl;
+  }
+
 }

@@ -10,6 +10,8 @@ Trunk (unreleased changes)
 
     WHIRR-237. Add Voldemort as a service. (Kirk True via asavu)
 
+    WHIRR-220. Support local tarball upload (asavu)
+
   IMPROVEMENTS
 
     WHIRR-262. Services should not have to do reverse DNS lookups. (tomwhite)

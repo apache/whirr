@@ -19,6 +19,7 @@
 package org.apache.whirr.service.hbase;
 
 import static org.apache.whirr.RolePredicates.role;
+import static org.apache.whirr.service.FirewallManager.Rule;
 import static org.jclouds.scriptbuilder.domain.Statements.call;
 
 import com.google.common.base.Charsets;
@@ -35,11 +36,8 @@ import org.apache.whirr.Cluster;
 import org.apache.whirr.Cluster.Instance;
 import org.apache.whirr.ClusterSpec;
 import org.apache.whirr.service.ClusterActionEvent;
-import org.apache.whirr.service.ComputeServiceContextBuilder;
 import org.apache.whirr.service.hadoop.HadoopProxy;
-import org.apache.whirr.service.jclouds.FirewallSettings;
 import org.apache.whirr.service.zookeeper.ZooKeeperCluster;
-import org.jclouds.compute.ComputeServiceContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,14 +59,18 @@ public class HBaseMasterClusterActionHandler extends HBaseClusterActionHandler {
   @Override
   protected void beforeBootstrap(ClusterActionEvent event) throws IOException {
     ClusterSpec clusterSpec = event.getClusterSpec();    
+
     addStatement(event, call("configure_hostnames",
       HBaseConstants.PARAM_PROVIDER, clusterSpec.getProvider()));
     addStatement(event, call("install_java"));
     addStatement(event, call("install_tarball"));
+
     String hbaseInstallFunction = getConfiguration(clusterSpec).getString(
       HBaseConstants.KEY_INSTALL_FUNCTION, HBaseConstants.FUNCTION_INSTALL);
-    String tarurl = getConfiguration(clusterSpec).getString(
-      HBaseConstants.KEY_TARBALL_URL);
+
+    String tarurl = prepareRemoteFileUrl(event,
+      getConfiguration(clusterSpec).getString(HBaseConstants.KEY_TARBALL_URL));
+
     addStatement(event, call(hbaseInstallFunction,
       HBaseConstants.PARAM_PROVIDER, clusterSpec.getProvider(),
       HBaseConstants.PARAM_TARBALL_URL, tarurl));
@@ -83,19 +85,21 @@ public class HBaseMasterClusterActionHandler extends HBaseClusterActionHandler {
     Instance instance = cluster.getInstanceMatching(role(ROLE));
     InetAddress masterPublicAddress = instance.getPublicAddress();
 
-    ComputeServiceContext computeServiceContext =
-      ComputeServiceContextBuilder.build(clusterSpec);
-    FirewallSettings.authorizeIngress(computeServiceContext, instance, clusterSpec,
-      MASTER_WEB_UI_PORT);
-    FirewallSettings.authorizeIngress(computeServiceContext, instance, clusterSpec,
-      MASTER_PORT);
+    event.getFirewallManager().addRules(
+      Rule.create()
+        .destination(instance)
+        .ports(MASTER_WEB_UI_PORT, MASTER_PORT)
+    );
 
     String hbaseConfigureFunction = getConfiguration(clusterSpec).getString(
       HBaseConstants.KEY_CONFIGURE_FUNCTION, HBaseConstants.FUNCTION_POST_CONFIGURE);
+
     String master = masterPublicAddress.getHostName();
     String quorum = ZooKeeperCluster.getHosts(cluster);
-    String tarurl = getConfiguration(clusterSpec).getString(
-      HBaseConstants.KEY_TARBALL_URL);  
+
+    String tarurl = prepareRemoteFileUrl(event,
+      getConfiguration(clusterSpec).getString(HBaseConstants.KEY_TARBALL_URL));
+
     addStatement(event, call(hbaseConfigureFunction, ROLE,
       HBaseConstants.PARAM_MASTER, master,
       HBaseConstants.PARAM_QUORUM, quorum,

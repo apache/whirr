@@ -44,14 +44,21 @@ public abstract class HadoopClusterActionHandler extends ClusterActionHandlerSup
   @Override
   protected void beforeBootstrap(ClusterActionEvent event) throws IOException {
     ClusterSpec clusterSpec = event.getClusterSpec();
+
     Configuration conf = getConfiguration(clusterSpec);
     addStatement(event, call("configure_hostnames", "-c", clusterSpec.getProvider()));
-    String hadoopInstallFunction = conf.getString(
-        "whirr.hadoop-install-function", "install_hadoop");
+
     addStatement(event, call("install_java"));
     addStatement(event, call("install_tarball"));
-    String tarball = conf.getString("whirr.hadoop.tarball.url");
-    addStatement(event, call(hadoopInstallFunction, "-c", clusterSpec.getProvider(),
+
+    String hadoopInstallFunction = conf.getString(
+        "whirr.hadoop-install-function", "install_hadoop");
+
+    String tarball = prepareRemoteFileUrl(event,
+        conf.getString("whirr.hadoop.tarball.url"));
+
+    addStatement(event, call(hadoopInstallFunction,
+        "-c", clusterSpec.getProvider(),
         "-u", tarball));
   }
 }
