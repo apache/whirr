@@ -19,6 +19,7 @@
 package org.apache.whirr.service.elasticsearch;
 
 import static org.apache.whirr.RolePredicates.role;
+import static org.apache.whirr.service.FirewallManager.Rule;
 import static org.jclouds.scriptbuilder.domain.Statements.call;
 
 import java.io.IOException;
@@ -28,9 +29,6 @@ import org.apache.whirr.Cluster;
 import org.apache.whirr.ClusterSpec;
 import org.apache.whirr.service.ClusterActionEvent;
 import org.apache.whirr.service.ClusterActionHandlerSupport;
-import org.apache.whirr.service.ComputeServiceContextBuilder;
-import org.apache.whirr.service.jclouds.FirewallSettings;
-import org.jclouds.compute.ComputeServiceContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,13 +47,15 @@ public class ElasticSearchHandler extends ClusterActionHandlerSupport {
   }
 
   @Override
-  protected void beforeBootstrap(ClusterActionEvent event) {
+  protected void beforeBootstrap(ClusterActionEvent event) throws IOException {
     ClusterSpec spec = event.getClusterSpec();
     Configuration config = spec.getConfiguration();
 
     addStatement(event, call("install_java"));
-    addStatement(event, call("install_elasticsearch",
-        config.getString("whirr.elasticsearch.tarball.url", "")));
+
+    String tarurl = prepareRemoteFileUrl(event,
+        config.getString("whirr.elasticsearch.tarball.url", ""));
+    addStatement(event, call("install_elasticsearch", tarurl));
   }
 
   @Override
@@ -63,12 +63,11 @@ public class ElasticSearchHandler extends ClusterActionHandlerSupport {
     ClusterSpec spec = event.getClusterSpec();
     Cluster cluster = event.getCluster();
 
-    LOG.info("Authorizing firewall port {}", HTTP_CLIENT_PORT);
-    ComputeServiceContext computeServiceContext =
-      ComputeServiceContextBuilder.build(spec);
-
-    FirewallSettings.authorizeIngress(computeServiceContext,
-      cluster.getInstancesMatching(role(ROLE)), spec, HTTP_CLIENT_PORT);
+    event.getFirewallManager().addRule(
+      Rule.create()
+        .destination(cluster.getInstancesMatching(role(ROLE)))
+        .port(HTTP_CLIENT_PORT)
+    );
 
     Configuration config = ElasticSearchConfigurationBuilder.buildConfig(spec, cluster);
     addStatement(event,

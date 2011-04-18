@@ -59,10 +59,13 @@ public class ZooKeeperClusterActionHandler extends ClusterActionHandlerSupport {
   @Override
   protected void beforeBootstrap(ClusterActionEvent event) throws IOException {
     Configuration config = getConfiguration(event.getClusterSpec());
+
     addStatement(event, call("install_java"));
     addStatement(event, call("install_tarball"));
+
+    String tarurl = config.getString("whirr.zookeeper.tarball.url");
     addStatement(event, call("install_zookeeper",
-      config.getString("whirr.zookeeper.tarball.url")));
+      prepareRemoteFileUrl(event, tarurl)));
   }
 
   @Override

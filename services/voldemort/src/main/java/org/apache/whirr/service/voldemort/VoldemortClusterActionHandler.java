@@ -71,14 +71,14 @@ public class VoldemortClusterActionHandler extends ClusterActionHandlerSupport {
 
     if (tarUrl != null && !tarUrl.trim().isEmpty()) {
       optArgs.add(PARAM_TARBALL_URL);
-      optArgs.add(tarUrl);
+      optArgs.add(prepareRemoteFileUrl(event, tarUrl));
     }
 
     String confUrl = config.getString(KEY_CONF_URL);
 
     if (confUrl != null && !confUrl.trim().isEmpty()) {
       optArgs.add(PARAM_CONF_URL);
-      optArgs.add(confUrl);
+      optArgs.add(prepareRemoteFileUrl(event, confUrl));
     }
 
     addStatement(event, call("install_java"));

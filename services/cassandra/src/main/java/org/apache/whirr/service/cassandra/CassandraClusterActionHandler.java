@@ -18,6 +18,8 @@
 
 package org.apache.whirr.service.cassandra;
 
+import static org.apache.whirr.RolePredicates.role;
+import static org.apache.whirr.service.FirewallManager.Rule;
 import static org.jclouds.scriptbuilder.domain.Statements.call;
 
 import com.google.common.base.Function;
@@ -34,9 +36,6 @@ import org.apache.whirr.Cluster.Instance;
 import org.apache.whirr.ClusterSpec;
 import org.apache.whirr.service.ClusterActionEvent;
 import org.apache.whirr.service.ClusterActionHandlerSupport;
-import org.apache.whirr.service.ComputeServiceContextBuilder;
-import org.apache.whirr.service.jclouds.FirewallSettings;
-import org.jclouds.compute.ComputeServiceContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,7 +61,7 @@ public class CassandraClusterActionHandler extends ClusterActionHandlerSupport {
     addStatement(event, call("install_java"));
     addStatement(event, call("install_tarball"));
     Configuration config = event.getClusterSpec().getConfiguration();
-    String tarball = config.getString(BIN_TARBALL, null);
+    String tarball = prepareRemoteFileUrl(event, config.getString(BIN_TARBALL, null));
     String major = config.getString(MAJOR_VERSION, null);
     if (tarball != null && major != null) {
       addStatement(event, call("install_cassandra", major, tarball));
@@ -76,14 +75,13 @@ public class CassandraClusterActionHandler extends ClusterActionHandlerSupport {
       throws IOException, InterruptedException {
     ClusterSpec clusterSpec = event.getClusterSpec();
     Cluster cluster = event.getCluster();
-    LOG.info("Authorizing firewall");
-    ComputeServiceContext computeServiceContext =
-      ComputeServiceContextBuilder.build(clusterSpec);
-    FirewallSettings.authorizeIngress(computeServiceContext,
-        cluster.getInstances(), clusterSpec, CLIENT_PORT);
-    FirewallSettings.authorizeIngress(computeServiceContext,
-        cluster.getInstances(), clusterSpec, JMX_PORT);
-    
+
+    event.getFirewallManager().addRule(
+      Rule.create()
+        .destination(cluster.getInstancesMatching(role(CASSANDRA_ROLE)))
+        .ports(CLIENT_PORT, JMX_PORT)
+    );
+
     List<Instance> seeds = getSeeds(cluster.getInstances());
     String servers = Joiner.on(' ').join(getPrivateIps(seeds));
     addStatement(event, call("configure_cassandra", "-c",
@@ -105,7 +103,7 @@ public class CassandraClusterActionHandler extends ClusterActionHandlerSupport {
    * selection method. Right now it picks 20% of the nodes as seeds, or a
    * minimum of one node if it is a small cluster.
    * 
-   * @param nodes
+   * @param instances
    *          all nodes in cluster
    * @return list of seeds
    */

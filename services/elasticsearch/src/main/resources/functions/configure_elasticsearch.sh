@@ -15,7 +15,7 @@
 # limitations under the License.
 #
 function configure_elasticsearch() {
-    cd /usr/local/elasticsearch-0.15.2/
+    cd /usr/local/elasticsearch-*
 
     for plugin in $@
     do
