@@ -123,6 +123,8 @@ public class ClusterSpec {
     BLOBSTORE_IDENTITY(String.class, false, "The blob store identity"),
 
     BLOBSTORE_CREDENTIAL(String.class, false, "The blob store credential"),
+
+    BLOBSTORE_LOCATION_ID(String.class, false, "The blob store location ID"),
       
     IMAGE_ID(String.class, false, "The ID of the image to use for " + 
       "instances. If not specified then a vanilla Linux image is " + 
@@ -240,6 +242,8 @@ public class ClusterSpec {
   private String publicKey;
 
   private String locationId;
+  private String blobStoreLocationId;
+
   private String imageId;
 
   private String hardwareId;
@@ -295,6 +299,7 @@ public class ClusterSpec {
     setHardwareMinRam(getInt(Property.HARDWARE_MIN_RAM, 1024));
 
     setLocationId(getString(Property.LOCATION_ID));
+    setBlobStoreLocationId(getString(Property.BLOBSTORE_LOCATION_ID));
     setClientCidrs(getList(Property.CLIENT_CIDRS));
 
     setVersion(getString(Property.VERSION));
@@ -438,6 +443,10 @@ public class ClusterSpec {
     return blobStoreCredential;
   }
 
+  public String getBlobStoreLocationId() {
+    return blobStoreLocationId;
+  }
+
   public String getServiceName() {
     return serviceName;
   }
@@ -520,6 +529,10 @@ public class ClusterSpec {
 
   public void setBlobStoreCredential(String credential) {
     blobStoreCredential = credential;
+  }
+
+  public void setBlobStoreLocationId(String locationId) {
+    blobStoreLocationId = locationId;
   }
 
   public void setClusterName(String clusterName) {
@@ -675,6 +688,7 @@ public class ClusterSpec {
         && Objects.equal(hardwareId, that.hardwareId)
         && Objects.equal(hardwareMinRam, that.hardwareMinRam)
         && Objects.equal(locationId, that.locationId)
+        && Objects.equal(blobStoreLocationId, that.blobStoreLocationId)
         && Objects.equal(clientCidrs, that.clientCidrs)
         && Objects.equal(version, that.version)
         ;
@@ -686,7 +700,7 @@ public class ClusterSpec {
     return Objects.hashCode(instanceTemplates, maxStartupRetries, provider,
       identity, credential, blobStoreProvider, blobStoreIdentity, blobStoreCredential,
       clusterName, serviceName, clusterUser, loginUser, publicKey, privateKey, imageId,
-      hardwareId, locationId, clientCidrs, version, runUrlBase);
+      hardwareId, locationId, blobStoreLocationId, clientCidrs, version, runUrlBase);
   }
   
   public String toString() {
@@ -709,6 +723,7 @@ public class ClusterSpec {
       .add("instanceSizeId", hardwareId)
       .add("instanceMinRam", hardwareMinRam)
       .add("locationId", locationId)
+      .add("blobStoreLocationId", blobStoreLocationId)
       .add("clientCidrs", clientCidrs)
       .add("version", version)
       .toString();
