@@ -111,7 +111,7 @@ public abstract class ClusterActionHandlerSupport extends ClusterActionHandler {
     } catch(ConfigurationException e) {
       throw new IOException("Error loading " + defaultsPropertiesFile, e);
     }
-  }
+ }
   
   /**
    * A convenience method for adding a {@link RunUrlStatement} to a

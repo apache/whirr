@@ -39,6 +39,9 @@ Trunk (unreleased changes)
 
     WHIRR-279. Create ClusterSpec aware BlobStoreContext factory class (asavu)
 
+    WHIRR-280. Create a blob cache that could be used for storing local 
+    files (asavu)
+
   BUG FIXES
 
     WHIRR-253. ZooKeeper service should only authorize ingress to ZooKeeper 
