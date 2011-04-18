@@ -62,6 +62,10 @@
       <artifactId>cloudservers-uk</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.jclouds</groupId>
+      <artifactId>jclouds-allblobstore</artifactId>
+    </dependency>
+    <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
     </dependency>

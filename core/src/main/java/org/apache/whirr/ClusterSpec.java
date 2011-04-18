@@ -25,6 +25,7 @@ import static org.apache.whirr.util.KeyPair.sameKeyPair;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Objects;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
@@ -70,8 +71,18 @@ public class ClusterSpec {
   }
   
   public enum Property {
+    CLUSTER_NAME(String.class, false,  "The name of the cluster " +
+      "to operate on. E.g. hadoopcluster."),
+
     SERVICE_NAME(String.class, false, "(optional) The name of the " +
       "service to use. E.g. hadoop."),
+
+    LOGIN_USER(String.class, false,  "Override the default login user "+
+      "used to bootstrap whirr. E.g. ubuntu or myuser:mypass."),
+
+    CLUSTER_USER(String.class, false, "The name of the user that Whirr " +
+            "will create on all the cluster instances. You have to use " +
+            "this user to login to nodes."),
 
     INSTANCE_TEMPLATES(String.class, false, "The number of instances " +
       "to launch for each set of roles. E.g. 1 hadoop-namenode+" +
@@ -99,15 +110,19 @@ public class ClusterSpec {
     CREDENTIAL(String.class, false, "The cloud credential."),
     
     IDENTITY(String.class, false, "The cloud identity."),
-    
-    CLUSTER_NAME(String.class, false,  "The name of the cluster " + 
-      "to operate on. E.g. hadoopcluster."),
-      
+
     PUBLIC_KEY_FILE(String.class, false, "The filename of the public " +
       "key used to connect to instances."),
       
     PRIVATE_KEY_FILE(String.class, false, "The filename of the " + 
       "private RSA key used to connect to instances."),
+
+    BLOBSTORE_PROVIDER(String.class, false, "The blob store provider. " +
+      "E.g. aws-s3, cloudfiles-us, cloudfiles-uk"),
+
+    BLOBSTORE_IDENTITY(String.class, false, "The blob store identity"),
+
+    BLOBSTORE_CREDENTIAL(String.class, false, "The blob store credential"),
       
     IMAGE_ID(String.class, false, "The ID of the image to use for " + 
       "instances. If not specified then a vanilla Linux image is " + 
@@ -122,21 +137,14 @@ public class ClusterSpec {
     LOCATION_ID(String.class, false, "The location to launch " + 
       "instances in. If not specified then an arbitrary location " + 
       "will be chosen."),
-      
-    CLIENT_CIDRS(String.class, true, "A comma-separated list of CIDR" + 
+
+    CLIENT_CIDRS(String.class, true, "A comma-separated list of CIDR" +
       " blocks. E.g. 208.128.0.0/11,108.128.0.0/11"),
       
     VERSION(String.class, false, ""),
     
     RUN_URL_BASE(String.class, false, "The base URL for forming run " + 
-      "urls from. Change this to host your own set of launch scripts."),
-    
-    LOGIN_USER(String.class, false,  "Override the default login user "+
-      "used to bootstrap whirr. E.g. ubuntu or myuser:mypass."),
-
-    CLUSTER_USER(String.class, false, "The name of the user that Whirr " +
-            "will create on all the cluster instances. You have to use " +
-            "this user to login to nodes.");
+      "urls from. Change this to host your own set of launch scripts.");
     
     private Class<?> type;
     private boolean multipleArguments;
@@ -223,6 +231,10 @@ public class ClusterSpec {
   private String identity;
   private String credential;
 
+  private String blobStoreProvider;
+  private String blobStoreIdentity;
+  private String blobStoreCredential;
+
   private String privateKey;
   private File privateKeyFile;
   private String publicKey;
@@ -271,6 +283,10 @@ public class ClusterSpec {
     setProvider(getString(Property.PROVIDER));
     setIdentity(getString(Property.IDENTITY));
     setCredential(getString(Property.CREDENTIAL));
+
+    setBlobStoreProvider(getString(Property.BLOBSTORE_PROVIDER));
+    setBlobStoreIdentity(getString(Property.BLOBSTORE_IDENTITY));
+    setBlobStoreCredential(getString(Property.BLOBSTORE_CREDENTIAL));
 
     checkAndSetKeyPair();
 
@@ -382,6 +398,46 @@ public class ClusterSpec {
     return clusterName;
   }
 
+  public String getBlobStoreProvider() {
+    if (blobStoreProvider == null) {
+      return getDefaultBlobStoreForComputeProvider();
+    }
+    return blobStoreProvider;
+  }
+
+  /**
+   * Probably jclouds should provide a similar mechanism
+   */
+  private String getDefaultBlobStoreForComputeProvider() {
+    Map<String, String> mappings = Maps.newHashMap();
+
+    mappings.put("ec2","aws-s3");
+    mappings.put("aws-ec2", "aws-s3");
+
+    mappings.put("cloudservers", "cloudfiles-us");
+    mappings.put("cloudservers-us", "cloudfiles-us");
+    mappings.put("cloudservers-uk", "cloudfiles-uk");
+
+    if (!mappings.containsKey(provider)) {
+      return null;
+    }
+    return mappings.get(provider);
+  }
+
+  public String getBlobStoreIdentity() {
+    if (blobStoreIdentity == null) {
+      return identity;
+    }
+    return blobStoreIdentity;
+  }
+
+  public String getBlobStoreCredential() {
+    if (blobStoreCredential == null) {
+      return credential;
+    }
+    return blobStoreCredential;
+  }
+
   public String getServiceName() {
     return serviceName;
   }
@@ -452,6 +508,18 @@ public class ClusterSpec {
 
   public void setCredential(String credential) {
     this.credential = credential;
+  }
+
+  public void setBlobStoreProvider(String provider) {
+    blobStoreProvider = provider;
+  }
+
+  public void setBlobStoreIdentity(String identity) {
+    blobStoreIdentity = identity;
+  }
+
+  public void setBlobStoreCredential(String credential) {
+    blobStoreCredential = credential;
   }
 
   public void setClusterName(String clusterName) {
@@ -596,6 +664,9 @@ public class ClusterSpec {
         && Objects.equal(provider, that.provider)
         && Objects.equal(identity, that.identity)
         && Objects.equal(credential, that.credential)
+        && Objects.equal(blobStoreProvider, that.blobStoreProvider)
+        && Objects.equal(blobStoreIdentity, that.blobStoreIdentity)
+        && Objects.equal(blobStoreCredential, that.blobStoreCredential)
         && Objects.equal(clusterName, that.clusterName)
         && Objects.equal(serviceName, that.serviceName)
         && Objects.equal(clusterUser, that.clusterUser)
@@ -613,9 +684,9 @@ public class ClusterSpec {
   
   public int hashCode() {
     return Objects.hashCode(instanceTemplates, maxStartupRetries, provider,
-      identity, credential, clusterName, serviceName, clusterUser, loginUser,
-      publicKey, privateKey, imageId, hardwareId, locationId, clientCidrs,
-      version, runUrlBase);
+      identity, credential, blobStoreProvider, blobStoreIdentity, blobStoreCredential,
+      clusterName, serviceName, clusterUser, loginUser, publicKey, privateKey, imageId,
+      hardwareId, locationId, clientCidrs, version, runUrlBase);
   }
   
   public String toString() {
@@ -625,6 +696,9 @@ public class ClusterSpec {
       .add("provider", provider)
       .add("identity", identity)
       .add("credential", credential)
+      .add("blobStoreProvider", blobStoreProvider)
+      .add("blobStoreCredential", blobStoreCredential)
+      .add("blobStoreIdentity", blobStoreIdentity)
       .add("clusterName", clusterName)
       .add("serviceName", serviceName)
       .add("clusterUser", clusterUser)
