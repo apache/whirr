@@ -37,6 +37,8 @@ Trunk (unreleased changes)
 
     WHIRR-283. Whirr in 5 minutes. (tomwhite)
 
+    WHIRR-279. Create ClusterSpec aware BlobStoreContext factory class (asavu)
+
   BUG FIXES
 
     WHIRR-253. ZooKeeper service should only authorize ingress to ZooKeeper 

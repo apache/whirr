@@ -292,4 +292,23 @@ public class ClusterSpecTest {
     assertThat(spec.getClusterUser(), is(System.getProperty("user.name")));
   }
 
+  @Test
+  public void testDefaultBlobStoreforComputeProvider() throws Exception {
+    for(String pair : new String[]{
+          "ec2:aws-s3",
+          "aws-ec2:aws-s3",
+          "cloudservers:cloudfiles-us",
+          "cloudservers-us:cloudfiles-us",
+          "cloudservers-uk:cloudfiles-uk"
+      }) {
+      String[] parts = pair.split(":");
+
+      Configuration config = new PropertiesConfiguration();
+      config.addProperty("whirr.provider", parts[0]);
+
+      ClusterSpec spec = ClusterSpec.withTemporaryKeys(config);
+      assertThat(spec.getBlobStoreProvider(), is(parts[1]));
+    }
+  }
+
 }

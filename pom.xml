@@ -96,6 +96,12 @@
         <artifactId>cloudservers-uk</artifactId>
         <version>${jclouds.version}</version>
       </dependency>
+      <!-- All cloud blob store providers are supported by default -->
+      <dependency>
+        <groupId>org.jclouds</groupId>
+        <artifactId>jclouds-allblobstore</artifactId>
+        <version>${jclouds.version}</version>
+      </dependency>
       <!-- End supported cloud providers. -->
       <dependency>
         <groupId>junit</groupId>
