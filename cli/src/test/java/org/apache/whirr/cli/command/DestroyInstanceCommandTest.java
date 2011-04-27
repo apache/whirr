@@ -79,7 +79,7 @@ public class DestroyInstanceCommandTest {
     when(factory.create((String) any())).thenReturn(controller);
 
     DestroyInstanceCommand command = new DestroyInstanceCommand(factory);
-        Map<String, File> keys = KeyPair.generateTemporaryFiles();
+    Map<String, File> keys = KeyPair.generateTemporaryFiles();
 
     int rc = command.run(null, out, null, Lists.newArrayList(
         "--instance-id", "region/instanceid",

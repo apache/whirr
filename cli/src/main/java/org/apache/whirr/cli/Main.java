@@ -24,6 +24,7 @@ import org.apache.whirr.cli.command.DestroyClusterCommand;
 import org.apache.whirr.cli.command.DestroyInstanceCommand;
 import org.apache.whirr.cli.command.LaunchClusterCommand;
 import org.apache.whirr.cli.command.ListClusterCommand;
+import org.apache.whirr.cli.command.RunScriptCommand;
 import org.apache.whirr.cli.command.VersionCommand;
 import org.apache.whirr.service.ClusterActionHandler;
 
@@ -99,7 +100,8 @@ public class Main {
         new LaunchClusterCommand(),
         new DestroyClusterCommand(),
         new DestroyInstanceCommand(),
-        new ListClusterCommand()
+        new ListClusterCommand(),
+        new RunScriptCommand()
     );
     int rc = main.run(System.in, System.out, System.err, Arrays.asList(args));
     System.exit(rc);

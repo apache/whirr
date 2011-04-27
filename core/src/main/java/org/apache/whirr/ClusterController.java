@@ -21,6 +21,7 @@ package org.apache.whirr;
 import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
 import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
 import com.google.common.io.Files;
 
 import java.io.File;
@@ -35,12 +36,19 @@ import org.apache.whirr.actions.DestroyClusterAction;
 import org.apache.whirr.service.ClusterActionHandler;
 import org.apache.whirr.service.ComputeServiceContextBuilder;
 import org.jclouds.compute.ComputeService;
+import org.jclouds.compute.ComputeServiceContext;
 import org.jclouds.compute.ComputeServiceContextFactory;
+import org.jclouds.compute.RunScriptOnNodesException;
 import org.jclouds.compute.domain.ComputeMetadata;
+import org.jclouds.compute.domain.ExecResponse;
 import org.jclouds.compute.domain.NodeMetadata;
 import org.jclouds.compute.domain.NodeState;
+import org.jclouds.domain.Credentials;
+import org.jclouds.scriptbuilder.domain.Statement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static org.jclouds.compute.options.RunScriptOptions.Builder.overrideCredentialsWith;
 
 /**
  * This class is used to start and stop clusters.
@@ -109,6 +117,7 @@ public class ClusterController {
   
   /**
    * Stop the cluster and destroy all resources associated with it.
+   *
    * @throws IOException if there is a problem while stopping the cluster. The
    * cluster may or may not have been stopped.
    * @throws InterruptedException if the thread is interrupted.
@@ -128,6 +137,20 @@ public class ClusterController {
     computeService.destroyNode(instanceId);
 
     LOG.info("Instance {} destroyed", instanceId);
+  }
+
+  public Map<? extends NodeMetadata, ExecResponse> runScriptOnNodesMatching(ClusterSpec spec,
+        Predicate<NodeMetadata> condition, Statement statement) throws IOException, RunScriptOnNodesException {
+
+    Credentials credentials = new Credentials(spec.getClusterUser(), spec.getPrivateKey());
+    ComputeServiceContext context = ComputeServiceContextBuilder.build(spec);
+    try {
+      condition = Predicates.and(runningInGroup(spec.getClusterName()), condition);
+      return context.getComputeService().runScriptOnNodesMatching(condition,
+        statement, overrideCredentialsWith(credentials).wrapInInitScript(false).runAsRoot(false));
+    } finally {
+      context.close();
+    }
   }
   
   public Set<? extends NodeMetadata> getNodes(ClusterSpec clusterSpec)

@@ -46,6 +46,8 @@ Trunk (unreleased changes)
     WHIRR-280. Create a blob cache that could be used for storing local 
     files (asavu)
 
+    WHIRR-173. Add ClusterAction for generic script execution (asavu)
+
   BUG FIXES
 
     WHIRR-253. ZooKeeper service should only authorize ingress to ZooKeeper 
