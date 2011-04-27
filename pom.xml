@@ -70,6 +70,11 @@
         <version>${jclouds.version}</version>
       </dependency>
       <dependency>
+        <groupId>org.jclouds.api</groupId>
+        <artifactId>byon</artifactId>
+        <version>${jclouds.version}</version>
+      </dependency>
+      <dependency>
         <groupId>org.jclouds.driver</groupId>
         <artifactId>jclouds-jsch</artifactId>
         <version>${jclouds.version}</version>

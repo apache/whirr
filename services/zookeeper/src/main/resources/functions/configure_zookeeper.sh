@@ -34,8 +34,11 @@ function configure_zookeeper() {
     ec2 | aws-ec2 )
       SELF_HOST=`wget -q -O - http://169.254.169.254/latest/meta-data/local-ipv4`
       ;;
-    *)
+    cloudservers-uk | cloudservers-us)
       SELF_HOST=`/sbin/ifconfig eth1 | grep 'inet addr:' | cut -d: -f2 | awk '{ print $1}'`
+      ;;
+    *)
+      SELF_HOST=`/sbin/ifconfig eth0 | grep 'inet addr:' | cut -d: -f2 | awk '{ print $1}'`
       ;;
   esac
   
