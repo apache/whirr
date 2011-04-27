@@ -27,6 +27,7 @@ import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.whirr.Cluster;
 import org.apache.whirr.ClusterController;
+import org.apache.whirr.ClusterControllerFactory;
 import org.apache.whirr.ClusterSpec;
 import org.apache.whirr.service.zookeeper.ZooKeeperCluster;
 import org.apache.zookeeper.CreateMode;
@@ -54,7 +55,7 @@ public class ZooKeeperServiceTest {
     }
     config.addConfiguration(new PropertiesConfiguration("whirr-zookeeper-test.properties"));
     clusterSpec = ClusterSpec.withTemporaryKeys(config);
-    controller = new ClusterController();
+    controller = new ClusterControllerFactory().create(clusterSpec.getServiceName());
     
     cluster = controller.launchCluster(clusterSpec);
     hosts = ZooKeeperCluster.getHosts(cluster);

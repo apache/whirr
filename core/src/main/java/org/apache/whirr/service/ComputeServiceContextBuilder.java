@@ -50,6 +50,12 @@ public class ComputeServiceContextBuilder {
   public static ComputeServiceContext build(final ComputeServiceContextFactory factory, final ClusterSpec spec) throws IOException {
     Configuration jcloudsConfig =
       spec.getConfigurationForKeysWithPrefix("jclouds");
+
+    // jclouds byon.endpoint property does not follow convention of starting
+    // with "jclouds." prefix, so we special case it here
+    if (jcloudsConfig.containsKey("jclouds.byon.endpoint")) {
+      jcloudsConfig.setProperty("byon.endpoint", jcloudsConfig.getProperty("jclouds.byon.endpoint"));
+    }
     Set<AbstractModule> wiring = ImmutableSet.of(new JschSshClientModule(),
       new Log4JLoggingModule(), new BindLoginCredentialsPatchForEC2());
     if (spec.getProvider().equals("ec2")){

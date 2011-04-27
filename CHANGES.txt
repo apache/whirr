@@ -12,6 +12,8 @@ Trunk (unreleased changes)
 
     WHIRR-220. Support local tarball upload (asavu)
 
+    WHIRR-285. Add support for BYON. (tomwhite)
+
   IMPROVEMENTS
 
     WHIRR-262. Services should not have to do reverse DNS lookups. (tomwhite)
