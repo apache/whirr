@@ -22,7 +22,6 @@ import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import com.jcraft.jsch.JSchException;
 import org.apache.whirr.Cluster;
 import org.apache.whirr.ClusterController;
 import org.apache.whirr.ClusterControllerFactory;
@@ -51,7 +50,6 @@ import static org.hamcrest.Matchers.is;
 import static org.jclouds.compute.predicates.NodePredicates.withIds;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 

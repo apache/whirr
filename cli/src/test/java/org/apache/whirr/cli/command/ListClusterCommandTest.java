@@ -18,6 +18,7 @@
 
 package org.apache.whirr.cli.command;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
@@ -35,14 +36,19 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.whirr.Cluster;
 import org.apache.whirr.ClusterController;
 import org.apache.whirr.ClusterControllerFactory;
 import org.apache.whirr.ClusterSpec;
+import org.apache.whirr.cli.MemoryClusterStateStore;
+import org.apache.whirr.service.ClusterStateStore;
+import org.apache.whirr.service.ClusterStateStoreFactory;
 import org.apache.whirr.util.KeyPair;
 import org.hamcrest.Matcher;
 import org.jclouds.compute.domain.NodeMetadata;
 import org.jclouds.compute.domain.NodeMetadataBuilder;
 import org.jclouds.compute.domain.NodeState;
+import org.jclouds.domain.Credentials;
 import org.jclouds.domain.LocationBuilder;
 import org.jclouds.domain.LocationScope;
 import org.junit.Before;
@@ -63,7 +69,7 @@ public class ListClusterCommandTest {
     errBytes = new ByteArrayOutputStream();
     err = new PrintStream(errBytes);
   }
-  
+
   @Test
   public void testInsufficientOptions() throws Exception {
     ListClusterCommand command = new ListClusterCommand();
@@ -71,33 +77,45 @@ public class ListClusterCommandTest {
     assertThat(rc, is(-1));
     assertThat(errBytes.toString(), containsUsageString());
   }
-  
+
   private Matcher<String> containsUsageString() {
     return StringContains.containsString("Usage: whirr list-cluster [OPTIONS]");
   }
-  
+
   @Test
   public void testAllOptions() throws Exception {
-    
+
     ClusterControllerFactory factory = mock(ClusterControllerFactory.class);
     ClusterController controller = mock(ClusterController.class);
     when(factory.create((String) any())).thenReturn(controller);
+
     NodeMetadata node1 = new NodeMetadataBuilder().name("name1").ids("id1")
         .location(new LocationBuilder().scope(LocationScope.PROVIDER)
           .id("location-id1").description("location-desc1").build())
         .imageId("image-id").state(NodeState.RUNNING)
-        .publicAddresses(Lists.newArrayList("100.0.0.1"))
-        .privateAddresses(Lists.newArrayList("10.0.0.1")).build();
+        .publicAddresses(Lists.newArrayList("127.0.0.1"))
+        .privateAddresses(Lists.newArrayList("127.0.0.1")).build();
+
     NodeMetadata node2 = new NodeMetadataBuilder().name("name2").ids("id2")
         .location(new LocationBuilder().scope(LocationScope.PROVIDER)
           .id("location-id2").description("location-desc2").build())
         .imageId("image-id").state(NodeState.RUNNING)
-        .publicAddresses(Lists.newArrayList("100.0.0.2"))
-        .privateAddresses(Lists.newArrayList("10.0.0.2")).build();
+        .publicAddresses(Lists.newArrayList("127.0.0.2"))
+        .privateAddresses(Lists.newArrayList("127.0.0.2")).build();
+
     when(controller.getNodes((ClusterSpec) any())).thenReturn(
         (Set) Sets.newLinkedHashSet(Lists.newArrayList(node1, node2)));
+    when(controller.getInstances((ClusterSpec)any(), (ClusterStateStore)any()))
+        .thenCallRealMethod();
 
-    ListClusterCommand command = new ListClusterCommand(factory);
+    ClusterStateStore memStore = new MemoryClusterStateStore();
+    memStore.save(createTestCluster(
+      new String[]{"id1", "id2"}, new String[]{"role1", "role2"}));
+
+    ClusterStateStoreFactory stateStoreFactory = mock(ClusterStateStoreFactory.class);
+    when(stateStoreFactory.create((ClusterSpec) any())).thenReturn(memStore);
+
+    ListClusterCommand command = new ListClusterCommand(factory, stateStoreFactory);
 
     Map<String, File> keys = KeyPair.generateTemporaryFiles();
     int rc = command.run(null, out, null, Lists.newArrayList(
@@ -110,10 +128,27 @@ public class ListClusterCommandTest {
     assertThat(rc, is(0));
     
     assertThat(outBytes.toString(), is(
-      "id1\timage-id\t100.0.0.1\t10.0.0.1\tRUNNING\tlocation-id1\n" +
-      "id2\timage-id\t100.0.0.2\t10.0.0.2\tRUNNING\tlocation-id2\n"));
+      "id1\timage-id\t127.0.0.1\t127.0.0.1\tRUNNING\tlocation-id1\trole1\n" +
+      "id2\timage-id\t127.0.0.2\t127.0.0.2\tRUNNING\tlocation-id2\trole2\n"));
     
     verify(factory).create("test-service");
     
   }
+
+  private Cluster createTestCluster(String[] ids, String[] roles) {
+    checkArgument(ids.length == roles.length, "each ID should have a role");
+
+    Credentials credentials = new Credentials("dummy", "dummy");
+    Set<Cluster.Instance> instances = Sets.newHashSet();
+
+    for(int i = 0; i < ids.length; i++) {
+      String ip = "127.0.0." + (i + 1);
+      instances.add(new Cluster.Instance(credentials,
+        Sets.newHashSet(roles[i]), ip, ip, ids[i], null));
+    }
+
+    return new Cluster(instances);
+  }
+
+
 }

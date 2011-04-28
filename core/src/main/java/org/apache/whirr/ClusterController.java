@@ -25,6 +25,8 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
 
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Sets;
 import org.apache.whirr.actions.BootstrapClusterAction;
 import org.apache.whirr.actions.ConfigureClusterAction;
 import org.apache.whirr.actions.DestroyClusterAction;
@@ -144,13 +146,46 @@ public class ClusterController {
       context.close();
     }
   }
-  
+
+  @Deprecated
   public Set<? extends NodeMetadata> getNodes(ClusterSpec clusterSpec)
     throws IOException, InterruptedException {
     ComputeService computeService =
       ComputeServiceContextBuilder.build(new ComputeServiceContextFactory(), clusterSpec).getComputeService();
     return computeService.listNodesDetailsMatching(
         runningInGroup(clusterSpec.getClusterName()));
+  }
+
+  public Set<Cluster.Instance> getInstances(ClusterSpec spec)
+      throws IOException, InterruptedException {
+    return getInstances(spec, null);
+  }
+
+  public Set<Cluster.Instance> getInstances(ClusterSpec spec, ClusterStateStore stateStore)
+      throws IOException, InterruptedException {
+    Set<Cluster.Instance> instances = Sets.newLinkedHashSet();
+    if (stateStore != null) {
+      /* enrich the instance information with node metadata */
+      Cluster cluster = stateStore.load();
+
+      for(NodeMetadata node : getNodes(spec)) {
+        Cluster.Instance instance = cluster.getInstanceMatching(withIds(node.getId()));
+        instances.add(new Cluster.Instance(instance.getLoginCredentials(), instance.getRoles(),
+          instance.getPublicIp(), instance.getPrivateIp(), node.getId(), node)
+        );
+      }
+    } else {
+      /* return a list of instances with no roles attached */
+      Credentials credentials = new Credentials(spec.getClusterUser(), spec.getPrivateKey());
+      for(NodeMetadata node : getNodes(spec)) {
+        instances.add(new Cluster.Instance(credentials, Sets.<String>newHashSet(),
+            Iterables.getFirst(node.getPublicAddresses(), null),
+            Iterables.getFirst(node.getPrivateAddresses(), null),
+            node.getId(), node));
+      }
+
+    }
+    return instances;
   }
   
   public static Predicate<ComputeMetadata> runningInGroup(final String group) {
