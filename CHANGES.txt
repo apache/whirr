@@ -48,6 +48,8 @@ Trunk (unreleased changes)
 
     WHIRR-173. Add ClusterAction for generic script execution (asavu)
 
+    WHIRR-246. Single place to store/load cluster state (David Alves and asavu)
+
   BUG FIXES
 
     WHIRR-253. ZooKeeper service should only authorize ingress to ZooKeeper 

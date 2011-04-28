@@ -26,6 +26,8 @@ import java.util.Set;
 
 import org.apache.whirr.Cluster.Instance;
 
+import javax.annotation.Nullable;
+
 /**
  * {@link Predicate}s for matching {@link Instance}s with certain cluster roles.
  */
@@ -80,6 +82,31 @@ public class RolePredicates {
         Set<String> copy = Sets.newLinkedHashSet(instance.getRoles());
         copy.retainAll(roles);
         return !copy.isEmpty();
+      }
+    };
+  }
+
+  /**
+   *
+   * @param ids list of instance ids
+   * @return  A {@link Predicate} that matches {@link Instance} whose id is
+   * found in the IDs list
+   */
+  public static Predicate<Instance> withIds(String ...ids) {
+    return withIds(Sets.<String>newHashSet(ids));
+  }
+
+  /**
+   *
+   * @param ids list of instance ids
+   * @return  A {@link Predicate} that matches {@link Instance} whose id is
+   * found in the IDs list
+   */
+  public static Predicate<Instance> withIds(final Set<String> ids) {
+    return new Predicate<Instance>() {
+      @Override
+      public boolean apply(@Nullable Instance input) {
+        return (input != null) ? ids.contains(input.getId()) : false;
       }
     };
   }

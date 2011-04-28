@@ -73,7 +73,6 @@ public class DestroyInstanceCommand extends AbstractClusterSpecCommand {
 
       String instanceId = optionSet.valueOf(instanceOption);
       controller.destroyInstance(clusterSpec, instanceId);
-      updateInstancesFile(clusterSpec, instanceId);
 
       return 0;
 
@@ -82,29 +81,6 @@ public class DestroyInstanceCommand extends AbstractClusterSpecCommand {
       printUsage(parser, err);
       return -1;
     }
-  }
-
-  private void updateInstancesFile(ClusterSpec clusterSpec, String instanceId)
-      throws IOException {
-    File instances = new File(clusterSpec.getClusterDirectory(), "instances");
-    if (!instances.exists()) return; // no file to update
-
-    StringBuilder newLines = new StringBuilder();
-
-    /* Filter the line containing the instance ID */
-    BufferedReader reader = new BufferedReader(new FileReader(instances));
-    String line = null;
-    while((line = reader.readLine()) != null) {
-      if (!line.contains(instanceId)) {
-        newLines.append(line + "\n");
-      }
-    }
-    reader.close();
-
-    /* Rewrite the file to the disk */
-    Writer writer = new FileWriter(instances);
-    writer.write(newLines.toString());
-    writer.close();
   }
 
   private void printUsage(OptionParser parser, PrintStream stream) throws IOException {

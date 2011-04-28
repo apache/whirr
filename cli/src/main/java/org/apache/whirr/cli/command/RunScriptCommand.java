@@ -22,14 +22,17 @@ import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.google.common.io.Files;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import joptsimple.OptionSpec;
 import org.apache.commons.lang.StringUtils;
+import org.apache.whirr.Cluster;
 import org.apache.whirr.ClusterController;
 import org.apache.whirr.ClusterControllerFactory;
 import org.apache.whirr.ClusterSpec;
+import org.apache.whirr.service.ClusterStateStoreFactory;
 import org.jclouds.compute.domain.ExecResponse;
 import org.jclouds.compute.domain.NodeMetadata;
 import org.jclouds.scriptbuilder.domain.Statement;
@@ -42,6 +45,7 @@ import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Map;
 
+import static org.apache.whirr.RolePredicates.anyRoleIn;
 import static org.jclouds.compute.predicates.NodePredicates.withIds;
 import static org.jclouds.scriptbuilder.domain.Statements.exec;
 
@@ -68,8 +72,13 @@ public class RunScriptCommand extends  AbstractClusterSpecCommand {
   }
 
   public RunScriptCommand(ClusterControllerFactory factory) {
+    this(factory, new ClusterStateStoreFactory());
+  }
+
+  public RunScriptCommand(ClusterControllerFactory factory,
+      ClusterStateStoreFactory stateStoreFactory) {
     super("run-script", "Run a script on a specific instance or a " +
-      "group of instances matching a role name", factory);
+      "group of instances matching a role name", factory, stateStoreFactory);
   }
 
   @Override
@@ -118,13 +127,10 @@ public class RunScriptCommand extends  AbstractClusterSpecCommand {
       String[] roles = optionSet.valueOf(rolesOption).split(",");
       List<String> ids = Lists.newArrayList();
 
-      for(String line : Files.readLines(
-        new File(spec.getClusterDirectory(), "instances"),
-        Charset.defaultCharset())) {
-
-        if (containsAny(line, roles)) {
-         ids.add(line.split("\t")[0].split("\\/")[1]);
-        }
+      Cluster cluster = createClusterStateStore(spec).load();
+      for (Cluster.Instance instance : cluster.getInstancesMatching(
+        anyRoleIn(Sets.<String>newHashSet(roles)))) {
+        ids.add(instance.getId().split("\\/")[1]);
       }
 
       condition = Predicates.and(condition,
@@ -149,13 +155,6 @@ public class RunScriptCommand extends  AbstractClusterSpecCommand {
       err.printf("%s%n", response.getError());
     }
     return rc;
-  }
-
-  private boolean containsAny(String line, String[] roles) {
-    for (String role : roles) {
-      if (line.contains(role)) return true;
-    }
-    return false;
   }
 
   private Statement execFile(String filePath) throws IOException {

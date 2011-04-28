@@ -37,6 +37,8 @@ import org.apache.whirr.util.DnsUtil;
 import org.jclouds.compute.domain.NodeMetadata;
 import org.jclouds.domain.Credentials;
 
+import javax.annotation.Nullable;
+
 /**
  * This class represents a real cluster of {@link Instance}s.
  *
@@ -132,9 +134,8 @@ public class Cluster {
         .add("nodeMetadata", nodeMetadata)
         .toString();
     }
-    
   }
-  
+
   private Set<Instance> instances;
   private Properties configuration;
 
@@ -160,6 +161,10 @@ public class Cluster {
 
   public Set<Instance> getInstancesMatching(Predicate<Instance> predicate) {
     return Sets.filter(instances, predicate);
+  }
+
+  public void removeInstancesMatching(Predicate<Instance> predicate) {
+    instances = Sets.filter(instances, predicate);
   }
 
   public String toString() {
