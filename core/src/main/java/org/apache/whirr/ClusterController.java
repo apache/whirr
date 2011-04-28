@@ -18,21 +18,18 @@
 
 package org.apache.whirr;
 
-import com.google.common.base.Charsets;
-import com.google.common.base.Joiner;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
-import com.google.common.io.Files;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.whirr.Cluster.Instance;
 import org.apache.whirr.actions.BootstrapClusterAction;
 import org.apache.whirr.actions.ConfigureClusterAction;
 import org.apache.whirr.actions.DestroyClusterAction;
+import org.apache.whirr.service.ClusterStateStore;
+import org.apache.whirr.service.ClusterStateStoreFactory;
 import org.apache.whirr.service.ClusterActionHandler;
 import org.apache.whirr.service.ComputeServiceContextBuilder;
 import org.jclouds.compute.ComputeService;
@@ -48,6 +45,7 @@ import org.jclouds.scriptbuilder.domain.Statement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static org.apache.whirr.RolePredicates.withIds;
 import static org.jclouds.compute.options.RunScriptOptions.Builder.overrideCredentialsWith;
 
 /**
@@ -56,6 +54,16 @@ import static org.jclouds.compute.options.RunScriptOptions.Builder.overrideCrede
 public class ClusterController {
 
   private static final Logger LOG = LoggerFactory.getLogger(ClusterController.class);
+
+  private ClusterStateStoreFactory stateStoreFactory;
+
+  public ClusterController() {
+    this(new ClusterStateStoreFactory());
+  }
+
+  public ClusterController(ClusterStateStoreFactory stateStoreFactory) {
+    this.stateStoreFactory = stateStoreFactory;
+  }
 
   /**
    * @return the unique name of the service.
@@ -86,35 +94,11 @@ public class ClusterController {
     ConfigureClusterAction configurer = new ConfigureClusterAction(computeServiceFactory, handlerMap);
     cluster = configurer.execute(clusterSpec, cluster);
 
-    createInstancesFile(clusterSpec, cluster);
+    stateStoreFactory.create(clusterSpec).save(cluster);
 
     return cluster;
   }
-  
-  private void createInstancesFile(ClusterSpec clusterSpec, Cluster cluster)
-      throws IOException {
 
-    File clusterDir = clusterSpec.getClusterDirectory();
-    File instancesFile = new File(clusterDir, "instances");
-    StringBuilder sb = new StringBuilder();
-    for (Instance instance : cluster.getInstances()) {
-      String id = instance.getId();
-      String roles = Joiner.on(',').join(instance.getRoles());
-      String publicIp = instance.getPublicIp();
-      String privateIp = instance.getPrivateIp();
-      sb.append(id).append("\t");
-      sb.append(roles).append("\t");
-      sb.append(publicIp).append("\t");
-      sb.append(privateIp).append("\n");
-    }
-    try {
-      Files.write(sb.toString(), instancesFile, Charsets.UTF_8);
-      LOG.info("Wrote instances file {}", instancesFile);
-    } catch (IOException e) {
-      LOG.error("Problem writing instances file {}", instancesFile, e);
-    }
-  }
-  
   /**
    * Stop the cluster and destroy all resources associated with it.
    *
@@ -126,15 +110,23 @@ public class ClusterController {
       InterruptedException {
     DestroyClusterAction destroyer = new DestroyClusterAction(new ComputeServiceContextFactory());
     destroyer.execute(clusterSpec, null);
-    Files.deleteRecursively(clusterSpec.getClusterDirectory());
+
+    stateStoreFactory.create(clusterSpec).destroy();
   }
 
   public void destroyInstance(ClusterSpec clusterSpec, String instanceId) throws IOException {
     LOG.info("Destroying instance {}", instanceId);
 
+    /* Destroy the instance */
     ComputeService computeService = ComputeServiceContextBuilder
       .build(clusterSpec).getComputeService();
     computeService.destroyNode(instanceId);
+
+    /* .. and update the cluster state storage */
+    ClusterStateStore store = stateStoreFactory.create(clusterSpec);
+    Cluster cluster = store.load();
+    cluster.removeInstancesMatching(withIds(instanceId));
+    store.save(cluster);
 
     LOG.info("Instance {} destroyed", instanceId);
   }

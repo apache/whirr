@@ -41,6 +41,8 @@ import org.apache.whirr.ClusterSpec;
 import org.apache.whirr.ClusterSpec.Property;
 import org.apache.whirr.actions.BootstrapClusterAction;
 import org.apache.whirr.cli.Command;
+import org.apache.whirr.service.ClusterStateStore;
+import org.apache.whirr.service.ClusterStateStoreFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,6 +55,7 @@ public abstract class AbstractClusterSpecCommand extends Command {
     LoggerFactory.getLogger(AbstractClusterSpecCommand.class);
 
   protected ClusterControllerFactory factory;
+  protected ClusterStateStoreFactory stateStoreFactory;
 
   protected OptionParser parser = new OptionParser();
   private Map<Property, OptionSpec> optionSpecs;
@@ -63,9 +66,18 @@ public abstract class AbstractClusterSpecCommand extends Command {
     .describedAs("config.properties")
     .ofType(String.class);
 
-  public AbstractClusterSpecCommand(String name, String description, ClusterControllerFactory factory) {
+  public AbstractClusterSpecCommand(String name, String description,
+                                    ClusterControllerFactory factory) {
+    this(name, description, factory, new ClusterStateStoreFactory());
+  }
+
+  public AbstractClusterSpecCommand(String name, String description,
+                                    ClusterControllerFactory factory,
+                                    ClusterStateStoreFactory stateStoreFactory) {
     super(name, description);
+
     this.factory = factory;
+    this.stateStoreFactory = stateStoreFactory;
 
     optionSpecs = Maps.newHashMap();
     for (Property property : EnumSet.allOf(Property.class)) {
@@ -119,6 +131,10 @@ public abstract class AbstractClusterSpecCommand extends Command {
       controller = factory.create(null);
     }
     return controller;
+  }
+
+  protected ClusterStateStore createClusterStateStore(ClusterSpec spec) {
+    return stateStoreFactory.create(spec);
   }
 
 }
