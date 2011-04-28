@@ -30,10 +30,15 @@ import java.util.Set;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 
+import org.apache.whirr.Cluster;
 import org.apache.whirr.ClusterController;
 import org.apache.whirr.ClusterControllerFactory;
 import org.apache.whirr.ClusterSpec;
+import org.apache.whirr.service.ClusterStateStore;
+import org.apache.whirr.service.ClusterStateStoreFactory;
 import org.jclouds.compute.domain.NodeMetadata;
+
+import static org.apache.whirr.RolePredicates.withIds;
 
 /**
  * A command to list the nodes in a cluster.
@@ -45,7 +50,12 @@ public class ListClusterCommand extends AbstractClusterSpecCommand {
   }
 
   public ListClusterCommand(ClusterControllerFactory factory) {
-    super("list-cluster", "List the nodes in a cluster.", factory);
+    this(factory, new ClusterStateStoreFactory());
+  }
+
+  public ListClusterCommand(ClusterControllerFactory factory,
+                            ClusterStateStoreFactory stateStoreFactory) {
+    super("list-cluster", "List the nodes in a cluster.", factory, stateStoreFactory);
   }
   
   @Override
@@ -60,14 +70,20 @@ public class ListClusterCommand extends AbstractClusterSpecCommand {
     }
     try {
       ClusterSpec clusterSpec = getClusterSpec(optionSet);
-
+      ClusterStateStore stateStore = createClusterStateStore(clusterSpec);
       ClusterController controller = createClusterController(clusterSpec.getServiceName());
-      Set<? extends NodeMetadata> nodes = controller.getNodes(clusterSpec);
-      for (NodeMetadata node : nodes) {
-        out.println(Joiner.on('\t').join(node.getId(), node.getImageId(),
-            getFirstAddress(node.getPublicAddresses()),
-            getFirstAddress(node.getPrivateAddresses()),
-            node.getState(), node.getLocation().getId()));
+
+      for (Cluster.Instance instance : controller.getInstances(clusterSpec, stateStore)) {
+        out.println(Joiner.on('\t').join(
+            instance.getId(),
+            instance.getNodeMetadata().getImageId(),
+            instance.getPublicIp(),
+            instance.getPrivateIp(),
+            instance.getNodeMetadata().getState(),
+            instance.getNodeMetadata().getLocation().getId(),
+            Joiner.on(",").join(instance.getRoles())
+          )
+        );
       }
       return 0;
     } catch (IllegalArgumentException e) {
@@ -75,10 +91,6 @@ public class ListClusterCommand extends AbstractClusterSpecCommand {
       printUsage(parser, err);
       return -1;
     }
-  }
-  
-  private String getFirstAddress(Set<String> addresses) {
-    return addresses.isEmpty() ? "" : Iterables.get(addresses, 0);
   }
 
   private void printUsage(OptionParser parser, PrintStream stream) throws IOException {

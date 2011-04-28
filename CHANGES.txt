@@ -50,6 +50,8 @@ Trunk (unreleased changes)
 
     WHIRR-246. Single place to store/load cluster state (David Alves and asavu)
 
+    WHIRR-289. Display role names in list-cluster command (asavu)
+
   BUG FIXES
 
     WHIRR-253. ZooKeeper service should only authorize ingress to ZooKeeper 
