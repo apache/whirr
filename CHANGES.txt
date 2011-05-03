@@ -52,6 +52,8 @@ Trunk (unreleased changes)
 
     WHIRR-289. Display role names in list-cluster command (asavu)
 
+    WHIRR-287. Script for running YCSB on HBase (asavu)
+
   BUG FIXES
 
     WHIRR-253. ZooKeeper service should only authorize ingress to ZooKeeper 
