@@ -164,9 +164,9 @@ public class ClusterController {
   public Set<Cluster.Instance> getInstances(ClusterSpec spec, ClusterStateStore stateStore)
       throws IOException, InterruptedException {
     Set<Cluster.Instance> instances = Sets.newLinkedHashSet();
-    if (stateStore != null) {
+    Cluster cluster = (stateStore != null) ? stateStore.load() : null;
+    if (cluster != null) {
       /* enrich the instance information with node metadata */
-      Cluster cluster = stateStore.load();
 
       for(NodeMetadata node : getNodes(spec)) {
         Cluster.Instance instance = cluster.getInstanceMatching(withIds(node.getId()));
@@ -176,6 +176,7 @@ public class ClusterController {
       }
     } else {
       /* return a list of instances with no roles attached */
+
       Credentials credentials = new Credentials(spec.getClusterUser(), spec.getPrivateKey());
       for(NodeMetadata node : getNodes(spec)) {
         instances.add(new Cluster.Instance(credentials, Sets.<String>newHashSet(),

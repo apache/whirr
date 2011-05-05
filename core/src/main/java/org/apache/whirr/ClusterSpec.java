@@ -47,6 +47,10 @@ import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.configuration.interpol.ConfigurationInterpolator;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.text.StrLookup;
+import org.jclouds.predicates.Validator;
+import org.jclouds.predicates.validators.DnsNameValidator;
+import org.jclouds.rest.annotations.ParamValidators;
+import org.jclouds.s3.predicates.validators.BucketNameValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -125,6 +129,15 @@ public class ClusterSpec {
     BLOBSTORE_CREDENTIAL(String.class, false, "The blob store credential"),
 
     BLOBSTORE_LOCATION_ID(String.class, false, "The blob store location ID"),
+
+    STATE_STORE(String.class, false, "What kind of store to use for state " +
+      "(local, blob or none). Defaults to local."),
+
+    STATE_STORE_CONTAINER(String.class, false, "Container where to store state. " +
+      "Valid only for the blob state store."),
+
+    STATE_STORE_BLOB(String.class, false, "Blob name for state storage. " +
+      "Valid only for the blob state store. Defaults to whirr-<cluster-name>"),
       
     IMAGE_ID(String.class, false, "The ID of the image to use for " + 
       "instances. If not specified then a vanilla Linux image is " + 
@@ -237,6 +250,10 @@ public class ClusterSpec {
   private String blobStoreIdentity;
   private String blobStoreCredential;
 
+  private String stateStore;
+  private String stateStoreContainer;
+  private String stateStoreBlob;
+
   private String privateKey;
   private File privateKeyFile;
   private String publicKey;
@@ -292,6 +309,10 @@ public class ClusterSpec {
     setBlobStoreIdentity(getString(Property.BLOBSTORE_IDENTITY));
     setBlobStoreCredential(getString(Property.BLOBSTORE_CREDENTIAL));
 
+    setStateStore(getString(Property.STATE_STORE));
+    setStateStoreContainer(getString(Property.STATE_STORE_CONTAINER));
+    setStateStoreBlob(getString(Property.STATE_STORE_BLOB));
+
     checkAndSetKeyPair();
 
     setImageId(getString(Property.IMAGE_ID));
@@ -307,7 +328,7 @@ public class ClusterSpec {
   }
 
   private String getString(Property key) {
-    return config.getString(key.getConfigName());
+    return config.getString(key.getConfigName(), null);
   }
 
   private int getInt(Property key, int defaultValue) {
@@ -447,6 +468,24 @@ public class ClusterSpec {
     return blobStoreLocationId;
   }
 
+  public String getStateStore() {
+    if (stateStore == null) {
+      return "local";
+    }
+    return stateStore;
+  }
+
+  public String getStateStoreContainer() {
+    return stateStoreContainer;
+  }
+
+  public String getStateStoreBlob() {
+    if (stateStoreBlob == null && "blob".equals(stateStore)) {
+      return "whirr-" + getClusterName();
+    }
+    return stateStoreBlob;
+  }
+
   public String getServiceName() {
     return serviceName;
   }
@@ -533,6 +572,29 @@ public class ClusterSpec {
 
   public void setBlobStoreLocationId(String locationId) {
     blobStoreLocationId = locationId;
+  }
+
+  public void setStateStore(String type) {
+    if (type != null) {
+      checkArgument(Sets.newHashSet("local", "blob", "none").contains(type),
+        "Invalid state store. Valid values are local, blob or none.");
+    }
+    this.stateStore = type;
+  }
+
+  public void setStateStoreContainer(String container) {
+    checkContainerName(container);
+    this.stateStoreContainer = container;
+  }
+
+  private void checkContainerName(String name) {
+    if (name != null) {
+      checkArgument((new DnsNameValidator(3, 63){}).apply(name));
+    }
+  }
+
+  public void setStateStoreBlob(String blob) {
+    this.stateStoreBlob = blob;
   }
 
   public void setClusterName(String clusterName) {
