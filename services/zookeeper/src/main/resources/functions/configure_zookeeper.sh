@@ -77,8 +77,4 @@ EOF
     fi
     echo $myid > $myid_file
   fi
-  
-  # Now that it's configured, start ZooKeeper
-  nohup /etc/rc.local &
-
 }

@@ -56,6 +56,9 @@ Trunk (unreleased changes)
 
     WHIRR-291. Add "noop" role useful just for provisioning (asavu)
 
+    WHIRR-297. Separate ZooKeeper and ElasticSearch install and configuration 
+    scripts into more generic functions (asavu)
+
   BUG FIXES
 
     WHIRR-253. ZooKeeper service should only authorize ingress to ZooKeeper 

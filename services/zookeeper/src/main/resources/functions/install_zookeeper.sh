@@ -44,11 +44,11 @@ function install_zookeeper() {
   
   CRON="0 0 * * * java -cp $ZK_JAR:$ZK_LOG4J_JAR:$ZK_CONF_DIR org.apache.zookeeper.server.PurgeTxnLog $ZK_DATA_DIR $ZK_DATA_DIR -n 10"
   crontab -l 2>/dev/null | { cat; echo "$CRON"; } | sort | uniq | crontab -
-      
-  # Ensure ZooKeeper starts on boot
-  sed -i -e "s/exit 0//" /etc/rc.local
-cat >> /etc/rc.local <<EOF
-ZOOCFGDIR=$ZK_CONF_DIR $ZOOKEEPER_HOME/bin/zkServer.sh start > /dev/null 2>&1 &
-EOF
 
+  cat >/etc/init.d/zookeeper <<EOF
+#!/bin/bash
+ZOOCFGDIR=$ZK_CONF_DIR $ZOOKEEPER_HOME/bin/zkServer.sh \$@ > /dev/null 2>&1 &
+EOF
+  chmod +x /etc/init.d/zookeeper
+  install_service zookeeper
 }

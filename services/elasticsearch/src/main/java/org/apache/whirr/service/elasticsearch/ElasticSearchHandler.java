@@ -52,6 +52,7 @@ public class ElasticSearchHandler extends ClusterActionHandlerSupport {
     Configuration config = spec.getConfiguration();
 
     addStatement(event, call("install_java"));
+    addStatement(event, call("install_tarball"));
 
     String tarurl = prepareRemoteFileUrl(event,
         config.getString("whirr.elasticsearch.tarball.url", ""));
@@ -74,5 +75,6 @@ public class ElasticSearchHandler extends ClusterActionHandlerSupport {
       ElasticSearchConfigurationBuilder.build("/tmp/elasticsearch.yml", config));
     addStatement(event, call("configure_elasticsearch",
       config.getStringArray("es.plugins")));
+    addStatement(event, call("start_elasticsearch"));
   }
 }

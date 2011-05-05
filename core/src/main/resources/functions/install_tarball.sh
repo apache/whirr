@@ -16,13 +16,16 @@
 #
 function install_tarball() {
   if [[ "$1" != "" ]]; then
-    # Download a .tar.gz file and extract to /usr/local
+    # Download a .tar.gz file and extract to target dir
 
     local tar_url=$1
     local tar_file=`basename $tar_url`
     local tar_file_md5=`basename $tar_url.md5`
 
-    local curl="curl --silent --show-error --fail --connect-timeout 10 --max-time 600"
+    local target=${2:-/usr/local/}
+    mkdir -p $target
+
+    local curl="curl -L --silent --show-error --fail --connect-timeout 10 --max-time 600 --retry 5"
     # any download should take less than 10 minutes
 
     for retry_count in `seq 1 3`;
@@ -54,7 +57,7 @@ function install_tarball() {
       exit 1
     fi
 
-    tar xzf $tar_file -C /usr/local
+    tar xzf $tar_file -C $target
     rm -f $tar_file $tar_file_md5
   fi
 }

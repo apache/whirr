@@ -14,17 +14,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-function configure_elasticsearch() {
+function cleanup_elasticsearch() {
     cd /usr/local/elasticsearch-*
 
-    for plugin in $@
-    do
-        ./bin/plugin install $plugin
-    done
+    ./bin/service/elasticsearch stop
+    ./bin/service/elasticsearch remove
 
-    # TODO allow user to set the amount of memory to use
-    # local MAXMEM=$(($(free|awk '/^Mem:/{print $2}') * 8 / 10 / 1024))m
-
-    cp /tmp/elasticsearch.yml config/elasticsearch.yml
+    rm -rf /usr/local/elasticsearch-*
 }
-
