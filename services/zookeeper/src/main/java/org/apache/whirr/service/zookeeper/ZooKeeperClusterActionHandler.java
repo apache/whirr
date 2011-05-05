@@ -63,6 +63,10 @@ public class ZooKeeperClusterActionHandler extends ClusterActionHandlerSupport {
     addStatement(event, call("install_java"));
     addStatement(event, call("install_tarball"));
 
+    /* register utility functions for managing init scripts */
+    addStatement(event, call("install_service"));
+    addStatement(event, call("remove_service"));
+
     String tarurl = config.getString("whirr.zookeeper.tarball.url");
     addStatement(event, call("install_zookeeper",
       prepareRemoteFileUrl(event, tarurl)));
@@ -82,12 +86,14 @@ public class ZooKeeperClusterActionHandler extends ClusterActionHandlerSupport {
     String servers = Joiner.on(' ').join(getPrivateIps(ensemble));
     addStatement(event, call("configure_zookeeper", "-c",
         clusterSpec.getProvider(), servers));
+    addStatement(event, call("start_zookeeper"));
   }
   
   @Override
   protected void afterConfigure(ClusterActionEvent event) {
     ClusterSpec clusterSpec = event.getClusterSpec();
     Cluster cluster = event.getCluster();
+
     LOG.info("Completed configuration of {}", clusterSpec.getClusterName());
     String hosts = Joiner.on(',').join(getHosts(cluster.getInstancesMatching(
       role(ZOOKEEPER_ROLE))));

@@ -15,28 +15,21 @@
 # limitations under the License.
 #
 function install_elasticsearch() {
-    local CURL="curl -L --silent --show-error --fail --connect-timeout 10 --max-time 600 --retry 5"
+
+    # TODO Run ElasticSearch as non-root-user
+    # http://www.elasticsearch.org/tutorials/2011/02/22/running-elasticsearch-as-a-non-root-user.html
 
     local ES_URL=${1:-http://github.com/downloads/elasticsearch/elasticsearch/elasticsearch-0.15.2.tar.gz}
-    local TAR_FILE=`basename $ES_URL`
+    install_tarball $ES_URL
 
-    for retry_count in `seq 1 3`
-    do
-      $CURL -O $ES_URL || true
-      if [ -f $TAR_FILE ]; then
-        break;
-      fi
-      if [ ! $retry_count -eq "3" ]; then
-        sleep 10
-      fi
-    done
+    # install the latest service wrapper for elasticsearch
+    local ES_WRAPPER=https://github.com/elasticsearch/elasticsearch-servicewrapper/tarball/master
+    install_tarball $ES_WRAPPER /tmp/
 
-    if [ -f $TAR_FILE ]; then
-      tar xzf $TAR_FILE -C /usr/local
-      rm -f $TAR_FILE
-    else
-      echo "Unable to download tar file from $ES_URL" >&2
-      exit 1
-    fi
+    # move the service wrapper in place
+    mv /tmp/elasticsearch-elasticsearch-servicewrapper-*/service /usr/local/elasticsearch-*/bin/
+    cd /usr/local/elasticsearch-*
+
+    # ensure that elasticsearch will start after reboot
+    ./bin/service/elasticsearch install
 }
-
