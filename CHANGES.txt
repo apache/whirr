@@ -54,6 +54,8 @@ Trunk (unreleased changes)
 
     WHIRR-287. Script for running YCSB on HBase (asavu)
 
+    WHIRR-291. Add "noop" role useful just for provisioning (asavu)
+
   BUG FIXES
 
     WHIRR-253. ZooKeeper service should only authorize ingress to ZooKeeper 
