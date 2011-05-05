@@ -59,6 +59,8 @@ Trunk (unreleased changes)
     WHIRR-297. Separate ZooKeeper and ElasticSearch install and configuration 
     scripts into more generic functions (asavu)
 
+    WHIRR-288. Add blob store persistence for cluster state (asavu)
+
   BUG FIXES
 
     WHIRR-253. ZooKeeper service should only authorize ingress to ZooKeeper 

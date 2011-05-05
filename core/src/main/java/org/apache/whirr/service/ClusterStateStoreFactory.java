@@ -18,9 +18,16 @@
 
 package org.apache.whirr.service;
 
+import com.google.common.collect.Maps;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.PropertiesConfiguration;
+import org.apache.whirr.Cluster;
 import org.apache.whirr.ClusterSpec;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.util.Map;
 
 /**
  * A factory for ClusterStateStores.
@@ -28,12 +35,40 @@ import org.apache.whirr.ClusterSpec;
  */
 public class ClusterStateStoreFactory {
 
+  private static final Logger LOG = LoggerFactory
+    .getLogger(ClusterStateStoreFactory.class);
+
+  private class NoopClusterStateStore extends ClusterStateStore {
+    public NoopClusterStateStore() {
+      LOG.warn("No cluster state is going to be persisted. There is no easy " +
+        "way to retrieve instance roles after launch.");
+    }
+    @Override
+    public Cluster load() throws IOException {
+      return null;
+    }
+    @Override
+    public void save(Cluster cluster) throws IOException {
+    }
+    @Override
+    public void destroy() throws IOException {
+    }
+  }
+
   public ClusterStateStore create(ClusterSpec spec) {
     return create(spec, new PropertiesConfiguration());
   }
 
   public ClusterStateStore create(ClusterSpec spec, Configuration conf) {
-    return new FileClusterStateStore(spec);
+    if ("local".equals(spec.getStateStore())) {
+      return new FileClusterStateStore(spec);
+
+    } else if("blob".equals(spec.getStateStore())) {
+      return new BlobClusterStateStore(spec);
+
+    } else {
+      return new NoopClusterStateStore();
+    }
   }
 
 }
