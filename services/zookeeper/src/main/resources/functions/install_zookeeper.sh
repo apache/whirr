@@ -15,6 +15,26 @@
 # limitations under the License.
 #
 function install_zookeeper() {
+  local OPTIND
+  local OPTARG
+  
+  CLOUD_PROVIDER=
+  while getopts "c:" OPTION; do
+    case $OPTION in
+    c)
+      CLOUD_PROVIDER="$OPTARG"
+      ;;
+    esac
+  done
+  
+  case $CLOUD_PROVIDER in
+    ec2 | aws-ec2 )
+      # Alias /mnt as /data
+      ln -s /mnt /data
+      ;;
+    *)
+      ;;
+  esac
 
   ZK_TARBALL_URL=$1
   ZOOKEEPER_HOME=/usr/local/$(basename $ZK_TARBALL_URL '.tar.gz')

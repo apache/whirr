@@ -33,7 +33,7 @@ function configure_cdh_hadoop() {
   case $CLOUD_PROVIDER in
     ec2 | aws-ec2 )
       # Alias /mnt as /data
-      ln -s /mnt /data
+      if [ ! -e /data ]; then ln -s /mnt /data; fi
       ;;
     *)
       ;;
@@ -120,6 +120,8 @@ function start_namenode() {
   $AS_HDFS "/usr/bin/$HADOOP fs -chmod +w /user"
   $AS_HDFS "/usr/bin/$HADOOP fs -mkdir /hadoop"
   $AS_HDFS "/usr/bin/$HADOOP fs -chmod +w /hadoop"
+  $AS_HDFS "/usr/bin/$HADOOP fs -mkdir /hbase"
+  $AS_HDFS "/usr/bin/$HADOOP fs -chmod +w /hbase"
   $AS_HDFS "/usr/bin/$HADOOP fs -mkdir /mnt"
   $AS_HDFS "/usr/bin/$HADOOP fs -chmod +w /mnt"
 

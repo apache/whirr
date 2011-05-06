@@ -14,7 +14,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-set -x
 function update_repo() {
   if which dpkg &> /dev/null; then
     cat > /etc/apt/sources.list.d/cloudera.list <<EOF
@@ -37,33 +36,57 @@ EOF
   fi
 }
 
-function install_cdh_hadoop() {
+function install_cdh_hbase() {
   local OPTIND
   local OPTARG
-
+  
   CLOUD_PROVIDER=
-  while getopts "c:" OPTION; do
+  HBASE_TAR_URL=
+  while getopts "c:u:" OPTION; do
     case $OPTION in
     c)
       CLOUD_PROVIDER="$OPTARG"
       ;;
+    u)
+      # ignore tarball
+      ;;
     esac
   done
   
+  case $CLOUD_PROVIDER in
+    ec2 | aws-ec2 )
+      # Alias /mnt as /data
+      if [ ! -e /data ]; then ln -s /mnt /data; fi
+      ;;
+    *)
+      ;;
+  esac
+  
   REPO=${REPO:-cdh3}
-  HADOOP=hadoop-${HADOOP_VERSION:-0.20}
-  HADOOP_CONF_DIR=/etc/$HADOOP/conf.dist
+  HBASE_HOME=/usr/lib/hbase
+  
+  # up file-max
+  sysctl -w fs.file-max=65535
+  # up ulimits
+  echo "root soft nofile 65535" >> /etc/security/limits.conf
+  echo "root hard nofile 65535" >> /etc/security/limits.conf
+  ulimit -n 65535
+  # up epoll limits; ok if this fails, only valid for kernels 2.6.27+
+  set +e
+  sysctl -w fs.epoll.max_user_instances=4096 > /dev/null 2>&1
+  set -e
+  # if there is no hosts file then provide a minimal one
+  [ ! -f /etc/hosts ] && echo "127.0.0.1 localhost" > /etc/hosts
 
   update_repo
   
   if which dpkg &> /dev/null; then
     apt-get update
-    apt-get -y install $HADOOP
-    cp -r /etc/$HADOOP/conf.empty $HADOOP_CONF_DIR
-    update-alternatives --install /etc/$HADOOP/conf $HADOOP-conf $HADOOP_CONF_DIR 90
+    apt-get -y install hadoop-hbase hadoop-hbase-master hadoop-hbase-regionserver hadoop-hbase-thrift
   elif which rpm &> /dev/null; then
-    yum install -y $HADOOP
-    cp -r /etc/$HADOOP/conf.empty $HADOOP_CONF_DIR
-    alternatives --install /etc/$HADOOP/conf $HADOOP-conf $HADOOP_CONF_DIR 90
+    yum install -y hadoop-hbase hadoop-hbase-master hadoop-hbase-regionserver hadoop-hbase-thrift
   fi
+  
+  echo "export HBASE_HOME=$HBASE_HOME" >> ~root/.bashrc
+  echo 'export PATH=$JAVA_HOME/bin:$HBASE_HOME/bin:$PATH' >> ~root/.bashrc
 }

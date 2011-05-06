@@ -80,8 +80,7 @@ public class BasicServerClusterActionHandler extends HBaseClusterActionHandler {
       port = getConfiguration(clusterSpec).getInt(configKeyPort, defaultPort);
     }
 
-    Cluster.Instance instance = cluster.getInstanceMatching(
-      role(HBaseMasterClusterActionHandler.ROLE));
+    Cluster.Instance instance = cluster.getInstanceMatching(role(role));
     InetAddress masterPublicAddress = instance.getPublicAddress();
 
     event.getFirewallManager().addRule(
