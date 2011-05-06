@@ -47,10 +47,7 @@ import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.configuration.interpol.ConfigurationInterpolator;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.text.StrLookup;
-import org.jclouds.predicates.Validator;
 import org.jclouds.predicates.validators.DnsNameValidator;
-import org.jclouds.rest.annotations.ParamValidators;
-import org.jclouds.s3.predicates.validators.BucketNameValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -746,6 +743,8 @@ public class ClusterSpec {
         && Objects.equal(serviceName, that.serviceName)
         && Objects.equal(clusterUser, that.clusterUser)
         && Objects.equal(loginUser, that.loginUser)
+        && Objects.equal(publicKey, that.publicKey)
+        && Objects.equal(privateKey, that.privateKey)
         && Objects.equal(imageId, that.imageId)
         && Objects.equal(hardwareId, that.hardwareId)
         && Objects.equal(hardwareMinRam, that.hardwareMinRam)
@@ -753,16 +752,43 @@ public class ClusterSpec {
         && Objects.equal(blobStoreLocationId, that.blobStoreLocationId)
         && Objects.equal(clientCidrs, that.clientCidrs)
         && Objects.equal(version, that.version)
+        && Objects.equal(runUrlBase, that.runUrlBase)
+        && Objects.equal(stateStore, that.stateStore)
+        && Objects.equal(stateStoreContainer, that.stateStoreContainer)
+        && Objects.equal(stateStoreBlob, that.stateStoreBlob)
         ;
     }
     return false;
   }
   
   public int hashCode() {
-    return Objects.hashCode(instanceTemplates, maxStartupRetries, provider,
-      identity, credential, blobStoreProvider, blobStoreIdentity, blobStoreCredential,
-      clusterName, serviceName, clusterUser, loginUser, publicKey, privateKey, imageId,
-      hardwareId, locationId, blobStoreLocationId, clientCidrs, version, runUrlBase);
+    return Objects.hashCode(
+        instanceTemplates,
+        maxStartupRetries,
+        provider,
+        identity,
+        credential,
+        blobStoreProvider,
+        blobStoreIdentity,
+        blobStoreCredential,
+        clusterName,
+        serviceName,
+        clusterUser, 
+        loginUser,
+        publicKey,
+        privateKey,
+        imageId,
+        hardwareId,
+        hardwareMinRam,
+        locationId,
+        blobStoreLocationId,
+        clientCidrs,
+        version,
+        runUrlBase,
+        stateStore, 
+        stateStoreBlob, 
+        stateStoreContainer
+    );
   }
   
   public String toString() {
@@ -782,12 +808,16 @@ public class ClusterSpec {
       .add("publicKey", publicKey)
       .add("privateKey", privateKey)
       .add("imageId", imageId)
-      .add("instanceSizeId", hardwareId)
-      .add("instanceMinRam", hardwareMinRam)
+      .add("hardwareId", hardwareId)
+      .add("hardwareMinRam", hardwareMinRam)
       .add("locationId", locationId)
       .add("blobStoreLocationId", blobStoreLocationId)
       .add("clientCidrs", clientCidrs)
       .add("version", version)
+      .add("runUrlBase", runUrlBase)
+      .add("stateStore", stateStore)
+      .add("stateStoreContainer", stateStoreContainer)
+      .add("stateStoreBlob", stateStoreBlob)
       .toString();
   }
 }

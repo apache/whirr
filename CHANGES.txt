@@ -81,6 +81,9 @@ Trunk (unreleased changes)
 
     WHIRR-172. Log warning for unrecognized service names. (tomwhite)
 
+    WHIRR-298. Use all cluster spec properties for hash and 
+    equality (tomwhite and asavu)
+
 Release 0.4.0 - 2011-03-15
 
   NEW FEATURES
