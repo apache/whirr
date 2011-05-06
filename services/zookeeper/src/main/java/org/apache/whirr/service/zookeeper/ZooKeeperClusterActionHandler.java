@@ -58,7 +58,10 @@ public class ZooKeeperClusterActionHandler extends ClusterActionHandlerSupport {
 
   @Override
   protected void beforeBootstrap(ClusterActionEvent event) throws IOException {
-    Configuration config = getConfiguration(event.getClusterSpec());
+    ClusterSpec clusterSpec = event.getClusterSpec();
+    String zookeeperInstallFunction = clusterSpec.getConfiguration().getString(
+        "whirr.zookeeper-install-function", "install_zookeeper");
+    Configuration config = getConfiguration(clusterSpec);
 
     addStatement(event, call("install_java"));
     addStatement(event, call("install_tarball"));
@@ -68,7 +71,7 @@ public class ZooKeeperClusterActionHandler extends ClusterActionHandlerSupport {
     addStatement(event, call("remove_service"));
 
     String tarurl = config.getString("whirr.zookeeper.tarball.url");
-    addStatement(event, call("install_zookeeper",
+    addStatement(event, call(zookeeperInstallFunction,
       prepareRemoteFileUrl(event, tarurl)));
   }
 
@@ -84,7 +87,9 @@ public class ZooKeeperClusterActionHandler extends ClusterActionHandlerSupport {
     // Pass list of all servers in ensemble to configure script.
     // Position is significant: i-th server has id i.
     String servers = Joiner.on(' ').join(getPrivateIps(ensemble));
-    addStatement(event, call("configure_zookeeper", "-c",
+    String zookeeperConfigureFunction = clusterSpec.getConfiguration().getString(
+        "whirr.zookeeper-configure-function", "configure_zookeeper");
+    addStatement(event, call(zookeeperConfigureFunction, "-c",
         clusterSpec.getProvider(), servers));
     addStatement(event, call("start_zookeeper"));
   }

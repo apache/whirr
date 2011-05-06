@@ -14,7 +14,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-set -x
 function update_repo() {
   if which dpkg &> /dev/null; then
     cat > /etc/apt/sources.list.d/cloudera.list <<EOF
@@ -37,10 +36,10 @@ EOF
   fi
 }
 
-function install_cdh_hadoop() {
+function install_cdh_zookeeper() {
   local OPTIND
   local OPTARG
-
+  
   CLOUD_PROVIDER=
   while getopts "c:" OPTION; do
     case $OPTION in
@@ -50,20 +49,42 @@ function install_cdh_hadoop() {
     esac
   done
   
+  case $CLOUD_PROVIDER in
+    ec2 | aws-ec2 )
+      # Alias /mnt as /data
+      if [ ! -e /data ]; then ln -s /mnt /data; fi
+      ;;
+    *)
+      ;;
+  esac
+  
   REPO=${REPO:-cdh3}
-  HADOOP=hadoop-${HADOOP_VERSION:-0.20}
-  HADOOP_CONF_DIR=/etc/$HADOOP/conf.dist
-
+  ZOOKEEPER_HOME=/usr/lib/zookeeper
+  ZK_CONF_DIR=/etc/zookeeper
+  ZK_LOG_DIR=/var/log/zookeeper
+  ZK_DATA_DIR=$ZK_LOG_DIR/txlog
+  
   update_repo
   
   if which dpkg &> /dev/null; then
     apt-get update
-    apt-get -y install $HADOOP
-    cp -r /etc/$HADOOP/conf.empty $HADOOP_CONF_DIR
-    update-alternatives --install /etc/$HADOOP/conf $HADOOP-conf $HADOOP_CONF_DIR 90
+    apt-get -y install hadoop-zookeeper-server
   elif which rpm &> /dev/null; then
-    yum install -y $HADOOP
-    cp -r /etc/$HADOOP/conf.empty $HADOOP_CONF_DIR
-    alternatives --install /etc/$HADOOP/conf $HADOOP-conf $HADOOP_CONF_DIR 90
+    yum install -y hadoop-zookeeper-server
   fi
+  
+  echo "export ZOOKEEPER_HOME=$ZOOKEEPER_HOME" >> /etc/profile
+  echo 'export PATH=$ZOOKEEPER_HOME/bin:$PATH' >> /etc/profile
+  
+  rm -rf $ZK_LOG_DIR
+  mkdir -p /data/zookeeper/logs
+  ln -s /data/zookeeper/logs $ZK_LOG_DIR
+  mkdir -p $ZK_LOG_DIR/txlog
+  chown -R zookeeper:zookeeper /data/zookeeper/logs
+  chown -R zookeeper:zookeeper $ZK_LOG_DIR
+  
+  sed -i -e "s|zookeeper.root.logger=.*|zookeeper.root.logger=INFO, ROLLINGFILE|" \
+         -e "s|zookeeper.log.dir=.*|zookeeper.log.dir=$ZK_LOG_DIR|" \
+         -e "s|zookeeper.tracelog.dir=.*|zookeeper.tracelog.dir=$ZK_LOG_DIR|" \
+      $ZK_CONF_DIR/log4j.properties
 }

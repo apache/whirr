@@ -2,6 +2,17 @@ Apache Whirr Change Log
 
 Trunk (unreleased changes)
 
+  INCOMPATIBLE CHANGES
+
+    WHIRR-245. Clearly demarcate the user and service provider APIs. There
+    are some incompatible API changes which affect clients and service writers:
+    * The client API has moved from the org.apache.whirr.service package to the
+      org.apache.whirr package.
+    * Service(Factory) has been renamed to ClusterController(Factory).
+    * org.apache.whirr.cluster.actions has been renamed to
+      org.apache.whirr.actions.
+    (tomwhite)
+
   NEW FEATURES
 
     WHIRR-261. Add ElasticSearch as a service (asavu)
@@ -14,6 +25,9 @@ Trunk (unreleased changes)
 
     WHIRR-285. Add support for BYON. (tomwhite)
 
+    WHIRR-191. Start other services based on CDH, not just HDFS and MR.
+    (tomwhite)
+
   IMPROVEMENTS
 
     WHIRR-262. Services should not have to do reverse DNS lookups. (tomwhite)
@@ -21,15 +35,6 @@ Trunk (unreleased changes)
     WHIRR-275. Improve firewall API for services. (tomwhite)
 
     WHIRR-278. Refactor ClusterSpec and extract InstanceTemplate class. (asavu)
-
-    WHIRR-245. Clearly demarcate the user and service provider APIs. There
-    are some incompatible API changes which affect clients and service writers:
-    * The client API has moved from the org.apache.whirr.service package to the
-      org.apache.whirr package.
-    * Service(Factory) has been renamed to ClusterController(Factory).
-    * org.apache.whirr.cluster.actions has been renamed to
-      org.apache.whirr.actions.
-    (tomwhite)
 
     WHIRR-269. Improve error msg "Key pair is encrypted" (tomwhite via asavu)
 

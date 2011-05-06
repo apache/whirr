@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.apache.whirr.service.hbase.integration;
+package org.apache.whirr.service.cdh.integration;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
@@ -32,11 +32,12 @@ import org.apache.hadoop.hbase.thrift.generated.Hbase;
 import org.apache.hadoop.hbase.thrift.generated.Mutation;
 import org.apache.hadoop.hbase.thrift.generated.TRowResult;
 import org.apache.hadoop.hbase.util.Bytes;
+import org.apache.whirr.service.hbase.integration.HBaseServiceController;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class HBaseServiceTest {
+public class CdhHBaseServiceTest {
 
   private static final byte[] FIRST = Bytes.toBytes("");
   private static final byte[] TABLE = Bytes.toBytes("testtable");
@@ -54,7 +55,7 @@ public class HBaseServiceTest {
     controller.ensureClusterRunning();
   }
 
-  @AfterClass
+  //@AfterClass
   public static void tearDown() throws Exception {
     controller.shutdown();
   }

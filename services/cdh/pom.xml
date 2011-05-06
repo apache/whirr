@@ -27,7 +27,7 @@
   <artifactId>whirr-cdh</artifactId>
   <packaging>jar</packaging>
   <version>0.5.0-incubating-SNAPSHOT</version>
-  <name>Apache Whirr Hadoop</name>
+  <name>Apache Whirr CDH</name>
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
@@ -44,6 +44,23 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>whirr-hadoop</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>whirr-hbase</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>whirr-hbase</artifactId>
+      <version>${project.version}</version>
+      <type>test-jar</type>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>whirr-zookeeper</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -99,7 +116,19 @@
     <dependency>
       <groupId>org.apache.hadoop</groupId>
       <artifactId>hadoop-core</artifactId>
-      <version>0.20.2-CDH3B4</version>
+      <version>0.20.2-cdh3u0</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.hbase</groupId>
+      <artifactId>hbase</artifactId>
+      <version>0.90.1-cdh3u0</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.zookeeper</groupId>
+      <artifactId>zookeeper</artifactId>
+      <version>3.3.3-cdh3u0</version>
       <scope>test</scope>
     </dependency>
     <!-- The following are missing CDH dependencies -->
