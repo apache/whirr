@@ -178,3 +178,16 @@ You can read more about this technique on
 Also, Mac OS X users might find
 [this thread|http://superuser.com/questions/43678/mac-os-x-at-command-not-working]
 a useful reference for the {{at}} command.
+
+h2. How do I start a machine without having a cluster role?
+
+Sometimes you need to provision machines in the same cluster without having 
+a specific role. For this you can use "noop" as a role name when specifying the 
+instance templates.
+
+{code}
+whirr.instance-templates=3 zookeeper,1 noop
+# will start three machines with zookeeper and one machine just with the OS  
+{code}
+
+
