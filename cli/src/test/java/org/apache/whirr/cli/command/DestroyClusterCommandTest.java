@@ -82,6 +82,7 @@ public class DestroyClusterCommandTest {
     Map<String, File> keys = KeyPair.generateTemporaryFiles();
     
     int rc = command.run(null, out, null, Lists.newArrayList(
+        "--instance-templates", "1 noop",
         "--service-name", "test-service",
         "--cluster-name", "test-cluster",
         "--provider", "rackspace",
@@ -94,6 +95,7 @@ public class DestroyClusterCommandTest {
 
     Configuration conf = new PropertiesConfiguration();
     conf.addProperty("whirr.version", "version-string");
+    conf.addProperty("whirr.instance-templates", "1 noop");
 
     ClusterSpec expectedClusterSpec = ClusterSpec.withTemporaryKeys(conf);
     expectedClusterSpec.setServiceName("test-service");

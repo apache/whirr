@@ -93,6 +93,7 @@ public class RunScriptCommandTest {
 
     int rc = command.run(null, out, System.err, Lists.newArrayList(
         "--script", "/dev/null",
+        "--instance-templates", "1 noop",
         "--instances", "A,B",
         "--cluster-name", "test-cluster",
         "--provider", "provider",
@@ -129,6 +130,7 @@ public class RunScriptCommandTest {
     Map<String, File> keys = KeyPair.generateTemporaryFiles();
 
     int rc = command.run(null, out, System.err, Lists.newArrayList(
+        "--instance-templates", "1 noop",
         "--script", "/dev/null",
         "--roles", "A",
         "--cluster-name", "test-cluster",

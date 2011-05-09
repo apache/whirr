@@ -82,6 +82,7 @@ public class DestroyInstanceCommandTest {
     Map<String, File> keys = KeyPair.generateTemporaryFiles();
 
     int rc = command.run(null, out, null, Lists.newArrayList(
+        "--instance-templates", "1 noop",
         "--instance-id", "region/instanceid",
         "--service-name", "test-service",
         "--cluster-name", "test-cluster",

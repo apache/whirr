@@ -20,6 +20,7 @@ package org.apache.whirr.cli.command;
 
 import static org.apache.whirr.ClusterSpec.Property.CLUSTER_NAME;
 import static org.apache.whirr.ClusterSpec.Property.IDENTITY;
+import static org.apache.whirr.ClusterSpec.Property.INSTANCE_TEMPLATES;
 
 import com.google.common.collect.Maps;
 
@@ -112,7 +113,7 @@ public abstract class AbstractClusterSpecCommand extends Command {
       config.addConfiguration(defaults);
     }
 
-    for (Property required : EnumSet.of(CLUSTER_NAME, IDENTITY)) {
+    for (Property required : EnumSet.of(CLUSTER_NAME, IDENTITY, INSTANCE_TEMPLATES)) {
       if (config.getString(required.getConfigName()) == null) {
         throw new IllegalArgumentException(String.format("Option '%s' not set.",
             required.getSimpleName()));
