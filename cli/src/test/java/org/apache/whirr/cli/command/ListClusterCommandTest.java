@@ -119,6 +119,7 @@ public class ListClusterCommandTest {
 
     Map<String, File> keys = KeyPair.generateTemporaryFiles();
     int rc = command.run(null, out, null, Lists.newArrayList(
+        "--instance-templates", "1 noop",
         "--service-name", "test-service",
         "--cluster-name", "test-cluster",
         "--identity", "myusername",

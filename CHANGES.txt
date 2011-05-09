@@ -68,6 +68,9 @@ Trunk (unreleased changes)
 
     WHIRR-300. FAQ entry for noop role. (asavu via tomwhite)
 
+    WHIRR-216. Improve error message if whirr.instance-templates left out of
+    config. (asavu via tomwhite)
+
   BUG FIXES
 
     WHIRR-253. ZooKeeper service should only authorize ingress to ZooKeeper 
