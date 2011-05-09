@@ -66,6 +66,8 @@ Trunk (unreleased changes)
 
     WHIRR-288. Add blob store persistence for cluster state (asavu)
 
+    WHIRR-300. FAQ entry for noop role. (asavu via tomwhite)
+
   BUG FIXES
 
     WHIRR-253. ZooKeeper service should only authorize ingress to ZooKeeper 
