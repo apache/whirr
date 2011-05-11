@@ -71,6 +71,8 @@ Trunk (unreleased changes)
     WHIRR-216. Improve error message if whirr.instance-templates left out of
     config. (asavu via tomwhite)
 
+    WHIRR-299. Recipe for BYON provider (asavu)
+
   BUG FIXES
 
     WHIRR-253. ZooKeeper service should only authorize ingress to ZooKeeper 
