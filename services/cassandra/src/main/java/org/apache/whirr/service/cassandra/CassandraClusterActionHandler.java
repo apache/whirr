@@ -60,9 +60,15 @@ public class CassandraClusterActionHandler extends ClusterActionHandlerSupport {
   protected void beforeBootstrap(ClusterActionEvent event) throws IOException {
     addStatement(event, call("install_java"));
     addStatement(event, call("install_tarball"));
+
+    addStatement(event, call("install_service"));
+    addStatement(event, call("remove_service"));
+
     Configuration config = event.getClusterSpec().getConfiguration();
+
     String tarball = prepareRemoteFileUrl(event, config.getString(BIN_TARBALL, null));
     String major = config.getString(MAJOR_VERSION, null);
+
     if (tarball != null && major != null) {
       addStatement(event, call("install_cassandra", major, tarball));
     } else {
@@ -86,6 +92,7 @@ public class CassandraClusterActionHandler extends ClusterActionHandlerSupport {
     String servers = Joiner.on(' ').join(getPrivateIps(seeds));
     addStatement(event, call("configure_cassandra", "-c",
         clusterSpec.getProvider(), servers));
+    addStatement(event, call("start_cassandra"));
   }
 
   private List<String> getPrivateIps(List<Instance> instances) {

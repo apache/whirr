@@ -73,6 +73,9 @@ Trunk (unreleased changes)
 
     WHIRR-299. Recipe for BYON provider (asavu)
 
+    WHIRR-292. Separate Cassandra install and configuration scripts 
+    into more generic functions (asavu)
+
   BUG FIXES
 
     WHIRR-253. ZooKeeper service should only authorize ingress to ZooKeeper 
