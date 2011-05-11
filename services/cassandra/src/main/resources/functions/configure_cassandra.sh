@@ -78,8 +78,5 @@ function configure_cassandra() {
     sed -i -e "s|listen_address: localhost|listen_address: $PRIVATE_SELF_HOST|" $config_file
     sed -i -e "s|rpc_address: localhost|rpc_address: $PUBLIC_SELF_HOST|" $config_file
   fi
-  
-  # Now that it's configured, start Cassandra
-  nohup /etc/rc.local &
-
 }
+
