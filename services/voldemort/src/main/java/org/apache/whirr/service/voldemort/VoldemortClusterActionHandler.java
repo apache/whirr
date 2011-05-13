@@ -82,6 +82,8 @@ public class VoldemortClusterActionHandler extends ClusterActionHandlerSupport {
     }
 
     addStatement(event, call("install_java"));
+    addStatement(event, call("install_service"));
+
     addStatement(event, call(FUNCTION_INSTALL, optArgs.toArray(new String[optArgs.size()])));
   }
 
@@ -109,6 +111,7 @@ public class VoldemortClusterActionHandler extends ClusterActionHandlerSupport {
                              PARAM_CLUSTER_NAME,
                              clusterSpec.getClusterName(),
                              servers));
+    addStatement(event, call("start_voldemort"));
   }
 
   @Override

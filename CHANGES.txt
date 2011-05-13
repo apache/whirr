@@ -76,6 +76,9 @@ Trunk (unreleased changes)
     WHIRR-292. Separate Cassandra install and configuration scripts 
     into more generic functions (asavu)
 
+    WHIRR-296. Separate Voldemort install and configuration scripts into more
+    generic functions. (asavu via tomwhite)
+
   BUG FIXES
 
     WHIRR-253. ZooKeeper service should only authorize ingress to ZooKeeper 

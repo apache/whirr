@@ -39,10 +39,13 @@ function configure_voldemort() {
   # Use public IPs for all Voldemort nodes                                                                    
   case $CLOUD_PROVIDER in
     ec2)
-    SELF_HOST=`wget -q -O - http://169.254.169.254/latest/meta-data/local-ipv4`
+      SELF_HOST=`wget -q -O - http://169.254.169.254/latest/meta-data/local-ipv4`
+    ;;
+    cloudservers-uk | cloudservers-us)
+      SELF_HOST=`/sbin/ifconfig eth1 | grep 'inet addr:' | cut -d: -f2 | awk '{ print $1}'`
     ;;
     *)
-    SELF_HOST=`/sbin/ifconfig eth1 | grep 'inet addr:' | cut -d: -f2 | awk '{ print $1}'`
+      SELF_HOST=`/sbin/ifconfig eth0 | grep 'inet addr:' | cut -d: -f2 | awk '{ print $1}'`
     ;;
   esac
   
@@ -79,13 +82,10 @@ function configure_voldemort() {
     echo "Missing server names"
     exit 1
   fi
-  
-  
+
   # Set up the cluster metadata
   chmod +x $VOLDEMORT_ROOT/contrib/ec2-testing/bin/run-class.sh
   chmod +x $VOLDEMORT_ROOT/contrib/ec2-testing/bin/voldemort-clustergenerator.sh
   $VOLDEMORT_ROOT/contrib/ec2-testing/bin/voldemort-clustergenerator.sh --useinternal true --clustername $CLUSTER_NAME --partitions $PARTITIONS_PER_NODE --hostnames $hostname_file > $VOLDEMORT_HOME/config/cluster.xml
   
-  # Start Voldemort
-  nohup /etc/rc.local &
 }
