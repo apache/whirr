@@ -72,14 +72,49 @@ function install_voldemort() {
   # Set Voldemort vars
   echo "export VOLDEMORT_ROOT=$VOLDEMORT_ROOT" >> /etc/profile
   echo "export VOLDEMORT_HOME=$VOLDEMORT_HOME" >> /etc/profile
-    
-  # Start
-  sed -i -e "s/exit 0//" /etc/rc.local
-  sed -i -e "s/voldemort//" /etc/rc.local
-    
-  cat >> /etc/rc.local <<RC_LOCAL
-cd \$VOLDEMORT_ROOT
-./bin/voldemort-server.sh > /var/log/voldemort.log 2>&1 &
-cd -
-RC_LOCAL
+
+  cat >/etc/init.d/voldemort <<END_OF_FILE
+#!/bin/sh
+# description: Voldemort distributed database server
+
+. /etc/profile
+
+prog="voldemort-server.sh"
+
+start() {
+      echo "Starting Voldemort"
+      \${VOLDEMORT_ROOT}/bin/voldemort-server.sh >/var/log/voldemort.log 2>&1 &
+}
+
+stop() {
+      echo "Stopping Voldemort"
+      \${VOLDEMORT_ROOT}/bin/voldemort-stop.sh
+}
+
+restart(){
+      stop
+      start
+}
+
+case "\$1" in
+    start)
+          start
+          ;;
+    stop)
+          stop
+          ;;
+    restart)
+          restart
+          ;;
+    *)
+          echo "Usage: voldemort {start|stop|restart}"
+          exit 1
+esac
+
+exit 0
+END_OF_FILE
+
+    chmod +x /etc/init.d/voldemort
+    install_service voldemort
+
 }
