@@ -2,6 +2,8 @@ h1. Configuration Guide
 
 Whirr is configured using a properties file, and optionally using command line arguments when using the CLI. Command line arguments take precedence over properties specified in a properties file.
 
+For example working configurations, please see the recipes in the _recipes_ directory of the distribution.
+
 || Name || Command line option || Default || Description ||
 | {{whirr.config}} | {{\--config}} | none | A filename of a properties file containing properties in this table. Note that Whirr properties specified in this file all have a {{whirr.}} prefix. |
 | {{whirr.service-name}} | {{\--service-name}} | The default service for launching clusters | The name of the service to use. You only need to set this if you want to use a non-standard service launcher. |
