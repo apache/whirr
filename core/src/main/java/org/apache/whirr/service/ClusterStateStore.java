@@ -31,8 +31,6 @@ import org.apache.whirr.Cluster;
 import org.apache.whirr.ClusterSpec;
 import org.apache.whirr.util.DnsUtil;
 import org.jclouds.domain.Credentials;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Interface for cluster state storage facilities.

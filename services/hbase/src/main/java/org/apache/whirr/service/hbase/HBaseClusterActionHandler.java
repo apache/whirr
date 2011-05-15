@@ -21,8 +21,6 @@ package org.apache.whirr.service.hbase;
 import java.io.IOException;
 
 import org.apache.commons.configuration.Configuration;
-import org.apache.commons.configuration.ConfigurationException;
-import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.whirr.ClusterSpec;
 import org.apache.whirr.service.ClusterActionHandlerSupport;
 

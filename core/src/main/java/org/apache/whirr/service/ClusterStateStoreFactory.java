@@ -18,7 +18,6 @@
 
 package org.apache.whirr.service;
 
-import com.google.common.collect.Maps;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.whirr.Cluster;
@@ -27,7 +26,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.Map;
 
 /**
  * A factory for ClusterStateStores.

@@ -28,7 +28,6 @@ import java.util.Set;
 
 import org.apache.whirr.actions.ByonClusterAction;
 import org.apache.whirr.service.ClusterActionHandler;
-import org.jclouds.compute.ComputeServiceContextFactory;
 import org.jclouds.compute.domain.NodeMetadata;
 
 /**
@@ -45,16 +44,13 @@ public class ByonClusterController extends ClusterController {
   public Cluster launchCluster(ClusterSpec clusterSpec) throws IOException,
       InterruptedException {
 
-    ComputeServiceContextFactory computeServiceFactory = new ComputeServiceContextFactory();
     Map<String, ClusterActionHandler> handlerMap = new HandlerMapFactory()
         .create();
 
-    ClusterAction bootstrapper = new ByonClusterAction(BOOTSTRAP_ACTION,
-        computeServiceFactory, handlerMap);
+    ClusterAction bootstrapper = new ByonClusterAction(BOOTSTRAP_ACTION, getCompute(), handlerMap);
     Cluster cluster = bootstrapper.execute(clusterSpec, null);
 
-    ClusterAction configurer = new ByonClusterAction(CONFIGURE_ACTION,
-        computeServiceFactory, handlerMap);
+    ClusterAction configurer = new ByonClusterAction(CONFIGURE_ACTION, getCompute(), handlerMap);
     cluster = configurer.execute(clusterSpec, cluster);
 
     return cluster;
@@ -62,12 +58,10 @@ public class ByonClusterController extends ClusterController {
 
   public void destroyCluster(ClusterSpec clusterSpec) throws IOException,
       InterruptedException {
-    ComputeServiceContextFactory computeServiceFactory = new ComputeServiceContextFactory();
     Map<String, ClusterActionHandler> handlerMap = new HandlerMapFactory()
         .create();
 
-    ClusterAction destroyer = new ByonClusterAction(DESTROY_ACTION,
-        computeServiceFactory, handlerMap);
+    ClusterAction destroyer = new ByonClusterAction(DESTROY_ACTION, getCompute(), handlerMap);
     destroyer.execute(clusterSpec, null);
   }
   

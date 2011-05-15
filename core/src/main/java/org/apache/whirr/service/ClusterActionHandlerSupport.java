@@ -143,7 +143,7 @@ public abstract class ClusterActionHandlerSupport extends ClusterActionHandler {
       try {
         URI uri = new URI(rawUrl);
 
-        BlobCache cache = BlobCache.getInstance(event.getClusterSpec());
+        BlobCache cache = BlobCache.getInstance(event.getCompute(), event.getClusterSpec());
         cache.putIfAbsent(uri);
 
         String basePath = "/tmp/whirr/cache/files/";

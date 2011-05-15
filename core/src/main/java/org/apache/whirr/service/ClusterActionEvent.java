@@ -22,6 +22,9 @@ import org.apache.whirr.Cluster;
 import org.apache.whirr.ClusterSpec;
 import org.apache.whirr.service.jclouds.StatementBuilder;
 import org.apache.whirr.service.jclouds.TemplateBuilderStrategy;
+import org.jclouds.compute.ComputeServiceContext;
+
+import com.google.common.base.Function;
 
 /**
  * An event object which is fired when a {@link org.apache.whirr.ClusterAction} occurs. 
@@ -35,19 +38,23 @@ public class ClusterActionEvent {
   private TemplateBuilderStrategy templateBuilderStrategy =
     new TemplateBuilderStrategy();
   private FirewallManager firewallManager;
+  private Function<ClusterSpec, ComputeServiceContext> getCompute;
   
   public ClusterActionEvent(String action, ClusterSpec clusterSpec,
-      Cluster cluster, FirewallManager firewallManager) {
-    this(action, clusterSpec, cluster, null, firewallManager);
+      Cluster cluster, Function<ClusterSpec, ComputeServiceContext> getCompute,
+      FirewallManager firewallManager) {
+    this(action, clusterSpec, cluster, null, getCompute, firewallManager);
   }
   
   public ClusterActionEvent(String action, ClusterSpec clusterSpec,
       Cluster cluster, StatementBuilder statementBuilder,
+      Function<ClusterSpec, ComputeServiceContext> getCompute,
       FirewallManager firewallManager) {
     this.action = action;
     this.clusterSpec = clusterSpec;
     this.cluster = cluster;
     this.statementBuilder = statementBuilder;
+    this.getCompute = getCompute;
     this.firewallManager = firewallManager;
   }
   
@@ -66,7 +73,11 @@ public class ClusterActionEvent {
   public ClusterSpec getClusterSpec() {
     return clusterSpec;
   }
-
+  
+  public Function<ClusterSpec, ComputeServiceContext> getCompute() {
+    return getCompute;
+  }
+   
   public StatementBuilder getStatementBuilder() {
     return statementBuilder;
   }

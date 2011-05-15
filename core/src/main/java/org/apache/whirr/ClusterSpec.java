@@ -324,6 +324,52 @@ public class ClusterSpec {
     setRunUrlBase(getString(Property.RUN_URL_BASE));
   }
 
+  /**
+   * Create a deep object copy. It's not enough to just copy the configuration
+   * because the object can also be modified using the setters and the changes
+   * are not reflected in the configuration object.
+   */
+  public ClusterSpec copy() throws ConfigurationException {
+    ClusterSpec r = new ClusterSpec(getConfiguration(), true);
+
+    r.setClusterName(getClusterName());
+    r.setServiceName(getServiceName());
+
+    r.setLoginUser(getLoginUser());
+    r.setClusterUser(getClusterUser());
+
+    r.setInstanceTemplates(Lists.newLinkedList(getInstanceTemplates()));
+    r.setMaxStartupRetries(getMaxStartupRetries());
+
+    r.setProvider(getProvider());
+    r.setIdentity(getIdentity());
+    r.setCredential(getCredential());
+
+    r.setBlobStoreProvider(getBlobStoreProvider());
+    r.setBlobStoreIdentity(getBlobStoreIdentity());
+    r.setBlobStoreCredential(getBlobStoreCredential());
+
+    r.setStateStore(getStateStore());
+    r.setStateStoreContainer(getStateStoreContainer());
+    r.setStateStoreBlob(getStateStoreBlob());
+
+    r.setPrivateKey(getPrivateKey());
+    r.setPublicKey(getPublicKey());
+
+    r.setImageId(getImageId());
+    r.setHardwareId(getHardwareId());
+    r.setHardwareMinRam(getHardwareMinRam());
+
+    r.setLocationId(getLocationId());
+    r.setBlobStoreLocationId(getBlobStoreLocationId());
+    r.setClientCidrs(getClientCidrs());
+
+    r.setVersion(getVersion());
+    r.setRunUrlBase(getRunUrlBase());
+
+    return r;
+  }
+
   private String getString(Property key) {
     return config.getString(key.getConfigName(), null);
   }
@@ -544,6 +590,14 @@ public class ClusterSpec {
   }
 
   public void setProvider(String provider) {
+    if ("ec2".equals(provider)) {
+      LOG.warn("Please use provider \"aws-ec2\" instead of \"ec2\"");
+      provider = "aws-ec2";
+    }
+    if ("cloudservers".equals(provider)) {
+      LOG.warn("Please use provider \"cloudservers-us\" instead of \"cloudservers\"");
+      provider = "cloudservers-us";
+    }
     this.provider = provider;
   }
 
@@ -731,31 +785,31 @@ public class ClusterSpec {
   public boolean equals(Object o) {
     if (o instanceof ClusterSpec) {
       ClusterSpec that = (ClusterSpec) o;
-      return Objects.equal(instanceTemplates, that.instanceTemplates)
-        && Objects.equal(maxStartupRetries, that.maxStartupRetries)
-        && Objects.equal(provider, that.provider)
-        && Objects.equal(identity, that.identity)
-        && Objects.equal(credential, that.credential)
-        && Objects.equal(blobStoreProvider, that.blobStoreProvider)
-        && Objects.equal(blobStoreIdentity, that.blobStoreIdentity)
-        && Objects.equal(blobStoreCredential, that.blobStoreCredential)
-        && Objects.equal(clusterName, that.clusterName)
-        && Objects.equal(serviceName, that.serviceName)
-        && Objects.equal(clusterUser, that.clusterUser)
-        && Objects.equal(loginUser, that.loginUser)
-        && Objects.equal(publicKey, that.publicKey)
-        && Objects.equal(privateKey, that.privateKey)
-        && Objects.equal(imageId, that.imageId)
-        && Objects.equal(hardwareId, that.hardwareId)
-        && Objects.equal(hardwareMinRam, that.hardwareMinRam)
-        && Objects.equal(locationId, that.locationId)
-        && Objects.equal(blobStoreLocationId, that.blobStoreLocationId)
-        && Objects.equal(clientCidrs, that.clientCidrs)
-        && Objects.equal(version, that.version)
-        && Objects.equal(runUrlBase, that.runUrlBase)
-        && Objects.equal(stateStore, that.stateStore)
-        && Objects.equal(stateStoreContainer, that.stateStoreContainer)
-        && Objects.equal(stateStoreBlob, that.stateStoreBlob)
+      return Objects.equal(getInstanceTemplates(), that.getInstanceTemplates())
+        && Objects.equal(getMaxStartupRetries(), that.getMaxStartupRetries())
+        && Objects.equal(getProvider(), that.getProvider())
+        && Objects.equal(getIdentity(), that.getIdentity())
+        && Objects.equal(getCredential(), that.getCredential())
+        && Objects.equal(getBlobStoreProvider(), that.getBlobStoreProvider())
+        && Objects.equal(getBlobStoreIdentity(), that.getBlobStoreIdentity())
+        && Objects.equal(getBlobStoreCredential(), that.getBlobStoreCredential())
+        && Objects.equal(getClusterName(), that.getClusterName())
+        && Objects.equal(getServiceName(), that.getServiceName())
+        && Objects.equal(getClusterUser(), that.getClusterUser())
+        && Objects.equal(getLoginUser(), that.getLoginUser())
+        && Objects.equal(getPublicKey(), that.getPublicKey())
+        && Objects.equal(getPrivateKey(), that.getPrivateKey())
+        && Objects.equal(getImageId(), that.getImageId())
+        && Objects.equal(getHardwareId(), that.getHardwareId())
+        && Objects.equal(getHardwareMinRam(), that.getHardwareMinRam())
+        && Objects.equal(getLocationId(), that.getLocationId())
+        && Objects.equal(getBlobStoreLocationId(), that.getBlobStoreLocationId())
+        && Objects.equal(getClientCidrs(), that.getClientCidrs())
+        && Objects.equal(getVersion(), that.getVersion())
+        && Objects.equal(getRunUrlBase(), that.getRunUrlBase())
+        && Objects.equal(getStateStore(), that.getStateStore())
+        && Objects.equal(getStateStoreContainer(), that.getStateStoreContainer())
+        && Objects.equal(getStateStoreBlob(), that.getStateStoreBlob())
         ;
     }
     return false;
@@ -763,61 +817,61 @@ public class ClusterSpec {
   
   public int hashCode() {
     return Objects.hashCode(
-        instanceTemplates,
-        maxStartupRetries,
-        provider,
-        identity,
-        credential,
-        blobStoreProvider,
-        blobStoreIdentity,
-        blobStoreCredential,
-        clusterName,
-        serviceName,
-        clusterUser, 
-        loginUser,
-        publicKey,
-        privateKey,
-        imageId,
-        hardwareId,
-        hardwareMinRam,
-        locationId,
-        blobStoreLocationId,
-        clientCidrs,
-        version,
-        runUrlBase,
-        stateStore, 
-        stateStoreBlob, 
-        stateStoreContainer
+        getInstanceTemplates(),
+        getMaxStartupRetries(),
+        getProvider(),
+        getIdentity(),
+        getCredential(),
+        getBlobStoreProvider(),
+        getBlobStoreIdentity(),
+        getBlobStoreCredential(),
+        getClusterName(),
+        getServiceName(),
+        getClusterUser(),
+        getLoginUser(),
+        getPublicKey(),
+        getPrivateKey(),
+        getImageId(),
+        getHardwareId(),
+        getHardwareMinRam(),
+        getLocationId(),
+        getBlobStoreLocationId(),
+        getClientCidrs(),
+        getVersion(),
+        getRunUrlBase(),
+        getStateStore(),
+        getStateStoreBlob(),
+        getStateStoreContainer()
     );
   }
   
   public String toString() {
     return Objects.toStringHelper(this)
-      .add("instanceTemplates", instanceTemplates)
-      .add("maxStartupRetries", maxStartupRetries)
-      .add("provider", provider)
-      .add("identity", identity)
-      .add("credential", credential)
-      .add("blobStoreProvider", blobStoreProvider)
-      .add("blobStoreCredential", blobStoreCredential)
-      .add("blobStoreIdentity", blobStoreIdentity)
-      .add("clusterName", clusterName)
-      .add("serviceName", serviceName)
-      .add("clusterUser", clusterUser)
-      .add("loginUser", loginUser)
-      .add("publicKey", publicKey)
-      .add("privateKey", privateKey)
-      .add("imageId", imageId)
-      .add("hardwareId", hardwareId)
-      .add("hardwareMinRam", hardwareMinRam)
-      .add("locationId", locationId)
-      .add("blobStoreLocationId", blobStoreLocationId)
-      .add("clientCidrs", clientCidrs)
-      .add("version", version)
-      .add("runUrlBase", runUrlBase)
-      .add("stateStore", stateStore)
-      .add("stateStoreContainer", stateStoreContainer)
-      .add("stateStoreBlob", stateStoreBlob)
+      .add("instanceTemplates", getInstanceTemplates())
+      .add("maxStartupRetries", getMaxStartupRetries())
+      .add("provider", getProvider())
+      .add("identity", getIdentity())
+      .add("credential", getCredential())
+      .add("blobStoreProvider", getBlobStoreProvider())
+      .add("blobStoreCredential", getBlobStoreCredential())
+      .add("blobStoreIdentity", getBlobStoreIdentity())
+      .add("clusterName", getClusterName())
+      .add("serviceName", getServiceName())
+      .add("clusterUser", getClusterUser())
+      .add("loginUser", getLoginUser())
+      .add("publicKey", getPublicKey())
+      .add("privateKey", getPrivateKey())
+      .add("imageId", getImageId())
+      .add("hardwareId", getHardwareId())
+      .add("hardwareMinRam", getHardwareMinRam())
+      .add("locationId", getLocationId())
+      .add("blobStoreLocationId", getBlobStoreLocationId())
+      .add("clientCidrs", getClientCidrs())
+      .add("version", getVersion())
+      .add("runUrlBase", getRunUrlBase())
+      .add("stateStore", getStateStore())
+      .add("stateStoreContainer", getStateStoreContainer())
+      .add("stateStoreBlob", getStateStoreBlob())
       .toString();
   }
 }

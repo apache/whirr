@@ -40,7 +40,6 @@ import org.apache.whirr.ClusterController;
 import org.apache.whirr.ClusterControllerFactory;
 import org.apache.whirr.ClusterSpec;
 import org.apache.whirr.ClusterSpec.Property;
-import org.apache.whirr.actions.BootstrapClusterAction;
 import org.apache.whirr.cli.Command;
 import org.apache.whirr.service.ClusterStateStore;
 import org.apache.whirr.service.ClusterStateStoreFactory;
@@ -59,7 +58,7 @@ public abstract class AbstractClusterSpecCommand extends Command {
   protected ClusterStateStoreFactory stateStoreFactory;
 
   protected OptionParser parser = new OptionParser();
-  private Map<Property, OptionSpec> optionSpecs;
+  private Map<Property, OptionSpec<?>> optionSpecs;
   private OptionSpec<String> configOption = parser
     .accepts("config", "Note that Whirr properties specified in " + 
       "this file  should all have a whirr. prefix.")
@@ -95,9 +94,9 @@ public abstract class AbstractClusterSpecCommand extends Command {
 
   protected ClusterSpec getClusterSpec(OptionSet optionSet) throws ConfigurationException {
     Configuration optionsConfig = new PropertiesConfiguration();
-    for (Map.Entry<Property, OptionSpec> entry : optionSpecs.entrySet()) {
+    for (Map.Entry<Property, OptionSpec<?>> entry : optionSpecs.entrySet()) {
       Property property = entry.getKey();
-      OptionSpec option = entry.getValue();
+      OptionSpec<?> option = entry.getValue();
       if (property.hasMultipleArguments()) {
         optionsConfig.setProperty(property.getConfigName(),
             optionSet.valuesOf(option));

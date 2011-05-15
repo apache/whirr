@@ -29,13 +29,8 @@ import org.apache.whirr.Cluster;
 import org.apache.whirr.ClusterSpec;
 import org.apache.whirr.service.ClusterActionEvent;
 import org.apache.whirr.service.ClusterActionHandlerSupport;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class ElasticSearchHandler extends ClusterActionHandlerSupport {
-
-  private static final Logger LOG =
-    LoggerFactory.getLogger(ElasticSearchHandler.class);
 
   public static final String ROLE = "elasticsearch";
 

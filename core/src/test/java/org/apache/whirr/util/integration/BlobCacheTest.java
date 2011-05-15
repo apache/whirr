@@ -19,8 +19,6 @@
 package org.apache.whirr.util.integration;
 
 import com.google.common.io.Files;
-import com.jcraft.jsch.JSchException;
-import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
@@ -30,6 +28,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.whirr.ClusterSpec;
+import org.apache.whirr.service.ComputeCache;
 import org.apache.whirr.util.BlobCache;
 import org.jclouds.http.HttpRequest;
 import org.jclouds.scriptbuilder.domain.OsFamily;
@@ -64,7 +63,7 @@ public class BlobCacheTest {
     File tempFile = createTemporaryFile(expected);
 
     ClusterSpec spec = getTestClusterSpec();
-    BlobCache cache = BlobCache.getInstance(spec);
+    BlobCache cache = BlobCache.getInstance(ComputeCache.INSTANCE, spec);
 
     try {
       cache.putIfAbsent(tempFile);
@@ -90,7 +89,7 @@ public class BlobCacheTest {
     }
     spec.setLocationId("eu-west-1");
 
-    BlobCache cache = BlobCache.getInstance(spec);
+    BlobCache cache = BlobCache.getInstance(ComputeCache.INSTANCE, spec);
     assertThat(cache.getLocation().getId(), is("EU"));
   }
 

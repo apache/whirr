@@ -45,9 +45,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class CassandraServiceTest {
-
-  private static final String KEYSPACE = "Keyspace1";
-
+   
   private ClusterSpec clusterSpec;
   private ClusterController controller;
   private Cluster cluster;

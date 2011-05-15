@@ -36,14 +36,9 @@ import org.apache.whirr.Cluster.Instance;
 import org.apache.whirr.ClusterSpec;
 import org.apache.whirr.service.ClusterActionEvent;
 import org.apache.whirr.service.ClusterActionHandlerSupport;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class CassandraClusterActionHandler extends ClusterActionHandlerSupport {
-  
-  private static final Logger LOG =
-    LoggerFactory.getLogger(CassandraClusterActionHandler.class);
-    
+
   public static final String CASSANDRA_ROLE = "cassandra";
   public static final int CLIENT_PORT = 9160;
   public static final int JMX_PORT = 8080;

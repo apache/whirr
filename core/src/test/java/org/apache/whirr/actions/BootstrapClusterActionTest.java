@@ -24,9 +24,9 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.google.common.base.Function;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import com.google.inject.Module;
 
 import java.io.IOException;
 import java.net.URI;
@@ -34,7 +34,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Properties;
 import java.util.Set;
 import java.util.Stack;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -46,7 +45,6 @@ import org.apache.whirr.ClusterSpec;
 import org.apache.whirr.service.ClusterActionHandler;
 import org.jclouds.compute.ComputeService;
 import org.jclouds.compute.ComputeServiceContext;
-import org.jclouds.compute.ComputeServiceContextFactory;
 import org.jclouds.compute.RunNodesException;
 import org.jclouds.compute.domain.Hardware;
 import org.jclouds.compute.domain.Image;
@@ -75,7 +73,8 @@ public class BootstrapClusterActionTest {
   private static final Logger LOG =
     LoggerFactory.getLogger(BootstrapClusterActionTest.class);
 
-  @Test
+  @SuppressWarnings("unchecked")
+@Test
   public void testDoActionRetriesSucceed() throws Exception {
     CompositeConfiguration config = new CompositeConfiguration();
     if (System.getProperty("config") != null) {
@@ -106,14 +105,13 @@ public class BootstrapClusterActionTest {
     handlerMap.put("hadoop-datanode", handler);
     handlerMap.put("hadoop-tasktracker", handler);
 
-    ComputeServiceContextFactory serviceContextFactory = mock(ComputeServiceContextFactory.class);
+    Function<ClusterSpec, ComputeServiceContext> getCompute = mock(Function.class);
     ComputeServiceContext serviceContext = mock(ComputeServiceContext.class);
     ComputeService computeService = mock(ComputeService.class);
     TemplateBuilder templateBuilder = mock(TemplateBuilder.class);
     Template template = mock(Template.class);
 
-    when(serviceContextFactory.createContext((String) any(), (String) any(), (String) any(),  
-        (Iterable<? extends Module>) any(), (Properties) any())).thenReturn(serviceContext);
+    when(getCompute.apply(clusterSpec)).thenReturn(serviceContext);
     when(serviceContext.getComputeService()).thenReturn(computeService);
     when(computeService.templateBuilder()).thenReturn(templateBuilder);
     when(templateBuilder.options((TemplateOptions) any())).thenReturn(templateBuilder);
@@ -131,7 +129,7 @@ public class BootstrapClusterActionTest {
     reaction.put(dntt, ddttStack);
     
     nodeStarterFactory = new TestNodeStarterFactory(reaction);
-    BootstrapClusterAction bootstrapper = new BootstrapClusterAction(serviceContextFactory, handlerMap, nodeStarterFactory);
+    BootstrapClusterAction bootstrapper = new BootstrapClusterAction(getCompute, handlerMap, nodeStarterFactory);
     
     bootstrapper.execute(clusterSpec, null);
     if (nodeStarterFactory != null) {
@@ -171,14 +169,13 @@ public class BootstrapClusterActionTest {
     handlerMap.put("hadoop-datanode", handler);
     handlerMap.put("hadoop-tasktracker", handler);
 
-    ComputeServiceContextFactory serviceContextFactory = mock(ComputeServiceContextFactory.class);
+    Function<ClusterSpec, ComputeServiceContext> getCompute = mock(Function.class);
     ComputeServiceContext serviceContext = mock(ComputeServiceContext.class);
     ComputeService computeService = mock(ComputeService.class);
     TemplateBuilder templateBuilder = mock(TemplateBuilder.class);
     Template template = mock(Template.class);
 
-    when(serviceContextFactory.createContext((String) any(), (String) any(), (String) any(),  
-        (Iterable<? extends Module>) any(), (Properties) any())).thenReturn(serviceContext);
+    when(getCompute.apply(clusterSpec)).thenReturn(serviceContext);
     when(serviceContext.getComputeService()).thenReturn(computeService);
     when(computeService.templateBuilder()).thenReturn(templateBuilder);
     when(templateBuilder.options((TemplateOptions) any())).thenReturn(templateBuilder);
@@ -197,7 +194,7 @@ public class BootstrapClusterActionTest {
     reaction.put(dntt, ddttStack);
     
     nodeStarterFactory = new TestNodeStarterFactory(reaction);
-    BootstrapClusterAction bootstrapper = new BootstrapClusterAction(serviceContextFactory, handlerMap, nodeStarterFactory);
+    BootstrapClusterAction bootstrapper = new BootstrapClusterAction(getCompute, handlerMap, nodeStarterFactory);
     
     bootstrapper.execute(clusterSpec, null); // this should file with too many retries
     if (nodeStarterFactory != null) {
