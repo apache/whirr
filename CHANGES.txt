@@ -82,6 +82,8 @@ Trunk (unreleased changes)
     WHIRR-61. Make more efficient use of ComputeServiceContext. (adriancole and
     asavu via tomwhite)
 
+    WHIRR-304. Upgrade to jclouds 1.0-beta-9c. (adriancole via tomwhite)
+
   BUG FIXES
 
     WHIRR-253. ZooKeeper service should only authorize ingress to ZooKeeper 
