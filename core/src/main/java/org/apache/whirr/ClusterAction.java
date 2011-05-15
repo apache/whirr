@@ -20,7 +20,9 @@ package org.apache.whirr;
 
 import java.io.IOException;
 
-import org.jclouds.compute.ComputeServiceContextFactory;
+import org.jclouds.compute.ComputeServiceContext;
+
+import com.google.common.base.Function;
 
 /**
  * Performs an action on a cluster. Example actions include bootstrapping
@@ -29,14 +31,14 @@ import org.jclouds.compute.ComputeServiceContextFactory;
  */
 public abstract class ClusterAction {
   
-  private final ComputeServiceContextFactory computeServiceContextFactory;
+  private final Function<ClusterSpec, ComputeServiceContext> getCompute;
 
-  protected ClusterAction(final ComputeServiceContextFactory computeServiceContextFactory) {
-    this.computeServiceContextFactory = computeServiceContextFactory;
+  protected ClusterAction(final Function<ClusterSpec, ComputeServiceContext> getCompute) {
+    this.getCompute = getCompute;
   }
   
-  protected ComputeServiceContextFactory getComputeServiceContextFactory() {
-    return computeServiceContextFactory;
+  protected Function<ClusterSpec, ComputeServiceContext> getCompute() {
+    return getCompute;
   }
   
   protected abstract String getAction();

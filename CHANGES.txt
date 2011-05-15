@@ -79,6 +79,9 @@ Trunk (unreleased changes)
     WHIRR-296. Separate Voldemort install and configuration scripts into more
     generic functions. (asavu via tomwhite)
 
+    WHIRR-61. Make more efficient use of ComputeServiceContext. (adriancole and
+    asavu via tomwhite)
+
   BUG FIXES
 
     WHIRR-253. ZooKeeper service should only authorize ingress to ZooKeeper 

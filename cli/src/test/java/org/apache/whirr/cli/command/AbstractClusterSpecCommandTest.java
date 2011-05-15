@@ -72,13 +72,6 @@ public class AbstractClusterSpecCommandTest {
       }
     };
 
-    Map<String, File> keys = KeyPair.generateTemporaryFiles();
-    OptionSet optionSet = clusterSpecCommand.parser.parse(
-        "--service-name", "foo",
-        "--config", "whirr-override-test.properties",
-        "--private-key-file", keys.get("private").getAbsolutePath()
-    );
-    ClusterSpec clusterSpec = clusterSpecCommand.getClusterSpec(optionSet);
     // following should not fail
     clusterSpecCommand.createClusterController("bar");
   }

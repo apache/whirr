@@ -18,6 +18,7 @@
 
 package org.apache.whirr;
 
+import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 
@@ -33,10 +34,9 @@ import org.apache.whirr.actions.DestroyClusterAction;
 import org.apache.whirr.service.ClusterStateStore;
 import org.apache.whirr.service.ClusterStateStoreFactory;
 import org.apache.whirr.service.ClusterActionHandler;
-import org.apache.whirr.service.ComputeServiceContextBuilder;
+import org.apache.whirr.service.ComputeCache;
 import org.jclouds.compute.ComputeService;
 import org.jclouds.compute.ComputeServiceContext;
-import org.jclouds.compute.ComputeServiceContextFactory;
 import org.jclouds.compute.RunScriptOnNodesException;
 import org.jclouds.compute.domain.ComputeMetadata;
 import org.jclouds.compute.domain.ExecResponse;
@@ -57,13 +57,17 @@ public class ClusterController {
 
   private static final Logger LOG = LoggerFactory.getLogger(ClusterController.class);
 
-  private ClusterStateStoreFactory stateStoreFactory;
+  private final Function<ClusterSpec, ComputeServiceContext> getCompute;
+  private final ClusterStateStoreFactory stateStoreFactory;
+
 
   public ClusterController() {
-    this(new ClusterStateStoreFactory());
+    this(ComputeCache.INSTANCE, new ClusterStateStoreFactory());
   }
 
-  public ClusterController(ClusterStateStoreFactory stateStoreFactory) {
+  public ClusterController(Function<ClusterSpec, ComputeServiceContext> getCompute,
+      ClusterStateStoreFactory stateStoreFactory) {
+    this.getCompute = getCompute;
     this.stateStoreFactory = stateStoreFactory;
   }
 
@@ -73,6 +77,14 @@ public class ClusterController {
   public String getName() {
     throw new UnsupportedOperationException("No service name");
   }
+  
+  /**
+   * @return compute service contexts for use in managing the service
+   */
+  protected Function<ClusterSpec, ComputeServiceContext> getCompute() {
+    return getCompute;
+  }
+  
   /**
    * Start the cluster described by <code>clusterSpec</code> and block until the
    * cluster is
@@ -87,13 +99,12 @@ public class ClusterController {
   public Cluster launchCluster(ClusterSpec clusterSpec)
       throws IOException, InterruptedException {
     
-    ComputeServiceContextFactory computeServiceFactory = new ComputeServiceContextFactory();
     Map<String, ClusterActionHandler> handlerMap = new HandlerMapFactory().create();
 
-    BootstrapClusterAction bootstrapper = new BootstrapClusterAction(computeServiceFactory, handlerMap);
+    BootstrapClusterAction bootstrapper = new BootstrapClusterAction(getCompute(), handlerMap);
     Cluster cluster = bootstrapper.execute(clusterSpec, null);
 
-    ConfigureClusterAction configurer = new ConfigureClusterAction(computeServiceFactory, handlerMap);
+    ConfigureClusterAction configurer = new ConfigureClusterAction(getCompute(), handlerMap);
     cluster = configurer.execute(clusterSpec, cluster);
 
     stateStoreFactory.create(clusterSpec).save(cluster);
@@ -110,7 +121,7 @@ public class ClusterController {
    */
   public void destroyCluster(ClusterSpec clusterSpec) throws IOException,
       InterruptedException {
-    DestroyClusterAction destroyer = new DestroyClusterAction(new ComputeServiceContextFactory());
+    DestroyClusterAction destroyer = new DestroyClusterAction(getCompute());
     destroyer.execute(clusterSpec, null);
 
     stateStoreFactory.create(clusterSpec).destroy();
@@ -120,8 +131,7 @@ public class ClusterController {
     LOG.info("Destroying instance {}", instanceId);
 
     /* Destroy the instance */
-    ComputeService computeService = ComputeServiceContextBuilder
-      .build(clusterSpec).getComputeService();
+    ComputeService computeService = getCompute().apply(clusterSpec).getComputeService();
     computeService.destroyNode(instanceId);
 
     /* .. and update the cluster state storage */
@@ -137,21 +147,17 @@ public class ClusterController {
         Predicate<NodeMetadata> condition, Statement statement) throws IOException, RunScriptOnNodesException {
 
     Credentials credentials = new Credentials(spec.getClusterUser(), spec.getPrivateKey());
-    ComputeServiceContext context = ComputeServiceContextBuilder.build(spec);
-    try {
-      condition = Predicates.and(runningInGroup(spec.getClusterName()), condition);
-      return context.getComputeService().runScriptOnNodesMatching(condition,
-        statement, overrideCredentialsWith(credentials).wrapInInitScript(false).runAsRoot(false));
-    } finally {
-      context.close();
-    }
+    ComputeServiceContext context = getCompute().apply(spec);
+
+    condition = Predicates.and(runningInGroup(spec.getClusterName()), condition);
+    return context.getComputeService().runScriptOnNodesMatching(condition,
+      statement, overrideCredentialsWith(credentials).wrapInInitScript(false).runAsRoot(false));
   }
 
   @Deprecated
   public Set<? extends NodeMetadata> getNodes(ClusterSpec clusterSpec)
     throws IOException, InterruptedException {
-    ComputeService computeService =
-      ComputeServiceContextBuilder.build(new ComputeServiceContextFactory(), clusterSpec).getComputeService();
+    ComputeService computeService = getCompute().apply(clusterSpec).getComputeService();
     return computeService.listNodesDetailsMatching(
         runningInGroup(clusterSpec.getClusterName()));
   }

@@ -28,7 +28,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -50,7 +49,7 @@ import org.junit.Test;
 
 public class HadoopConfigurationBuilderTest {
   
-  static class RegexMatcher extends BaseMatcher {
+  static class RegexMatcher extends BaseMatcher<String> {
     private final String regex;
 
     public RegexMatcher(String regex) {

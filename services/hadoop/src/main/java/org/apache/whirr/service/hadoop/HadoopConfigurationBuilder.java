@@ -21,7 +21,6 @@ package org.apache.whirr.service.hadoop;
 import static org.apache.whirr.RolePredicates.role;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Functions;
 import com.google.common.collect.Iterables;
 
 import java.io.IOException;

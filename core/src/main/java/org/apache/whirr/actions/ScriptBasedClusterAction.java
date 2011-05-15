@@ -18,6 +18,7 @@
 
 package org.apache.whirr.actions;
 
+import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 
@@ -30,12 +31,9 @@ import org.apache.whirr.ClusterSpec;
 import org.apache.whirr.InstanceTemplate;
 import org.apache.whirr.service.ClusterActionEvent;
 import org.apache.whirr.service.ClusterActionHandler;
-import org.apache.whirr.service.ComputeServiceContextBuilder;
 import org.apache.whirr.service.FirewallManager;
 import org.apache.whirr.service.jclouds.StatementBuilder;
 import org.jclouds.compute.ComputeServiceContext;
-import org.jclouds.compute.ComputeServiceContextFactory;
-import org.jclouds.scriptbuilder.domain.Statements;
 
 /**
  * A {@link ClusterAction} that provides the base functionality for running
@@ -45,9 +43,9 @@ public abstract class ScriptBasedClusterAction extends ClusterAction {
 
   private final Map<String, ClusterActionHandler> handlerMap;
   
-  protected ScriptBasedClusterAction(final ComputeServiceContextFactory computeServiceContextFactory,
+  protected ScriptBasedClusterAction(Function<ClusterSpec, ComputeServiceContext> getCompute,
       final Map<String, ClusterActionHandler> handlerMap) {
-    super(computeServiceContextFactory);
+    super(getCompute);
     this.handlerMap = handlerMap;
   }
   
@@ -61,13 +59,12 @@ public abstract class ScriptBasedClusterAction extends ClusterAction {
     for (InstanceTemplate instanceTemplate : clusterSpec.getInstanceTemplates()) {
       StatementBuilder statementBuilder = new StatementBuilder();
 
-      ComputeServiceContext computServiceContext = // TODO: shouldn't create lots of these
-        ComputeServiceContextBuilder.build(getComputeServiceContextFactory(), clusterSpec);
+      ComputeServiceContext computServiceContext = getCompute().apply(clusterSpec);
       FirewallManager firewallManager = new FirewallManager(computServiceContext,
           clusterSpec, newCluster);
 
       ClusterActionEvent event = new ClusterActionEvent(getAction(),
-          clusterSpec, newCluster, statementBuilder, firewallManager);
+          clusterSpec, newCluster, statementBuilder, getCompute(), firewallManager);
 
       eventMap.put(instanceTemplate, event);
       for (String role : instanceTemplate.getRoles()) {

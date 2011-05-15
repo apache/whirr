@@ -311,4 +311,15 @@ public class ClusterSpecTest {
     }
   }
 
+  @Test
+  public void testCopySpec() throws Exception {
+    ClusterSpec spec = ClusterSpec.withTemporaryKeys(
+      new PropertiesConfiguration("whirr-core-test.properties"));
+    spec.setLocationId("random-location");
+
+    /* check the copy is the same as the original */
+    assertThat(spec.copy(), is(spec));
+    assertThat(spec.copy().hashCode(), is(spec.hashCode()));
+  }
+
 }

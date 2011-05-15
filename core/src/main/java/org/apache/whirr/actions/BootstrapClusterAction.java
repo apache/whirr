@@ -51,12 +51,10 @@ import org.apache.whirr.ClusterSpec;
 import org.apache.whirr.InstanceTemplate;
 import org.apache.whirr.service.ClusterActionEvent;
 import org.apache.whirr.service.ClusterActionHandler;
-import org.apache.whirr.service.ComputeServiceContextBuilder;
 import org.apache.whirr.service.jclouds.StatementBuilder;
 import org.apache.whirr.service.jclouds.TemplateBuilderStrategy;
 import org.jclouds.compute.ComputeService;
 import org.jclouds.compute.ComputeServiceContext;
-import org.jclouds.compute.ComputeServiceContextFactory;
 import org.jclouds.compute.RunNodesException;
 import org.jclouds.compute.domain.NodeMetadata;
 import org.jclouds.compute.domain.Template;
@@ -78,14 +76,14 @@ public class BootstrapClusterAction extends ScriptBasedClusterAction {
   
   private final NodeStarterFactory nodeStarterFactory;
   
-  public BootstrapClusterAction(final ComputeServiceContextFactory computeServiceContextFactory,
+  public BootstrapClusterAction(final Function<ClusterSpec, ComputeServiceContext> getCompute,
       final Map<String, ClusterActionHandler> handlerMap) {
-    this(computeServiceContextFactory, handlerMap, new NodeStarterFactory());
+    this(getCompute, handlerMap, new NodeStarterFactory());
   }
   
-  BootstrapClusterAction(final ComputeServiceContextFactory computeServiceContextFactory,
+  BootstrapClusterAction(final Function<ClusterSpec, ComputeServiceContext> getCompute,
       final Map<String, ClusterActionHandler> handlerMap, final NodeStarterFactory nodeStarterFactory) {
-    super(computeServiceContextFactory, handlerMap);
+    super(getCompute, handlerMap);
     this.nodeStarterFactory = nodeStarterFactory;
   }
   
@@ -108,8 +106,7 @@ public class BootstrapClusterAction extends ScriptBasedClusterAction {
       final ClusterSpec clusterSpec = entry.getValue().getClusterSpec();
       final int maxNumberOfRetries = clusterSpec.getMaxStartupRetries(); 
       StatementBuilder statementBuilder = entry.getValue().getStatementBuilder();
-      ComputeServiceContext computeServiceContext =
-        ComputeServiceContextBuilder.build(getComputeServiceContextFactory(), clusterSpec);
+      ComputeServiceContext computeServiceContext = getCompute().apply(clusterSpec);
       final ComputeService computeService =
         computeServiceContext.getComputeService();
       final Template template = buildTemplate(clusterSpec, computeService,

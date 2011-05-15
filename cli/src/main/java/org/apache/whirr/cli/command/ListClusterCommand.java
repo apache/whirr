@@ -19,13 +19,11 @@
 package org.apache.whirr.cli.command;
 
 import com.google.common.base.Joiner;
-import com.google.common.collect.Iterables;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.util.List;
-import java.util.Set;
 
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
@@ -36,9 +34,6 @@ import org.apache.whirr.ClusterControllerFactory;
 import org.apache.whirr.ClusterSpec;
 import org.apache.whirr.service.ClusterStateStore;
 import org.apache.whirr.service.ClusterStateStoreFactory;
-import org.jclouds.compute.domain.NodeMetadata;
-
-import static org.apache.whirr.RolePredicates.withIds;
 
 /**
  * A command to list the nodes in a cluster.

@@ -18,16 +18,16 @@
 
 package org.apache.whirr.util;
 
+import com.google.common.base.Function;
 import com.google.common.collect.Maps;
+import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.whirr.ClusterSpec;
 import org.apache.whirr.service.BlobStoreContextBuilder;
-import org.apache.whirr.service.ComputeServiceContextBuilder;
 import org.apache.whirr.service.jclouds.SaveHttpResponseTo;
 import org.jclouds.blobstore.BlobStore;
 import org.jclouds.blobstore.BlobStoreContext;
 import org.jclouds.blobstore.domain.Blob;
-import org.jclouds.compute.ComputeService;
 import org.jclouds.compute.ComputeServiceContext;
 import org.jclouds.domain.Location;
 import org.jclouds.http.HttpRequest;
@@ -61,9 +61,14 @@ public class BlobCache {
     });
   }
 
-  public synchronized static BlobCache getInstance(ClusterSpec spec) throws IOException {
-    if (instances.containsKey(spec) == false) {
-      instances.put(spec, new BlobCache(spec));
+  public synchronized static BlobCache getInstance(Function<ClusterSpec, ComputeServiceContext> getCompute,
+      ClusterSpec spec) throws IOException {
+    if (!instances.containsKey(spec)) {
+      try {
+        instances.put(spec.copy(), new BlobCache(getCompute, spec));
+      } catch (ConfigurationException e) {
+        throw new IOException(e);
+      }
     }
     return instances.get(spec);
   }
@@ -75,12 +80,15 @@ public class BlobCache {
     instances.clear();
   }
 
-  BlobStoreContext context = null;
+  final BlobStoreContext context;
+  final Function<ClusterSpec, ComputeServiceContext> getCompute;
   String container = null;
   Location defaultLocation = null;
 
-  private BlobCache(ClusterSpec spec) throws IOException {
-    context = BlobStoreContextBuilder.build(spec);
+  private BlobCache(Function<ClusterSpec, ComputeServiceContext> getCompute,
+      ClusterSpec spec) throws IOException {
+    this.getCompute = getCompute;
+    this.context = BlobStoreContextBuilder.build(spec);
     updateDefaultLocation(spec);
   }
 
@@ -103,28 +111,25 @@ public class BlobCache {
       }
     } else if (spec.getLocationId() != null) {
       /* find the closest location to the compute nodes */
-      ComputeServiceContext compute = ComputeServiceContextBuilder.build(spec);
-      try {
-        Set<String> computeIsoCodes = null;
-        for(Location loc : compute.getComputeService().listAssignableLocations()) {
-          if (loc.getId().equals(spec.getLocationId())) {
-            computeIsoCodes = loc.getIso3166Codes();
+      ComputeServiceContext compute = getCompute.apply(spec);
+
+      Set<String> computeIsoCodes = null;
+      for(Location loc : compute.getComputeService().listAssignableLocations()) {
+        if (loc.getId().equals(spec.getLocationId())) {
+          computeIsoCodes = loc.getIso3166Codes();
+          break;
+        }
+      }
+      if (computeIsoCodes == null) {
+        LOG.warn("Invalid compute location ID '{}'. " +
+          "Using default blob store location.", spec.getLocationId());
+      } else {
+        for (Location loc : context.getBlobStore().listAssignableLocations()) {
+          if (containsAny(loc.getIso3166Codes(), computeIsoCodes)) {
+            defaultLocation = loc;
             break;
           }
         }
-        if (computeIsoCodes == null) {
-          LOG.warn("Invalid compute location ID '{}'. " +
-            "Using default blob store location.", spec.getLocationId());
-        } else {
-          for (Location loc : context.getBlobStore().listAssignableLocations()) {
-            if (containsAny(loc.getIso3166Codes(), computeIsoCodes)) {
-              defaultLocation = loc;
-              break;
-            }
-          }
-        }
-      } finally {
-        compute.close();
       }
     }
   }

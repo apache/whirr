@@ -30,7 +30,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.security.GeneralSecurityException;
-import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.interfaces.RSAPublicKey;
 import java.util.Map;
@@ -119,7 +118,6 @@ public class KeyPair {
     try {
       PKCS8Key decodedKey = new PKCS8Key(
           new FileInputStream(privateKeyFile), null);
-      PrivateKey privateKey = decodedKey.getPrivateKey();
       PublicKey publicKey = decodedKey.getPublicKey();
 
       byte[] actual = encodePublicKey((RSAPublicKey) publicKey);

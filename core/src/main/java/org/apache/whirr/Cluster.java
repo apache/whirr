@@ -32,12 +32,9 @@ import java.net.InetAddress;
 import java.util.Properties;
 import java.util.Set;
 
-import org.apache.whirr.Cluster.Instance;
 import org.apache.whirr.util.DnsUtil;
 import org.jclouds.compute.domain.NodeMetadata;
 import org.jclouds.domain.Credentials;
-
-import javax.annotation.Nullable;
 
 /**
  * This class represents a real cluster of {@link Instance}s.

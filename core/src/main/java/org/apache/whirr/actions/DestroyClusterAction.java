@@ -26,11 +26,12 @@ import org.apache.whirr.Cluster;
 import org.apache.whirr.ClusterAction;
 import org.apache.whirr.ClusterSpec;
 import org.apache.whirr.service.ClusterActionHandler;
-import org.apache.whirr.service.ComputeServiceContextBuilder;
 import org.jclouds.compute.ComputeService;
-import org.jclouds.compute.ComputeServiceContextFactory;
+import org.jclouds.compute.ComputeServiceContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.base.Function;
 
 /**
  * A {@link ClusterAction} for tearing down a running cluster and freeing up
@@ -41,8 +42,8 @@ public class DestroyClusterAction extends ClusterAction {
   private static final Logger LOG =
     LoggerFactory.getLogger(DestroyClusterAction.class);
   
-  public DestroyClusterAction(final ComputeServiceContextFactory computeServiceContextFactory) {
-    super(computeServiceContextFactory);
+  public DestroyClusterAction(Function<ClusterSpec, ComputeServiceContext> getCompute) {
+    super(getCompute);
   }
 
   @Override
@@ -54,8 +55,7 @@ public class DestroyClusterAction extends ClusterAction {
   public Cluster execute(ClusterSpec clusterSpec, Cluster cluster)
       throws IOException, InterruptedException {
     LOG.info("Destroying " + clusterSpec.getClusterName() + " cluster");
-    ComputeService computeService =
-    ComputeServiceContextBuilder.build(getComputeServiceContextFactory(), clusterSpec).getComputeService();
+    ComputeService computeService = getCompute().apply(clusterSpec).getComputeService();
     computeService.destroyNodesMatching(inGroup(clusterSpec.getClusterName()));
     LOG.info("Cluster {} destroyed", clusterSpec.getClusterName());
     return null;

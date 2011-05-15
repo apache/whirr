@@ -43,11 +43,9 @@ import org.apache.whirr.ClusterSpec;
 import org.apache.whirr.InstanceTemplate;
 import org.apache.whirr.service.ClusterActionEvent;
 import org.apache.whirr.service.ClusterActionHandler;
-import org.apache.whirr.service.ComputeServiceContextBuilder;
 import org.apache.whirr.service.jclouds.StatementBuilder;
 import org.jclouds.compute.ComputeService;
 import org.jclouds.compute.ComputeServiceContext;
-import org.jclouds.compute.ComputeServiceContextFactory;
 import org.jclouds.compute.domain.ComputeMetadata;
 import org.jclouds.compute.domain.NodeMetadata;
 import org.jclouds.domain.Credentials;
@@ -62,9 +60,9 @@ public class ByonClusterAction extends ScriptBasedClusterAction {
 
   private final String action;
   
-  public ByonClusterAction(String action, final ComputeServiceContextFactory computeServiceContextFactory,
-      final Map<String, ClusterActionHandler> handlerMap) {
-    super(computeServiceContextFactory, handlerMap);
+  public ByonClusterAction(String action, Function<ClusterSpec, ComputeServiceContext> getCompute,
+      Map<String, ClusterActionHandler> handlerMap) {
+    super(getCompute, handlerMap);
     this.action = action;
   }
   
@@ -88,8 +86,7 @@ public class ByonClusterAction extends ScriptBasedClusterAction {
 
       ClusterSpec clusterSpec = entry.getValue().getClusterSpec();
       final StatementBuilder statementBuilder = entry.getValue().getStatementBuilder();
-      ComputeServiceContext computeServiceContext =
-        ComputeServiceContextBuilder.build(getComputeServiceContextFactory(), clusterSpec);
+      ComputeServiceContext computeServiceContext = getCompute().apply(clusterSpec);
       final ComputeService computeService = computeServiceContext.getComputeService();
       Credentials credentials = new Credentials(clusterSpec.getIdentity(), clusterSpec.getCredential());
       

@@ -20,7 +20,7 @@ package org.apache.whirr.service;
 
 public class NoopClusterActionHandler extends ClusterActionHandlerSupport {
 
-  public final String ROLE = "noop";
+  public static final String ROLE = "noop";
 
   @Override
   public String getRole() {
