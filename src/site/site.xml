@@ -18,7 +18,7 @@
 <project name="Whirr">
   <bannerLeft>
     <name>Whirr</name>
-    <src>http://incubator.apache.org/whirr/images/whirr-logo-large.png</src>
+    <src>http://incubator.apache.org/whirr/images/whirr-logo.png</src>
     <href>http://incubator.apache.org/whirr/</href>
   </bannerLeft>
   <bannerRight>

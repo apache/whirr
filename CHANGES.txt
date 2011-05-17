@@ -86,6 +86,8 @@ Trunk (unreleased changes)
 
     WHIRR-236. Update Configuration Guides with Recipe Info. (tomwhite)
 
+    WHIRR-141. Create a logo. (Alison Wong via tomwhite)
+
   BUG FIXES
 
     WHIRR-253. ZooKeeper service should only authorize ingress to ZooKeeper 
