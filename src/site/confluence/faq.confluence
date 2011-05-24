@@ -60,30 +60,29 @@ final {{a}}) would start the cluster in that particular availability zone
 h2. How can I use a custom image? How can I control the cloud hardware used?
 
 The default image used is dependent on the Cloud provider, the hardware, and the
-service.
+service. Whirr tries to find an image with Ubuntu Server and at least 1024 MB of RAM.
 
 Use {{image-id}} to specify the image used, and {{hardware-id}} to specify the
 hardware. Both are cloud-specific.
+
+You can specify the amount of RAM in a cloud agnostic way by setting a value for
+{{hardware-min-ram}}.
 
 In addition, on EC2 you need to set jclouds.ec2.ami-owners to include the AMI
 owner if it is not Amazon, Alestic, Canonical, or RightScale.
 
 h2. How do I log in to a node in the cluster?
 
-On EC2, if you know the node's address you can do
+On EC2, if you know the node's address you can do:
 
 {code}
-ssh -i ~/.ssh/id_rsa ec2-user@host
+ssh -i ~/.ssh/id_rsa <whirr.cluster-user>@host
 {code}
 
 This assumes that you use the default private key; if this is not the case then
 specify the one you used at cluster launch.
 
-The Amazon Linux AMI requires that you login as {{ec2-user}}. If needed, you can
-become root by doing {{sudo su -}} after logging in.
-
-Different AMIs may have different login users. Check with the documentation for
-the AMI.
+{{whirr.cluster-user}} defaults to the name of the local user running Whirr. 
 
 {anchor:how-can-i-modify-the-instance-installation-and-configuration-scripts}
 h2. How can I modify the instance installation and configuration scripts?

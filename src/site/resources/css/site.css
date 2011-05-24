@@ -19,7 +19,13 @@
   background: none;
 }
 
-#banner img {
-  height: 123px;
-  width 130px;
+#bannerLeft img {
+  height: 90px;
+  margin-left: 30px;
+  margin-top: 4px;
 }
+
+#bannerRight img {
+  margin: 17px;
+}
+
