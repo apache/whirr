@@ -33,6 +33,7 @@ import org.apache.hadoop.hbase.thrift.generated.Mutation;
 import org.apache.hadoop.hbase.thrift.generated.TRowResult;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.whirr.service.hbase.integration.HBaseServiceController;
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -54,7 +55,7 @@ public class CdhHBaseServiceTest {
     controller.ensureClusterRunning();
   }
 
-  //@AfterClass
+  @AfterClass
   public static void tearDown() throws Exception {
     controller.shutdown();
   }
