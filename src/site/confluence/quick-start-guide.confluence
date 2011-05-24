@@ -43,9 +43,11 @@ directory of the distribution.
 {code}
 whirr.cluster-name=myhadoopcluster
 whirr.instance-templates=1 hadoop-jobtracker+hadoop-namenode,1 hadoop-datanode+hadoop-tasktracker
-whirr.provider=ec2
+
+whirr.provider=aws-ec2
 whirr.identity=${env:AWS_ACCESS_KEY_ID}
 whirr.credential=${env:AWS_SECRET_ACCESS_KEY}
+
 whirr.private-key-file=${sys:user.home}/.ssh/id_rsa
 whirr.public-key-file=${sys:user.home}/.ssh/id_rsa.pub
 {code}
@@ -158,7 +160,7 @@ for properties is not reflected in the command line argument):
 % bin/whirr launch-cluster \
     --cluster-name=myhadoopcluster \
     --instance-templates='1 hadoop-jobtracker+hadoop-namenode,1 hadoop-datanode+hadoop-tasktracker' \
-    --provider=ec2 \
+    --provider=aws-ec2 \
     --identity=$AWS_ACCESS_KEY_ID \
     --credential=$AWS_SECRET_ACCESS_KEY \
     --private-key-file=~/.ssh/id_rsa \
