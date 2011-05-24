@@ -90,6 +90,9 @@ Release 0.5.0 - 2011-05-16
 
     WHIRR-310. Improve Configuration Guide. (asavu via tomwhite)
 
+    WHIRR-312. Destroy instance removes all entries from the instances file
+    except the one that is being terminated. (asavu
+
   BUG FIXES
 
     WHIRR-253. ZooKeeper service should only authorize ingress to ZooKeeper 
