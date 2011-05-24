@@ -88,6 +88,8 @@ Release 0.5.0 - 2011-05-16
 
     WHIRR-141. Create a logo. (Alison Wong via tomwhite)
 
+    WHIRR-310. Improve Configuration Guide. (asavu via tomwhite)
+
   BUG FIXES
 
     WHIRR-253. ZooKeeper service should only authorize ingress to ZooKeeper 
