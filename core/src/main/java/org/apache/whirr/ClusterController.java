@@ -24,6 +24,7 @@ import com.google.common.base.Predicates;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Set;
 
 import com.google.common.collect.Iterables;
@@ -112,6 +113,7 @@ public class ClusterController {
     return cluster;
   }
 
+
   /**
    * Stop the cluster and destroy all resources associated with it.
    *
@@ -169,30 +171,31 @@ public class ClusterController {
 
   public Set<Cluster.Instance> getInstances(ClusterSpec spec, ClusterStateStore stateStore)
       throws IOException, InterruptedException {
+
     Set<Cluster.Instance> instances = Sets.newLinkedHashSet();
     Cluster cluster = (stateStore != null) ? stateStore.load() : null;
-    if (cluster != null) {
-      /* enrich the instance information with node metadata */
 
-      for(NodeMetadata node : getNodes(spec)) {
-        Cluster.Instance instance = cluster.getInstanceMatching(withIds(node.getId()));
-        instances.add(new Cluster.Instance(instance.getLoginCredentials(), instance.getRoles(),
-          instance.getPublicIp(), instance.getPrivateIp(), node.getId(), node)
-        );
-      }
-    } else {
-      /* return a list of instances with no roles attached */
-
-      Credentials credentials = new Credentials(spec.getClusterUser(), spec.getPrivateKey());
-      for(NodeMetadata node : getNodes(spec)) {
-        instances.add(new Cluster.Instance(credentials, Sets.<String>newHashSet(),
-            Iterables.getFirst(node.getPublicAddresses(), null),
-            Iterables.getFirst(node.getPrivateAddresses(), null),
-            node.getId(), node));
-      }
-
+    for(NodeMetadata node : getNodes(spec)) {
+      instances.add(toInstance(node, cluster, spec));
     }
+
     return instances;
+  }
+
+  private Cluster.Instance toInstance(NodeMetadata metadata, Cluster cluster, ClusterSpec spec) {
+    Credentials credentials = new Credentials(spec.getClusterUser(), spec.getPrivateKey());
+
+    Set<String> roles = Sets.newHashSet();
+    try {
+      if (cluster != null) {
+        roles = cluster.getInstanceMatching(withIds(metadata.getId())).getRoles();
+      }
+    } catch(NoSuchElementException e) {}
+
+    return new Cluster.Instance(credentials, roles,
+      Iterables.getFirst(metadata.getPublicAddresses(), null),
+      Iterables.getFirst(metadata.getPrivateAddresses(), null),
+      metadata.getId(), metadata);
   }
   
   public static Predicate<ComputeMetadata> runningInGroup(final String group) {

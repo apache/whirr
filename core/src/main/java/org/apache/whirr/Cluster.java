@@ -23,6 +23,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 import com.google.common.net.InetAddresses;
@@ -161,7 +162,7 @@ public class Cluster {
   }
 
   public void removeInstancesMatching(Predicate<Instance> predicate) {
-    instances = Sets.filter(instances, predicate);
+    instances = Sets.filter(instances, Predicates.not(predicate));
   }
 
   public String toString() {
