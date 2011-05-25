@@ -113,6 +113,9 @@ Release 0.5.0 - 2011-05-16
     WHIRR-298. Use all cluster spec properties for hash and 
     equality (tomwhite and asavu)
 
+    WHIRR-314. HBase integration test can fail due to Thrift server race.
+    (tomwhite)
+
 Release 0.4.0 - 2011-03-15
 
   NEW FEATURES
