@@ -112,6 +112,10 @@ function configure_cdh_hbase() {
  <name>hbase.tmp.dir</name>
  <value>/data/tmp/hbase-\${user.name}</value>
 </property>
+<property>
+ <name>hbase.client.retries.number</name>
+ <value>100</value>
+</property>
 </configuration>
 EOF
 
