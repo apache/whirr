@@ -23,6 +23,122 @@
     <body>
     <!-- Paste release notes from https://issues.apache.org/jira/browse/WHIRR here. -->
 
+
+	        <h1>Release Notes - Whirr - Version 0.5.0</h1>
+
+	<h2>        Sub-task
+	</h2>
+	<ul>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-277'>WHIRR-277</a>] -         Support multiple versions of ZooKeeper
+	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-279'>WHIRR-279</a>] -         Create ClusterSpec aware BlobStoreContext factory class
+	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-280'>WHIRR-280</a>] -         Create a blob cache that could be used for storing local files
+	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-292'>WHIRR-292</a>] -         Separate Cassandra install and configuration scripts into more generic functions
+	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-296'>WHIRR-296</a>] -         Separate Voldemort install and configuration scripts into more generic functions
+	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-297'>WHIRR-297</a>] -         Separate ZooKeeper and ElasticSearch install and configuration scripts into more generic functions
+	</li>
+	</ul>
+
+	<h2>        Bug
+	</h2>
+	<ul>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-172'>WHIRR-172</a>] -         Log warning for unrecognized service names
+	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-253'>WHIRR-253</a>] -         ZooKeeper service should only authorize ingress to ZooKeeper instances
+	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-268'>WHIRR-268</a>] -         whirr hangs when the file &#39;$HOME/.ssh/known_hosts&#39; includes an obsolete identifier for a certain ip address host.
+	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-271'>WHIRR-271</a>] -         Classpath needs to be quoted in whirr script
+	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-274'>WHIRR-274</a>] -         Add wagon-ssh-external as a maven build extension
+	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-298'>WHIRR-298</a>] -         Use all cluster spec properties for hash and equality
+	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-312'>WHIRR-312</a>] -         Destroy instance removes all entries from the instances file except the one that is being terminated
+	</li>
+	</ul>
+
+	<h2>        Improvement
+	</h2>
+	<ul>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-61'>WHIRR-61</a>] -         make more efficient use of ComputeServiceContext
+	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-173'>WHIRR-173</a>] -         Add ClusterAction for generic script execution
+	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-216'>WHIRR-216</a>] -         Improve error message if whirr.instance-templates left out of config
+	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-222'>WHIRR-222</a>] -         Support multiple versions of Hadoop
+	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-236'>WHIRR-236</a>] -         Update Configuration Guides with Recipe Info
+	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-245'>WHIRR-245</a>] -         Clearly demarcate the user and service provider APIs
+	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-246'>WHIRR-246</a>] -         Single place to store/load cluster state
+	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-262'>WHIRR-262</a>] -         Services should not have to do reverse DNS lookups
+	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-269'>WHIRR-269</a>] -         improve error msg &quot;Key pair is encrypted&quot;
+	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-275'>WHIRR-275</a>] -         Improve firewall API for services
+	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-278'>WHIRR-278</a>] -         Refactor ClusterSpec and extract InstanceTemplate class
+	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-282'>WHIRR-282</a>] -         Set number of Hadoop slots based on hardware
+	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-283'>WHIRR-283</a>] -         Whirr in 5 minutes
+	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-284'>WHIRR-284</a>] -         Runurl should only be installed when needed
+	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-288'>WHIRR-288</a>] -         Add blob store persistence for cluster state
+	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-289'>WHIRR-289</a>] -         Display role names in list-cluster command
+	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-291'>WHIRR-291</a>] -         Add &quot;noop&quot; role useful just for provisioning
+	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-299'>WHIRR-299</a>] -         Recipe for BYON provider
+	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-300'>WHIRR-300</a>] -         FAQ entry for noop role
+	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-304'>WHIRR-304</a>] -         Upgrade to jclouds 1.0-beta-9c
+	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-310'>WHIRR-310</a>] -         Improve Configuration Guide
+	</li>
+	</ul>
+
+	<h2>        New Feature
+	</h2>
+	<ul>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-191'>WHIRR-191</a>] -         [CDH] Start other services based on CDH, not just HDFS and MR
+	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-220'>WHIRR-220</a>] -         Support local tarball upload
+	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-237'>WHIRR-237</a>] -         Add Voldemort as a service
+	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-261'>WHIRR-261</a>] -         Add ElasticSearch as a service
+	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-285'>WHIRR-285</a>] -         Add support for BYON
+	</li>
+	</ul>
+
+	<h2>        Task
+	</h2>
+	<ul>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-141'>WHIRR-141</a>] -         Create a logo
+	</li>
+	</ul>
+
+	<h2>        Test
+	</h2>
+	<ul>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-287'>WHIRR-287</a>] -         Script for running YCSB on HBase
+	</li>
+	</ul>
+
+
       <h1>Release Notes - Whirr - Version 0.4.0</h1>
     
   <h2>        Sub-task
