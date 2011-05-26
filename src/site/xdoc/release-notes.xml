@@ -60,6 +60,8 @@
 	</li>
 	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-312'>WHIRR-312</a>] -         Destroy instance removes all entries from the instances file except the one that is being terminated
 	</li>
+	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-314'>WHIRR-314</a>] -         HBase integration test can fail due to Thrift server race
+	</li>
 	</ul>
 
 	<h2>        Improvement
@@ -137,7 +139,6 @@
 	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-287'>WHIRR-287</a>] -         Script for running YCSB on HBase
 	</li>
 	</ul>
-
 
       <h1>Release Notes - Whirr - Version 0.4.0</h1>
     
