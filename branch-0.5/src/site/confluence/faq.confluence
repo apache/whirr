@@ -1,0 +1,192 @@
+h1. Frequently Asked Questions
+
+{anchor:how-do-i-find-my-cloud-credentials}
+h2. How do I find my cloud credentials?
+
+On EC2:
+# Go to [http://aws-portal.amazon.com/gp/aws/developer/account/index.html?action=access-key]
+# Log in, if prompted
+# Find your Access Key ID and Secret Access Key in the "Access Credentials" section, under the "Access Keys" tab. You will have to click "Show" to see the text of your secret access key. 
+
+Another good resource is [Understanding Access Credentials for AWS/EC2|http://alestic.com/2009/11/ec2-credentials] by Eric Hammond.
+
+h2. Can I specify my own private key?
+
+Yes, by setting {{whirr.private-key-file}} (or {{\--private-key-file}} on the
+command line). You should also set {{whirr.public-key-file}}
+({{\--public-key-file}}) at the same time.
+
+Private keys must not have a passphrase associated with them. You can check this
+with:
+
+{code}
+grep ENCRYPTED ~/.ssh/id_rsa
+{code}
+
+If there is no passphrase then there will be no match.
+
+h2. How do I access my cluster from a different network?
+
+By default, access to clusters is restricted to the single IP address of the
+machine starting the cluster, as determined by
+[Amazon's check IP service|http://checkip.amazonaws.com/]. However, some
+networks report multiple origin IP addresses (e.g. they round-robin between
+them by connection), which may cause problems if the address used for later
+connections is different to the one reported at the time of the first
+connection.
+
+A related problem is when you wish to access the cluster from a different
+network to the one it was launched from.
+
+In these cases you can specify the IP addresses of the machines that may connect
+to the cluster by setting the {{client-cidrs}} property to a comma-separated
+list of [CIDR|http://en.wikipedia.org/wiki/Classless\_Inter-Domain\_Routing]
+blocks.
+
+For example, {{208.128.0.0/16,38.102.147.107/32}} would allow access from the
+{{208.128.0.0}} class B network, and the (single) IP address 38.102.147.107.
+
+h2. How can I start a cluster in a particular location?
+
+By default clusters are started in an arbitrary location (e.g. region or
+data center). You can control the location by setting {{location-id}} (see the
+[configuration guide|configuration-guide] for details).
+
+For example, in EC2, setting {{location-id}} to {{us-east-1}} would start the
+cluster in the US-East region, while setting it to {{us-east-1a}} (note the
+final {{a}}) would start the cluster in that particular availability zone
+({{us-east-1a}}) in the US-East region.
+
+h2. How can I use a custom image? How can I control the cloud hardware used?
+
+The default image used is dependent on the Cloud provider, the hardware, and the
+service. Whirr tries to find an image with Ubuntu Server and at least 1024 MB of RAM.
+
+Use {{image-id}} to specify the image used, and {{hardware-id}} to specify the
+hardware. Both are cloud-specific.
+
+You can specify the amount of RAM in a cloud agnostic way by setting a value for
+{{hardware-min-ram}}.
+
+In addition, on EC2 you need to set jclouds.ec2.ami-owners to include the AMI
+owner if it is not Amazon, Alestic, Canonical, or RightScale.
+
+h2. How do I log in to a node in the cluster?
+
+On EC2, if you know the node's address you can do:
+
+{code}
+ssh -i ~/.ssh/id_rsa <whirr.cluster-user>@host
+{code}
+
+This assumes that you use the default private key; if this is not the case then
+specify the one you used at cluster launch.
+
+{{whirr.cluster-user}} defaults to the name of the local user running Whirr. 
+
+{anchor:how-can-i-modify-the-instance-installation-and-configuration-scripts}
+h2. How can I modify the instance installation and configuration scripts?
+
+The scripts to install and configure cloud instances are searched for on the
+classpath.
+
+(Note that in versions prior to 0.4.0 scripts were downloaded from S3
+by default, and could be overridden by setting {{run-url-base}}. This property
+no longer has any effect, so you should instead use the approach explained
+below.)
+
+If you want to change the scripts then you can place a modified copy of the
+scripts in a _functions_ directory in Whirr's installation directory. The
+original versions of the scripts can be found in _functions_ directories in the
+source trees.
+
+For example, to override the Hadoop scripts, do the following:
+
+{code}
+cd $WHIRR_HOME
+mkdir functions
+cp services/hadoop/src/main/resources/functions/* functions
+{code}
+
+Then make your changes to the copies in _functions_.
+
+The first port of call for debugging the scripts that run on on a cloud instance
+is the _whirr.log_ in the directory from which you launched the _whirr_ CLI.
+
+The script output in this log file may be truncated, but you can see the
+complete output by logging into the node on which the script ran
+(see "How do I log in to a node in the cluster?" above) and looking in the
+_/tmp/bootstrap_ or _/tmp/jclouds-script-*_ directories for the script itself,
+and the standard output and standard error logs.
+
+h2. How do I specify the service version and other service properties?
+
+Some services have a property to control the version number of the software to
+be installed. This is typically achieved by setting the property
+{{whirr.<service-name>.tarball.url}}. Similarly, some services can have
+arbitrary service properties set.
+
+See the samples in the _recipes_ directory for details for a particular service.
+
+In cases where neither of these configuration controls are supported, you
+may modify the scripts to install a particular version of the service, or to
+change the service properties from the defaults. See
+"How to modify the instance installation and configuration scripts" above
+for details on how to override the scripts.
+
+h2. How can I install custom packages?
+
+You can install extra software by modifying the scripts that run on
+the cloud instances. See "How to modify the instance installation and
+configuration scripts" above.
+
+h2. How do I run Cloudera's Distribution for Hadoop?
+
+You can run CDH rather than Apache Hadoop by running the Hadoop service and
+setting the {{whirr.hadoop-install-function}} and
+{{whirr.hadoop-configure-function}}
+properties. See the _recipes_ directory in the distribution for samples.
+
+{anchor:other-services}
+h2. How do I run a Cassandra/HBase/ZooKeeper cluster?
+
+See the _recipes_ directory in the distribution for samples.
+
+h2. How do I automatically tear down a cluster after a fixed time?
+
+It's often convenient to terminate a cluster a fixed time after launch. This is
+the case for test clusters, for example. You can achieve this by scheduling the
+destroy command using the {{at}} command from your local machine.
+
+*WARNING: The machine from which you issued the {{at}} command must be running (and able
+to contact the cloud provider) at the time it runs.*
+
+{code}
+% echo 'bin/whirr destroy-cluster --config hadoop.properties' \
+    | at 'now + 50 min'
+{code}
+
+Note that issuing a {{shutdown}} command on an instance may simply stop the
+instance, which is not sufficient to fully terminate the instance, in which
+case you would continue to be charged for it. This is the
+case for EBS boot instances, for example.
+
+You can read more about this technique on
+[Eric Hammond's blog|http://alestic.com/2010/09/ec2-instance-termination].
+
+Also, Mac OS X users might find
+[this thread|http://superuser.com/questions/43678/mac-os-x-at-command-not-working]
+a useful reference for the {{at}} command.
+
+h2. How do I start a machine without having a cluster role?
+
+Sometimes you need to provision machines in the same cluster without having 
+a specific role. For this you can use "noop" as a role name when specifying the 
+instance templates.
+
+{code}
+whirr.instance-templates=3 zookeeper,1 noop
+# will start three machines with zookeeper and one machine just with the OS  
+{code}
+
+

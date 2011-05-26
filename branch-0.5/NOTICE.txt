@@ -1,0 +1,12 @@
+Apache Whirr
+Copyright 2010-2011 The Apache Software Foundation
+
+This product includes software developed at
+The Apache Software Foundation (http://www.apache.org/).
+
+This product includes Common Annotations (JSR 250, https://jsr250.dev.java.net/)
+distributed under the CDDL Version 1.0 license.
+
+This product includes Jersey (https://jersey.dev.java.net/)
+distributed under the CDDL Version 1.0 license.
+

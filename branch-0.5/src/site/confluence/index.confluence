@@ -1,0 +1,58 @@
+h1. Apache Whirr
+
+Apache Whirr is a set of libraries for running cloud services. Whirr is currently in the [Apache Incubator|http://incubator.apache.org/]. 
+
+Whirr provides: 
+* A cloud-neutral way to run services. You don't have to worry about the idiosyncrasies of each provider. 
+* A common service API. The details of provisioning are particular to the service. 
+* Smart defaults for services. You can get a properly configured system running quickly, while still being able to override settings as needed. 
+
+You can also use Whirr as a command line tool for deploying clusters.
+
+Find out more about Whirr at our [wiki|https://cwiki.apache.org/confluence/display/WHIRR].
+
+h2. Getting Started
+
+You can use Whirr's CLI or APIs to [get started with Whirr|quick-start-guide].
+
+There is also an [FAQ|faq] which covers how to achieve common
+tasks with Whirr, and a [configuration guide|configuration-guide] for reference.
+
+h2. Getting Involved
+
+Have you got a suggestion for improving Whirr? It's easy to [get involved|https://cwiki.apache.org/confluence/display/WHIRR/How+To+Contribute].
+
+h2. Which services and cloud providers are supported?
+
+Whirr uses [jclouds|http://code.google.com/p/jclouds/] for provisioning, so in principle it should support all the cloud providers that jclouds supports. The following table shows
+the cloud provider and service combinations that have been tested.
+
+||Cloud provider||Cassandra||Hadoop||ZooKeeper||HBase||elasticsearch||Voldemort||
+|Amazon EC2|Yes|Yes|Yes|Yes|Yes|Yes|
+|Rackspace Cloud Servers|Yes|Yes|Yes|Yes|Yes|Yes|
+
+For development and local testing we are also supporting the BYON (bring your own nodes) jclouds provider. Check the _recipes_ folder for a configuration sample.
+
+h2. What server operating systems are supported?
+
+Each release is tested by running the integration tests on Ubuntu Server 10.04. All setup scripts should also work on Centos 5.x but we don't have a formal testing procedure in place right now. 
+
+h2. Download
+
+Download a release of Whirr from a [nearby mirror|http://www.apache.org/dyn/closer.cgi/incubator/whirr/].
+
+h2. History
+
+The code that would become Whirr started out in 2007 as some
+[bash scripts in Apache Hadoop|https://issues.apache.org/jira/browse/HADOOP-884]
+for running Hadoop clusters on EC2. Later the scripts were
+[ported to Python|https://issues.apache.org/jira/browse/WHIRR-3]
+for extra features (such as EBS support) and a wider range of cloud providers.
+These Python scripts are available today in Whirr under _contrib/python_.
+
+In May 2010 the [Apache Whirr Incubator|http://incubator.apache.org/whirr]
+project was started to give a home to
+the existing work that had been done, but also to create a Java version 
+using [jclouds|http://code.google.com/p/jclouds/] as the cloud provisioning
+library. jclouds supports many providers and has a very rich API for running
+code on instances, so it provides a very solid foundation for building Whirr on.

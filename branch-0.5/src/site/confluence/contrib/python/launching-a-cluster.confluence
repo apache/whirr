@@ -1,0 +1,59 @@
+h1. Launching a Cluster
+
+After you install the client scripts and enter your EC2 account information,
+starting a Hadoop cluster with 10 nodes is easy with a single command.
+\\
+\\
+To launch a cluster called "my-hadoop-cluster" with 10 worker (slave) nodes, use this command:
+{code}
+% hadoop-ec2 launch-cluster my-hadoop-cluster 10
+{code}
+\\
+This command boots the master node and 10 worker nodes. The master node runs the
+Namenode, secondary Namenode, and Jobtracker, and each worker node runs a
+Datanode and a Tasktracker.
+
+Equivalently, you can launch the cluster by using this command syntax:
+{code}
+% hadoop-ec2 launch-cluster my-hadoop-cluster 1 nn,snn,jt 10 dn,tt
+{code}
+Note that by using this syntax, you can also launch a split Namenode/Jobtracker
+cluster. For example:
+{code}
+% hadoop-ec2 launch-cluster my-hadoop-cluster 1 nn,snn 1 jt 10 dn,tt
+{code}
+After the nodes have started and the Hadoop cluster is operational, the console
+will display a message such as:
+{code}
+Browse the cluster at http://ec2-xxx-xxx-xxx-xxx.compute-1.amazonaws.com/
+{code}
+You can access Hadoop's web UI at the URL in the message. By default, port 80 is
+opened for access from your client machine. You can change the firewall settings
+(to allow access from a network, rather than just a single machine, for example)
+by using the Amazon EC2 command line tools, or by using a tool such as
+[Elastic Fox|http://developer.amazonwebservices.com/connect/entry.jspa?externalID=609].
+The security group to change is the one named {{<cluster-name>-<role>}}.
+For example, for the Namenode in the cluster started above, it would be
+{{my-hadoop-cluster-nn}}.
+
+For security reasons, traffic from the network your client is running on is
+proxied through the master node of the cluster using an SSH tunnel (a SOCKS
+proxy on port 6666).
+
+To set up the proxy, run the following command:
+{code}
+% eval `hadoop-ec2 proxy my-hadoop-cluster`
+{code}
+Note the backticks, which are used to evaluate the result of the command. This
+allows you to stop the proxy later on (from the same terminal):
+{code}
+% kill $HADOOP_CLOUD_PROXY_PID
+{code}
+Web browsers need to be configured to use this proxy too, so you can view pages
+served by worker nodes in the cluster. The most convenient way to do this is to
+use a [proxy auto-config (PAC) file|http://en.wikipedia.org/wiki/Proxy\_auto-config]
+file, such as [this one|http://apache-hadoop-ec2.s3.amazonaws.com/proxy.pac]
+for Hadoop EC2 clusters.
+
+If you are using Firefox, then you may find
+[FoxyProxy|http://foxyproxy.mozdev.org/] useful for managing PAC files.

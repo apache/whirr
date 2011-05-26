@@ -1,0 +1,187 @@
+h1. Getting Started with Whirr
+
+The Whirr CLI provides the most convenient way to launch clusters. For the
+programmatic interface, see the [javadoc|apidocs/index.html].
+
+Also see [Whirr in 5 Minutes|whirr-in-5-minutes] for the condensed instructions
+for getting started (with ZooKeeper as the example).
+
+h3. Pre-requisites
+* Java 6
+* An account with a cloud provider, such as Amazon EC2, or Rackspace Cloud Servers
+* An SSH client 
+
+h3. Install Whirr
+
+[Download|http://www.apache.org/dyn/closer.cgi/incubator/whirr/] or
+[build|https://cwiki.apache.org/confluence/display/WHIRR/How+To+Contribute] Whirr.
+
+You can test that Whirr is working by running:
+
+{code}
+% bin/whirr version
+{code}
+
+Which will display the version of Whirr that is installed.
+
+To get usage instructions type:
+
+{code}
+% bin/whirr
+{code}
+
+h3. Configure a Hadoop cluster
+
+First, create a properties file to define the cluster. The name doesn't matter,
+but here we will assume it is called _hadoop.properties_ and located in your home directory.
+This file defines a cluster
+with a single machine for the namenode and jobtracker, and
+a further machine for a datanode and tasktracker. You can see how to launch
+other services by consulting the sample configurations in the _recipes_
+directory of the distribution.
+
+{code}
+whirr.cluster-name=myhadoopcluster
+whirr.instance-templates=1 hadoop-jobtracker+hadoop-namenode,1 hadoop-datanode+hadoop-tasktracker
+
+whirr.provider=aws-ec2
+whirr.identity=${env:AWS_ACCESS_KEY_ID}
+whirr.credential=${env:AWS_SECRET_ACCESS_KEY}
+
+whirr.private-key-file=${sys:user.home}/.ssh/id_rsa
+whirr.public-key-file=${sys:user.home}/.ssh/id_rsa.pub
+{code}
+
+Note that we haven't specified a particular cloud image, since Whirr
+provides a default for each provider which should work well enough. However, for
+larger clusters you will likely use larger hardware sizes or particular images.
+See the _recipes_ files and the [Configuration Guide|configuration-guide] for
+details.
+
+In this configuration file the cloud identity and credential are read from
+environment variables - you can equally well put them in the configuration file
+if you wish.
+
+The {{private-key-file}} and {{public-key-file}} properties specify an SSH
+keypair. You can generate a keypair with:
+
+{code}
+% ssh-keygen -t rsa -P ''
+{code}
+
+You should use only RSA SSH keys, since DSA keys are not accepted yet. 
+
+*Note*: the keypair specified by these properties is not the same as the AWS
+keypair generated with the {{ec2-add-keypair}} command or the AWS Management
+Console (since these don't place _both_ of the keys on your local machine). The
+PEM-encoded X.509 Certificate and Private Key (e.g. pk-XXXXXX.pem) cannot be
+used as a keypair either.
+
+h3. Launch a Hadoop cluster
+
+Run the following command to launch a cluster:
+
+{code}
+% bin/whirr launch-cluster --config hadoop.properties
+{code}
+
+Messages will be logged to the console as the cluster starts. You can see
+debug-level logging in a file named _whirr.log_ in the directory you ran the
+_whirr_ command from.
+
+A message will be printed out when the cluster has started, with a URL that you
+can use to access the web UI.
+
+h3. Run a proxy
+
+For security reasons, traffic from the network your client is running on is
+proxied through the master node of the cluster using an SSH tunnel
+(a SOCKS proxy on port 6666).
+
+A script to launch the proxy is created when you launch the cluster, and may be found in
+_~/.whirr/<cluster-name>_. Run it as a follows (in a new terminal window):
+
+{code}
+% . ~/.whirr/myhadoopcluster/hadoop-proxy.sh
+{code}
+
+To stop the proxy, just kill the process with Ctrl-C.
+
+Web browsers need to be configured to use this proxy too, so you can view pages
+served by worker nodes in the cluster. The most convenient way to do this is to
+use a
+[proxy auto-config (PAC) file|http://en.wikipedia.org/wiki/Proxy\_auto-config]
+file, such as [this one|http://apache-hadoop-ec2.s3.amazonaws.com/proxy.pac] for
+Hadoop EC2 clusters.
+
+If you are using Firefox, then you may find
+[FoxyProxy|http://foxyproxy.mozdev.org/] useful for managing PAC files.
+
+h3. Run a MapReduce job
+
+After you launch a cluster, a _hadoop-site.xml_ file is created in the directory
+_~/.whirr/<cluster-name>_. You can use this to connect to the cluster by setting
+the {{HADOOP\_CONF\_DIR}} environment variable.
+(It is also possible to set the configuration file to use by passing it as a
+{{-conf}} option to Hadoop Tools):
+
+{code}
+% export HADOOP_CONF_DIR=~/.whirr/myhadoopcluster
+{code}
+
+You should now be able to browse HDFS:
+
+{code}
+% hadoop fs -ls /
+{code}
+
+Note that the version of Hadoop installed locally should match the version
+installed on the cluster. You should also make sure that the {{HADOOP\_HOME}}
+environment variable is set.
+
+Here's how you can run a MapReduce job:
+
+{code}
+hadoop fs -mkdir input
+hadoop fs -put $HADOOP_HOME/LICENSE.txt input
+hadoop jar $HADOOP_HOME/hadoop-*examples*.jar wordcount input output
+hadoop fs -cat output/part-* | head
+{code}
+
+h3. Configuration
+
+Whirr is configured using a properties file, and optionally using command line arguments when using the CLI. Command line arguments take precedence over properties specified in a properties file.
+
+For example, instead of using the properties file above, you could launch a
+Hadoop cluster with the following command line (note that the {{whirr.}} prefix
+for properties is not reflected in the command line argument):
+
+{code}
+% bin/whirr launch-cluster \
+    --cluster-name=myhadoopcluster \
+    --instance-templates='1 hadoop-jobtracker+hadoop-namenode,1 hadoop-datanode+hadoop-tasktracker' \
+    --provider=aws-ec2 \
+    --identity=$AWS_ACCESS_KEY_ID \
+    --credential=$AWS_SECRET_ACCESS_KEY \
+    --private-key-file=~/.ssh/id_rsa \
+    --public-key-file=~/.ssh/id_rsa.pub
+{code}
+
+Notice that here we took advantage of the fact that the AWS credentials have
+been defined in environment variables.
+
+See the [configuration guide|configuration-guide] for a list of all the configuration
+properties you can set.
+
+h3. Destroy a cluster
+
+When you've finished using a cluster you can terminate the instances and clean up resources with the following.
+
+*WARNING: All data will be deleted when you destroy the cluster.*
+
+{code}
+% bin/whirr destroy-cluster --config hadoop.properties
+{code}
+
+At this point you shut down the SSH proxy to the cluster if you started one
+earlier.

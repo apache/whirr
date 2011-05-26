@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one or more
+  contributor license agreements.  See the NOTICE file distributed with
+  this work for additional information regarding copyright ownership.
+  The ASF licenses this file to You under the Apache License, Version 2.0
+  (the "License"); you may not use this file except in compliance with
+  the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<project name="Whirr">
+  <bannerLeft>
+    <name>Whirr</name>
+    <src>http://incubator.apache.org/whirr/images/whirr-logo.png</src>
+    <href>http://incubator.apache.org/whirr/</href>
+  </bannerLeft>
+  <bannerRight>
+    <src>http://incubator.apache.org/images/apache-incubator-logo.png</src>
+    <href>http://incubator.apache.org/</href>
+  </bannerRight>
+
+  <publishDate position="right"/>
+  <version position="right"/>
+
+  <skin>
+    <groupId>org.apache.maven.skins</groupId>
+    <artifactId>maven-stylus-skin</artifactId>
+    <version>1.2</version>
+  </skin>
+
+  <body>
+    <links position="left">
+      <item name="Wiki" href="https://cwiki.apache.org/confluence/display/WHIRR" />
+      <item name="JIRA" href="https://issues.apache.org/jira/browse/WHIRR" />
+      <item name="SVN" href="https://svn.apache.org/repos/asf/incubator/whirr/" />
+    </links>
+
+    <breadcrumbs position="left">
+      <item name="Apache" href="http://www.apache.org/" />
+      <item name="Apache Incubator" href="http://incubator.apache.org/" />
+      <item name="Whirr" href="http://incubator.apache.org/whirr/"/>
+    </breadcrumbs>
+
+    <menu name="Whirr">
+      <item name="About" href="index.html"/>
+      <item name="Download" href="http://www.apache.org/dyn/closer.cgi/incubator/whirr/"/>
+      <item name="Release Notes" href="release-notes.html" />
+      <item name="Road Map" href="https://cwiki.apache.org/confluence/display/WHIRR/RoadMap" />
+      <item name="Wiki" href="https://cwiki.apache.org/confluence/display/WHIRR" />
+      <item name="FAQ" href="faq.html"/>
+    </menu>
+
+    <menu name="Project Information">
+      <item name="Summary" href="project-info.html" />
+      <item name="Mailing Lists" href="mail-lists.html" />
+      <item name="IRC" href="https://cwiki.apache.org/confluence/display/WHIRR/IRC+Channel" />
+      <item name="Team" href="team-list.html" />
+      <item name="Issue Tracking" href="issue-tracking.html" />
+      <item name="License" href="license.html" />
+    </menu>
+
+    <menu name="Documentation">
+      <item name="Whirr in 5 Minutes" href="whirr-in-5-minutes.html"/>
+      <item name="Quick Start Guide" href="quick-start-guide.html"/>
+      <item name="Configuration Guide" href="configuration-guide.html"/>
+      <item name="API Guide" href="api-guide.html"/>
+      <item name="Javadoc" href="apidocs/index.html"/>
+    </menu>
+
+    <menu name="Python Contrib Documentation">
+      <item name="Installation" href="contrib/python/installation.html"/>
+      <item name="Configuring and Running" href="contrib/python/configuring-and-running.html"/>
+      <item name="Launching a Cluster" href="contrib/python/launching-a-cluster.html"/>
+      <item name="Using Persistent Clusters" href="contrib/python/using-persistent-clusters.html"/>
+      <item name="Running MapReduce Jobs" href="contrib/python/running-mapreduce-jobs.html"/>
+      <item name="Terminating a Cluster" href="contrib/python/terminating-a-cluster.html"/>
+      <item name="Automatically Shutting Down a Cluster" href="contrib/python/automatically-shutting-down-a-cluster.html"/>
+      <item name="Using Command Line Options" href="contrib/python/using-command-line-options.html"/>
+      <item name="Running ZooKeeper" href="contrib/python/running-zooKeeper.html"/>
+    </menu>
+
+  </body>
+</project>

@@ -1,0 +1,486 @@
+Apache Whirr Change Log
+
+Release 0.5.0 - 2011-05-16
+
+  INCOMPATIBLE CHANGES
+
+    WHIRR-245. Clearly demarcate the user and service provider APIs. There
+    are some incompatible API changes which affect clients and service writers:
+    * The client API has moved from the org.apache.whirr.service package to the
+      org.apache.whirr package.
+    * Service(Factory) has been renamed to ClusterController(Factory).
+    * org.apache.whirr.cluster.actions has been renamed to
+      org.apache.whirr.actions.
+    (tomwhite)
+
+  NEW FEATURES
+
+    WHIRR-261. Add ElasticSearch as a service (asavu)
+
+    WHIRR-222. Support multiple versions of Hadoop. (tomwhite)
+
+    WHIRR-237. Add Voldemort as a service. (Kirk True via asavu)
+
+    WHIRR-220. Support local tarball upload (asavu)
+
+    WHIRR-285. Add support for BYON. (tomwhite)
+
+    WHIRR-191. Start other services based on CDH, not just HDFS and MR.
+    (tomwhite)
+
+  IMPROVEMENTS
+
+    WHIRR-262. Services should not have to do reverse DNS lookups. (tomwhite)
+
+    WHIRR-275. Improve firewall API for services. (tomwhite)
+
+    WHIRR-278. Refactor ClusterSpec and extract InstanceTemplate class. (asavu)
+
+    WHIRR-269. Improve error msg "Key pair is encrypted" (tomwhite via asavu)
+
+    WHIRR-277. Support multiple versions of ZooKeeper (asavu)
+
+    WHIRR-282. Set number of Hadoop slots based on hardware (tomwhite via asavu)
+
+    WHIRR-284. Runurl should only be installed when needed (tomwhite via asavu)
+
+    WHIRR-283. Whirr in 5 minutes. (tomwhite)
+
+    WHIRR-279. Create ClusterSpec aware BlobStoreContext factory class (asavu)
+
+    WHIRR-280. Create a blob cache that could be used for storing local 
+    files (asavu)
+
+    WHIRR-173. Add ClusterAction for generic script execution (asavu)
+
+    WHIRR-246. Single place to store/load cluster state (David Alves and asavu)
+
+    WHIRR-289. Display role names in list-cluster command (asavu)
+
+    WHIRR-287. Script for running YCSB on HBase (asavu)
+
+    WHIRR-291. Add "noop" role useful just for provisioning (asavu)
+
+    WHIRR-297. Separate ZooKeeper and ElasticSearch install and configuration 
+    scripts into more generic functions (asavu)
+
+    WHIRR-288. Add blob store persistence for cluster state (asavu)
+
+    WHIRR-300. FAQ entry for noop role. (asavu via tomwhite)
+
+    WHIRR-216. Improve error message if whirr.instance-templates left out of
+    config. (asavu via tomwhite)
+
+    WHIRR-299. Recipe for BYON provider (asavu)
+
+    WHIRR-292. Separate Cassandra install and configuration scripts 
+    into more generic functions (asavu)
+
+    WHIRR-296. Separate Voldemort install and configuration scripts into more
+    generic functions. (asavu via tomwhite)
+
+    WHIRR-61. Make more efficient use of ComputeServiceContext. (adriancole and
+    asavu via tomwhite)
+
+    WHIRR-304. Upgrade to jclouds 1.0-beta-9c. (adriancole via tomwhite)
+
+    WHIRR-236. Update Configuration Guides with Recipe Info. (tomwhite)
+
+    WHIRR-141. Create a logo. (Alison Wong via tomwhite)
+
+    WHIRR-310. Improve Configuration Guide. (asavu via tomwhite)
+
+    WHIRR-312. Destroy instance removes all entries from the instances file
+    except the one that is being terminated. (asavu
+
+  BUG FIXES
+
+    WHIRR-253. ZooKeeper service should only authorize ingress to ZooKeeper 
+    instances (tomwhite via asavu)
+
+    WHIRR-268. whirr hangs when the file '$HOME/.ssh/known_hosts' includes 
+    an obsolete identifier for a certain ip address host. 
+    (Hyunsik Choi via asavu)
+
+    WHIRR-271. Classpath needs to be quoted in whirr script. (asavu)
+
+    WHIRR-274. Add wagon-ssh-external as a maven build extension. (asavu)
+
+    WHIRR-172. Log warning for unrecognized service names. (tomwhite)
+
+    WHIRR-298. Use all cluster spec properties for hash and 
+    equality (tomwhite and asavu)
+
+    WHIRR-314. HBase integration test can fail due to Thrift server race.
+    (tomwhite)
+
+Release 0.4.0 - 2011-03-15
+
+  NEW FEATURES
+
+    WHIRR-226. Add the ability to destroy a cluster instance (asavu)
+
+    WHIRR-225. Support locally-supplied scripts.
+    With this change the properties whirr.hadoop-install-runurl and
+    whirr.hadoop-configure-runurl are replaced by whirr.hadoop-install-function
+    and whirr.hadoop-configure-function. See recipes for details. (tomwhite)
+
+    WHIRR-198. Support user-defined images (Adrian Cole via asavu)
+
+    WHIRR-158. Allow users to log into clusters as themselves 
+    (Adrian Cole and asavu)
+
+  IMPROVEMENTS
+
+    WHIRR-139. upgrade to version 1 of the "enforcer" plugin (Jakob Homan 
+    via asavu)
+
+    WHIRR-193. Recipe for a HBase Cluster. (asavu)
+
+    WHIRR-219. Support dynamic addition of services to CLI. (tomwhite)
+
+    WHIRR-195. Display available roles instead of service names 
+    when running ./bin/whirr (asavu)
+
+    WHIRR-199. Add aliases for short role names like nn, jt, tt, dn, zk.
+    (asavu via tomwhite)
+
+    WHIRR-183. ZooKeeper Data Directory Cleanup. (asavu via tomwhite)
+
+    WHIRR-124. Upgrade to jclouds 1.0-beta-9 (Adrian Cole via larsgeorge)
+
+    WHIRR-124. Show warning messages before converting ec2->aws-ec2 and 
+    cloudservers -> clouservers-us (Adrian Cole via asavu)
+
+    WHIRR-167. Improve bootstrapping and configuration to be able to 
+    isolate and repair or evict failing nodes on EC2 (Tibor Kiss via asavu)
+
+    WHIRR-55. Users should be able to override an arbitrary Hadoop property
+    before launch. (tomwhite)
+
+    WHIRR-242. Update documentation for overriding locally supplied 
+    scripts (tomwhite via asavu)
+
+    WHIRR-248. Upgrade to jclouds 1.0-beta-9b (adriancole)
+
+    WHIRR-244. Add package-level javadoc. (tomwhite)
+
+    WHIRR-254. Document limitation that a role may only appear in 
+    one instance template group (tomwhite via asavu)
+
+    WHIRR-259. Disable configuration list handling for Hadoop 
+    properties (asavu)
+
+    WHIRR-233. Change test properties to be less provider bound and 
+    improve TemplateBuilder defaults (asavu)
+
+    WHIRR-265. Missing SVN EOL properties (Sebb via asavu)
+
+  BUG FIXES
+
+    WHIRR-170. Instances should be started in the order specified in 
+    the template (tomwhite via asavu)
+
+    WHIRR-186. [HBase] Add version support configurable in properties file.
+    (largsgeorge)
+
+    WHIRR-201. [HBase] Integration test fails. (largsgeorge via tomwhite)
+
+    WHIRR-217. Log files should not be included in tarball or checked 
+    by RAT (tomwhite via asavu)
+
+    WHIRR-232. NPE for stopped instances on EC2. (tomwhite)
+
+    WHIRR-234. Resource functions/install_cdh_hadoop.sh not found when 
+    running from the CLI (tomwhite via asavu)
+
+    WHIRR-235. fix whirr.provider in recipes/* (Eugene Koontz via asavu)
+
+    WHIRR-207. Handle curl timeouts better (asavu)
+
+    WHIRR-241. Update to use CDH3B4. (tomwhite)
+
+    WHIRR-247. Add license headers to service install and configure 
+    scripts (asavu)
+
+    WHIRR-251. Handle Apache cryptography requirements for release 
+    (tomwhite via asavu)
+
+    WHIRR-250. Ensure all libraries in binary distribution have 
+    associated licenses where stipulated (tomwhite via asavu)
+
+    WHIRR-263. Default tarball not found for Cassandra (broken link 
+    in install_cassandra.sh) (asavu)
+
+    WHIRR-267. Update NOTICE and LICENSE files to mention 3rd party 
+    products (tomwhite via asavu)
+
+Release 0.3.0 - 2011-01-15
+
+  NEW FEATURES
+
+    WHIRR-117. Composable services. (tomwhite)
+
+    WHIRR-176. Set AWS credentials in the local site file for Hadoop S3 access.
+    (Lars George via tomwhite)
+
+    WHIRR-25. Add HBase service. (Lars George via tomwhite)
+
+  IMPROVEMENTS
+
+    WHIRR-87. Parallelize Hadoop cluster creation. (tomwhite)
+
+    WHIRR-92. Add a benchmark for Hadoop clusters. (tomwhite)
+
+    WHIRR-153. Add documentation for WHIRR-87 (Parallelize Hadoop cluster
+    creation). (tomwhite)
+
+    WHIRR-115. Distribution should include documentation. (tomwhite)
+
+    WHIRR-154. Cassandra: expose JMX port. (Kelvin Kakugawa via tomwhite)
+
+    WHIRR-160. Improve SSH key diagnostics. (Andrei Savu via tomwhite)
+
+    WHIRR-150. Allow retrieval of instance roles. (tomwhite)
+
+    WHIRR-163. Support environment variable interpolation in configuration
+    properties. (tomwhite)
+
+    WHIRR-157. Remove service name property. (tomwhite)
+
+    WHIRR-166. Improve docs regarding private keys. (Stu Hood via tomwhite)
+
+    WHIRR-174. Fix ZooKeeper to allow stand-alone mode setups.
+    (Lars George via tomwhite)
+
+    WHIRR-145. Add Whirr recipes for common configurations. (tomwhite)
+
+    WHIRR-178. [Hadoop] Guard useradd against existing user account.
+    (Lars George via tomwhite)
+
+    WHIRR-187. [HBase] Change hbase.tmp.dir to be in line with Hadoop service.
+    (Lars George via tomwhite)
+
+    WHIRR-181. Add descriptions for CLI command options.
+    (Andrei Savu via tomwhite)
+
+    WHIRR-161. Check that both SSH keys belong to the same pair.
+    (Andrei Savu via tomwhite)
+
+    WHIRR-155. Support multiple versions of Cassandra.
+    (Stu Hood via johan)
+
+    WHIRR-190. Create /tmp in HDFS for Pig. (Andrei Savu and tomwhite via
+    tomwhite)
+
+    WHIRR-202. Improve instance template syntax checking. (tomwhite)
+
+    WHIRR-205. Override service.provider for integration tests.
+    (Andrei Savu via tomwhite)
+
+    WHIRR-203. General documentation improvements for 0.3.0. (tomwhite)
+
+    WHIRR-206. [HBase] Extract strings to a HBaseServiceConstants interface.
+    (Lars George via tomwhite)
+
+    WHIRR-194. Update the list of supported services on the home page.
+    (asavu via tomwhite)
+
+  BUG FIXES
+
+    WHIRR-128. Fix DNS resolution for clients running within EC2.
+    (Tibor Kiss via tomwhite)
+
+    WHIRR-137. Allow use of an arbitrary AMI on EC2. (tomwhite)
+
+    WHIRR-146. Changing the mapred.child.java.opts value does not change the
+    heap size from a default one. (Tibor Kiss via tomwhite)
+
+    WHIRR-147. Regression on launching clusters from EC2. (tomwhite)
+
+    WHIRR-151. Credentials not set correctly for Hadoop service configure step.
+    (tomwhite)
+
+    WHIRR-159. Cassandra and ZooKeeper fail on Ubuntu on Rackspace. (tomwhite)
+
+    WHIRR-123. Cassandra integration tests hang if whirr's scripts bucket is
+    missing. (tomwhite)
+
+    WHIRR-156. Cli script doesn't launch post-modularization. (Andrei Savu and
+    tomwhite via tomwhite)
+
+    WHIRR-162. DnsUtilTest fails when offline or for slow connections.
+    (Andrei Savu via tomwhite)
+
+    WHIRR-175. ZooKeeper service does not honor instance roles.
+    (Lars George via tomwhite)
+
+    WHIRR-165. Hadoop integration tests fail due to WHIRR-160 changes.
+    (tomwhite)
+
+    WHIRR-180. ListClusterCommand.run throws a NullPointerException for
+    unrecognized service names. (Andrei Savu via tomwhite)
+
+    WHIRR-179. [Hadoop] Guard $MOUNT/tmp mkdir call against existing directory.
+    (Lars George via tomwhite)
+
+    WHIRR-185. [ZooKeeper] Fix selection of instances for getHosts() call.
+    (Lars George via tomwhite)
+
+    WHIRR-164. Tests fail if there is no ~/.ssh/id_rsa keypair.
+    (Andrei Savu via tomwhite)
+
+    WHIRR-200. Cassandra integration test hangs. (Stu Hood via tomwhite)
+
+    WHIRR-204. CDH Hadoop integration test fails on Rackspace. (tomwhite)
+
+    WHIRR-210. Remove unneeded dependent libraries. (tomwhite)
+
+    WHIRR-211. Fix checkstyle errors for 0.3.0. (tomwhite)
+
+Release 0.2.0 - 2010-11-04
+
+  NEW FEATURES
+
+    WHIRR-100. Create a binary distribution of Whirr. (tomwhite)
+
+    WHIRR-73. Add a list command to the CLI. (tomwhite)
+
+  IMPROVEMENTS
+
+    WHIRR-89. Support maven 3 builds. (Adrian Cole via tomwhite)
+
+    WHIRR-90. Scripts should be versioned. (tomwhite)
+
+    WHIRR-66. Upgrade to jclouds 1.0-beta-7. (Adrian Cole via tomwhite)
+
+    WHIRR-103. Add more to .gitignore. (phunt via tomwhite)
+
+    WHIRR-105. Add version command to the CLI. (tomwhite)
+
+    WHIRR-109. Unit tests fail if there is no private key found at
+    ~/.ssh/id_rsa. (Adrian Cole via tomwhite)
+
+    WHIRR-110. Create client-side Hadoop configuration file during cluster
+    launch. (tomwhite)
+
+    WHIRR-112. Expand documentation. (tomwhite)
+
+    WHIRR-52. Support all services on Rackspace Cloud Servers. (tomwhite)
+
+  BUG FIXES
+
+    WHIRR-93. Fail on checkstyle violation. (tomwhite)
+
+    WHIRR-97. Lucid is not stable on EC2. Default is now the Amazon Linux AMI
+    on EC2. (tomwhite)
+
+    WHIRR-102. unknown service NPEs cli, should print the bad service
+    to console (phunt)
+
+    WHIRR-104. print available services in cli help string (phunt)
+
+    WHIRR-108. Fix checkstyle and rat violations. (tomwhite)
+
+    WHIRR-101. Hadoop on EC2 does not use the /mnt partition. (tomwhite)
+
+    WHIRR-107. Test failing due to not matching Amazon Linux AMI on EC2.
+    (tomwhite)
+
+    WHIRR-106. Improve logging in whirr cli. (tomwhite)
+
+    WHIRR-113. Hadoop cluster instances should all start in the same location.
+    (tomwhite)
+
+    WHIRR-114. Support + character in version number. (tomwhite)
+
+    WHIRR-91. Add DISCLAIMER file to CLI JAR (phunt)
+
+    WHIRR-122. whirr site has two FAQ links
+
+    WHIRR-126. Deployment process does not deploy required test JARs
+    (tomwhite)
+
+Release 0.1.0 - 2010-09-02
+
+  INCOMPATIBLE CHANGES
+
+  NEW FEATURES
+
+    WHIRR-33. Add a CLI. (tomwhite)
+
+    WHIRR-54. Implement service/cdh. To run CDH rather than Apache Hadoop, set
+    the property whirr.hadoop-install-runurl to cloudera/cdh/install (tomwhite)
+
+  IMPROVEMENTS
+
+    WHIRR-2. Import initial Java source code. (tomwhite)
+
+    WHIRR-20. Generate RAT report. (phunt via tomwhite)
+
+    WHIRR-32. Update POM to point to Apache RAT 0.8-SNAPSHOT.
+    (Jeff Hammerbacher via tomwhite)
+
+    WHIRR-21. Enforce source code style. (tomwhite)
+
+    WHIRR-34. Open up ports 50010 (JobTracker) and 50070 (NameNode) for the
+    Hadoop Service. (Jeff Hammerbacher via tomwhite)
+
+    WHIRR-26. Allow script locations to be overridden.
+    (Jeff Hammerbacher via tomwhite)
+
+    WHIRR-22. Separate unit and integration (system) tests. (tomwhite)
+
+    WHIRR-37. Don't require manual installation of Apache RAT to compile.
+    (tomwhite)
+
+    WHIRR-38. Add core javadoc. (tomwhite)
+
+    WHIRR-47. Create a Service factory. (tomwhite)
+
+    WHIRR-51. Allow the Hadoop service to be run on Rackspace Cloud servers.
+    (tomwhite)
+
+    WHIRR-53. Adopt the standard Java SPI interface. (tomwhite)
+
+    WHIRR-23. Upgrade to jclouds 1.0-beta-6. (Adrian Cole via tomwhite)
+
+    WHIRR-64. Unify ClusterSpec and ServiceSpec. (tomwhite)
+
+    WHIRR-58. Introduce naming consistency for cloud service providers.
+    (Adrian Cole via tomwhite)
+
+    WHIRR-75. Use Commons Configuration to manage cluster specs. (tomwhite)
+
+    WHIRR-40. Fill in getting started documentation. (tomwhite)
+
+    WHIRR-77. Document and implement release process. (tomwhite)
+
+    WHIRR-70. decouple keypairs from the files that hold them.
+    (Adrian Cole via tomwhite)
+
+    WHIRR-80. Clean up POM dependencies. (tomwhite)
+
+    WHIRR-85. Publish Maven artifacts to http://repository.apache.org.
+    (tomwhite)
+
+  BUG FIXES
+
+    WHIRR-50. Cassandra POM should depend on top-level. (tomwhite)
+
+    WHIRR-48. Fix RAT warnings due to site files. (tomwhite)
+
+    WHIRR-65. Workaround bug 331 in jclouds (Some EC2ComputeService operations
+    fail for stopped instances). (tomwhite)
+
+    WHIRR-71. Only allow access to clusters from defined networks. (tomwhite)
+
+    WHIRR-79. Hadoop service is broken. (tomwhite)
+
+    WHIRR-82. Integration tests should not run on "mvn install". (tomwhite)
+
+    WHIRR-84. Log4j is missing from the CLI JAR. (tomwhite)
+
+    WHIRR-86. Update quick start documentation to work with release 0.1.0.
+    (tomwhite)
+

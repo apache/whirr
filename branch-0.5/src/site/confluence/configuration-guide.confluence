@@ -1,0 +1,99 @@
+h1. Configuration Guide
+
+Whirr is configured using a properties file, and optionally using command line arguments when using the CLI. Command line arguments take precedence over properties specified in a properties file.
+
+For example working configurations, please see the recipes in the _recipes_ directory of the distribution.
+
+h2. General Options
+
+|| Name || Command line option || Default || Description ||
+| {{whirr.config}} | {{\--config}} | none | A filename of a properties file containing properties in this table. Note that Whirr properties specified in this file all have a {{whirr.}} prefix. |
+| {{whirr.service-name}} | {{\--service-name}} | The default service for launching clusters | The name of the service to use. You only need to set this if you want to use a non-standard service launcher. |
+| {{whirr.cluster-name}} | {{\--cluster-name}} | none | The name of the cluster to operate on. E.g. {{hadoopcluster}}. The cluster name is used to tag the instances in some cloud-specific way. For example, in Amazon it is used to form the security group name. |
+
+h2. Instance Templates Options
+
+|| Name || Command line option || Default || Description ||
+| {{whirr.instance-templates}} | {{\--instance-templates}} | none | The number of instances to launch for each set of roles in a service. E.g. {{1 nn+jt,10 dn+tt}} means one instance with the roles {{nn}} (namenode) and {{jt}} (jobtracker), and ten instances each with the roles {{dn}} (datanode) and {{tt}} (tasktracker). Note that currently a role may only be specified in a single group.|
+| {{whirr.instance-templates-max-percent-failures}} | {{\--instance-templates-max-percent-failures}} | none | The percentage of successfully started instances for each set of roles. E.g. {{100 nn+jt,60 dn+tt}} means all instances with the roles {{nn}} (namenode) and {{jt}} (jobtracker) has to be successfully started, and 60% of instances has to be successfully started each with the roles {{dn}} (datanode) and {{tt}} (tasktracker), otherwise a retry step is initiated with the number of nodes equal with the missing nodes per role compared to {{instance-templates}} value. If after the retry the percentage of successfully started instances is still behind the limit, then the cluster startup is considered invalid. In a valid cluster startup, with or without retry mechanism, all the failed nodes will be cleaned up immediately. Only the completely failed cluster may leave unterminated failed nodes. Default value is 100 for each roles, in that case we don't need to use this parameter at all. In case we would like to lower the limit from 100% to 60% for only the {{dd}} (datanode) and {{tt}} (tasktracker), then we can specify {{60 dn+tt}} for the parameter and we may left the {{100 nn+jt,}} from the beginning of the value. |
+| {{whirr.instance-templates-minimum-number-of-instances}} | {{\--instance-templates-minimum-number-of-instances}} | none | The minimum number of successfully started instances for each set of roles. E.g. {{1 nn+jt,6 dn+tt}} means 1 instance with the roles {{nn}} (namenode) and {{jt}} (jobtracker) has to be successfully started, and 6 instances has to be successfully started each with the roles {{dn}} (datanode) and {{tt}} (tasktracker), otherwise a retry step is initiated with the number of nodes equal with the missing nodes per role compared to {{instance-templates}} value. If after the retry the number of successfully started instances i still behind the limit, then the cluster startup is considered invalid. In a valid cluster startup, with or without retry mechanism, all the failed nodes will be cleaned up immediately. Only the completely failed cluster may leave unterminated failed nodes. Note that we may specify only {{6 dd+tt}}, in that case the limit will be applied only to the specified role. Default value is 100 for each roles, in that case we don't need to use this parameter at all. In case we would like to lower the limit for only the {{dd}} (datanode) and {{tt}} (tasktracker), then we can specify {{60 dn+tt}} for the parameter, skipping the {{100 nn+jt}}. |
+| {{whirr.max-startup-retries}} | {{\--max-startup-retries}} | {{1}} | The number of retries in case of insufficient successfully started instances.|
+
+h2. Cloud Provider Options
+
+|| Name || Command line option || Default || Description ||
+| {{whirr.provider}} | {{\--provider}} | {{aws-ec2}} | The name of the cloud provider. See the [table below|#cloud-provider-config] for possible provider names.|
+| {{whirr.location-id}} | {{\--location-id}} | none | The location to launch instances in. If not specified then an arbitrary location will be chosen. |
+| {{whirr.identity}} | {{\--identity}} | none | The cloud identity. See the [table below|#cloud-provider-config] for how this maps to the credentials for your provider. |
+| {{whirr.credential}} | {{\--credential}} | none | The cloud credential. See the [table below|#cloud-provider-config] for how this maps to the credentials for your provider. |
+| {{whirr.login-user}} | {{\--login-user}} | none | Override the default login user used to bootstrap whirr. E.g. ubuntu or myuser:mypass |
+
+h2. BlobStore Provider Options
+
+|| Name || Command line option || Default || Description ||
+| {{whirr.blobstore-provider}} | {{\--blobstore-provider}} | Computed from {{whirr.provider}}  | The name of the blobstore provider. All jclouds blobstore providers are supported |
+| {{whirr.blobstore-identity}} | {{\--blobstore-identity}} | {{whirr.identity}} | The blobstore identity. See the [table below|#cloud-provider-config] for how this maps to the credentials for your provider. |
+| {{whirr.blobstore-credential}} | {{\--blobstore-credential}} | {{whirr.credential}} | The blobstore credential. See the [table below|#cloud-provider-config] for how this maps to the credentials for your provider. |
+| {{whirr.blobstore-location-id}} | {{\--blobstore-location-id}} | As close as possible to the compute nodes | The blobstore location ID |
+
+h2. Cluster State Store Options
+
+|| Name || Command line option || Default || Description ||
+| {{whirr.state-store}} | {{\--state-store}} | local | What kind of store to use for cluster state (local, blob or none). |
+| {{whirr.state-store-container}} | {{\--state-store-container}} | none | Container where to store state. Valid only for the blob state store. |
+| {{whirr.state-store-blob}} | {{\--state-store-blob}} | whirr-<{{whirr.cluster-name}}> | Blob name for state storage. Valid only for the blob state store. |
+
+h2. Instance Login Options
+
+|| Name || Command line option || Default || Description ||
+| {{whirr.cluster-user}} | {{\--cluster-user}} | Current local user | The name of the user that Whirr will create on all instances. This is the user you should use to access the cluster. |
+| {{whirr.private-key-file}} | {{\--private-key-file}} | _\~/.ssh/id\_rsa_ | The filename of the private RSA SSH key used to connect to instances. Note: the public/private key must be set together, and must be passwordless. |
+| {{whirr.public-key-file}} | {{\--public-key-file}} | _\~/.ssh/id\_rsa_.pub | The filename of the public RSA SSH key used to connect to instances. Note: the public/private key must be set together, and must be passwordless.|
+
+h2. Image and Hardware Selection Options
+
+|| Name || Command line option || Default || Description ||
+| {{whirr.image-id}} | {{\--image-id}} | none | The ID of the image to use for instances. If not specified then a vanilla Linux image is chosen. |
+| {{whirr.hardware-id}} | {{\--hardware-id}} | none | The type of hardware to use for the instance. This must be compatible with the image ID. |
+| {{whirr.hardware-min-ram}} | {{\--hardware-min-ram}} | 1024 | The minimum amount of RAM each instance should have |
+
+h2. Firewall Options
+
+|| Name || Command line option || Default || Description ||
+| {{whirr.client-cidrs}} | {{\--client-cidrs}} | none | A comma-separated list of [CIDR |http://en.wikipedia.org/wiki/Classless\_Inter-Domain\_Routing] blocks. E.g. {{208.128.0.0/11,108.128.0.0/11}} |
+
+{anchor:cloud-provider-config}
+h2. Cloud provider specific configuration
+
+|| Compute Service Provider || {{whirr.provider}} || {{whirr.identity}} || {{whirr.credential}} || Notes ||
+| Amazon EC2 | {{aws-ec2}} | Access Key ID | Secret Access Key | Used to form security Group (via jclouds tag) |
+| Rackspace Cloud Servers | {{cloudservers-us}} | Username | API Key | Warning: clusters do not run behind a firewall. |
+
+{anchor:comparison-with-python}
+h1. Comparison with Python
+
+See [Using Command Line Options|contrib/python/using-command-line-options].
+
+|| Python || Java || Notes ||
+| {{config-dir}} | {{whirr.config}} | |
+| {{service}} | {{whirr.service-name}} | |
+| none | {{whirr.cluster-name}} | Specified as a positional argument on the Python CLI. |
+| none | {{whirr.instance-templates}} | Specified as a positional arguments on the Python CLI. |
+| {{cloud-provider}} | {{whirr.provider}} | |
+| none | {{whirr.identity}} | Specified using environment variables for Python. E.g. {{AWS\_ACCESS\_KEY\_ID}}, {{RACKSPACE\_KEY}} |
+| none | {{whirr.credential}} | Specified using environment variables for Python. E.g. {{AWS\_ACCESS\_KEY\_ID}}, {{RACKSPACE\_SECRET}} |
+| {{private-key}} | {{whirr.private-key-file}} | |
+| {{public-key}} | {{whirr.public-key-file}} | |
+| {{client-cidr}} | {{whirr.client-cidrs}} | Python's {{client-cidr}} option may be repeated multiple times, whereas Java's {{whirr.client-cidrs}} contains comma-separated CIDRs. |
+| none | {{whirr.run-url-base}} | Specified using {{user-data-file}} in Python. |
+| {{image-id}} | {{whirr.image-id}} | |
+| {{instance-type}} | {{whirr.hardware-id}} |  |
+| {{availability-zone}} | {{whirr.location-id}} | Location is more general than availability zone. |
+| {{security-group}} | none | Amazon-specific. However, Amazon users may wish to start a cluster in additional security groups, which isn't currently supported in Java. |
+| {{env}} | none | May not be needed in Java with runurls. |
+| {{user-data-file}} | none | Amazon-specific. Use runurls. |
+| {{key-name}} | none | Amazon-specific. Jclouds generates a new key for clusters. |
+| {{user-packages}} | none | Implement by allowing arbitrary runurls. |
+| {{auto-shutdown}} | none | Implement by allowing arbitrary runurls. |
+| {{ssh-options}} | none | Jclouds handles SSH, so not needed in Java. |
+
