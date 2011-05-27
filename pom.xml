@@ -39,6 +39,7 @@
     <module>build-tools</module>
     <module>cli</module>
     <module>core</module>
+    <module>examples</module>
     <module>services/cassandra</module>
     <module>services/cdh</module>
     <module>services/hadoop</module>
