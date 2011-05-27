@@ -2,6 +2,10 @@ Apache Whirr Change Log
 
 Trunk (unreleased changes)
 
+  IMPROVEMENTS
+
+    WHIRR-28. Add examples module (asavu)
+
 Release 0.5.0 - 2011-05-16
 
   INCOMPATIBLE CHANGES
