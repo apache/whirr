@@ -496,6 +496,14 @@
         <role>committer</role>
       </roles>
     </developer>
+    <developer>
+      <id>tibor</id>
+      <name>Tibor Kiss</name>
+      <organization>Omixon</organization>
+      <roles>
+        <role>committer</role>
+      </roles>
+    </developer>
   </developers>
   <issueManagement>
     <system>JIRA</system>
