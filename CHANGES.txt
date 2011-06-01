@@ -6,6 +6,8 @@ Trunk (unreleased changes)
 
     WHIRR-28. Add examples module (asavu)
 
+    WHIRR-319. Run rat & checkstyle before packaging (tomwhite and asavu)
+
 Release 0.5.0 - 2011-05-16
 
   INCOMPATIBLE CHANGES

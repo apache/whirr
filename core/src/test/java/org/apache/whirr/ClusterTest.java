@@ -35,7 +35,7 @@ import static org.junit.Assert.fail;
 public class ClusterTest {
 
   private Cluster cluster;
-  private final int NUMBER_OF_INSTANCES = 5;
+  private static final int NUMBER_OF_INSTANCES = 5;
 
   @Before
   public void setUp() {

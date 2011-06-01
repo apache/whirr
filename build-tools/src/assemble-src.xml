@@ -21,6 +21,7 @@
   <formats>
     <format>tar.gz</format>
   </formats>
+  <baseDirectory>${project.build.finalName}-src</baseDirectory>
   <fileSets>
     <fileSet>
       <directory>${project.basedir}</directory>
@@ -32,6 +33,10 @@
         <exclude>**/${project.build.directory}/**</exclude>
         <exclude>**/dependency-reduced-pom.xml</exclude>
         <exclude>**/*.log</exclude>
+        <exclude>**/*.log.*</exclude>
+        <exclude>**/*.rej</exclude>
+        <exclude>**/*.classpath</exclude>
+        <exclude>**/whirr-logo.ai</exclude>
       </excludes>
     </fileSet>
   </fileSets>
