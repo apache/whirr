@@ -10,7 +10,7 @@ BUILDING
 
 To run unit tests and install artifacts locally:
 
-mvn clean install
+mvn install
 
 To build a source package:
 
