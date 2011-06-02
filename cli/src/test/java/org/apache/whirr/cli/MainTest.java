@@ -33,6 +33,7 @@ import java.io.PrintStream;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.whirr.command.Command;
 import org.junit.Test;
 
 public class MainTest {

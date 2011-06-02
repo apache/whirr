@@ -32,13 +32,14 @@ import org.apache.whirr.Cluster;
 import org.apache.whirr.ClusterController;
 import org.apache.whirr.ClusterControllerFactory;
 import org.apache.whirr.ClusterSpec;
+import org.apache.whirr.command.AbstractClusterCommand;
 import org.apache.whirr.service.ClusterStateStore;
 import org.apache.whirr.service.ClusterStateStoreFactory;
 
 /**
  * A command to list the nodes in a cluster.
  */
-public class ListClusterCommand extends AbstractClusterSpecCommand {
+public class ListClusterCommand extends AbstractClusterCommand {
 
   public ListClusterCommand() throws IOException {
     this(new ClusterControllerFactory());

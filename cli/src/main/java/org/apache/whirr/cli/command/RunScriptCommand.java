@@ -33,6 +33,7 @@ import org.apache.whirr.Cluster;
 import org.apache.whirr.ClusterController;
 import org.apache.whirr.ClusterControllerFactory;
 import org.apache.whirr.ClusterSpec;
+import org.apache.whirr.command.AbstractClusterCommand;
 import org.apache.whirr.service.ClusterStateStoreFactory;
 import org.jclouds.compute.domain.ComputeMetadata;
 import org.jclouds.compute.domain.ExecResponse;
@@ -53,7 +54,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static org.apache.whirr.RolePredicates.anyRoleIn;
 import static org.jclouds.scriptbuilder.domain.Statements.exec;
 
-public class RunScriptCommand extends  AbstractClusterSpecCommand {
+public class RunScriptCommand extends AbstractClusterCommand {
 
   private OptionSpec<String> rolesOption = parser
     .accepts("roles", "List of comma separated role names. " +

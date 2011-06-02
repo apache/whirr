@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.apache.whirr.cli.command;
+package org.apache.whirr.command;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
@@ -34,11 +34,11 @@ import org.apache.whirr.ClusterSpec;
 import org.apache.whirr.util.KeyPair;
 import org.junit.Test;
 
-public class AbstractClusterSpecCommandTest {
+public class AbstractClusterCommandTest {
 
   @Test
   public void testOverrides() throws Exception {
-    AbstractClusterSpecCommand clusterSpecCommand = new AbstractClusterSpecCommand("name",
+    AbstractClusterCommand clusterCommand = new AbstractClusterCommand("name",
         "description", new ClusterControllerFactory()) {
       @Override
       public int run(InputStream in, PrintStream out, PrintStream err,
@@ -48,12 +48,12 @@ public class AbstractClusterSpecCommandTest {
     };
 
     Map<String, File> keys = KeyPair.generateTemporaryFiles();
-    OptionSet optionSet = clusterSpecCommand.parser.parse(
+    OptionSet optionSet = clusterCommand.parser.parse(
         "--service-name", "overridden-test-service",
         "--config", "whirr-override-test.properties",
         "--private-key-file", keys.get("private").getAbsolutePath()
     );
-    ClusterSpec clusterSpec = clusterSpecCommand.getClusterSpec(optionSet);
+    ClusterSpec clusterSpec = clusterCommand.getClusterSpec(optionSet);
     assertThat(clusterSpec.getServiceName(), is("overridden-test-service"));
     assertThat(clusterSpec.getClusterName(), is("test-cluster"));
   }
@@ -63,7 +63,7 @@ public class AbstractClusterSpecCommandTest {
    * warning).
    */
   public void testCreateServerWithInvalidClusterControllerName() throws Exception {
-    AbstractClusterSpecCommand clusterSpecCommand = new AbstractClusterSpecCommand("name",
+    AbstractClusterCommand clusterCommand = new AbstractClusterCommand("name",
         "description", new ClusterControllerFactory()) {
       @Override
       public int run(InputStream in, PrintStream out, PrintStream err,
@@ -73,6 +73,6 @@ public class AbstractClusterSpecCommandTest {
     };
 
     // following should not fail
-    clusterSpecCommand.createClusterController("bar");
+    clusterCommand.createClusterController("bar");
   }
 }

@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.apache.whirr.cli;
+package org.apache.whirr.command;
 
 import java.io.InputStream;
 import java.io.PrintStream;

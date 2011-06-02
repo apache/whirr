@@ -30,11 +30,12 @@ import joptsimple.OptionSpec;
 import org.apache.whirr.ClusterController;
 import org.apache.whirr.ClusterControllerFactory;
 import org.apache.whirr.ClusterSpec;
+import org.apache.whirr.command.AbstractClusterCommand;
 
 /**
  * A command to destroy an instance from a cluster
  */
-public class DestroyInstanceCommand extends AbstractClusterSpecCommand {
+public class DestroyInstanceCommand extends AbstractClusterCommand {
 
   private OptionSpec<String> instanceOption = parser
       .accepts("instance-id", "Cluster instance ID")
