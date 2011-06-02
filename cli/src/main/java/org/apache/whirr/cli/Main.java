@@ -18,14 +18,10 @@
 
 package org.apache.whirr.cli;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import org.apache.whirr.cli.command.DestroyClusterCommand;
-import org.apache.whirr.cli.command.DestroyInstanceCommand;
-import org.apache.whirr.cli.command.LaunchClusterCommand;
-import org.apache.whirr.cli.command.ListClusterCommand;
-import org.apache.whirr.cli.command.RunScriptCommand;
-import org.apache.whirr.cli.command.VersionCommand;
+import org.apache.whirr.command.Command;
 import org.apache.whirr.service.ClusterActionHandler;
 
 import java.io.IOException;
@@ -95,14 +91,9 @@ public class Main {
   }
 
   public static void main(String... args) throws Exception {
-    Main main = new Main(
-        new VersionCommand(),
-        new LaunchClusterCommand(),
-        new DestroyClusterCommand(),
-        new DestroyInstanceCommand(),
-        new ListClusterCommand(),
-        new RunScriptCommand()
-    );
+    ServiceLoader<Command> loader = ServiceLoader.load(Command.class);
+    Main main = new Main(Lists.newArrayList(loader).toArray(new Command[0]));
+
     int rc = main.run(System.in, System.out, System.err, Arrays.asList(args));
     System.exit(rc);
   }

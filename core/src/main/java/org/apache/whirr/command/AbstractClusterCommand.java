@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.apache.whirr.cli.command;
+package org.apache.whirr.command;
 
 import static org.apache.whirr.ClusterSpec.Property.CLUSTER_NAME;
 import static org.apache.whirr.ClusterSpec.Property.IDENTITY;
@@ -40,7 +40,6 @@ import org.apache.whirr.ClusterController;
 import org.apache.whirr.ClusterControllerFactory;
 import org.apache.whirr.ClusterSpec;
 import org.apache.whirr.ClusterSpec.Property;
-import org.apache.whirr.cli.Command;
 import org.apache.whirr.service.ClusterStateStore;
 import org.apache.whirr.service.ClusterStateStoreFactory;
 import org.slf4j.Logger;
@@ -49,10 +48,10 @@ import org.slf4j.LoggerFactory;
 /**
  * An abstract command for interacting with clusters.
  */
-public abstract class AbstractClusterSpecCommand extends Command {
+public abstract class AbstractClusterCommand extends Command {
   
   private static final Logger LOG =
-    LoggerFactory.getLogger(AbstractClusterSpecCommand.class);
+    LoggerFactory.getLogger(AbstractClusterCommand.class);
 
   protected ClusterControllerFactory factory;
   protected ClusterStateStoreFactory stateStoreFactory;
@@ -66,14 +65,14 @@ public abstract class AbstractClusterSpecCommand extends Command {
     .describedAs("config.properties")
     .ofType(String.class);
 
-  public AbstractClusterSpecCommand(String name, String description,
-                                    ClusterControllerFactory factory) {
+  public AbstractClusterCommand(String name, String description,
+                                ClusterControllerFactory factory) {
     this(name, description, factory, new ClusterStateStoreFactory());
   }
 
-  public AbstractClusterSpecCommand(String name, String description,
-                                    ClusterControllerFactory factory,
-                                    ClusterStateStoreFactory stateStoreFactory) {
+  public AbstractClusterCommand(String name, String description,
+                                ClusterControllerFactory factory,
+                                ClusterStateStoreFactory stateStoreFactory) {
     super(name, description);
 
     this.factory = factory;

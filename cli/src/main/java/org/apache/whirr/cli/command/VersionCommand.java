@@ -23,7 +23,7 @@ import java.io.PrintStream;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.whirr.cli.Command;
+import org.apache.whirr.command.Command;
 
 public class VersionCommand extends Command {
 

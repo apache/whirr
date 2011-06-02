@@ -30,11 +30,12 @@ import org.apache.whirr.Cluster;
 import org.apache.whirr.ClusterController;
 import org.apache.whirr.ClusterControllerFactory;
 import org.apache.whirr.ClusterSpec;
+import org.apache.whirr.command.AbstractClusterCommand;
 
 /**
  * A command to launch a new cluster.
  */
-public class LaunchClusterCommand extends AbstractClusterSpecCommand {
+public class LaunchClusterCommand extends AbstractClusterCommand {
 
   public LaunchClusterCommand() throws IOException {
     this(new ClusterControllerFactory());

@@ -8,6 +8,8 @@ Trunk (unreleased changes)
 
     WHIRR-319. Run rat & checkstyle before packaging (tomwhite and asavu)
 
+    WHIRR-311. Allow services to register new CLI commands (asavu)
+
   BUG FIXES
 
     WHIRR-315. Temporary override Providers#withIds until jclouds 

@@ -29,11 +29,12 @@ import joptsimple.OptionSet;
 import org.apache.whirr.ClusterController;
 import org.apache.whirr.ClusterControllerFactory;
 import org.apache.whirr.ClusterSpec;
+import org.apache.whirr.command.AbstractClusterCommand;
 
 /**
  * A command to destroy a running cluster (terminate and cleanup).
  */
-public class DestroyClusterCommand extends AbstractClusterSpecCommand {
+public class DestroyClusterCommand extends AbstractClusterCommand {
 
   public DestroyClusterCommand() throws IOException {
     this(new ClusterControllerFactory());
