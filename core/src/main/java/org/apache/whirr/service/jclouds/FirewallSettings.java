@@ -35,6 +35,8 @@ import org.jclouds.aws.util.AWSUtils;
 import org.jclouds.compute.ComputeServiceContext;
 import org.jclouds.ec2.EC2Client;
 import org.jclouds.ec2.domain.IpProtocol;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Utility functions for controlling firewall settings for a cluster.
@@ -42,6 +44,8 @@ import org.jclouds.ec2.domain.IpProtocol;
  */
 @Deprecated
 public class FirewallSettings {
+
+  private static final Logger LOG = LoggerFactory.getLogger(FirewallSettings.class);
   
   /**
    * @return the IP address of the client on which this code is running.
@@ -91,9 +95,14 @@ public class FirewallSettings {
       String groupName = "jclouds#" + clusterSpec.getClusterName() + "#" + region;
       for (String cidr : cidrs) {
         for (int port : ports) {
-          ec2Client.getSecurityGroupServices()
-            .authorizeSecurityGroupIngressInRegion(region, groupName,
+          try {
+            ec2Client.getSecurityGroupServices()
+              .authorizeSecurityGroupIngressInRegion(region, groupName,
                 IpProtocol.TCP, port, port, cidr);
+          } catch(IllegalStateException e) {
+            LOG.warn(e.getMessage());
+            /* ignore, it means that this permission was already granted */
+          }
         }
       }
     }

@@ -15,6 +15,8 @@ Trunk (unreleased changes)
     WHIRR-315. Temporary override Providers#withIds until jclouds 
     beta-10 is out (asavu and Adrian Cole)
 
+    WHIRR-249. Firewall authorization should be idempotent (asavu)
+
 Release 0.5.0 - 2011-05-16
 
   INCOMPATIBLE CHANGES
