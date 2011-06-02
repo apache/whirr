@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<document xmlns="http://maven.apache.org/XDOC/2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 http://maven.apache.org/xsd/xdoc-2.0.xsd">
+<!--
+ Licensed to the Apache Software Foundation (ASF) under one or more
+ contributor license agreements.  See the NOTICE file distributed with
+ this work for additional information regarding copyright ownership.
+ The ASF licenses this file to You under the Apache License, Version 2.0
+ (the"License"); you may not use this file except in compliance with
+ the License.  You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->  
+  <properties></properties>
+  <body>
+    <section name="Configuring and Running"></section>
+    
+    <subsection name="Setting Environment Variables to Specify AWS Credentials"></subsection>
+
+    <p>You must specify your AWS credentials when using the cloud scripts (see 
+    <a href="../../faq.html#how-do-i-find-my-cloud-credentials">How do I find my cloud credentials?</a>). The simplest
+    way to do this is to set the environment variables (see 
+    <a class="externalLink" href="http://code.google.com/p/boto/wiki/BotoConfig">this page</a>for other options):</p>
+    <ul>
+      <li>
+      <tt>AWS_ACCESS_KEY_ID</tt>: Your AWS Access Key ID</li>
+      <li>
+      <tt>AWS_SECRET_ACCESS_KEY</tt>: Your AWS Secret Access Key</li>
+    </ul>
+    
+    <subsection name="Configuring the Python Cloud Scripts"></subsection>
+
+    <p>To configure the scripts, create a directory called 
+    <i>.hadoop-cloud</i> in your home directory (note the leading period "."). In that directory, create a file called 
+    <i>clusters.cfg</i> that contains a section for each cluster you want to control. The following example shows how to
+    specify an i386 Ubuntu OS as the AMI in a 
+    <i>clusters.cfg</i> file.</p>
+    <source>
+[my-hadoop-cluster] 
+image_id=ami-ed59bf84 
+instance_type=c1.medium 
+key_name=tom 
+availability_zone=us-east-1c
+private_key=/path/to/private/key/file 
+ssh_options=-i %(private_key)s -o StrictHostKeyChecking=no
+</source>
+    <p>You can select a suitable AMI from the following table:</p>
+    <table border="0">
+      <tr valign="top">
+        <th>
+          <b>AMI (bucket/name)</b>
+        </th>
+        <th>
+          <b>ID</b>
+        </th>
+        <th>
+          <b>OS</b>
+        </th>
+      </tr>
+      <tr valign="top">
+        <td>cloudera-ec2-hadoop-images/cloudera-hadoop-ubuntu-20090623-i386</td>
+        <td>ami-ed59bf84</td>
+        <td>Ubuntu 8.10 (Intrepid)</td>
+      </tr>
+      <tr valign="top">
+        <td>cloudera-ec2-hadoop-images/cloudera-hadoop-ubuntu-20090623-x8664</td>
+        <td>ami-8759bfee</td>
+        <td>Ubuntu 8.10 (Intrepid)</td>
+      </tr>
+      <tr valign="top">
+        <td>cloudera-ec2-hadoop-images/cloudera-hadoop-fedora-20090623-i386</td>
+        <td>ami-6159bf08</td>
+        <td>Fedora release 8 (Werewolf)</td>
+      </tr>
+      <tr valign="top">
+        <td>cloudera-ec2-hadoop-images/cloudera-hadoop-fedora-20090623-x8664</td>
+        <td>ami-2359bf4a</td>
+        <td>Fedora release 8 (Werewolf)</td>
+      </tr>
+    </table>
+    <p></p>
+    <p>If you wish to use 
+    <a class="externalLink" href="http://www.cloudera.com/hadoop/">CDH</a>instead of Apache Hadoop, use the following
+    configuration:</p>
+    <source>
+[my-hadoop-cluster]
+image_id=ami-2d4aa444 
+instance_type=c1.medium 
+key_name=tom 
+availability_zone=us-east-1c
+private_key=/path/to/private/key/file 
+ssh_options=-i %(private_key)s -o StrictHostKeyChecking=no
+user_data_file=http://archive.cloudera.com/cloud/ec2/cdh3/hadoop-ec2-init-remote.sh
+</source>
+    <p>Note that this example uses CDH3, as specified by the 
+    <tt>user_data_file</tt> property (the version of Hadoop to install is determined by this script). For CDH, use one
+    of the AMIs from this table:</p>
+    <table border="0">
+      <tr valign="top">
+        <th>
+          <b>AMI (bucket/name)</b>
+        </th>
+        <th>
+          <b>ID</b>
+        </th>
+        <th>
+          <b>OS</b>
+        </th>
+        <th>
+          <b>Notes</b>
+        </th>
+      </tr>
+      <tr valign="top">
+        <td>ubuntu-images/ubuntu-lucid-10.04-i386-server-20100427.1</td>
+        <td>ami-2d4aa444</td>
+        <td>Ubuntu 10.04 (Lucid)</td>
+        <td>This AMI is suitable for use with CDH3b2 onwards. See http://alestic.com/</td>
+      </tr>
+      <tr valign="top">
+        <td>ubuntu-images/ubuntu-lucid-10.04-amd64-server-20100427.1</td>
+        <td>ami-fd4aa494</td>
+        <td>Ubuntu 10.04 (Lucid)</td>
+        <td>This AMI is suitable for use with CDH3b2 onwards. See http://alestic.com/</td>
+      </tr>
+    </table>
+    
+    <subsection name="Running a Basic Cloud Script"></subsection>
+
+    <p>After specifying an AMI, you can run the 
+    <tt>hadoop-ec2</tt> script. It will display usage instructions when you invoke it without arguments.</p>
+    <p>You can test that the script can connect to your cloud provider by typing:</p>
+    <source>% hadoop-ec2 list</source>
+  </body>
+</document>

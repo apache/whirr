@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<document xmlns="http://maven.apache.org/XDOC/2.0"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 http://maven.apache.org/xsd/xdoc-2.0.xsd">
+<!--
+ Licensed to the Apache Software Foundation (ASF) under one or more
+ contributor license agreements.  See the NOTICE file distributed with
+ this work for additional information regarding copyright ownership.
+ The ASF licenses this file to You under the Apache License, Version 2.0
+ (the "License"); you may not use this file except in compliance with
+ the License.  You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+  <properties></properties>
+  <body>
+    <section name="Using Persistent Clusters"></section>
+    <p>
+      <b>Support for Amazon Elastic Block Storage (EBS) is a Beta feature.</b>
+    </p>
+    <p>When not in use, an EBS-cluster can surrender unneeded EC2 instances, then restart later and
+    continue where it left off. Users no longer need to copy large volumes of data from S3 to local
+    disk on the EC2 instance; data persists reliably and independently in Amazon's EBS, saving
+    compute costs.</p>
+    <p>
+      <b>Schematic showing how the cluster is set up:</b>
+    </p>
+    <img src="../../images/persistent-ec2.png" alt="" />
+    <p>
+      <b>To Use Persistent Cluster with EBS Storage</b>
+    </p>
+    <ol style="list-style-type: decimal">
+      <li>Create a new section called 
+      <tt>my-ebs-cluster</tt>in the 
+      <tt>~/.hadoop-cloud/clusters.cfg</tt>file.</li>
+      <li>Create storage for the new cluster by creating a temporary EBS volume of size 100GiB,
+      formatting it, and saving it as a snapshot in S3. This way, you only have to do the
+      formatting once.</li>
+    </ol>
+    <source>% hadoop-ec2 create-formatted-snapshot my-ebs-cluster 100</source>
+    <p>You create storage for a single Namenode and for two Datanodes. The volumes to create are
+    described in a JSON spec file, which references the snapshot you just created. Here is the
+    contents of a JSON file, called 
+    <tt>my-ebs-cluster-storage-spec.jso</tt>:</p>
+    <p>
+      <b>Example contents of my-ebs-cluster-storage-spec.json</b>
+    </p>
+    <source>
+{'dn': [{'device': '/dev/sdj',
+         'mount_point': '/ebs1',
+         'size_gb': '100',
+         'snapshot_id': 'snap-268e704f'},
+        {'device': '/dev/sdk',
+         'mount_point': '/ebs2',
+         'size_gb': '100',
+         'snapshot_id': 'snap-268e704f'}],
+ 'nn': [{'device': '/dev/sdj',
+         'mount_point': '/ebs1',
+         'size_gb': '100',
+         'snapshot_id': 'snap-268e704f'},
+        {'device': '/dev/sdk',
+         'mount_point': '/ebs2',
+         'size_gb': '100',
+         'snapshot_id': 'snap-268e704f'}]}
+</source>
+    <p>Each role (
+    <tt>nn</tt>and 
+    <tt>dn</tt>) is the key to an array of volume specifications. In this example, each role has
+    two devices (
+    <tt>/dev/sdj</tt>and 
+    <tt>/dev/sdk</tt>) with different mount points, and generated from an EBS snapshot. The
+    snapshot is the formatted snapshot created earlier, so that the volumes you create are
+    pre-formatted. The size of the drives must match the size of the snapshot created earlier.</p>
+    <p>
+      <b>To use this file to create actual volumes:</b>
+    </p>
+    <source>
+% hadoop-ec2 create-storage my-ebs-cluster nn 1 my-ebs-cluster-storage-spec.json 
+% hadoop-ec2 create-storage my-ebs-cluster dn 2 my-ebs-cluster-storage-spec.json
+</source>
+    <p>
+      <b>To start the cluster with two slave nodes:</b>
+    </p>
+    <source>% hadoop-ec2 launch-cluster my-ebs-cluster 1 nn,snn,jt 2 dn,tt</source>
+    <p>
+      <b>To login and run a job which creates some output:</b>
+    </p>
+    <source>
+% hadoop-ec2 login my-ebs-cluster 
+# hadoop fs -mkdir input 
+# hadoop fs -put /etc/hadoop/conf/*.xml input 
+# hadoop jar /usr/lib/hadoop/hadoop-*-examples.jar grep input output \ 'dfs[a-z.]+'
+</source>
+    <p>
+      <b>To view the output:</b>
+    </p>
+    <source># hadoop fs -cat output/part-* | head</source>
+    <p>
+      <b>To shutdown the cluster:</b>
+    </p>
+    <source>% hadoop-ec2 terminate-cluster my-ebs-cluster</source>
+    <p>
+      <b>To restart the cluster and login (after a short delay):</b>
+    </p>
+    <source>
+% hadoop-ec2 launch-cluster my-ebs-cluster 2 
+% hadoop-ec2 login my-ebs-cluster
+</source>
+    <p>
+      <b>The output from the job you ran before should still be there:</b>
+    </p>
+    <source># hadoop fs -cat output/part-* | head</source>
+  </body>
+</document>

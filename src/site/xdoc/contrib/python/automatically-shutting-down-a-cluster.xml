@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<document xmlns="http://maven.apache.org/XDOC/2.0"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 http://maven.apache.org/xsd/xdoc-2.0.xsd">
+<!--
+ Licensed to the Apache Software Foundation (ASF) under one or more
+ contributor license agreements.  See the NOTICE file distributed with
+ this work for additional information regarding copyright ownership.
+ The ASF licenses this file to You under the Apache License, Version 2.0
+ (the "License"); you may not use this file except in compliance with
+ the License.  You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->  
+  <properties></properties>
+  <body>
+    <section name="Automatically Shutting Down a Cluster"></section>
+    <p>You can use the 
+    <tt>--auto-shutdown</tt>option to automatically terminate a cluster at a specified number of
+    minutes after launch. This is useful for short-lived clusters where the jobs complete in a
+    known amount of time.</p>
+    <p>
+      <b>To configure the automatic shutdown (for example, 50 minutes after launch):</b>
+    </p>
+    <source>hadoop-ec2 launch-cluster --auto-shutdown 50 my-hadoop-cluster 2</source>
+    <p>You can also use the configuration property 
+    <tt>auto_shutdown</tt>in the configuration file; for example, to shut down 50 minutes after
+    launch, you would use 
+    <tt>auto_shutdown=50</tt>.</p>
+    <p>
+      <b>To cancel the automatic shutdown:</b>
+    </p>
+    <source>
+% hadoop-ec2 exec my-hadoop-cluster shutdown -c 
+% hadoop-ec2 update-slaves-file my-hadoop-cluster 
+% hadoop-ec2 exec my-hadoop-cluster /usr/lib/hadoop/bin/slaves.sh shutdown -c
+</source>
+  </body>
+</document>

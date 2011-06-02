@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<document xmlns="http://maven.apache.org/XDOC/2.0"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 http://maven.apache.org/xsd/xdoc-2.0.xsd">
+<!--
+ Licensed to the Apache Software Foundation (ASF) under one or more
+ contributor license agreements.  See the NOTICE file distributed with
+ this work for additional information regarding copyright ownership.
+ The ASF licenses this file to You under the Apache License, Version 2.0
+ (the "License"); you may not use this file except in compliance with
+ the License.  You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->  
+  <properties></properties>
+  <body>
+
+    <section name="Using Command Line Options"></section>
+
+    <p>It is possible to specify options on the command line when you launch a cluster. The options
+    take precedence over any settings specified in the configuration file.</p>
+    <p>For example, the following command launches a 10-node cluster using a specified image and
+    instance type, overriding the equivalent settings (if any) that are in the 
+    <tt>my-hadoop-cluster</tt> section of the configuration file. Note that words in options are
+    separated by hyphens (
+    <tt>--instance-type</tt> ) while the corresponding configuration parameter are separated by
+    underscores (
+    <tt>instance_type</tt> ).</p>
+    <source>
+% hadoop-ec2 launch-cluster --image-id ami-2359bf4a --instance-type c1.xlarge my-hadoop-cluster 10
+</source>
+    <p>If there options are that you want to specify multiple times, you can set them in the
+    configuration file by separating them with newlines (and leading whitespace). For example:</p>
+    <source>env=AWS_ACCESS_KEY_ID=... AWS_SECRET_ACCESS_KEY=...</source>
+    <p>The scripts install Hadoop from a tarball (or, in the case of CDH, from RPMs or Debian
+    packages, depending on the OS) at instance boot time.</p>
+    <p>By default, Apache Hadoop 0.20.1 is installed. To run a different version of Hadoop, change
+    the 
+    <tt>user_data_file</tt> setting.</p>
+    <p>For example, to use the latest version of CDH3 add the following parameter:</p>
+    <source>--user-data-file http://archive.cloudera.com/cloud/ec2/cdh3/hadoop-ec2-init-remote.sh</source>
+    <p>By default, the latest version of the specified CDH release series is used. To use a
+    particular release of CDH, use the 
+    <tt>REPO env</tt> parameter, in addition to setting 
+    <tt>user_data_file</tt> . For example, to specify the Beta 1 release of CDH3:</p>
+    <source>--env REPO=cdh3b1</source>
+    <p>For this release, Hadoop configuration files can be found in 
+    <tt>/etc/hadoop/conf</tt> and logs are in 
+    <tt>/var/log/hadoop</tt> .</p>
+    
+    <subsection name="Customization"></subsection>
+
+    <p>You can specify a list of packages to install on every instance at boot time by using the 
+    <tt>--user-packages</tt> command-line option or the 
+    <tt>user_packages</tt> configuration parameter. Packages should be space-separated. Note that
+    package names should reflect the package manager being used to install them (
+    <tt>yum</tt> or 
+    <tt>apt-get</tt> depending on the OS).</p>
+    <p>For example, to install RPMs for R and git:</p>
+    <source>% hadoop-ec2 launch-cluster --user-packages 'R git-core' my-hadoop-cluster 10</source>
+    <p>You have full control over the script that is run when each instance boots. The default
+    script, 
+    <tt>hadoop-ec2-init-remote.sh</tt> , may be used as a starting point to add extra configuration
+    or customization of the instance. Make a copy of the script in your home directory, or
+    somewhere similar, and set the 
+    <tt>--user-data-file</tt> command-line option (or the 
+    <tt>user_data_file</tt> configuration parameter) to point to the (modified) copy. This option
+    may also point to an arbitrary URL, which makes it easy to share scripts.</p>
+    <p>For CDH, use the script located at 
+    <a class="externalLink"
+    href="http://archive.cloudera.com/cloud/ec2/cdh3/hadoop-ec2-init-remote.sh">
+    http://archive.cloudera.com/cloud/ec2/cdh3/hadoop-ec2-init-remote.sh</a></p>
+    <p>The 
+    <tt>hadoop-ec2</tt> script will replace 
+    <tt>%ENV%</tt> in your user data script with 
+    <tt>USER_PACKAGES</tt> , 
+    <tt>AUTO_SHUTDOWN</tt> , and 
+    <tt>EBS_MAPPINGS</tt> , as well as extra parameters supplied using the 
+    <tt>--env</tt> command-line flag.</p>
+    <p>Another way of customizing the instance, which may be more appropriate for larger changes,
+    is to create your own image.</p>
+    <p>It's possible to use any image, as long as it satisfies both of the following
+    conditions:</p>
+    <ul>
+      <li>Runs (gzip compressed) user data on boot</li>
+      <li>Has Java installed</li>
+    </ul>
+  </body>
+</document>

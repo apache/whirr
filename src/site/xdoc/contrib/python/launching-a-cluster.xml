@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<document xmlns="http://maven.apache.org/XDOC/2.0"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 http://maven.apache.org/xsd/xdoc-2.0.xsd">
+<!--
+ Licensed to the Apache Software Foundation (ASF) under one or more
+ contributor license agreements.  See the NOTICE file distributed with
+ this work for additional information regarding copyright ownership.
+ The ASF licenses this file to You under the Apache License, Version 2.0
+ (the "License"); you may not use this file except in compliance with
+ the License.  You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->  
+  <properties></properties>
+  <body>
+    <section name="Launching a Cluster"></section>
+    <p>After you install the client scripts and enter your EC2 account information, starting a
+    Hadoop cluster with 10 nodes is easy with a single command. 
+    <br />
+    <br />To launch a cluster called "my-hadoop-cluster" with 10 worker (slave) nodes, use this
+    command:</p>
+    <source>% hadoop-ec2 launch-cluster my-hadoop-cluster 10</source>
+    <p>
+    <br />This command boots the master node and 10 worker nodes. The master node runs the
+    Namenode, secondary Namenode, and Jobtracker, and each worker node runs a Datanode and a
+    Tasktracker.</p>
+    <p>Equivalently, you can launch the cluster by using this command syntax:</p>
+    <source>% hadoop-ec2 launch-cluster my-hadoop-cluster 1 nn,snn,jt 10 dn,tt</source>
+    <p>Note that by using this syntax, you can also launch a split Namenode/Jobtracker cluster. For
+    example:</p>
+    <source>% hadoop-ec2 launch-cluster my-hadoop-cluster 1 nn,snn 1 jt 10 dn,tt</source>
+    <p>After the nodes have started and the Hadoop cluster is operational, the console will display
+    a message such as:</p>
+    <source>Browse the cluster at http://ec2-xxx-xxx-xxx-xxx.compute-1.amazonaws.com/</source>
+    <p>You can access Hadoop's web UI at the URL in the message. By default, port 80 is opened for
+    access from your client machine. You can change the firewall settings (to allow access from a
+    network, rather than just a single machine, for example) by using the Amazon EC2 command line
+    tools, or by using a tool such as 
+    <a class="externalLink"
+    href="http://developer.amazonwebservices.com/connect/entry.jspa?externalID=609">Elastic
+    Fox</a>. The security group to change is the one named 
+    <tt>&lt;cluster-name&gt;-&lt;role&gt;</tt>. For example, for the Namenode in the cluster
+    started above, it would be 
+    <tt>my-hadoop-cluster-nn</tt>.</p>
+    <p>For security reasons, traffic from the network your client is running on is proxied through
+    the master node of the cluster using an SSH tunnel (a SOCKS proxy on port 6666).</p>
+    <p>To set up the proxy, run the following command:</p>
+    <source>% eval `hadoop-ec2 proxy my-hadoop-cluster`</source>
+    <p>Note the backticks, which are used to evaluate the result of the command. This allows you to
+    stop the proxy later on (from the same terminal):</p>
+    <source>% kill $HADOOP_CLOUD_PROXY_PID</source>
+    <p>Web browsers need to be configured to use this proxy too, so you can view pages served by
+    worker nodes in the cluster. The most convenient way to do this is to use a 
+    <a class="externalLink" href="http://en.wikipedia.org/wiki/Proxy_auto-config">proxy auto-config
+    (PAC) file</a>file, such as 
+    <a class="externalLink" href="http://apache-hadoop-ec2.s3.amazonaws.com/proxy.pac">this
+    one</a>for Hadoop EC2 clusters.</p>
+    <p>If you are using Firefox, then you may find 
+    <a class="externalLink" href="http://foxyproxy.mozdev.org/">FoxyProxy</a>useful for managing
+    PAC files.</p>
+  </body>
+</document>
