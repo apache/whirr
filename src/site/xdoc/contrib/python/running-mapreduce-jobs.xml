@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<document xmlns="http://maven.apache.org/XDOC/2.0"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 http://maven.apache.org/xsd/xdoc-2.0.xsd">
+<!--
+ Licensed to the Apache Software Foundation (ASF) under one or more
+ contributor license agreements.  See the NOTICE file distributed with
+ this work for additional information regarding copyright ownership.
+ The ASF licenses this file to You under the Apache License, Version 2.0
+ (the "License"); you may not use this file except in compliance with
+ the License.  You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->  
+  <properties></properties>
+  <body>
+    <section name="Running MapReduce Jobs"></section>
+    <p>After you launch a cluster, a 
+    <tt>hadoop-site.xml</tt> file is created in the directory 
+    <tt>~/.hadoop-cloud/&lt;cluster-name&gt;</tt>. You can use this to connect to the cluster by
+    setting the 
+    <tt>HADOOP_CONF_DIR</tt> environment variable. (It is also possible to set the configuration
+    file to use by passing it as a 
+    <tt>-conf</tt> option to Hadoop Tools):</p>
+    <source>% export HADOOP_CONF_DIR=~/.hadoop-cloud/my-hadoop-cluster</source>
+    <p>
+      <b>To browse HDFS:</b>
+    </p>
+    <source>% hadoop fs -ls /</source>
+    <p>Note that the version of Hadoop installed locally should match the version installed on the
+    cluster. 
+    <br />
+    <br />
+    <b>To run a job locally:</b></p>
+    <source>
+% hadoop fs -mkdir input 
+# create an input directory 
+% hadoop fs -put $HADOOP_HOME/LICENSE.txt input 
+# copy a file there % hadoop jar $HADOOP_HOME/hadoop-*examples*.jar wordcount input output 
+% hadoop fs -cat output/part-* | head
+</source>
+    <p>The preceding examples assume that you installed Hadoop on your local machine. But you can
+    also run jobs within the cluster. 
+    <br />
+    <br />
+    <b>To run jobs within the cluster:</b></p>
+    <p>1. Log into the Namenode:</p>
+    <source>% hadoop-ec2 login my-hadoop-cluster</source>
+    <p>2. Run the job:</p>
+    <source>
+# hadoop fs -mkdir input 
+# hadoop fs -put /etc/hadoop/conf/*.xml input 
+# hadoop jar /usr/lib/hadoop/hadoop-*-examples.jar grep input output 'dfs\[a-z.]+' 
+# hadoop fs -cat output/part-* | head
+</source>
+  </body>
+</document>

@@ -83,7 +83,7 @@
       <item name="Terminating a Cluster" href="contrib/python/terminating-a-cluster.html"/>
       <item name="Automatically Shutting Down a Cluster" href="contrib/python/automatically-shutting-down-a-cluster.html"/>
       <item name="Using Command Line Options" href="contrib/python/using-command-line-options.html"/>
-      <item name="Running ZooKeeper" href="contrib/python/running-zooKeeper.html"/>
+      <item name="Running ZooKeeper" href="contrib/python/running-zookeeper.html"/>
     </menu>
 
   </body>

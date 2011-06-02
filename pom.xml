@@ -355,10 +355,10 @@
             <exclude>.git/**</exclude>
             <exclude>.gitignore</exclude>
             <exclude>**/*.json</exclude>
-            <exclude>**/*.confluence</exclude>
             <exclude>**/src/main/resources/version-banner.txt</exclude>
             <exclude>docs/**</exclude>
             <exclude>**/*.log*</exclude>
+            <exclude>.idea/**</exclude>
             <exclude>src/site/resources/images/whirr-logo.ai</exclude> <!-- binary -->
           </excludes>
         </configuration>

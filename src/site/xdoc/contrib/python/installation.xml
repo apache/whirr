@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<document xmlns="http://maven.apache.org/XDOC/2.0"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 http://maven.apache.org/xsd/xdoc-2.0.xsd">
+<!--
+ Licensed to the Apache Software Foundation (ASF) under one or more
+ contributor license agreements.  See the NOTICE file distributed with
+ this work for additional information regarding copyright ownership.
+ The ASF licenses this file to You under the Apache License, Version 2.0
+ (the "License"); you may not use this file except in compliance with
+ the License.  You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+  <properties></properties>
+  <body>
+    <section name="Installation"></section>
+    <p>The Python cloud scripts enable you to run Hadoop on cloud providers. A working cluster will
+    start immediately with one command. It's ideal for running temporary Hadoop clusters to carry
+    out a proof of concept, or to run a few one-time jobs. Currently, the scripts support Amazon
+    EC2 only, but in the future other cloud providers may also be supported.</p>
+    <p>Amazon Machine Images (AMIs) and associated launch scripts are provided that make it easy to
+    run Hadoop on EC2. Note that the AMIs contain only base packages (such as Java), and not a
+    particular version of Hadoop because Hadoop is installed at launch time.</p>
+    <p>
+      <b>In this section, command lines that start with 
+      <tt>#</tt> are executed on a cloud instance, and command lines starting with a 
+      <tt>%</tt> are executed on your workstation.</b>
+    </p>
+    <subsection name="Installing the Python Cloud Scripts"></subsection>
+    <p>The following prerequisites apply to using the Python cloud scripts:</p>
+    <ul>
+      <li>Python 2.5</li>
+      <li>boto 1.8d</li>
+      <li>simplejson 2.0.9</li>
+    </ul>
+    <p>You can install bot and simplejson by using 
+    <a class="externalLink" href="http://pypi.python.org/pypi/setuptools">easy_install</a>:</p>
+    <source>
+% easy_install "simplejson==2.0.9" 
+% easy_install "boto==1.8d"
+</source>
+    <p></p>
+    <p>Alternatively, you might like to use the python-boto and python-simplejson RPM and Debian
+    packages.</p>
+    <p>The Python Cloud scripts are packaged in the source tarball. Unpack the tarball on your
+    system. The CDH Cloud scripts are in 
+    <i>contrib/python/src/py</i>. For convenience, you can add this directory to your path.</p>
+  </body>
+</document>

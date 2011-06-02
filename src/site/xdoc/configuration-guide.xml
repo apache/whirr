@@ -1,0 +1,750 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!--
+ Licensed to the Apache Software Foundation (ASF) under one or more
+ contributor license agreements.  See the NOTICE file distributed with
+ this work for additional information regarding copyright ownership.
+ The ASF licenses this file to You under the Apache License, Version 2.0
+ (the "License"); you may not use this file except in compliance with
+ the License.  You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+<document xmlns="http://maven.apache.org/XDOC/2.0"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 http://maven.apache.org/xsd/xdoc-2.0.xsd">
+  <properties></properties>
+  <body>
+    <section name="Configuration Guide"></section>
+    <p>Whirr is configured using a properties file, and optionally using command line arguments
+    when using the CLI. Command line arguments take precedence over properties specified in a
+    properties file.</p>
+    <p>For example working configurations, please see the recipes in the 
+    <i>recipes</i> directory of the distribution.</p>
+    <subsection name="General Options"></subsection>
+    <table border="0">
+      <tr valign="top">
+        <th>
+          <b>Name</b>
+        </th>
+        <th>
+          <b>Command line option</b>
+        </th>
+        <th>
+          <b>Default</b>
+        </th>
+        <th>
+          <b>Description</b>
+        </th>
+      </tr>
+      <tr valign="top">
+        <td>
+          <tt>whirr.config</tt>
+        </td>
+        <td>
+          <tt>--config</tt>
+        </td>
+        <td>none</td>
+        <td>A filename of a properties file containing properties in this table.
+        Note that Whirr properties specified in this file all have a 
+        <tt>whirr.</tt>prefix.</td>
+      </tr>
+      <tr valign="top">
+        <td>
+          <tt>whirr.service-name</tt>
+        </td>
+        <td>
+          <tt>--service-name</tt>
+        </td>
+        <td>The default service for launching clusters</td>
+        <td>The name of the service to use. You only need to set this if you want to
+        use a non-standard service launcher.</td>
+      </tr>
+      <tr valign="top">
+        <td>
+          <tt>whirr.cluster-name</tt>
+        </td>
+        <td>
+          <tt>--cluster-name</tt>
+        </td>
+        <td>none</td>
+        <td>The name of the cluster to operate on. E.g. 
+        <tt>hadoopcluster</tt>. The cluster name is used to tag the instances in some
+        cloud-specific way. For example, in Amazon it is used to form the security group name.</td>
+      </tr>
+    </table>
+    <subsection name="Instance Templates Options"></subsection>
+    <table border="0">
+      <tr valign="top">
+        <th>
+          <b>Name</b>
+        </th>
+        <th>
+          <b>Command line option</b>
+        </th>
+        <th>
+          <b>Default</b>
+        </th>
+        <th>
+          <b>Description</b>
+        </th>
+      </tr>
+      <tr valign="top">
+        <td>
+          <tt>whirr.instance-templates</tt>
+        </td>
+        <td>
+          <tt>--instance-templates</tt>
+        </td>
+        <td>none</td>
+        <td>The number of instances to launch for each set of roles in a service.
+        E.g. 
+        <tt>1 nn+jt,10 dn+tt</tt>means one instance with the roles 
+        <tt>nn</tt>(namenode) and 
+        <tt>jt</tt>(jobtracker), and ten instances each with the roles 
+        <tt>dn</tt>(datanode) and 
+        <tt>tt</tt>(tasktracker). Note that currently a role may only be specified in a single
+        group.</td>
+      </tr>
+      <tr valign="top">
+        <td>
+          <tt>whirr.instance-templates-max-percent-failures</tt>
+        </td>
+        <td>
+          <tt>--instance-templates-max-percent-failures</tt>
+        </td>
+        <td>none</td>
+        <td>The percentage of successfully started instances for each set of roles.
+        E.g. 
+        <tt>100 nn+jt,60 dn+tt</tt>means all instances with the roles 
+        <tt>nn</tt>(namenode) and 
+        <tt>jt</tt>(jobtracker) has to be successfully started, and 60% of instances has to be
+        successfully started each with the roles 
+        <tt>dn</tt>(datanode) and 
+        <tt>tt</tt>(tasktracker), otherwise a retry step is initiated with the number of nodes
+        equal with the missing nodes per role compared to 
+        <tt>instance-templates</tt>value. If after the retry the percentage of successfully started
+        instances is still behind the limit, then the cluster startup is considered invalid. In a
+        valid cluster startup, with or without retry mechanism, all the failed nodes will be
+        cleaned up immediately. Only the completely failed cluster may leave unterminated failed
+        nodes. Default value is 100 for each roles, in that case we don't need to use this
+        parameter at all. In case we would like to lower the limit from 100% to 60% for only the 
+        <tt>dd</tt>(datanode) and 
+        <tt>tt</tt>(tasktracker), then we can specify 
+        <tt>60 dn+tt</tt>for the parameter and we may left the 
+        <tt>100 nn+jt,</tt>from the beginning of the value.</td>
+      </tr>
+      <tr valign="top">
+        <td>
+          <tt>whirr.instance-templates-minimum-number-of-instances</tt>
+        </td>
+        <td>
+          <tt>--instance-templates-minimum-number-of-instances</tt>
+        </td>
+        <td>none</td>
+        <td>The minimum number of successfully started instances for each set of
+        roles. E.g. 
+        <tt>1 nn+jt,6 dn+tt</tt>means 1 instance with the roles 
+        <tt>nn</tt>(namenode) and 
+        <tt>jt</tt>(jobtracker) has to be successfully started, and 6 instances has to be
+        successfully started each with the roles 
+        <tt>dn</tt>(datanode) and 
+        <tt>tt</tt>(tasktracker), otherwise a retry step is initiated with the number of nodes
+        equal with the missing nodes per role compared to 
+        <tt>instance-templates</tt>value. If after the retry the number of successfully started
+        instances i still behind the limit, then the cluster startup is considered invalid. In a
+        valid cluster startup, with or without retry mechanism, all the failed nodes will be
+        cleaned up immediately. Only the completely failed cluster may leave unterminated failed
+        nodes. Note that we may specify only 
+        <tt>6 dd+tt</tt>, in that case the limit will be applied only to the specified role.
+        Default value is 100 for each roles, in that case we don't need to use this parameter at
+        all. In case we would like to lower the limit for only the 
+        <tt>dd</tt>(datanode) and 
+        <tt>tt</tt>(tasktracker), then we can specify 
+        <tt>60 dn+tt</tt>for the parameter, skipping the 
+        <tt>100 nn+jt</tt>.</td>
+      </tr>
+      <tr valign="top">
+        <td>
+          <tt>whirr.max-startup-retries</tt>
+        </td>
+        <td>
+          <tt>--max-startup-retries</tt>
+        </td>
+        <td>
+          <tt>1</tt>
+        </td>
+        <td>The number of retries in case of insufficient successfully started
+        instances.</td>
+      </tr>
+    </table>
+    <subsection name="Cloud Provider Options"></subsection>
+    <table border="0">
+      <tr valign="top">
+        <th>
+          <b>Name</b>
+        </th>
+        <th>
+          <b>Command line option</b>
+        </th>
+        <th>
+          <b>Default</b>
+        </th>
+        <th>
+          <b>Description</b>
+        </th>
+      </tr>
+      <tr valign="top">
+        <td>
+          <tt>whirr.provider</tt>
+        </td>
+        <td>
+          <tt>--provider</tt>
+        </td>
+        <td>
+          <tt>aws-ec2</tt>
+        </td>
+        <td>The name of the cloud provider. See the 
+        <a href="#cloud-provider-config">table below</a>for possible provider names.</td>
+      </tr>
+      <tr valign="top">
+        <td>
+          <tt>whirr.location-id</tt>
+        </td>
+        <td>
+          <tt>--location-id</tt>
+        </td>
+        <td>none</td>
+        <td>The location to launch instances in. If not specified then an arbitrary
+        location will be chosen.</td>
+      </tr>
+      <tr valign="top">
+        <td>
+          <tt>whirr.identity</tt>
+        </td>
+        <td>
+          <tt>--identity</tt>
+        </td>
+        <td>none</td>
+        <td>The cloud identity. See the 
+        <a href="#cloud-provider-config">table below</a>for how this maps to the credentials for
+        your provider.</td>
+      </tr>
+      <tr valign="top">
+        <td>
+          <tt>whirr.credential</tt>
+        </td>
+        <td>
+          <tt>--credential</tt>
+        </td>
+        <td>none</td>
+        <td>The cloud credential. See the 
+        <a href="#cloud-provider-config">table below</a>for how this maps to the credentials for
+        your provider.</td>
+      </tr>
+      <tr valign="top">
+        <td>
+          <tt>whirr.login-user</tt>
+        </td>
+        <td>
+          <tt>--login-user</tt>
+        </td>
+        <td>none</td>
+        <td>Override the default login user used to bootstrap whirr. E.g. ubuntu or
+        myuser:mypass</td>
+      </tr>
+    </table>
+    <subsection name="BlobStore Provider Options"></subsection>
+    <table border="0">
+      <tr valign="top">
+        <th>
+          <b>Name</b>
+        </th>
+        <th>
+          <b>Command line option</b>
+        </th>
+        <th>
+          <b>Default</b>
+        </th>
+        <th>
+          <b>Description</b>
+        </th>
+      </tr>
+      <tr valign="top">
+        <td>
+          <tt>whirr.blobstore-provider</tt>
+        </td>
+        <td>
+          <tt>--blobstore-provider</tt>
+        </td>
+        <td>Computed from 
+        <tt>whirr.provider</tt></td>
+        <td>The name of the blobstore provider. All jclouds blobstore providers are
+        supported</td>
+      </tr>
+      <tr valign="top">
+        <td>
+          <tt>whirr.blobstore-identity</tt>
+        </td>
+        <td>
+          <tt>--blobstore-identity</tt>
+        </td>
+        <td>
+          <tt>whirr.identity</tt>
+        </td>
+        <td>The blobstore identity. See the 
+        <a href="#cloud-provider-config">table below</a>for how this maps to the credentials for
+        your provider.</td>
+      </tr>
+      <tr valign="top">
+        <td>
+          <tt>whirr.blobstore-credential</tt>
+        </td>
+        <td>
+          <tt>--blobstore-credential</tt>
+        </td>
+        <td>
+          <tt>whirr.credential</tt>
+        </td>
+        <td>The blobstore credential. See the 
+        <a href="#cloud-provider-config">table below</a>for how this maps to the credentials for
+        your provider.</td>
+      </tr>
+      <tr valign="top">
+        <td>
+          <tt>whirr.blobstore-location-id</tt>
+        </td>
+        <td>
+          <tt>--blobstore-location-id</tt>
+        </td>
+        <td>As close as possible to the compute nodes</td>
+        <td>The blobstore location ID</td>
+      </tr>
+    </table>
+    <subsection name="Cluster State Store Options"></subsection>
+    <table border="0">
+      <tr valign="top">
+        <th>
+          <b>Name</b>
+        </th>
+        <th>
+          <b>Command line option</b>
+        </th>
+        <th>
+          <b>Default</b>
+        </th>
+        <th>
+          <b>Description</b>
+        </th>
+      </tr>
+      <tr valign="top">
+        <td>
+          <tt>whirr.state-store</tt>
+        </td>
+        <td>
+          <tt>--state-store</tt>
+        </td>
+        <td>local</td>
+        <td>What kind of store to use for cluster state (local, blob or none).</td>
+      </tr>
+      <tr valign="top">
+        <td>
+          <tt>whirr.state-store-container</tt>
+        </td>
+        <td>
+          <tt>--state-store-container</tt>
+        </td>
+        <td>none</td>
+        <td>Container where to store state. Valid only for the blob state
+        store.</td>
+      </tr>
+      <tr valign="top">
+        <td>
+          <tt>whirr.state-store-blob</tt>
+        </td>
+        <td>
+          <tt>--state-store-blob</tt>
+        </td>
+        <td>whirr-&lt;
+        <tt>whirr.cluster-name</tt>&gt;</td>
+        <td>Blob name for state storage. Valid only for the blob state store.</td>
+      </tr>
+    </table>
+    <subsection name="Instance Login Options"></subsection>
+    <table border="0">
+      <tr valign="top">
+        <th>
+          <b>Name</b>
+        </th>
+        <th>
+          <b>Command line option</b>
+        </th>
+        <th>
+          <b>Default</b>
+        </th>
+        <th>
+          <b>Description</b>
+        </th>
+      </tr>
+      <tr valign="top">
+        <td>
+          <tt>whirr.cluster-user</tt>
+        </td>
+        <td>
+          <tt>--cluster-user</tt>
+        </td>
+        <td>Current local user</td>
+        <td>The name of the user that Whirr will create on all instances. This is
+        the user you should use to access the cluster.</td>
+      </tr>
+      <tr valign="top">
+        <td>
+          <tt>whirr.private-key-file</tt>
+        </td>
+        <td>
+          <tt>--private-key-file</tt>
+        </td>
+        <td>
+          <i>~/.ssh/id_rsa</i>
+        </td>
+        <td>The filename of the private RSA SSH key used to connect to instances.
+        Note: the public/private key must be set together, and must be passwordless.</td>
+      </tr>
+      <tr valign="top">
+        <td>
+          <tt>whirr.public-key-file</tt>
+        </td>
+        <td>
+          <tt>--public-key-file</tt>
+        </td>
+        <td>
+        <i>~/.ssh/id_rsa</i>.pub</td>
+        <td>The filename of the public RSA SSH key used to connect to instances.
+        Note: the public/private key must be set together, and must be passwordless.</td>
+      </tr>
+    </table>
+    <subsection name="Image and Hardware Selection Options"></subsection>
+    <table border="0">
+      <tr valign="top">
+        <th>
+          <b>Name</b>
+        </th>
+        <th>
+          <b>Command line option</b>
+        </th>
+        <th>
+          <b>Default</b>
+        </th>
+        <th>
+          <b>Description</b>
+        </th>
+      </tr>
+      <tr valign="top">
+        <td>
+          <tt>whirr.image-id</tt>
+        </td>
+        <td>
+          <tt>--image-id</tt>
+        </td>
+        <td>none</td>
+        <td>The ID of the image to use for instances. If not specified then a
+        vanilla Linux image is chosen.</td>
+      </tr>
+      <tr valign="top">
+        <td>
+          <tt>whirr.hardware-id</tt>
+        </td>
+        <td>
+          <tt>--hardware-id</tt>
+        </td>
+        <td>none</td>
+        <td>The type of hardware to use for the instance. This must be compatible
+        with the image ID.</td>
+      </tr>
+      <tr valign="top">
+        <td>
+          <tt>whirr.hardware-min-ram</tt>
+        </td>
+        <td>
+          <tt>--hardware-min-ram</tt>
+        </td>
+        <td>1024</td>
+        <td>The minimum amount of RAM each instance should have</td>
+      </tr>
+    </table>
+    <subsection name="Firewall Options"></subsection>
+    <table border="0">
+      <tr valign="top">
+        <th>
+          <b>Name</b>
+        </th>
+        <th>
+          <b>Command line option</b>
+        </th>
+        <th>
+          <b>Default</b>
+        </th>
+        <th>
+          <b>Description</b>
+        </th>
+      </tr>
+      <tr valign="top">
+        <td>
+          <tt>whirr.client-cidrs</tt>
+        </td>
+        <td>
+          <tt>--client-cidrs</tt>
+        </td>
+        <td>none</td>
+        <td>A comma-separated list of 
+        <a class="externalLink" href="http://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing">
+        CIDR</a>blocks. E.g. 
+        <tt>208.128.0.0/11,108.128.0.0/11</tt></td>
+      </tr>
+    </table>
+    <p>
+      <a name="cloud-provider-config"></a>
+    </p>
+    <subsection name="Cloud provider specific configuration"></subsection>
+    <table border="0">
+      <tr valign="top">
+        <th>
+          <b>Compute Service Provider</b>
+        </th>
+        <th>
+          <b>
+            <tt>whirr.provider</tt>
+          </b>
+        </th>
+        <th>
+          <b>
+            <tt>whirr.identity</tt>
+          </b>
+        </th>
+        <th>
+          <b>
+            <tt>whirr.credential</tt>
+          </b>
+        </th>
+        <th>
+          <b>Notes</b>
+        </th>
+      </tr>
+      <tr valign="top">
+        <td>Amazon EC2</td>
+        <td>
+          <tt>aws-ec2</tt>
+        </td>
+        <td>Access Key ID</td>
+        <td>Secret Access Key</td>
+        <td>Used to form security Group (via jclouds tag)</td>
+      </tr>
+      <tr valign="top">
+        <td>Rackspace Cloud Servers</td>
+        <td>
+          <tt>cloudservers-us</tt>
+        </td>
+        <td>Username</td>
+        <td>API Key</td>
+        <td>Warning: clusters do not run behind a firewall.</td>
+      </tr>
+    </table>
+    <p>
+      <a name="comparison-with-python"></a>
+    </p>
+    <section name="Comparison with Python"></section>
+    <p>See 
+    <a href="contrib/python/using-command-line-options.html">Using Command Line Options</a>.</p>
+    <table border="0">
+      <tr valign="top">
+        <th>
+          <b>Python</b>
+        </th>
+        <th>
+          <b>Java</b>
+        </th>
+        <th>
+          <b>Notes</b>
+        </th>
+      </tr>
+      <tr valign="top">
+        <td>
+          <tt>config-dir</tt>
+        </td>
+        <td>
+          <tt>whirr.config</tt>
+        </td>
+        <td></td>
+      </tr>
+      <tr valign="top">
+        <td>
+          <tt>service</tt>
+        </td>
+        <td>
+          <tt>whirr.service-name</tt>
+        </td>
+        <td></td>
+      </tr>
+      <tr valign="top">
+        <td>none</td>
+        <td>
+          <tt>whirr.cluster-name</tt>
+        </td>
+        <td>Specified as a positional argument on the Python CLI.</td>
+      </tr>
+      <tr valign="top">
+        <td>none</td>
+        <td>
+          <tt>whirr.instance-templates</tt>
+        </td>
+        <td>Specified as a positional arguments on the Python CLI.</td>
+      </tr>
+      <tr valign="top">
+        <td>
+          <tt>cloud-provider</tt>
+        </td>
+        <td>
+          <tt>whirr.provider</tt>
+        </td>
+        <td></td>
+      </tr>
+      <tr valign="top">
+        <td>none</td>
+        <td>
+          <tt>whirr.identity</tt>
+        </td>
+        <td>Specified using environment variables for Python. E.g. 
+        <tt>AWS_ACCESS_KEY_ID</tt>, 
+        <tt>RACKSPACE_KEY</tt></td>
+      </tr>
+      <tr valign="top">
+        <td>none</td>
+        <td>
+          <tt>whirr.credential</tt>
+        </td>
+        <td>Specified using environment variables for Python. E.g. 
+        <tt>AWS_ACCESS_KEY_ID</tt>, 
+        <tt>RACKSPACE_SECRET</tt></td>
+      </tr>
+      <tr valign="top">
+        <td>
+          <tt>private-key</tt>
+        </td>
+        <td>
+          <tt>whirr.private-key-file</tt>
+        </td>
+        <td></td>
+      </tr>
+      <tr valign="top">
+        <td>
+          <tt>public-key</tt>
+        </td>
+        <td>
+          <tt>whirr.public-key-file</tt>
+        </td>
+        <td></td>
+      </tr>
+      <tr valign="top">
+        <td>
+          <tt>client-cidr</tt>
+        </td>
+        <td>
+          <tt>whirr.client-cidrs</tt>
+        </td>
+        <td>Python's 
+        <tt>client-cidr</tt>option may be repeated multiple times, whereas Java's 
+        <tt>whirr.client-cidrs</tt>contains comma-separated CIDRs.</td>
+      </tr>
+      <tr valign="top">
+        <td>none</td>
+        <td>
+          <tt>whirr.run-url-base</tt>
+        </td>
+        <td>Specified using 
+        <tt>user-data-file</tt>in Python.</td>
+      </tr>
+      <tr valign="top">
+        <td>
+          <tt>image-id</tt>
+        </td>
+        <td>
+          <tt>whirr.image-id</tt>
+        </td>
+        <td></td>
+      </tr>
+      <tr valign="top">
+        <td>
+          <tt>instance-type</tt>
+        </td>
+        <td>
+          <tt>whirr.hardware-id</tt>
+        </td>
+        <td></td>
+      </tr>
+      <tr valign="top">
+        <td>
+          <tt>availability-zone</tt>
+        </td>
+        <td>
+          <tt>whirr.location-id</tt>
+        </td>
+        <td>Location is more general than availability zone.</td>
+      </tr>
+      <tr valign="top">
+        <td>
+          <tt>security-group</tt>
+        </td>
+        <td>none</td>
+        <td>Amazon-specific. However, Amazon users may wish to start a cluster in
+        additional security groups, which isn't currently supported in Java.</td>
+      </tr>
+      <tr valign="top">
+        <td>
+          <tt>env</tt>
+        </td>
+        <td>none</td>
+        <td>May not be needed in Java with runurls.</td>
+      </tr>
+      <tr valign="top">
+        <td>
+          <tt>user-data-file</tt>
+        </td>
+        <td>none</td>
+        <td>Amazon-specific. Use runurls.</td>
+      </tr>
+      <tr valign="top">
+        <td>
+          <tt>key-name</tt>
+        </td>
+        <td>none</td>
+        <td>Amazon-specific. Jclouds generates a new key for clusters.</td>
+      </tr>
+      <tr valign="top">
+        <td>
+          <tt>user-packages</tt>
+        </td>
+        <td>none</td>
+        <td>Implement by allowing arbitrary runurls.</td>
+      </tr>
+      <tr valign="top">
+        <td>
+          <tt>auto-shutdown</tt>
+        </td>
+        <td>none</td>
+        <td>Implement by allowing arbitrary runurls.</td>
+      </tr>
+      <tr valign="top">
+        <td>
+          <tt>ssh-options</tt>
+        </td>
+        <td>none</td>
+        <td>Jclouds handles SSH, so not needed in Java.</td>
+      </tr>
+    </table>
+  </body>
+</document>
