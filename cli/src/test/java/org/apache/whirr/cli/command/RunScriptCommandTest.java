@@ -147,7 +147,7 @@ public class RunScriptCommandTest {
     // check predicate equality by using the object string representation
 
     Predicate<NodeMetadata> expected = Predicates.and(
-      Predicates.<NodeMetadata>alwaysTrue(), withIds("A"));
+      Predicates.<NodeMetadata>alwaysTrue(), withIds("reg/A"));
     assertThat(predicate.getValue().toString(), is(expected.toString()));
 
   }

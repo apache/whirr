@@ -79,7 +79,7 @@ public class DestroyInstanceCommand extends AbstractClusterSpecCommand {
   }
 
   private void printUsage(OptionParser parser, PrintStream stream) throws IOException {
-    stream.println("Usage: whirr destroy-instance --instance-id <ID> [OPTIONS]");
+    stream.println("Usage: whirr destroy-instance --instance-id <region/ID> [OPTIONS]");
     stream.println();
     parser.printHelpOn(stream);
   }
