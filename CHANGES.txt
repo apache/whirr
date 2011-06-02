@@ -8,6 +8,11 @@ Trunk (unreleased changes)
 
     WHIRR-319. Run rat & checkstyle before packaging (tomwhite and asavu)
 
+  BUG FIXES
+
+    WHIRR-315. Temporary override Providers#withIds until jclouds 
+    beta-10 is out (asavu and Adrian Cole)
+
 Release 0.5.0 - 2011-05-16
 
   INCOMPATIBLE CHANGES

@@ -20,6 +20,7 @@ package org.apache.whirr.cli.command;
 
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -33,10 +34,12 @@ import org.apache.whirr.ClusterController;
 import org.apache.whirr.ClusterControllerFactory;
 import org.apache.whirr.ClusterSpec;
 import org.apache.whirr.service.ClusterStateStoreFactory;
+import org.jclouds.compute.domain.ComputeMetadata;
 import org.jclouds.compute.domain.ExecResponse;
 import org.jclouds.compute.domain.NodeMetadata;
 import org.jclouds.scriptbuilder.domain.Statement;
 
+import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -44,9 +47,10 @@ import java.io.PrintStream;
 import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static org.apache.whirr.RolePredicates.anyRoleIn;
-import static org.jclouds.compute.predicates.NodePredicates.withIds;
 import static org.jclouds.scriptbuilder.domain.Statements.exec;
 
 public class RunScriptCommand extends  AbstractClusterSpecCommand {
@@ -130,13 +134,32 @@ public class RunScriptCommand extends  AbstractClusterSpecCommand {
       Cluster cluster = createClusterStateStore(spec).load();
       for (Cluster.Instance instance : cluster.getInstancesMatching(
         anyRoleIn(Sets.<String>newHashSet(roles)))) {
-        ids.add(instance.getId().split("\\/")[1]);
+        ids.add(instance.getId());
       }
 
       condition = Predicates.and(condition,
         withIds(ids.toArray(new String[0])));
     }
     return condition;
+  }
+
+  /**
+   * temporary override Providers#withIds until jclouds beta-10 is out
+   */
+  @Deprecated
+  private <T extends ComputeMetadata> Predicate<T> withIds(String ... ids) {
+    final Set<String> search = ImmutableSet.copyOf(checkNotNull(ids, "ids must be defined"));
+    return new Predicate<T>() {
+      @Override
+      public boolean apply(@Nullable T computeMetadata) {
+        if (computeMetadata != null) return search.contains(computeMetadata.getId());
+        return false;
+      }
+      @Override
+      public String toString() {
+        return "withIds(" + search + ")";
+      }
+    };
   }
 
   private int handleScriptOutput(PrintStream out, PrintStream err,

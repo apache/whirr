@@ -69,7 +69,7 @@ public class DestroyInstanceCommandTest {
     assertThat(errOutput, containsString("You need to specify " +
         "an instance ID."));
     assertThat(errOutput, containsString("Usage: whirr destroy-instance" +
-        " --instance-id <ID> [OPTIONS]"));
+        " --instance-id <region/ID> [OPTIONS]"));
   }
 
   @Test
