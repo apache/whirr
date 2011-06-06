@@ -82,13 +82,22 @@ public class BlobCache {
 
   final BlobStoreContext context;
   final Function<ClusterSpec, ComputeServiceContext> getCompute;
+
   String container = null;
+  boolean temporary = true;
+
   Location defaultLocation = null;
 
   private BlobCache(Function<ClusterSpec, ComputeServiceContext> getCompute,
       ClusterSpec spec) throws IOException {
     this.getCompute = getCompute;
     this.context = BlobStoreContextBuilder.build(spec);
+
+    if (spec.getBlobStoreCacheContainer() != null) {
+      this.container = spec.getBlobStoreCacheContainer();
+      this.temporary = false;
+    }
+
     updateDefaultLocation(spec);
   }
 
@@ -169,6 +178,7 @@ public class BlobCache {
       Blob blob = context.getBlobStore().newBlob(name);
       blob.setPayload(in);
       blob.getMetadata().getContentMetadata().setContentLength(contentLength);
+
       store.putBlob(container, blob);
     }
   }
@@ -185,6 +195,10 @@ public class BlobCache {
   public synchronized HttpRequest getSignedRequest(String blobName) throws IOException {
     checkExistsBlob(blobName);
     return context.getSigner().signGetBlob(container, blobName);
+  }
+
+  public String getContainer() {
+    return container;
   }
 
   private void checkExistsBlob(String name) throws IOException {
@@ -208,8 +222,8 @@ public class BlobCache {
     return candidate;
   }
 
-  private void dropAndClose() {
-    if (container != null) {
+  public synchronized void dropAndClose() {
+    if (container != null && temporary) {
       LOG.info("Removing blob cache '{}'", container);
       context.getBlobStore().deleteContainer(container);
     }

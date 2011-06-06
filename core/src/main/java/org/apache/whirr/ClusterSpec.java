@@ -127,6 +127,10 @@ public class ClusterSpec {
 
     BLOBSTORE_LOCATION_ID(String.class, false, "The blob store location ID"),
 
+    BLOBSTORE_CACHE_CONTAINER(String.class, false, "The name of the " +
+        "container to be used for caching local files. If not specified Whirr will " +
+        "create a random one and remove it at the end of the session."),
+
     STATE_STORE(String.class, false, "What kind of store to use for state " +
       "(local, blob or none). Defaults to local."),
 
@@ -246,6 +250,7 @@ public class ClusterSpec {
   private String blobStoreProvider;
   private String blobStoreIdentity;
   private String blobStoreCredential;
+  private String blobStoreCacheContainer;
 
   private String stateStore;
   private String stateStoreContainer;
@@ -305,6 +310,7 @@ public class ClusterSpec {
     setBlobStoreProvider(getString(Property.BLOBSTORE_PROVIDER));
     setBlobStoreIdentity(getString(Property.BLOBSTORE_IDENTITY));
     setBlobStoreCredential(getString(Property.BLOBSTORE_CREDENTIAL));
+    setBlobStoreCacheContainer(getString(Property.BLOBSTORE_CACHE_CONTAINER));
 
     setStateStore(getString(Property.STATE_STORE));
     setStateStoreContainer(getString(Property.STATE_STORE_CONTAINER));
@@ -348,6 +354,7 @@ public class ClusterSpec {
     r.setBlobStoreProvider(getBlobStoreProvider());
     r.setBlobStoreIdentity(getBlobStoreIdentity());
     r.setBlobStoreCredential(getBlobStoreCredential());
+    r.setBlobStoreCacheContainer(getBlobStoreCacheContainer());
 
     r.setStateStore(getStateStore());
     r.setStateStoreContainer(getStateStoreContainer());
@@ -511,6 +518,10 @@ public class ClusterSpec {
     return blobStoreLocationId;
   }
 
+  public String getBlobStoreCacheContainer() {
+    return blobStoreCacheContainer;
+  }
+
   public String getStateStore() {
     if (stateStore == null) {
       return "local";
@@ -623,6 +634,10 @@ public class ClusterSpec {
 
   public void setBlobStoreLocationId(String locationId) {
     blobStoreLocationId = locationId;
+  }
+
+  public void setBlobStoreCacheContainer(String container) {
+    blobStoreCacheContainer = container;
   }
 
   public void setStateStore(String type) {
@@ -793,6 +808,7 @@ public class ClusterSpec {
         && Objects.equal(getBlobStoreProvider(), that.getBlobStoreProvider())
         && Objects.equal(getBlobStoreIdentity(), that.getBlobStoreIdentity())
         && Objects.equal(getBlobStoreCredential(), that.getBlobStoreCredential())
+        && Objects.equal(getBlobStoreCacheContainer(), that.getBlobStoreCacheContainer())
         && Objects.equal(getClusterName(), that.getClusterName())
         && Objects.equal(getServiceName(), that.getServiceName())
         && Objects.equal(getClusterUser(), that.getClusterUser())
@@ -825,6 +841,7 @@ public class ClusterSpec {
         getBlobStoreProvider(),
         getBlobStoreIdentity(),
         getBlobStoreCredential(),
+        getBlobStoreCacheContainer(),
         getClusterName(),
         getServiceName(),
         getClusterUser(),
@@ -855,6 +872,7 @@ public class ClusterSpec {
       .add("blobStoreProvider", getBlobStoreProvider())
       .add("blobStoreCredential", getBlobStoreCredential())
       .add("blobStoreIdentity", getBlobStoreIdentity())
+      .add("blobStoreCacheContainer", getBlobStoreCacheContainer())
       .add("clusterName", getClusterName())
       .add("serviceName", getServiceName())
       .add("clusterUser", getClusterUser())
