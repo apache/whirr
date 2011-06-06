@@ -22,14 +22,17 @@ import com.google.common.io.Files;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
+import org.apache.commons.lang.RandomStringUtils;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.whirr.ClusterSpec;
+import org.apache.whirr.service.BlobStoreContextBuilder;
 import org.apache.whirr.service.ComputeCache;
 import org.apache.whirr.util.BlobCache;
+import org.jclouds.blobstore.BlobStoreContext;
 import org.jclouds.http.HttpRequest;
 import org.jclouds.scriptbuilder.domain.OsFamily;
 import org.junit.Test;
@@ -91,6 +94,37 @@ public class BlobCacheTest {
 
     BlobCache cache = BlobCache.getInstance(ComputeCache.INSTANCE, spec);
     assertThat(cache.getLocation().getId(), is("EU"));
+  }
+
+  @Test
+  public void testSpecifyCacheContainerInConfig() throws Exception {
+    ClusterSpec spec = getTestClusterSpec();
+
+    BlobStoreContext context = BlobStoreContextBuilder.build(spec);
+    String container = generateRandomContainerName(context);
+    LOG.info("Created temporary container '{}'", container);
+
+    try {
+      spec.setBlobStoreCacheContainer(container);
+
+      BlobCache cache = BlobCache.getInstance(ComputeCache.INSTANCE, spec);
+      assertThat(cache.getContainer(), is(container));
+      cache.dropAndClose();
+
+      assertThat(context.getBlobStore().containerExists(container), is(true));
+
+    } finally {
+      LOG.info("Removing temporary container '{}'", container);
+      context.getBlobStore().deleteContainer(container);
+    }
+  }
+
+  private String generateRandomContainerName(BlobStoreContext context) {
+    String candidate;
+    do {
+      candidate = RandomStringUtils.randomAlphanumeric(12).toLowerCase();
+    } while(!context.getBlobStore().createContainerInLocation(null, candidate));
+    return candidate;
   }
 
   private String readContent(HttpRequest req) throws IOException {

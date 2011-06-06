@@ -325,6 +325,16 @@ xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 http://maven.apache.org/xsd
         <td>As close as possible to the compute nodes</td>
         <td>The blobstore location ID</td>
       </tr>
+      <tr valign="top">
+        <td>
+          <tt>whirr.blobstore-cache-container</tt>
+        </td>
+        <td>
+          <tt>--blobstore-cache-container</tt>
+        </td>
+        <td>Random container automatically removed at the end of the session</td>
+        <td>The name of the container that Whirr should use to cache local files</td>
+      </tr>
     </table>
     <subsection name="Cluster State Store Options"></subsection>
     <table border="0">
