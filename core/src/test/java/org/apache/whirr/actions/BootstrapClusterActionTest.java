@@ -25,6 +25,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.google.common.base.Function;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
@@ -292,7 +293,7 @@ public class BootstrapClusterActionTest {
         NodeMetadata nodeMeta = new NodeMetadataImpl(
             "ec2", "" + roles + id, "nodeId" + id + i, 
             location, new URI("http://node" + i),
-            userMetadata, null, null, null, null, NodeState.RUNNING, 22,
+            userMetadata, ImmutableSet.<String>of(), null, null, null, null, NodeState.RUNNING, 22,
             addresses, addresses, null, loginCredentials);
         if (i < only) {
           nodes.add(nodeMeta);
@@ -304,10 +305,11 @@ public class BootstrapClusterActionTest {
       }
       if (failedNodes.size() > 0) {
         Image image = new ImageImpl("ec2", "test", "testId", location, new URI("http://node"),
-            userMetadata, new OperatingSystem(null, null, null, null, "op", true), "description",
-            null, null, loginCredentials);
+            userMetadata, ImmutableSet.<String>of(), new OperatingSystem(null, null, null, null, "op", true), 
+            "description", null, null, loginCredentials);
         Hardware hardware = new HardwareImpl("ec2", "test", "testId", location, new URI("http://node"),
-                userMetadata, new ArrayList<Processor>(), 1, new ArrayList<Volume>(), null);
+                userMetadata, ImmutableSet.<String>of(), new ArrayList<Processor>(), 1,
+                new ArrayList<Volume>(), null);
         Template template = new TemplateImpl(image, hardware, location, TemplateOptions.NONE);
         throw new RunNodesException("tag" + id, num, template, nodes, executionExceptions, failedNodes);
       }

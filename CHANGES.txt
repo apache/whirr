@@ -15,6 +15,8 @@ Trunk (unreleased changes)
     WHIRR-323. Allow user to specify a blobstore container to be used 
     for caching local files (asavu)
 
+    WHIRR-327. Upgrade to jclouds 1.0.0 (Adrian Cole and asavu)
+
   BUG FIXES
 
     WHIRR-315. Temporary override Providers#withIds until jclouds 
