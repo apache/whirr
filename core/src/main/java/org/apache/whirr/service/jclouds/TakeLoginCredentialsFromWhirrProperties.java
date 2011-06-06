@@ -29,7 +29,7 @@ import org.jclouds.domain.Credentials;
 import org.jclouds.ec2.compute.strategy.EC2PopulateDefaultLoginCredentialsForImageStrategy;
 
 @Singleton
-// patch until jclouds 1.0-beta-10
+// patch until jclouds http://code.google.com/p/jclouds/issues/detail?id=441
 public class TakeLoginCredentialsFromWhirrProperties extends
     EC2PopulateDefaultLoginCredentialsForImageStrategy {
 

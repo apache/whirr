@@ -23,13 +23,13 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterators;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
+import com.google.common.collect.ImmutableSet.Builder;
 
 import java.util.List;
-import java.util.Set;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.PropertiesConfiguration;
@@ -88,26 +88,26 @@ public class HadoopConfigurationBuilderTest {
   
   private Cluster newCluster(int numberOfWorkers) {
     NodeMetadata node = mock(NodeMetadata.class);
-    List<Processor> processors = Lists.newArrayList(new Processor(4, 1.0));
+    List<Processor> processors = ImmutableList.of(new Processor(4, 1.0));
     Hardware hardware = new HardwareImpl(null, null, "id", null, null,
-        Maps.<String,String>newHashMap(), processors, 1024,
-        Lists.<Volume>newArrayList(), null);
+        ImmutableMap.<String,String>of(), ImmutableSet.<String>of(), processors, 
+        1024, ImmutableList.<Volume>of(), null);
     when(node.getHardware()).thenReturn(hardware);
     
-    Set<Instance> instances = Sets.newLinkedHashSet();
+    Builder<Instance> instances = ImmutableSet.<Instance>builder();
     Instance master = new Instance(new Credentials("", ""),
-        Sets.newHashSet(HadoopNameNodeClusterActionHandler.ROLE,
+        ImmutableSet.of(HadoopNameNodeClusterActionHandler.ROLE,
             HadoopJobTrackerClusterActionHandler.ROLE),
             "10.0.0.1", "10.0.0.1", "1", node);
     instances.add(master);
     for (int i = 0; i < numberOfWorkers; i++) {
       int id = i + 2;
       instances.add(new Instance(new Credentials("", ""),
-          Sets.newHashSet(HadoopDataNodeClusterActionHandler.ROLE,
+        ImmutableSet.of(HadoopDataNodeClusterActionHandler.ROLE,
               HadoopTaskTrackerClusterActionHandler.ROLE),
               "10.0.0." + id, "10.0.0." + id, id + "", node));
     }
-    return new Cluster(instances);
+    return new Cluster(instances.build());
   }
 
   @Test

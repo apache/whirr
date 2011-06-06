@@ -50,7 +50,7 @@
   </modules>
 
   <properties>
-    <jclouds.version>1.0-beta-9c</jclouds.version>
+    <jclouds.version>1.0.0</jclouds.version>
   </properties>
 
   <dependencyManagement>

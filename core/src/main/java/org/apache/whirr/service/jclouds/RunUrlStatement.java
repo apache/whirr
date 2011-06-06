@@ -59,7 +59,7 @@ public class RunUrlStatement implements Statement {
   }
 
   @Override
-  public Iterable<String> functionDependecies(OsFamily family) {
+  public Iterable<String> functionDependencies(OsFamily family) {
     return ImmutableSet.<String>of("install_runurl");
   }
 
