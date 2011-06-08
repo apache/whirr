@@ -2,6 +2,10 @@ Apache Whirr Change Log
 
 Trunk (unreleased changes)
 
+  NEW FEATURES
+
+    WHIRR-313. Add Hama as a Service. (Edward J. Yoon via tomwhite)
+
   IMPROVEMENTS
 
     WHIRR-28. Add examples module (asavu)

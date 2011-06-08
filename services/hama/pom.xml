@@ -21,19 +21,18 @@
     <groupId>org.apache.whirr</groupId>
     <artifactId>whirr</artifactId>
     <version>0.6.0-incubating-SNAPSHOT</version>
-    <relativePath>../pom.xml</relativePath>
+    <relativePath>../../pom.xml</relativePath>
   </parent>
   <groupId>org.apache.whirr</groupId>
-  <artifactId>whirr-cli</artifactId>
+  <artifactId>whirr-hama</artifactId>
   <packaging>jar</packaging>
   <version>0.6.0-incubating-SNAPSHOT</version>
-  <name>Apache Whirr CLI</name>
+  <name>Apache Whirr Hama</name>
+  <properties>
+    <hadoop.version>0.20.2</hadoop.version>
+    <hama.version>0.2.0-incubating</hama.version>
+  </properties>
   <dependencies>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>whirr-voldemort</artifactId>
-      <version>${project.version}</version>
-    </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>whirr-core</artifactId>
@@ -41,13 +40,22 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>whirr-cassandra</artifactId>
+      <artifactId>whirr-core</artifactId>
       <version>${project.version}</version>
+      <type>test-jar</type>
+      <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>whirr-cdh</artifactId>
-      <version>${project.version}</version>
+      <groupId>org.apache.hama</groupId>
+      <artifactId>hama</artifactId>
+      <version>${hama.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.hama</groupId>
+      <artifactId>hama-examples</artifactId>
+      <version>${hama.version}</version>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
@@ -60,23 +68,12 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>whirr-elasticsearch</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>whirr-hbase</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>whirr-hama</artifactId>
-      <version>${project.version}</version>
+      <groupId>org.jclouds</groupId>
+      <artifactId>jclouds-compute</artifactId>
     </dependency>
     <dependency>
       <groupId>org.jclouds</groupId>
-      <artifactId>jclouds-compute</artifactId>
+      <artifactId>jclouds-core</artifactId>
     </dependency>
     <dependency>
       <groupId>org.jclouds.driver</groupId>
@@ -95,8 +92,8 @@
       <artifactId>hamcrest-all</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.mockito</groupId>
-      <artifactId>mockito-all</artifactId>
+      <groupId>commons-configuration</groupId>
+      <artifactId>commons-configuration</artifactId>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
@@ -105,6 +102,7 @@
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-log4j12</artifactId>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>com.jcraft</groupId>
@@ -113,40 +111,19 @@
     <dependency>
       <groupId>log4j</groupId>
       <artifactId>log4j</artifactId>
+      <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>commons-configuration</groupId>
-      <artifactId>commons-configuration</artifactId>
+      <groupId>org.apache.hadoop</groupId>
+      <artifactId>hadoop-core</artifactId>
+      <version>${hadoop.version}</version>
+      <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>net.sf.jopt-simple</groupId>
-      <artifactId>jopt-simple</artifactId>
-      <version>3.2</version>
+      <groupId>org.apache.hadoop</groupId>
+      <artifactId>zookeeper</artifactId>
+      <version>3.3.1</version>
+      <scope>test</scope>
     </dependency>
   </dependencies>
-  <build>
-    <resources>
-      <resource>
-        <directory>${project.basedir}/src/main/resources</directory>
-        <filtering>true</filtering>
-      </resource>
-    </resources>
-    <plugins>
-      <!-- Copy dependencies to lib directory so that bin/whirr works in place -->
-      <plugin>
-        <artifactId>maven-dependency-plugin</artifactId>
-          <executions>
-            <execution>
-              <phase>install</phase>
-              <goals>
-                <goal>copy-dependencies</goal>
-              </goals>
-              <configuration>
-                <outputDirectory>${project.build.directory}/lib</outputDirectory>
-              </configuration>
-            </execution>
-          </executions>
-        </plugin>
-    </plugins>
-  </build>
 </project>
