@@ -6,6 +6,9 @@ Trunk (unreleased changes)
 
     WHIRR-313. Add Hama as a Service. (Edward J. Yoon via tomwhite)
 
+    WHIRR-326. Use jclouds provider metadata to help with cloud 
+    provider configuration (asavu)
+
   IMPROVEMENTS
 
     WHIRR-28. Add examples module (asavu)
