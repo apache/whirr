@@ -210,7 +210,7 @@ xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 http://maven.apache.org/xsd
           <tt>aws-ec2</tt>
         </td>
         <td>The name of the cloud provider. See the 
-        <a href="#cloud-provider-config">table below</a>for possible provider names.</td>
+        <a href="#cloud-provider-config">table below</a> for possible provider names.</td>
       </tr>
       <tr valign="top">
         <td>
@@ -232,7 +232,7 @@ xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 http://maven.apache.org/xsd
         </td>
         <td>none</td>
         <td>The cloud identity. See the 
-        <a href="#cloud-provider-config">table below</a>for how this maps to the credentials for
+        <a href="#cloud-provider-config">table below</a> for how this maps to the credentials for
         your provider.</td>
       </tr>
       <tr valign="top">
@@ -244,7 +244,7 @@ xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 http://maven.apache.org/xsd
         </td>
         <td>none</td>
         <td>The cloud credential. See the 
-        <a href="#cloud-provider-config">table below</a>for how this maps to the credentials for
+        <a href="#cloud-provider-config">table below</a> for how this maps to the credentials for
         your provider.</td>
       </tr>
       <tr valign="top">
@@ -259,6 +259,12 @@ xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 http://maven.apache.org/xsd
         myuser:mypass</td>
       </tr>
     </table>
+
+    <p>You can see a list of all the available compute providers by running:</p>
+    <source>$ whirr list-providers compute</source>
+
+    <p>Note: we are testing only on aws-ec2 and cloudserver-us.</p>
+
     <subsection name="BlobStore Provider Options"></subsection>
     <table border="0">
       <tr valign="top">
@@ -298,7 +304,7 @@ xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 http://maven.apache.org/xsd
           <tt>whirr.identity</tt>
         </td>
         <td>The blobstore identity. See the 
-        <a href="#cloud-provider-config">table below</a>for how this maps to the credentials for
+        <a href="#cloud-provider-config">table below</a> for how this maps to the credentials for
         your provider.</td>
       </tr>
       <tr valign="top">
@@ -312,7 +318,7 @@ xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 http://maven.apache.org/xsd
           <tt>whirr.credential</tt>
         </td>
         <td>The blobstore credential. See the 
-        <a href="#cloud-provider-config">table below</a>for how this maps to the credentials for
+        <a href="#cloud-provider-config">table below</a> for how this maps to the credentials for
         your provider.</td>
       </tr>
       <tr valign="top">
@@ -336,6 +342,12 @@ xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 http://maven.apache.org/xsd
         <td>The name of the container that Whirr should use to cache local files</td>
       </tr>
     </table>
+
+    <p>You can see a list of all the available blobstore providers by running</p>
+    <source>$ whirr list-providers blobstore</source>
+
+    <p>Note: we are testing only on aws-s3 and cloudfiles-us.</p>
+
     <subsection name="Cluster State Store Options"></subsection>
     <table border="0">
       <tr valign="top">

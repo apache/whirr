@@ -54,16 +54,8 @@
       <artifactId>jclouds-log4j</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.jclouds.provider</groupId>
-      <artifactId>aws-ec2</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.jclouds.provider</groupId>
-      <artifactId>cloudservers-us</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.jclouds.provider</groupId>
-      <artifactId>cloudservers-uk</artifactId>
+      <groupId>org.jclouds</groupId>
+      <artifactId>jclouds-allcompute</artifactId>
     </dependency>
     <dependency>
       <groupId>org.jclouds</groupId>
