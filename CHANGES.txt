@@ -31,6 +31,9 @@ Trunk (unreleased changes)
 
     WHIRR-249. Firewall authorization should be idempotent (asavu)
 
+    WHIRR-330. BYON doesn't work with HadoopConfigurationBuilder
+    (John Amos and asavu)
+
 Release 0.5.0 - 2011-05-16
 
   INCOMPATIBLE CHANGES
