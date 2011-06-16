@@ -105,19 +105,24 @@ public class HadoopConfigurationBuilder {
       
       Hardware hardware = Iterables.getFirst(taskTrackers, null)
         .getNodeMetadata().getHardware();
-      int coresPerNode = 0;
-      for (Processor processor : hardware.getProcessors()) {
-        coresPerNode += processor.getCores();
+
+      /* null when using the BYON jclouds compute provider */
+      if (hardware != null) {
+
+        int coresPerNode = 0;
+        for (Processor processor : hardware.getProcessors()) {
+          coresPerNode += processor.getCores();
+        }
+        int mapTasksPerNode = (int) Math.ceil(coresPerNode * 1.0);
+        int reduceTasksPerNode = (int) Math.ceil(coresPerNode * 0.75);
+
+        setIfAbsent(config, "mapred.tasktracker.map.tasks.maximum", mapTasksPerNode + "");
+        setIfAbsent(config, "mapred.tasktracker.reduce.tasks.maximum", reduceTasksPerNode + "");
+
+        int clusterReduceSlots = taskTrackers.size() * reduceTasksPerNode;
+        setIfAbsent(config, "mapred.reduce.tasks", clusterReduceSlots + "");
+
       }
-      int mapTasksPerNode = (int) Math.ceil(coresPerNode * 1.0);
-      int reduceTasksPerNode = (int) Math.ceil(coresPerNode * 0.75);
-      
-      setIfAbsent(config, "mapred.tasktracker.map.tasks.maximum", mapTasksPerNode + "");
-      setIfAbsent(config, "mapred.tasktracker.reduce.tasks.maximum", reduceTasksPerNode + "");
-  
-      int clusterReduceSlots = taskTrackers.size() * reduceTasksPerNode;
-      setIfAbsent(config, "mapred.reduce.tasks", clusterReduceSlots + "");
-      
     }
 
     Instance jobtracker = cluster
