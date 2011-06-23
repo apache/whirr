@@ -21,6 +21,26 @@ function configure_cdh_hbase() {
   ROLES=$1
   shift
   
+  for role in $(echo "$ROLES" | tr "," "\n"); do
+    case $role in
+    hbase-master)
+      install_hbase_daemon hadoop-hbase-master 
+      ;;
+    hbase-regionserver)
+      install_hbase_daemon hadoop-hbase-regionserver
+      ;;
+    hbase-restserver)
+      # not supported
+      ;;
+    hbase-avroserver)
+      # not supported
+      ;;
+    hbase-thriftserver)
+      install_hbase_daemon hadoop-hbase-thrift
+      ;;
+    esac
+  done
+  
   # get parameters
   MASTER_HOST=
   ZOOKEEPER_QUORUM=
@@ -147,7 +167,7 @@ EOF
     $HBASE_CONF_DIR/hbase-env.sh
 
   # disable IPv6
-  sed -i -e 's|# export HBASE_OPTS=.*|export HBASE_OPTS="-Djava.net.preferIPv4Stack=true"|' \
+  sed -i -e 's|export HBASE_OPTS="$HBASE_OPTS -ea -XX:+UseConcMarkSweepGC -XX:+CMSIncrementalMode"|export HBASE_OPTS="$HBASE_OPTS -ea -XX:+UseConcMarkSweepGC -XX:+CMSIncrementalMode -Djava.net.preferIPv4Stack=true"|' \
     $HBASE_CONF_DIR/hbase-env.sh
 
   # hbase logs should be on the /data partition
@@ -180,4 +200,12 @@ EOF
   done
 }
 
-
+function install_hbase_daemon() {
+  daemon=$1
+  if which dpkg &> /dev/null; then
+    apt-get -y install $daemon
+  elif which rpm &> /dev/null; then
+    yum install -y $daemon
+  fi
+  service $daemon stop
+}

@@ -82,9 +82,9 @@ function install_cdh_hbase() {
   
   if which dpkg &> /dev/null; then
     apt-get update
-    apt-get -y install hadoop-hbase hadoop-hbase-master hadoop-hbase-regionserver hadoop-hbase-thrift
+    apt-get -y install hadoop-hbase
   elif which rpm &> /dev/null; then
-    yum install -y hadoop-hbase hadoop-hbase-master hadoop-hbase-regionserver hadoop-hbase-thrift
+    yum install -y hadoop-hbase
   fi
   
   echo "export HBASE_HOME=$HBASE_HOME" >> ~root/.bashrc

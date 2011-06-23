@@ -76,6 +76,6 @@ EOF
   fi
   
   # Now that it's configured, start ZooKeeper
-  service hadoop-zookeeper start
+  service hadoop-zookeeper-server start
 
 }

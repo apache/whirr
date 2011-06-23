@@ -66,7 +66,7 @@ EOF
     $HADOOP_CONF_DIR/hadoop-env.sh
     
   # Disable IPv6
-  sed -i -e 's|# export HADOOP_OPTS=.*|export HADOOP_OPTS="-Djava.net.preferIPv4Stack=true"|' \
+  sed -i -e 's|# Extra Java runtime options.  Empty by default.|# Extra Java runtime options.  Empty by default.\nexport HADOOP_OPTS="$HADOOP_OPTS -Djava.net.preferIPv4Stack=true"|' \
     $HADOOP_CONF_DIR/hadoop-env.sh
 
   # Hadoop logs should be on the /data partition

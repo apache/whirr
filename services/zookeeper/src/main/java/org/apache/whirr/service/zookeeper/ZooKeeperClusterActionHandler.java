@@ -72,6 +72,7 @@ public class ZooKeeperClusterActionHandler extends ClusterActionHandlerSupport {
 
     String tarurl = config.getString("whirr.zookeeper.tarball.url");
     addStatement(event, call(zookeeperInstallFunction,
+      "-c", clusterSpec.getProvider(),
       prepareRemoteFileUrl(event, tarurl)));
   }
 
@@ -91,7 +92,12 @@ public class ZooKeeperClusterActionHandler extends ClusterActionHandlerSupport {
         "whirr.zookeeper-configure-function", "configure_zookeeper");
     addStatement(event, call(zookeeperConfigureFunction, "-c",
         clusterSpec.getProvider(), servers));
-    addStatement(event, call("start_zookeeper"));
+    if (zookeeperConfigureFunction.equals("configure_zookeeper")) { //default zookeeper-configure-function
+      addStatement(event, call("start_zookeeper"));
+    }
+    else {
+      //don't call start_zookeeper, because the CDH config starts the CDH version of zookeeper on its own
+    }
   }
   
   @Override
