@@ -153,6 +153,8 @@ public abstract class ClusterActionHandlerSupport extends ClusterActionHandler {
       } catch (URISyntaxException e) {
         throw new IOException(e);
       }
+    } else if(rawUrl != null && rawUrl.startsWith("remote://")) {
+      return rawUrl.replaceFirst("remote://", "file://");
     }
     return rawUrl;
   }

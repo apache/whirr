@@ -24,6 +24,9 @@ Trunk (unreleased changes)
 
     WHIRR-327. Upgrade to jclouds 1.0.0 (Adrian Cole and asavu)
 
+    WHIRR-331. Add the ability to specify tarball URLs that are local 
+    to the remote machine (asavu)
+
   BUG FIXES
 
     WHIRR-315. Temporary override Providers#withIds until jclouds 
