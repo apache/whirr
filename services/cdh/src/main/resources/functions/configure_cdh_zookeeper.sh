@@ -55,6 +55,8 @@ syncLimit=5
 dataDir=/var/log/zookeeper/txlog
 # The port at which the clients will connect
 clientPort=2181
+# Max client connections needs to be increased for HBase
+maxClientCnxns=60
 # The servers in the ensemble
 EOF
   
