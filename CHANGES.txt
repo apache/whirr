@@ -9,6 +9,8 @@ Trunk (unreleased changes)
     WHIRR-326. Use jclouds provider metadata to help with cloud 
     provider configuration (asavu)
 
+    WHIRR-76. Support spot instances in python scripts (Soren Macbeth via  asavu)
+
   IMPROVEMENTS
 
     WHIRR-28. Add examples module (asavu)

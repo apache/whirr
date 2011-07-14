@@ -296,7 +296,7 @@ def main():
                          opt.get('user_data_file'),
                          opt.get('availability_zone'), opt.get('user_packages'),
                          opt.get('auto_shutdown'), opt.get('env'),
-                         opt.get('security_group'))
+                         opt.get('security_group'), opt.get('spot_price'))
     service.launch_master(template, config_dir, opt.get('client_cidr'))
 
   elif command == 'launch-slaves':
@@ -311,7 +311,7 @@ def main():
                          opt.get('user_data_file'),
                          opt.get('availability_zone'), opt.get('user_packages'),
                          opt.get('auto_shutdown'), opt.get('env'),
-                         opt.get('security_group'))
+                         opt.get('security_group'), opt.get('spot_price'))
     service.launch_slaves(template)
 
   elif command == 'launch-cluster':
@@ -333,7 +333,7 @@ def main():
                          opt.get('user_data_file'),
                          opt.get('availability_zone'), opt.get('user_packages'),
                          opt.get('auto_shutdown'), opt.get('env'),
-                         opt.get('security_group')),
+                         opt.get('security_group'), opt.get('spot_price')),
         InstanceTemplate((DATANODE, TASKTRACKER), number_of_slaves,
                          get_image_id(service.cluster, opt),
                          opt.get('instance_type'), opt.get('key_name'),
@@ -341,7 +341,7 @@ def main():
                          opt.get('user_data_file'),
                          opt.get('availability_zone'), opt.get('user_packages'),
                          opt.get('auto_shutdown'), opt.get('env'),
-                         opt.get('security_group')),
+                         opt.get('security_group'), opt.get('spot_price')),
                          ]
     elif len(args) > 2 and len(args) % 2 == 0:
       print_usage(sys.argv[0])
@@ -358,7 +358,7 @@ def main():
                            opt.get('availability_zone'),
                            opt.get('user_packages'),
                            opt.get('auto_shutdown'), opt.get('env'),
-                           opt.get('security_group')))
+                           opt.get('security_group'), opt.get('spot_price')))
 
     service.launch_cluster(instance_templates, config_dir,
                            opt.get('client_cidr'))

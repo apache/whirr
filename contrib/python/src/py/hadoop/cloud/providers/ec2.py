@@ -243,6 +243,46 @@ class Ec2Cluster(Cluster):
       sys.stdout.write(".")
       sys.stdout.flush()
       time.sleep(1)
+    
+  def launch_spot_instances(self, roles, price, number, image_id, size_id,
+                       instance_user_data, **kwargs):
+    
+    for role in roles:
+      self._check_role_name(role)  
+      self._create_groups(role)
+      
+    user_data = instance_user_data.read_as_gzip_stream()
+    security_groups = self._get_group_names(roles) + kwargs.get('security_groups', [])
+    
+    spot_request = self.ec2Connection.request_spot_instances(price=price, image_id=image_id,
+      count=number, type='one-time', valid_from=None, valid_until=None,
+      launch_group=kwargs.get('launch_group', None),
+      availability_zone_group=kwargs.get('availability_zone_group', None),
+      key_name=kwargs.get('key_name', None),
+      security_groups=security_groups, user_data=user_data,
+      instance_type=size_id, placement=kwargs.get('placement', None))
+    spot_instance_request_ids = [request.id for request in spot_request]
+    instance_ids = self.wait_for_spot_instances(spot_instance_request_ids)
+    return instance_ids
+
+  def wait_for_spot_instances(self, request_ids, timeout=1200):
+    start_time = time.time()
+    while True:
+      if (time.time() - start_time >= timeout):
+        raise TimeoutException()
+      if self._all_spot_requests_started(self.ec2Connection.get_all_spot_instance_requests(request_ids)):
+        instance_ids = [request.instance_id for request in self.ec2Connection.get_all_spot_instance_requests(request_ids)]
+        if self._all_started(self.ec2Connection.get_all_instances(instance_ids)):
+          return instance_ids
+      sys.stdout.write(".")
+      sys.stdout.flush()
+      time.sleep(1)
+
+  def _all_spot_requests_started(self, requests):
+    for request in requests:
+      if request.state != "active":
+        return False
+    return True
 
   def _all_started(self, reservations):
     for res in reservations:
@@ -255,6 +295,9 @@ class Ec2Cluster(Cluster):
     instances = self._get_instances(self._get_cluster_group_name(), "running")
     if instances:
       self.ec2Connection.terminate_instances([i.id for i in instances])
+      spot_instance_request_ids = map(lambda x: x.spot_instance_request_id, filter(lambda x: x.spot_instance_request_id is not None, instances))
+      if spot_instance_request_ids:
+          self.ec2Connection.cancel_spot_instance_requests(spot_instance_request_ids)
 
   def delete(self):
     """

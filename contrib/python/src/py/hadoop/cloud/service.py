@@ -52,7 +52,7 @@ class InstanceTemplate(object):
                      key_name, public_key, private_key,
                      user_data_file_template=None, placement=None,
                      user_packages=None, auto_shutdown=None, env_strings=[],
-                     security_groups=[]):
+                     security_groups=[], spot_price=None):
     self.roles = roles
     self.number = number
     self.image_id = image_id
@@ -66,6 +66,7 @@ class InstanceTemplate(object):
     self.auto_shutdown = auto_shutdown
     self.env_strings = env_strings
     self.security_groups = security_groups
+    self.spot_price = spot_price
 
   def add_env_strings(self, env_strings):
     new_env_strings = list(self.env_strings or [])
@@ -210,12 +211,21 @@ class Service(object):
       "EBS_MAPPINGS": ebs_mappings,
     }) }
     instance_user_data = InstanceUserData(user_data_file_template, replacements)
-    instance_ids = self.cluster.launch_instances(it.roles, it.number, it.image_id,
-                                            it.size_id,
-                                            instance_user_data,
-                                            key_name=it.key_name,
-                                            public_key=it.public_key,
-                                            placement=it.placement)
+
+    if it.spot_price is None:
+        instance_ids = self.cluster.launch_instances(it.roles, it.number, it.image_id,
+                                                it.size_id,
+                                                instance_user_data,
+                                                key_name=it.key_name,
+                                                public_key=it.public_key,
+                                                placement=it.placement)
+    else:
+        instance_ids = self.cluster.launch_spot_instances(it.roles, it.spot_price, it.number, it.image_id,
+                                                it.size_id,
+                                                instance_user_data,
+                                                key_name=it.key_name,
+                                                public_key=it.public_key,
+                                                placement=it.placement)
     print "Waiting for %s instances in role %s to start" % \
       (it.number, ",".join(it.roles))
     try:
