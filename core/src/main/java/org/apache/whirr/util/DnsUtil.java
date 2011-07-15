@@ -19,6 +19,7 @@
 package org.apache.whirr.util;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
 
 import org.xbill.DNS.DClass;
 import org.xbill.DNS.ExtendedResolver;
@@ -54,9 +55,10 @@ public class DnsUtil {
     Message response = res.send(query);
 
     Record[] answers = response.getSectionArray(Section.ANSWER);
-    if (answers.length == 0)
-      return hostIp;
-    else {
+    if (answers.length == 0) {
+      // Fall back to standard Java: in contrast to dnsjava, this also reads /etc/hosts
+      return new InetSocketAddress(hostIp, 0).getAddress().getCanonicalHostName();
+    } else {
       String revaddr = answers[0].rdataToString();
       return revaddr.endsWith(".") ? revaddr.substring(0, revaddr.length() - 1) : revaddr;
     }
