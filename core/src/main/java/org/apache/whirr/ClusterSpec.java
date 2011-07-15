@@ -139,6 +139,8 @@ public class ClusterSpec {
 
     STATE_STORE_BLOB(String.class, false, "Blob name for state storage. " +
       "Valid only for the blob state store. Defaults to whirr-<cluster-name>"),
+
+    AWS_EC2_SPOT_PRICE(Float.class, false, "Spot instance price (aws-ec2 specific option)"),
       
     IMAGE_ID(String.class, false, "The ID of the image to use for " + 
       "instances. If not specified then a vanilla Linux image is " + 
@@ -256,6 +258,8 @@ public class ClusterSpec {
   private String stateStoreContainer;
   private String stateStoreBlob;
 
+  private float awsEc2SpotPrice;
+
   private String privateKey;
   private File privateKeyFile;
   private String publicKey;
@@ -316,6 +320,8 @@ public class ClusterSpec {
     setStateStoreContainer(getString(Property.STATE_STORE_CONTAINER));
     setStateStoreBlob(getString(Property.STATE_STORE_BLOB));
 
+    setAwsEc2SpotPrice(getFloat(Property.AWS_EC2_SPOT_PRICE, -1));
+
     checkAndSetKeyPair();
 
     setImageId(getString(Property.IMAGE_ID));
@@ -356,6 +362,8 @@ public class ClusterSpec {
     r.setBlobStoreCredential(getBlobStoreCredential());
     r.setBlobStoreCacheContainer(getBlobStoreCacheContainer());
 
+    r.setAwsEc2SpotPrice(getAwsEc2SpotPrice());
+
     r.setStateStore(getStateStore());
     r.setStateStoreContainer(getStateStoreContainer());
     r.setStateStoreBlob(getStateStoreBlob());
@@ -383,6 +391,10 @@ public class ClusterSpec {
 
   private int getInt(Property key, int defaultValue) {
     return config.getInt(key.getConfigName(), defaultValue);
+  }
+
+  private float getFloat(Property key, float defaultValue) {
+    return config.getFloat(key.getConfigName(), defaultValue);
   }
 
   private List<String> getList(Property key) {
@@ -540,6 +552,10 @@ public class ClusterSpec {
     return stateStoreBlob;
   }
 
+  public float getAwsEc2SpotPrice() {
+    return awsEc2SpotPrice;
+  }
+
   public String getServiceName() {
     return serviceName;
   }
@@ -661,6 +677,10 @@ public class ClusterSpec {
 
   public void setStateStoreBlob(String blob) {
     this.stateStoreBlob = blob;
+  }
+
+  public void setAwsEc2SpotPrice(float value) {
+    this.awsEc2SpotPrice = value;
   }
 
   public void setClusterName(String clusterName) {
@@ -826,6 +846,7 @@ public class ClusterSpec {
         && Objects.equal(getStateStore(), that.getStateStore())
         && Objects.equal(getStateStoreContainer(), that.getStateStoreContainer())
         && Objects.equal(getStateStoreBlob(), that.getStateStoreBlob())
+        && Objects.equal(getAwsEc2SpotPrice(), that.getAwsEc2SpotPrice())
         ;
     }
     return false;
@@ -858,7 +879,8 @@ public class ClusterSpec {
         getRunUrlBase(),
         getStateStore(),
         getStateStoreBlob(),
-        getStateStoreContainer()
+        getStateStoreContainer(),
+        getAwsEc2SpotPrice()
     );
   }
   
@@ -890,6 +912,7 @@ public class ClusterSpec {
       .add("stateStore", getStateStore())
       .add("stateStoreContainer", getStateStoreContainer())
       .add("stateStoreBlob", getStateStoreBlob())
+      .add("awsEc2SpotPrice", getAwsEc2SpotPrice())
       .toString();
   }
 }

@@ -182,6 +182,25 @@ xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 http://maven.apache.org/xsd
         <td>The number of retries in case of insufficient successfully started
         instances.</td>
       </tr>
+      <tr valign="top">
+        <td>
+          <tt>whirr.aws-ec2-spot-price</tt>
+        </td>
+        <td>
+          <tt>--aws-ec2-spot-price</tt>
+        </td>
+        <td>
+          <tt>none</tt>
+        </td>
+        <td>
+          Spot instance price. If the price isn't fulfilled it times out after 20 minutes 
+          (<tt>jclouds.compute.timeout.node-running</tt>). We recommended that you set the spot price
+          to current real price so that you will always save money while keeping the instances
+          running because you will still pay the spot price and not the max value you put in. Keep
+          in mind that price spikes can still take out some instances, or prevent requests being 
+          filled, but it works well most of the time. Note: this is an EC2 specific option.
+        </td>
+      </tr>
     </table>
     <subsection name="Cloud Provider Options"></subsection>
     <table border="0">

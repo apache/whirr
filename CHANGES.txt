@@ -11,6 +11,8 @@ Trunk (unreleased changes)
 
     WHIRR-76. Support spot instances in python scripts (Soren Macbeth via  asavu)
 
+    WHIRR-260. Support Spot Instances (asavu)
+
   IMPROVEMENTS
 
     WHIRR-28. Add examples module (asavu)
