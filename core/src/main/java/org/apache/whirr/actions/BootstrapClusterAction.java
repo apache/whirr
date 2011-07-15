@@ -53,12 +53,14 @@ import org.apache.whirr.service.ClusterActionEvent;
 import org.apache.whirr.service.ClusterActionHandler;
 import org.apache.whirr.service.jclouds.StatementBuilder;
 import org.apache.whirr.service.jclouds.TemplateBuilderStrategy;
+import org.jclouds.aws.ec2.compute.AWSEC2TemplateOptions;
 import org.jclouds.compute.ComputeService;
 import org.jclouds.compute.ComputeServiceContext;
 import org.jclouds.compute.RunNodesException;
 import org.jclouds.compute.domain.NodeMetadata;
 import org.jclouds.compute.domain.Template;
 import org.jclouds.compute.domain.TemplateBuilder;
+import org.jclouds.aws.ec2.AWSEC2Client;
 import org.jclouds.scriptbuilder.InitBuilder;
 import org.jclouds.scriptbuilder.domain.OsFamily;
 import org.jclouds.scriptbuilder.domain.Statement;
@@ -148,19 +150,39 @@ public class BootstrapClusterAction extends ScriptBasedClusterAction {
       ComputeService computeService, StatementBuilder statementBuilder,
       TemplateBuilderStrategy strategy)
       throws MalformedURLException {
+
     LOG.info("Configuring template");
     if (LOG.isDebugEnabled())
       LOG.debug("Running script:\n{}", statementBuilder.render(OsFamily.UNIX));
+
     Statement runScript = addUserAndAuthorizeSudo(
         clusterSpec.getClusterUser(),
         clusterSpec.getPublicKey(),
         clusterSpec.getPrivateKey(),
         statementBuilder);
+
     TemplateBuilder templateBuilder = computeService.templateBuilder()
       .options(runScript(runScript));
     strategy.configureTemplateBuilder(clusterSpec, templateBuilder);
-    return templateBuilder.build();
-    
+
+    return setSpotInstancePriceIfSpecified(
+      computeService.getContext(), clusterSpec, templateBuilder.build());
+  }
+
+  /**
+   * Set maximum spot instance price based on the configuration
+   */
+  private Template setSpotInstancePriceIfSpecified(
+      ComputeServiceContext context, ClusterSpec spec, Template template) {
+
+    if (context != null && context.getProviderSpecificContext().getApi() instanceof AWSEC2Client) {
+      if (spec.getAwsEc2SpotPrice() > 0) {
+        template.getOptions().as(AWSEC2TemplateOptions.class)
+          .spotPrice(spec.getAwsEc2SpotPrice());
+      }
+    }
+
+    return template;
   }
   
   private static Statement addUserAndAuthorizeSudo(String user,

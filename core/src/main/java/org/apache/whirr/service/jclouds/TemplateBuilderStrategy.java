@@ -45,7 +45,7 @@ public class TemplateBuilderStrategy {
     } else {
       templateBuilder.minRam(1024);
     }
-    
+
     if (clusterSpec.getLocationId() != null) {
       templateBuilder.locationId(clusterSpec.getLocationId());
     }
