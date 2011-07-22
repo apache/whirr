@@ -80,6 +80,9 @@ xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 http://maven.apache.org/xsd
         <th align="center">
           <b>Voldemort</b>
         </th>
+        <th align="center">
+          <b>Hama</b>
+        </th>
       </tr>
       <tr valign="top">
         <td align="center">Amazon EC2</td>
@@ -89,9 +92,11 @@ xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 http://maven.apache.org/xsd
         <td align="center">Yes</td>
         <td align="center">Yes</td>
         <td align="center">Yes</td>
+        <td align="center">Yes</td>        
       </tr>
       <tr valign="top">
         <td align="center">Rackspace Cloud Servers</td>
+        <td align="center">Yes</td>
         <td align="center">Yes</td>
         <td align="center">Yes</td>
         <td align="center">Yes</td>
