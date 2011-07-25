@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-function update_repo() {
+function register_cloudera_repo() {
   if which dpkg &> /dev/null; then
     cat > /etc/apt/sources.list.d/cloudera.list <<EOF
 deb http://archive.cloudera.com/debian lucid-$REPO contrib
@@ -78,13 +78,13 @@ function install_cdh_hbase() {
   # if there is no hosts file then provide a minimal one
   [ ! -f /etc/hosts ] && echo "127.0.0.1 localhost" > /etc/hosts
 
-  update_repo
+  register_cloudera_repo
   
   if which dpkg &> /dev/null; then
     apt-get update
-    apt-get -y install hadoop-hbase hadoop-hbase-master hadoop-hbase-regionserver hadoop-hbase-thrift
+    apt-get -y install hadoop-hbase
   elif which rpm &> /dev/null; then
-    yum install -y hadoop-hbase hadoop-hbase-master hadoop-hbase-regionserver hadoop-hbase-thrift
+    yum install -y hadoop-hbase
   fi
   
   echo "export HBASE_HOME=$HBASE_HOME" >> ~root/.bashrc

@@ -62,18 +62,18 @@ public class HBaseMasterClusterActionHandler extends HBaseClusterActionHandler {
 
     addStatement(event, call("configure_hostnames",
       HBaseConstants.PARAM_PROVIDER, clusterSpec.getProvider()));
+
     addStatement(event, call("install_java"));
     addStatement(event, call("install_tarball"));
-
-    String hbaseInstallFunction = getConfiguration(clusterSpec).getString(
-      HBaseConstants.KEY_INSTALL_FUNCTION, HBaseConstants.FUNCTION_INSTALL);
 
     String tarurl = prepareRemoteFileUrl(event,
       getConfiguration(clusterSpec).getString(HBaseConstants.KEY_TARBALL_URL));
 
-    addStatement(event, call(hbaseInstallFunction,
+    addStatement(event, call(
+      getInstallFunction(getConfiguration(clusterSpec)),
       HBaseConstants.PARAM_PROVIDER, clusterSpec.getProvider(),
-      HBaseConstants.PARAM_TARBALL_URL, tarurl));
+      HBaseConstants.PARAM_TARBALL_URL, tarurl)
+    );
   }
 
   @Override
@@ -91,20 +91,20 @@ public class HBaseMasterClusterActionHandler extends HBaseClusterActionHandler {
         .ports(MASTER_WEB_UI_PORT, MASTER_PORT)
     );
 
-    String hbaseConfigureFunction = getConfiguration(clusterSpec).getString(
-      HBaseConstants.KEY_CONFIGURE_FUNCTION, HBaseConstants.FUNCTION_POST_CONFIGURE);
-
     String master = masterPublicAddress.getHostName();
     String quorum = ZooKeeperCluster.getHosts(cluster);
 
     String tarurl = prepareRemoteFileUrl(event,
       getConfiguration(clusterSpec).getString(HBaseConstants.KEY_TARBALL_URL));
 
-    addStatement(event, call(hbaseConfigureFunction, ROLE,
+    addStatement(event, call(
+      getConfigureFunction(getConfiguration(clusterSpec)),
+      ROLE,
       HBaseConstants.PARAM_MASTER, master,
       HBaseConstants.PARAM_QUORUM, quorum,
       HBaseConstants.PARAM_PROVIDER, clusterSpec.getProvider(),
-      HBaseConstants.PARAM_TARBALL_URL, tarurl));
+      HBaseConstants.PARAM_TARBALL_URL, tarurl)
+    );
   }
 
   @Override

@@ -55,12 +55,11 @@ public class HadoopDataNodeClusterActionHandler extends HadoopClusterActionHandl
       throw new IOException(e);
     }
 
-    String hadoopConfigureFunction = clusterSpec.getConfiguration().getString(
-        "whirr.hadoop-configure-function", "configure_hadoop");
-    addStatement(event, call(hadoopConfigureFunction,
-        "hadoop-datanode,hadoop-tasktracker",
-        "-c", clusterSpec.getProvider()
-    ));
+    addStatement(event, call(
+      getConfigureFunction(getConfiguration(clusterSpec)),
+      "hadoop-datanode,hadoop-tasktracker",
+      "-c", clusterSpec.getProvider())
+    );
   }
   
 }

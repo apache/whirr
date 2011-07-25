@@ -56,42 +56,61 @@ public class ZooKeeperClusterActionHandler extends ClusterActionHandlerSupport {
     return getConfiguration(spec, "whirr-zookeeper-default.properties");
   }
 
+  protected String getInstallFunction(Configuration config) {
+    return getInstallFunction(config, getRole(), "install_" + getRole());
+  }
+
+  protected String getConfigureFunction(Configuration config) {
+    return getConfigureFunction(config, getRole(), "configure_" + getRole());
+  }
+
+  protected String getStartFunction(Configuration config) {
+    return getStartFunction(config, getRole(), "start_" + getRole());
+  }
+
   @Override
   protected void beforeBootstrap(ClusterActionEvent event) throws IOException {
     ClusterSpec clusterSpec = event.getClusterSpec();
-    String zookeeperInstallFunction = clusterSpec.getConfiguration().getString(
-        "whirr.zookeeper-install-function", "install_zookeeper");
     Configuration config = getConfiguration(clusterSpec);
 
     addStatement(event, call("install_java"));
     addStatement(event, call("install_tarball"));
-
-    /* register utility functions for managing init scripts */
     addStatement(event, call("install_service"));
-    addStatement(event, call("remove_service"));
 
     String tarurl = config.getString("whirr.zookeeper.tarball.url");
-    addStatement(event, call(zookeeperInstallFunction,
-      prepareRemoteFileUrl(event, tarurl)));
+    addStatement(event, call(getInstallFunction(config),
+      "-c", clusterSpec.getProvider(),
+      "-u", prepareRemoteFileUrl(event, tarurl))
+    );
   }
 
   @Override
   protected void beforeConfigure(ClusterActionEvent event) throws IOException, InterruptedException {
     ClusterSpec clusterSpec = event.getClusterSpec();
     Cluster cluster = event.getCluster();
-    Set<Instance> ensemble = cluster.getInstancesMatching(role(ZOOKEEPER_ROLE));
+
     event.getFirewallManager().addRule(
         Rule.create().destination(role(ZOOKEEPER_ROLE)).port(CLIENT_PORT)
     );
     
     // Pass list of all servers in ensemble to configure script.
     // Position is significant: i-th server has id i.
+
+    Set<Instance> ensemble = cluster.getInstancesMatching(role(ZOOKEEPER_ROLE));
     String servers = Joiner.on(' ').join(getPrivateIps(ensemble));
-    String zookeeperConfigureFunction = clusterSpec.getConfiguration().getString(
-        "whirr.zookeeper-configure-function", "configure_zookeeper");
-    addStatement(event, call(zookeeperConfigureFunction, "-c",
+
+    Configuration config = getConfiguration(clusterSpec);
+    String configureFunction = getConfigureFunction(config);
+
+    addStatement(event, call(configureFunction, "-c",
         clusterSpec.getProvider(), servers));
-    addStatement(event, call("start_zookeeper"));
+
+    if (configureFunction.equals("configure_zookeeper")) { //default zookeeper.configure-function
+      addStatement(event, call(getStartFunction(config)));
+    }
+    else {
+      //don't call start_zookeeper, because the CDH config starts the CDH version of zookeeper on its own
+    }
   }
   
   @Override

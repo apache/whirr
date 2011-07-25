@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-function update_repo() {
+function register_cloudera_repo() {
   if which dpkg &> /dev/null; then
     cat > /etc/apt/sources.list.d/cloudera.list <<EOF
 deb http://archive.cloudera.com/debian lucid-$REPO contrib
@@ -41,7 +41,7 @@ function install_cdh_zookeeper() {
   local OPTARG
   
   CLOUD_PROVIDER=
-  while getopts "c:" OPTION; do
+  while getopts "c:u:" OPTION; do
     case $OPTION in
     c)
       CLOUD_PROVIDER="$OPTARG"
@@ -64,13 +64,13 @@ function install_cdh_zookeeper() {
   ZK_LOG_DIR=/var/log/zookeeper
   ZK_DATA_DIR=$ZK_LOG_DIR/txlog
   
-  update_repo
+  register_cloudera_repo
   
   if which dpkg &> /dev/null; then
     apt-get update
-    apt-get -y install hadoop-zookeeper-server
+    apt-get -y install hadoop-zookeeper
   elif which rpm &> /dev/null; then
-    yum install -y hadoop-zookeeper-server
+    yum install -y hadoop-zookeeper
   fi
   
   echo "export ZOOKEEPER_HOME=$ZOOKEEPER_HOME" >> /etc/profile

@@ -86,12 +86,11 @@ public class HadoopNameNodeClusterActionHandler extends HadoopClusterActionHandl
       throw new IOException(e);
     }
     
-    String hadoopConfigureFunction = clusterSpec.getConfiguration().getString(
-        "whirr.hadoop-configure-function", "configure_hadoop");
-    addStatement(event, call(hadoopConfigureFunction,
-        "hadoop-namenode,hadoop-jobtracker",
-        "-c", clusterSpec.getProvider()
-    ));
+    addStatement(event, call(
+      getConfigureFunction(getConfiguration(clusterSpec)),
+      "hadoop-namenode,hadoop-jobtracker",
+      "-c", clusterSpec.getProvider())
+    );
   }
   
   @Override
