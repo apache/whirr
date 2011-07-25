@@ -31,6 +31,8 @@ import org.apache.whirr.ClusterSpec;
 import org.apache.whirr.service.jclouds.RunUrlStatement;
 import org.apache.whirr.util.BlobCache;
 import org.jclouds.scriptbuilder.domain.Statement;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This is a utility class to make it easier to implement
@@ -38,6 +40,9 @@ import org.jclouds.scriptbuilder.domain.Statement;
  * is a corresponding method that implementations may override.
  */
 public abstract class ClusterActionHandlerSupport extends ClusterActionHandler {
+
+  private static final Logger LOG =
+    LoggerFactory.getLogger(ClusterActionHandler.class);
 
   @Override
   public void beforeAction(ClusterActionEvent event)
@@ -157,6 +162,54 @@ public abstract class ClusterActionHandlerSupport extends ClusterActionHandler {
       return rawUrl.replaceFirst("remote://", "file://");
     }
     return rawUrl;
+  }
+
+  /**
+   * Get service start function name from the configuration
+   */
+  public String getStartFunction(Configuration config, String service, String defaultFunction) {
+    return getFunctionName(config, service, "start", defaultFunction);
+  }
+
+  /**
+   * Get service start function name from the configuration
+   */
+  public String getStopFunction(Configuration config, String service, String defaultFunction) {
+    return getFunctionName(config, service, "stop", defaultFunction);
+  }
+
+  /**
+   * Get service install function name from the configuration
+   */
+  public String getInstallFunction(Configuration config, String service, String defaultFunction) {
+    return getFunctionName(config, service, "install", defaultFunction);
+  }
+
+  /**
+   * Get service configure function name from the configuration
+   */
+  public String getConfigureFunction(Configuration config, String service, String defaultFunction) {
+    return getFunctionName(config, service, "configure", defaultFunction);
+  }
+
+  /**
+   * Get service cleanup function name from the configuration
+   */
+  public String getCleanupFunction(Configuration config, String service, String defaultFunction) {
+    return getFunctionName(config, service, "cleanup", defaultFunction);
+  }
+
+  public String getFunctionName(Configuration config, String service, String functionName, String defaultFunction) {
+
+    String deprecatedKey = String.format("whirr.%s-%s-function", service, functionName);
+    String key = String.format("whirr.%s.%s-function", service, functionName);
+
+    if (config.containsKey(deprecatedKey)) {
+      LOG.warn("'{}' is deprecated. Replace with '{}'", deprecatedKey, key);
+      return config.getString(deprecatedKey);
+    }
+
+    return config.getString(key, defaultFunction);
   }
 
 }

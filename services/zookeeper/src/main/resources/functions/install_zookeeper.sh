@@ -19,10 +19,14 @@ function install_zookeeper() {
   local OPTARG
   
   CLOUD_PROVIDER=
-  while getopts "c:" OPTION; do
+  ZK_TARBALL_URL=
+  while getopts "c:u:" OPTION; do
     case $OPTION in
     c)
       CLOUD_PROVIDER="$OPTARG"
+      ;;
+    u)
+      ZK_TARBALL_URL="$OPTARG"
       ;;
     esac
   done
@@ -36,7 +40,6 @@ function install_zookeeper() {
       ;;
   esac
 
-  ZK_TARBALL_URL=$1
   ZOOKEEPER_HOME=/usr/local/$(basename $ZK_TARBALL_URL '.tar.gz')
 
   ZK_CONF_DIR=/etc/zookeeper/conf
@@ -50,8 +53,10 @@ function install_zookeeper() {
   
   mkdir -p /mnt/zookeeper/logs
   ln -s /mnt/zookeeper/logs $ZK_LOG_DIR
+
   mkdir -p $ZK_LOG_DIR/txlog
   mkdir -p $ZK_CONF_DIR
+
   cp $ZOOKEEPER_HOME/conf/log4j.properties $ZK_CONF_DIR
   
   sed -i -e "s|log4j.rootLogger=INFO, CONSOLE|log4j.rootLogger=INFO, ROLLINGFILE|" \

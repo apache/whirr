@@ -20,12 +20,10 @@ package org.apache.whirr.service.hbase;
 
 public final class HBaseConstants {
 
-  public static final String KEY_INSTALL_FUNCTION = "whirr.hbase.install-function";
-  public static final String KEY_CONFIGURE_FUNCTION = "whirr.hbase.configure-function";
   public static final String KEY_TARBALL_URL = "whirr.hbase.tarball.url";
 
   public static final String FUNCTION_INSTALL = "install_hbase";
-  public static final String FUNCTION_POST_CONFIGURE = "configure_hbase";
+  public static final String FUNCTION_CONFIGURE = "configure_hbase";
 
   public static final String PARAM_PROVIDER = "-c";
   public static final String PARAM_MASTER = "-m";

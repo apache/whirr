@@ -116,6 +116,10 @@ function configure_cdh_hbase() {
  <name>hbase.client.retries.number</name>
  <value>100</value>
 </property>
+<property>
+ <name>hbase.zookeeper.recoverable.waittime</name>
+ <value>600000</value>
+</property>
 </configuration>
 EOF
 
@@ -147,7 +151,7 @@ EOF
     $HBASE_CONF_DIR/hbase-env.sh
 
   # disable IPv6
-  sed -i -e 's|# export HBASE_OPTS=.*|export HBASE_OPTS="-Djava.net.preferIPv4Stack=true"|' \
+  sed -i -e 's|export HBASE_OPTS="$HBASE_OPTS -ea -XX:+UseConcMarkSweepGC -XX:+CMSIncrementalMode"|export HBASE_OPTS="$HBASE_OPTS -ea -XX:+UseConcMarkSweepGC -XX:+CMSIncrementalMode -Djava.net.preferIPv4Stack=true"|' \
     $HBASE_CONF_DIR/hbase-env.sh
 
   # hbase logs should be on the /data partition
@@ -158,14 +162,15 @@ EOF
   chown hbase:hbase /data/hbase/logs
   ln -s /data/hbase/logs /var/log/hbase
   chown -R hbase:hbase /var/log/hbase
-  
+
+  # Now that the configuration is done, install the daemon packages
   for role in $(echo "$ROLES" | tr "," "\n"); do
     case $role in
     hbase-master)
-      service hadoop-hbase-master start 
+      install_hbase_daemon hadoop-hbase-master
       ;;
     hbase-regionserver)
-      service hadoop-hbase-regionserver start
+      install_hbase_daemon hadoop-hbase-regionserver
       ;;
     hbase-restserver)
       # not supported
@@ -174,10 +179,41 @@ EOF
       # not supported
       ;;
     hbase-thriftserver)
-      service hadoop-hbase-thrift start
+      install_hbase_daemon hadoop-hbase-thrift
       ;;
     esac
   done
+
+  # Start services
+  # For DEB, the services have already been started as part of the daemon package installation
+  if which rpm &> /dev/null; then
+    for role in $(echo "$ROLES" | tr "," "\n"); do
+      case $role in
+      hbase-master)
+        service hadoop-hbase-master restart
+        ;;
+      hbase-regionserver)
+        service hadoop-hbase-regionserver restart
+        ;;
+      hbase-restserver)
+        # not supported
+        ;;
+      hbase-avroserver)
+        # not supported
+        ;;
+      hbase-thriftserver)
+        service hadoop-hbase-thrift restart
+        ;;
+      esac
+    done
+  fi
 }
 
-
+function install_hbase_daemon() {
+  daemon=$1
+  if which dpkg &> /dev/null; then
+    apt-get -y install $daemon
+  elif which rpm &> /dev/null; then
+    yum install -y $daemon
+  fi
+}

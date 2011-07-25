@@ -75,7 +75,16 @@ EOF
     echo $myid > $myid_file
   fi
   
-  # Now that it's configured, start ZooKeeper
-  service hadoop-zookeeper start
+  # Now that it's configured, install daemon package
+  if which dpkg &> /dev/null; then
+    apt-get -y install hadoop-zookeeper-server
+  elif which rpm &> /dev/null; then
+    yum install -y hadoop-zookeeper-server
+  fi
 
+  # Start ZooKeeper
+  # For DEB, the service is already started as part of the daemon package installation
+  if which rpm &> /dev/null; then
+    service hadoop-zookeeper-server start
+  fi
 }

@@ -59,7 +59,7 @@ public class CdhZooKeeperServiceTest {
     cluster = controller.launchCluster(clusterSpec);
     hosts = ZooKeeperCluster.getHosts(cluster);
   }
-  
+
   @Test
   public void test() throws Exception {
     class ConnectionWatcher implements Watcher {

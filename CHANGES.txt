@@ -47,6 +47,8 @@ Trunk (unreleased changes)
     WHIRR-330. BYON doesn't work with HadoopConfigurationBuilder
     (John Amos and asavu)
 
+    WHIRR-334. Support for CDH3u0 HBase (Geoff Black, Andrei Savu, Bruno Dumon)
+
 Release 0.5.0 - 2011-05-16
 
   INCOMPATIBLE CHANGES

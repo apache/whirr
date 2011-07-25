@@ -15,7 +15,7 @@
 # limitations under the License.
 #
 set -x
-function update_repo() {
+function register_cloudera_repo() {
   if which dpkg &> /dev/null; then
     cat > /etc/apt/sources.list.d/cloudera.list <<EOF
 deb http://archive.cloudera.com/debian lucid-$REPO contrib
@@ -54,7 +54,7 @@ function install_cdh_hadoop() {
   HADOOP=hadoop-${HADOOP_VERSION:-0.20}
   HADOOP_CONF_DIR=/etc/$HADOOP/conf.dist
 
-  update_repo
+  register_cloudera_repo
   
   if which dpkg &> /dev/null; then
     apt-get update

@@ -161,8 +161,8 @@ above for details on how to override the scripts.</p>
 <subsection name="How do I run Cloudera's Distribution for Hadoop?"></subsection>
 
 <p>You can run CDH rather than Apache Hadoop by running the Hadoop service and setting the 
-<tt>whirr.hadoop-install-function</tt> and 
-<tt>whirr.hadoop-configure-function</tt> properties. See the 
+<tt>whirr.hadoop.install-function</tt> and
+<tt>whirr.hadoop.configure-function</tt> properties. See the
 <i>recipes</i>directory in the distribution for samples.</p>
 <p>
 <a name="other-services"></a> 

@@ -40,4 +40,13 @@ public abstract class HBaseClusterActionHandler
     return getConfiguration(clusterSpec,
       HBaseConstants.FILE_HBASE_DEFAULT_PROPERTIES);
   }
+
+  protected String getInstallFunction(Configuration config) {
+    return getInstallFunction(config, "hbase", HBaseConstants.FUNCTION_INSTALL);
+  }
+
+  protected String getConfigureFunction(Configuration config) {
+    return getConfigureFunction(config, "hbase", HBaseConstants.FUNCTION_CONFIGURE);
+  }
+
 }
