@@ -18,8 +18,15 @@
 
 package org.apache.whirr.util;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Maps;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.whirr.ClusterSpec;
@@ -35,15 +42,8 @@ import org.jclouds.scriptbuilder.domain.Statement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.Map;
-import java.util.Set;
+import com.google.common.base.Function;
+import com.google.common.collect.Maps;
 
 public class BlobCache {
 
@@ -165,7 +165,20 @@ public class BlobCache {
   }
 
   public synchronized void putIfAbsent(File file) throws FileNotFoundException {
-    putIfAbsent(file.getName(), new FileInputStream(file), file.length());
+      allocateContainer();
+
+      BlobStore store = context.getBlobStore();
+      if (!store.blobExists(container, file.getName())) {
+        LOG.info("Uploading '{}' to '{}' blob cache.", file.getName(), container);
+
+        Blob blob = context.getBlobStore().blobBuilder(container)
+                .name(file.getName())
+                .payload(file)
+                .contentLength(file.length())
+                .build();
+
+        store.putBlob(container, blob);
+      }
   }
 
   public synchronized void putIfAbsent(String name, InputStream in, long contentLength) {
