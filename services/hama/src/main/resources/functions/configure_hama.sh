@@ -56,7 +56,7 @@ function configure_hama() {
   esac
   
   # assign default URL if no other given (optional)
-  HAMA_TAR_URL=${HAMA_TAR_URL:-http://archive.apache.org/dist/incubator/hama/0.2-incubating/hama-0.2.0.tar.gz}
+  HAMA_TAR_URL=${HAMA_TAR_URL:-http://archive.apache.org/dist/incubator/hama/0.3-incubating/hama-0.3.0-incubating.tar.gz}
   # derive details from the URL
   HAMA_TAR_FILE=${HAMA_TAR_URL##*/}
 
@@ -103,7 +103,7 @@ function configure_hama() {
  <value>$ZOOKEEPER_QUORUM</value>
 </property>
 <property>
- <name>zookeeper.client.port</name>
+ <name>hama.zookeeper.property.clientPort</name>
  <value>2181</value>
 </property>
 </configuration>
@@ -112,7 +112,7 @@ EOF
   # override JVM options
   cat >> $HAMA_CONF_DIR/hama-env.sh <<EOF
 export HAMA_MASTER_OPTS="-Xms1000m -Xmx1000m -Xmn256m -XX:+UseConcMarkSweepGC -XX:+AggressiveOpts -verbose:gc -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:/mnt/hama/logs/hama-master-gc.log"
-export HAMA_GROOMSERVER_OPTS="-Xms2000m -Xmx2000m -Xmn256m -XX:+UseConcMarkSweepGC -XX:CMSInitiatingOccupancyFraction=88 -XX:+AggressiveOpts -verbose:gc -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:/mnt/hama/logs/hama-groomserver-gc.log"
+export HAMA_GROOMSERVER_OPTS="-Xms1000m -Xmx1000m -Xmn256m -XX:+UseConcMarkSweepGC -XX:CMSInitiatingOccupancyFraction=88 -XX:+AggressiveOpts -verbose:gc -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:/mnt/hama/logs/hama-groomserver-gc.log"
 EOF
 
   # keep PID files in a non-temporary directory
@@ -135,6 +135,7 @@ EOF
   rm -rf /var/log/hama
   mkdir $MOUNT/hama/logs
   chown hadoop:hadoop $MOUNT/hama/logs
+  chown -R hadoop:hadoop $HAMA_HOME
   ln -s $MOUNT/hama/logs /var/log/hama
   chown -R hadoop:hadoop /var/log/hama
 }

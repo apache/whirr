@@ -36,5 +36,5 @@ public class HamaConstants {
   public static final String PARAM_TARBALL_URL = "-u";
 
   public static final String PROP_HAMA_ZOOKEEPER_QUORUM = "hama.zookeeper.quorum";
-  public static final String PROP_HAMA_ZOOKEEPER_CLIENTPORT = "zookeeper.client.port";
+  public static final String PROP_HAMA_ZOOKEEPER_CLIENTPORT = "hama.zookeeper.property.clientPort";
 }

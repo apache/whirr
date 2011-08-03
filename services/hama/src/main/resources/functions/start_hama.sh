@@ -34,7 +34,7 @@ function start_hama() {
   done
 
   # assign default URL if no other given (optional)
-  HAMA_TAR_URL=${HAMA_TAR_URL:-http://archive.apache.org/dist/incubator/hama/0.2-incubating/hama-0.2.0.tar.gz}
+  HAMA_TAR_URL=${HAMA_TAR_URL:-http://archive.apache.org/dist/incubator/hama/0.3-incubating/hama-0.3.0-incubating.tar.gz}
   # derive details from the URL
   HAMA_TAR_FILE=${HAMA_TAR_URL##*/}
 

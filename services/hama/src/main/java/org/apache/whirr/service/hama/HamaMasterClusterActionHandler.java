@@ -46,6 +46,7 @@ public class HamaMasterClusterActionHandler extends HamaClusterActionHandler {
 
   public static final String ROLE = "hama-master";
   public static final int MASTER_PORT = 40000;
+  public static final int MASTER_WEB_UI_PORT = 40013;
 
   @Override
   public String getRole() {
@@ -63,6 +64,7 @@ public class HamaMasterClusterActionHandler extends HamaClusterActionHandler {
     InetAddress masterPublicAddress = instance.getPublicAddress();
 
     event.getFirewallManager().addRules(
+        Rule.create().destination(instance).ports(MASTER_WEB_UI_PORT),
         Rule.create().destination(instance).ports(MASTER_PORT));
 
     String hamaConfigureFunction = getConfiguration(clusterSpec).getString(
@@ -71,7 +73,6 @@ public class HamaMasterClusterActionHandler extends HamaClusterActionHandler {
 
     String master = masterPublicAddress.getHostName();
     String quorum = ZooKeeperCluster.getHosts(cluster);
-    quorum = quorum.split(":")[0];
 
     String tarurl = prepareRemoteFileUrl(event, getConfiguration(clusterSpec)
         .getString(HamaConstants.KEY_TARBALL_URL));
@@ -97,8 +98,10 @@ public class HamaMasterClusterActionHandler extends HamaClusterActionHandler {
     Instance instance = cluster.getInstanceMatching(role(ROLE));
     InetAddress masterPublicAddress = instance.getPublicAddress();
 
+    LOG.info("BSPMaster web UI available at http://{}:{}",
+        masterPublicAddress.getHostName(), MASTER_WEB_UI_PORT);
+    
     String quorum = ZooKeeperCluster.getHosts(cluster);
-    quorum = quorum.split(":")[0];
     Properties config = createClientSideProperties(masterPublicAddress, quorum);
     createClientSideHadoopSiteFile(clusterSpec, config);
     createProxyScript(clusterSpec, cluster);

@@ -37,6 +37,8 @@ Trunk (unreleased changes)
     WHIRR-345. Add Hama service information to the website 
     (Edward J. Yoon via asavu)
 
+    WHIRR-350. Update Hama service to 0.3 version (Edward J. Yoon via asavu)
+
   BUG FIXES
 
     WHIRR-315. Temporary override Providers#withIds until jclouds 

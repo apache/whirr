@@ -40,7 +40,7 @@ function install_hama() {
   done
   
   # assign default URL if no other given (optional)
-  HAMA_TAR_URL=${HAMA_TAR_URL:-http://archive.apache.org/dist/incubator/hama/0.2-incubating/hama-0.2.0.tar.gz}
+  HAMA_TAR_URL=${HAMA_TAR_URL:-http://archive.apache.org/dist/incubator/hama/0.3-incubating/hama-0.3.0-incubating.tar.gz}
   # derive details from the URL
   HAMA_TAR_FILE=${HAMA_TAR_URL##*/}
   HAMA_TAR_MD5_FILE=$HAMA_TAR_FILE.md5
@@ -61,6 +61,7 @@ function install_hama() {
 
   install_tarball $HAMA_TAR_URL
 
+  chmod 755 $HAMA_HOME/*.jar
   echo "export HAMA_HOME=$HAMA_HOME" >> ~root/.bashrc
   echo 'export PATH=$JAVA_HOME/bin:$HAMA_HOME/bin:$PATH' >> ~root/.bashrc
 }
