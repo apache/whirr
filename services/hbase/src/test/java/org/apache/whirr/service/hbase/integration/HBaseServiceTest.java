@@ -33,10 +33,9 @@ import org.apache.hadoop.hbase.thrift.generated.Mutation;
 import org.apache.hadoop.hbase.thrift.generated.TRowResult;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.junit.AfterClass;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class HBaseServiceTest {
+public abstract class HBaseServiceTest {
 
   private static final byte[] FIRST = Bytes.toBytes("");
   private static final byte[] TABLE = Bytes.toBytes("testtable");
@@ -46,13 +45,7 @@ public class HBaseServiceTest {
   private static final byte[] COLUMN = Bytes.toBytes("testFamily1:testColumn");
   private static final byte[] VALUE = Bytes.toBytes("testValue");
 
-  private static HBaseServiceController controller =
-    HBaseServiceController.getInstance();
-
-  @BeforeClass
-  public static void setUp() throws Exception {
-    controller.ensureClusterRunning();
-  }
+  protected static HBaseServiceController controller;
 
   @AfterClass
   public static void tearDown() throws Exception {

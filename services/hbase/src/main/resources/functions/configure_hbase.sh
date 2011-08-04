@@ -130,6 +130,10 @@ function configure_hbase() {
  <name>hbase.client.retries.number</name>
  <value>100</value>
 </property>
+<property>
+ <name>hbase.zookeeper.recoverable.waittime</name>
+ <value>600000</value>
+</property>
 </configuration>
 EOF
 
@@ -168,6 +172,22 @@ EOF
 #mapred.period=10
 #mapred.servers=$MASTER_HOST:8649
 #EOF
+
+  # Replace Hadoop jar of HBase with the ones from the actually installed Hadoop version
+  # This assumes there will always be Hadoop installed on each HBase node
+
+  if [ -d /usr/local/hadoop ] ; then
+    # First, remove existing jar file
+    rm -f $HBASE_HOME/lib/hadoop*
+
+    # This makes the assumption there will be exactly one file matching
+    # The stars around core is because the file is named differently in CDH vs Apache
+    # Hadoop distributon (hadoop-core-version vs hadoop-version-core).
+    HADOOP_JAR=`ls /usr/local/hadoop-*/hadoop*core*.jar`
+    ln -s $HADOOP_JAR $HBASE_HOME/lib/hadoop-core.jar
+  else
+    echo Copy hadoop jar to HBase error: did not find your Hadoop installation
+  fi
 
   # keep PID files in a non-temporary directory
   sed -i -e "s|# export HBASE_PID_DIR=.*|export HBASE_PID_DIR=/var/run/hbase|" \

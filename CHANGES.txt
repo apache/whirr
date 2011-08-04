@@ -13,6 +13,8 @@ Trunk (unreleased changes)
 
     WHIRR-260. Support Spot Instances (asavu)
 
+    WHIRR-240. [HBase] Enable support for HBase 0.90.x (Bruno Dumon via asavu)
+
   IMPROVEMENTS
 
     WHIRR-28. Add examples module (asavu)

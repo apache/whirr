@@ -20,6 +20,8 @@ package org.apache.whirr.service.hbase.integration;
 
 import java.io.IOException;
 import java.net.InetAddress;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.commons.configuration.CompositeConfiguration;
@@ -47,14 +49,20 @@ import org.slf4j.LoggerFactory;
 
 public class HBaseServiceController {
 
+  private final String configResource;
+
   private static final Logger LOG =
     LoggerFactory.getLogger(HBaseServiceController.class);
 
-  private static final HBaseServiceController INSTANCE =
-    new HBaseServiceController();
+  private static final Map<String, HBaseServiceController> INSTANCES = new HashMap<String, HBaseServiceController>();
 
-  public static HBaseServiceController getInstance() {
-    return INSTANCE;
+  public static HBaseServiceController getInstance(String configResource) {
+    HBaseServiceController controller = INSTANCES.get(configResource);
+    if (controller == null) {
+      controller = new HBaseServiceController(configResource);
+      INSTANCES.put(configResource, controller);
+    }
+    return controller;
   }
 
   private boolean running;
@@ -64,7 +72,8 @@ public class HBaseServiceController {
   private Cluster cluster;
   private Hbase.Client thriftClient;
 
-  private HBaseServiceController() {
+  private HBaseServiceController(String configResource) {
+    this.configResource = configResource;
   }
 
   public synchronized boolean ensureClusterRunning() throws Exception {
@@ -83,7 +92,7 @@ public class HBaseServiceController {
     if (System.getProperty("config") != null) {
       config.addConfiguration(new PropertiesConfiguration(System.getProperty("config")));
     }
-    config.addConfiguration(new PropertiesConfiguration("whirr-hbase-test.properties"));
+    config.addConfiguration(new PropertiesConfiguration(this.configResource));
     clusterSpec = ClusterSpec.withTemporaryKeys(config);
     controller = new ClusterController();
 

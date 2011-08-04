@@ -48,7 +48,7 @@ public class CdhHBaseServiceTest {
   private static final byte[] VALUE = Bytes.toBytes("testValue");
 
   private static HBaseServiceController controller =
-    HBaseServiceController.getInstance();
+    HBaseServiceController.getInstance("whirr-hbase-test.properties");
 
   @BeforeClass
   public static void setUp() throws Exception {
