@@ -74,17 +74,5 @@
       <item name="Javadoc" href="apidocs/index.html"/>
     </menu>
 
-    <menu name="Python Contrib Documentation">
-      <item name="Installation" href="contrib/python/installation.html"/>
-      <item name="Configuring and Running" href="contrib/python/configuring-and-running.html"/>
-      <item name="Launching a Cluster" href="contrib/python/launching-a-cluster.html"/>
-      <item name="Using Persistent Clusters" href="contrib/python/using-persistent-clusters.html"/>
-      <item name="Running MapReduce Jobs" href="contrib/python/running-mapreduce-jobs.html"/>
-      <item name="Terminating a Cluster" href="contrib/python/terminating-a-cluster.html"/>
-      <item name="Automatically Shutting Down a Cluster" href="contrib/python/automatically-shutting-down-a-cluster.html"/>
-      <item name="Using Command Line Options" href="contrib/python/using-command-line-options.html"/>
-      <item name="Running ZooKeeper" href="contrib/python/running-zookeeper.html"/>
-    </menu>
-
   </body>
 </project>

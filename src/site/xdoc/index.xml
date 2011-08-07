@@ -128,8 +128,8 @@ xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 http://maven.apache.org/xsd
     Apache Hadoop</a> for running Hadoop clusters on EC2. Later the scripts were 
     <a class="externalLink" href="https://issues.apache.org/jira/browse/WHIRR-3">ported to
     Python</a> for extra features (such as EBS support) and a wider range of cloud providers. These
-    Python scripts are available today in Whirr under 
-    <i>contrib/python</i>.</p>
+    Python scripts are no longer supported, but can be found in the 0.5.0 release and the
+    <i>contrib-python</i> SVN branch.</p>
     <p>In May 2010 the 
     <a class="externalLink" href="http://incubator.apache.org/whirr">Apache Whirr
     Incubator</a> project was started to give a home to the existing work that had been done, but

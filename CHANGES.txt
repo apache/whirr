@@ -43,6 +43,8 @@ Trunk (unreleased changes)
 
     WHIRR-354. Upgrade to jclouds 1.1.0 (Adrian Cole via asavu)
 
+    WHIRR-257. Remove outdated Python contrib (Tom White via asavu)
+
   BUG FIXES
 
     WHIRR-315. Temporary override Providers#withIds until jclouds 
