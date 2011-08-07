@@ -20,11 +20,13 @@ package org.apache.whirr.service.hbase;
 
 import static org.apache.whirr.RolePredicates.role;
 import static org.apache.whirr.service.FirewallManager.Rule;
+import static org.apache.whirr.service.hbase.HBaseConfigurationBuilder.buildHBaseSite;
 import static org.jclouds.scriptbuilder.domain.Statements.call;
 
 import java.io.IOException;
 import java.net.InetAddress;
 
+import org.apache.commons.configuration.ConfigurationException;
 import org.apache.whirr.Cluster;
 import org.apache.whirr.Cluster.Instance;
 import org.apache.whirr.ClusterSpec;
@@ -78,6 +80,14 @@ public class HBaseRegionServerClusterActionHandler extends HBaseClusterActionHan
         .destination(instance)
         .ports(REGIONSERVER_WEB_UI_PORT, REGIONSERVER_PORT)
     );
+
+    try {
+      event.getStatementBuilder().addStatement(
+        buildHBaseSite("/tmp/hbase-site.xml", clusterSpec, cluster)
+      );
+    } catch (ConfigurationException e) {
+      throw new IOException(e);
+    }
 
     String master = masterPublicAddress.getHostName();
     String quorum = ZooKeeperCluster.getHosts(cluster);

@@ -77,51 +77,8 @@ function configure_cdh_hbase() {
     chmod a+rwxt /data/tmp
   fi
 
-  ##############################################################################
-  # Modify this section to customize your HBase cluster.
-  ##############################################################################
-  cat > $HBASE_CONF_DIR/hbase-site.xml <<EOF
-<?xml version="1.0"?>
-<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
-<configuration>
-<property>
- <name>hbase.rootdir</name>
- <value>hdfs://$MASTER_HOST:8020/hbase</value>
-</property>
-<property>
- <name>hbase.cluster.distributed</name>
- <value>true</value>
-</property>
-<property>
- <name>hbase.zookeeper.quorum</name>
- <value>$ZOOKEEPER_QUORUM</value>
-</property>
-<property>
- <name>hbase.regionserver.handler.count</name>
- <value>100</value>
-</property>
-<property>
- <name>dfs.replication</name>
- <value>3</value>
-</property>
-<property>
- <name>zookeeper.session.timeout</name>
- <value>60000</value>
-</property>
-<property>
- <name>hbase.tmp.dir</name>
- <value>/data/tmp/hbase-\${user.name}</value>
-</property>
-<property>
- <name>hbase.client.retries.number</name>
- <value>100</value>
-</property>
-<property>
- <name>hbase.zookeeper.recoverable.waittime</name>
- <value>600000</value>
-</property>
-</configuration>
-EOF
+  # Copy generated configuration file in place
+  cp /tmp/hbase-site.xml $HBASE_CONF_DIR
 
   # override JVM options
   cat >> $HBASE_CONF_DIR/hbase-env.sh <<EOF

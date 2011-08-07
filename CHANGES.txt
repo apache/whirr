@@ -45,6 +45,9 @@ Trunk (unreleased changes)
 
     WHIRR-257. Remove outdated Python contrib (Tom White via asavu)
 
+    WHIRR-339. Allow to specify hbase-site.xml properties through 
+    cluster configuration file (Bruno Dumon via asavu)
+
   BUG FIXES
 
     WHIRR-315. Temporary override Providers#withIds until jclouds 
