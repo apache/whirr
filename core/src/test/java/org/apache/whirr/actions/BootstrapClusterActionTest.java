@@ -294,7 +294,7 @@ public class BootstrapClusterActionTest {
             "ec2", "" + roles + id, "nodeId" + id + i, 
             location, new URI("http://node" + i),
             userMetadata, ImmutableSet.<String>of(), null, null, null, null, NodeState.RUNNING, 22,
-            addresses, addresses, null, loginCredentials);
+            addresses, addresses, null, loginCredentials, "hostname");
         if (i < only) {
           nodes.add(nodeMeta);
           LOG.info("{} - Node successfully started: {}", roles, nodeMeta.getId());

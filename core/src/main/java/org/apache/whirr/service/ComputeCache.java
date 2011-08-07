@@ -41,7 +41,7 @@ import org.jclouds.domain.Credentials;
 import org.jclouds.ec2.compute.strategy.EC2PopulateDefaultLoginCredentialsForImageStrategy;
 import org.jclouds.logging.log4j.config.Log4JLoggingModule;
 import org.jclouds.rest.RestContext;
-import org.jclouds.ssh.jsch.config.JschSshClientModule;
+import org.jclouds.sshj.config.SshjSshClientModule;
 
 /**
  * A convenience class for building jclouds {@link ComputeServiceContext} objects.
@@ -71,7 +71,7 @@ public enum ComputeCache implements Function<ClusterSpec, ComputeServiceContext>
             jcloudsConfig.setProperty("byon.endpoint", jcloudsConfig.getProperty("jclouds.byon.endpoint"));
           }
 
-          Set<AbstractModule> wiring = ImmutableSet.of(new JschSshClientModule(),
+          Set<AbstractModule> wiring = ImmutableSet.of(new SshjSshClientModule(),
             new Log4JLoggingModule(), new BindLoginCredentialsPatchForEC2());
 
           return new IgnoreCloseComputeServiceContext(factory.createContext(
