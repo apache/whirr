@@ -18,7 +18,15 @@
 
 package org.apache.whirr.util.integration;
 
-import com.google.common.io.Files;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.util.Collection;
+import java.util.Map;
+
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
@@ -39,14 +47,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.util.Collection;
-import java.util.Map;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
+import com.google.common.io.Files;
 
 public class BlobCacheTest {
 
@@ -61,9 +62,19 @@ public class BlobCacheTest {
   }
 
   @Test
-  public void testUploadFileToBlobCache() throws Exception {
-    String expected = "dummy content";
-    File tempFile = createTemporaryFile(expected);
+  public void testUploadSmallFileToBlobCache() throws Exception {
+    testBlobCacheUpload("dummy small content");
+  }
+
+  @Test
+  public void testUploadLargeFileToBlobCache() throws Exception {
+    testBlobCacheUpload(
+        RandomStringUtils.randomAlphanumeric(1024*1024)
+    );
+  }
+
+  private void testBlobCacheUpload(String payload) throws Exception {
+    File tempFile = createTemporaryFile(payload);
 
     ClusterSpec spec = getTestClusterSpec();
     BlobCache cache = BlobCache.getInstance(ComputeCache.INSTANCE, spec);
@@ -72,7 +83,7 @@ public class BlobCacheTest {
       cache.putIfAbsent(tempFile);
 
       HttpRequest req = cache.getSignedRequest(tempFile.getName());
-      assertThat(readContent(req), is(expected));
+      assertThat(readContent(req), is(payload));
 
       /* render download statement for visual test inspection */
       LOG.info(cache.getAsSaveToStatement("/tmp",

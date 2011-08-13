@@ -139,21 +139,27 @@ public abstract class ClusterActionHandlerSupport extends ClusterActionHandler {
   }
 
   /**
-   * Prepare the file url for the remote machine. For public urls this function
-   * does nothing. For local urls it uploads the files to a temporary blob cache.
+   * Prepare the file url for the remote machine.
+   *
+   * For public urls this function does nothing. For local urls it uploads the files to a
+   * temporary blob cache and adds download statement.
+   *
+   * @param rawUrl    raw url as provided in the configuration file
+   * @return  an URL visible to the install / configure scripts
    */
   public String prepareRemoteFileUrl(ClusterActionEvent event, String rawUrl)
       throws IOException {
     if (rawUrl != null && rawUrl.startsWith("file://")) {
       try {
         URI uri = new URI(rawUrl);
+        File localFile = new File(uri);
 
         BlobCache cache = BlobCache.getInstance(event.getCompute(), event.getClusterSpec());
-        cache.putIfAbsent(uri);
+        cache.putIfAbsent(localFile);
 
-        String basePath = "/tmp/whirr/cache/files/";
+        final String basePath = "/tmp/whirr/cache/files/";
         addStatement(event, cache.getAsSaveToStatement(basePath, uri));
-        return "file://" + basePath + (new File(uri)).getName();
+        return "file://" + basePath + localFile.getName();
 
       } catch (URISyntaxException e) {
         throw new IOException(e);

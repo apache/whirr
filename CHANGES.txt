@@ -48,6 +48,8 @@ Trunk (unreleased changes)
     WHIRR-339. Allow to specify hbase-site.xml properties through 
     cluster configuration file (Bruno Dumon via asavu)
 
+    WHIRR-349. Retry if blobstore put fails (Karel Vervaeke and asavu)
+
   BUG FIXES
 
     WHIRR-315. Temporary override Providers#withIds until jclouds 
