@@ -181,7 +181,7 @@ public class BlobStoreContextBuilder {
    * @see <a href="http://code.google.com/p/jclouds/issues/detail?id=657" />
    */
   public static final Iterable<String> BLOBSTORE_APIS = ImmutableSet.of("transient", "file", "swift", "walrus",
-      "atmos");
+      "atmos", "aws-s3", "cloudfiles-us", "cloudfiles-uk");
 
   /**
    *  jclouds providers and apis that can be used in BlobStoreContextFactory

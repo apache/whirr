@@ -69,28 +69,26 @@ public class BlobCacheTest {
   @Test
   public void testUploadLargeFileToBlobCache() throws Exception {
     testBlobCacheUpload(
-        RandomStringUtils.randomAlphanumeric(1024*1024)
+        RandomStringUtils.randomAlphanumeric(1024 * 1024)
     );
   }
 
-  private void testBlobCacheUpload(String payload) throws Exception {
-    File tempFile = createTemporaryFile(payload);
-
+  @Test
+  public void testUploadInEUS3Region() throws Exception {
     ClusterSpec spec = getTestClusterSpec();
-    BlobCache cache = BlobCache.getInstance(ComputeCache.INSTANCE, spec);
+    if ("aws-ec2".equals(spec.getProvider())) {
 
-    try {
-      cache.putIfAbsent(tempFile);
+      // Configuration workaround need until the following issue is fixed
+      // http://code.google.com/p/jclouds/issues/detail?id=656
 
-      HttpRequest req = cache.getSignedRequest(tempFile.getName());
-      assertThat(readContent(req), is(payload));
+      spec.setBlobStoreLocationId("EU");
+      spec.getConfiguration().setProperty(
+          "jclouds.aws-s3.endpoint", "https://s3-eu-west-1.amazonaws.com");
 
-      /* render download statement for visual test inspection */
-      LOG.info(cache.getAsSaveToStatement("/tmp",
-          tempFile.getName()).render(OsFamily.UNIX));
-
-    } finally {
-      BlobCache.dropAndCloseAll();
+      testBlobCacheUpload(
+          RandomStringUtils.randomAlphanumeric(1024 * 1024),
+          spec
+      );
     }
   }
 
@@ -127,6 +125,31 @@ public class BlobCacheTest {
     } finally {
       LOG.info("Removing temporary container '{}'", container);
       context.getBlobStore().deleteContainer(container);
+    }
+  }
+
+  private void testBlobCacheUpload(String payload) throws Exception {
+    testBlobCacheUpload(payload, getTestClusterSpec());
+  }
+
+  private void testBlobCacheUpload(String payload, ClusterSpec spec)
+      throws Exception {
+    File tempFile = createTemporaryFile(payload);
+
+    BlobCache cache = BlobCache.getInstance(ComputeCache.INSTANCE, spec);
+
+    try {
+      cache.putIfAbsent(tempFile);
+
+      HttpRequest req = cache.getSignedRequest(tempFile.getName());
+      assertThat(readContent(req), is(payload));
+
+      /* render download statement for visual test inspection */
+      LOG.info(cache.getAsSaveToStatement("/tmp",
+          tempFile.getName()).render(OsFamily.UNIX));
+
+    } finally {
+      BlobCache.dropAndCloseAll();
     }
   }
 
