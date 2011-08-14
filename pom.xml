@@ -83,7 +83,12 @@
       </dependency>
       <dependency>
         <groupId>org.jclouds.driver</groupId>
-        <artifactId>jclouds-log4j</artifactId>
+        <artifactId>jclouds-slf4j</artifactId>
+        <version>${jclouds.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.jclouds.driver</groupId>
+        <artifactId>jclouds-enterprise</artifactId>
         <version>${jclouds.version}</version>
       </dependency>
       <dependency>

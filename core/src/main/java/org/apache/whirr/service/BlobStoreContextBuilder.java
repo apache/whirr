@@ -21,6 +21,10 @@ package org.apache.whirr.service;
 import org.apache.whirr.ClusterSpec;
 import org.jclouds.blobstore.BlobStoreContext;
 import org.jclouds.blobstore.BlobStoreContextFactory;
+import org.jclouds.enterprise.config.EnterpriseConfigurationModule;
+import org.jclouds.logging.slf4j.config.SLF4JLoggingModule;
+
+import com.google.common.collect.ImmutableSet;
 
 public class BlobStoreContextBuilder {
 
@@ -31,7 +35,9 @@ public class BlobStoreContextBuilder {
   public static BlobStoreContext build(final BlobStoreContextFactory factory,
                                        final ClusterSpec spec) {
     return factory.createContext(spec.getBlobStoreProvider(),
-        spec.getBlobStoreIdentity(), spec.getBlobStoreCredential());
+        spec.getBlobStoreIdentity(), spec.getBlobStoreCredential(), 
+        ImmutableSet.of(new SLF4JLoggingModule(), 
+                        new EnterpriseConfigurationModule()));
   }
 
 }

@@ -50,6 +50,8 @@ Trunk (unreleased changes)
 
     WHIRR-349. Retry if blobstore put fails (Karel Vervaeke and asavu)
 
+    WHIRR-361. refactor jclouds dependencies (Adrian Cole via asavu)
+
   BUG FIXES
 
     WHIRR-315. Temporary override Providers#withIds until jclouds 

@@ -39,7 +39,8 @@ import org.jclouds.compute.ComputeServiceContextFactory;
 import org.jclouds.compute.Utils;
 import org.jclouds.domain.Credentials;
 import org.jclouds.ec2.compute.strategy.EC2PopulateDefaultLoginCredentialsForImageStrategy;
-import org.jclouds.logging.log4j.config.Log4JLoggingModule;
+import org.jclouds.enterprise.config.EnterpriseConfigurationModule;
+import org.jclouds.logging.slf4j.config.SLF4JLoggingModule;
 import org.jclouds.rest.RestContext;
 import org.jclouds.sshj.config.SshjSshClientModule;
 
@@ -71,8 +72,11 @@ public enum ComputeCache implements Function<ClusterSpec, ComputeServiceContext>
             jcloudsConfig.setProperty("byon.endpoint", jcloudsConfig.getProperty("jclouds.byon.endpoint"));
           }
 
-          Set<AbstractModule> wiring = ImmutableSet.of(new SshjSshClientModule(),
-            new Log4JLoggingModule(), new BindLoginCredentialsPatchForEC2());
+          Set<AbstractModule> wiring = ImmutableSet.of(
+                new SshjSshClientModule(),
+                new SLF4JLoggingModule(), 
+                new EnterpriseConfigurationModule(),
+                new BindLoginCredentialsPatchForEC2());
 
           return new IgnoreCloseComputeServiceContext(factory.createContext(
             arg0.provider, arg0.identity, arg0.credential,
