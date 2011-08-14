@@ -75,6 +75,8 @@ Trunk (unreleased changes)
     WHIRR-363. ComputeCache redundantly creates ComputeServiceContexts 
     (Adrian Cole via asavu)
 
+    WHIRR-364. [voldemort] 0.90.RC3 build artifact no longer available (asavu)
+
 Release 0.5.0 - 2011-05-16
 
   INCOMPATIBLE CHANGES

@@ -21,7 +21,7 @@ function download() {
   dest_dir=$2
 
   for i in `seq 1 3`; do
-    curl --retry 3 --show-error --fail -O $tar_url
+    curl -L --retry 3 --show-error --fail -O $tar_url
     if tar zxf $tar_file -C $dest_dir ; then
       break;
     else
@@ -37,8 +37,8 @@ function download() {
 
 # -f <configuration URL> -u <voldemort_tar_url>
 function install_voldemort() {
-  VOLDEMORT_VERSION="0.90.RC3"
-  VOLDEMORT_TAR_URL=http://test.project-voldemort.com:8080/job/release-090/lastSuccessfulBuild/artifact/dist/voldemort-${VOLDEMORT_VERSION}.tar.gz
+  VOLDEMORT_VERSION="0.90"
+  VOLDEMORT_TAR_URL=https://github.com/downloads/voldemort/voldemort/voldemort-${VOLDEMORT_VERSION}.tar.gz
   VOLDEMORT_CONF_URL=
   VOLDEMORT_ROOT=/usr/local/voldemort
   VOLDEMORT_HOME=/etc/voldemort
