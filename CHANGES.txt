@@ -64,6 +64,9 @@ Trunk (unreleased changes)
 
     WHIRR-334. Support for CDH3u0 HBase (Geoff Black, Andrei Savu, Bruno Dumon)
 
+    WHIRR-363. ComputeCache redundantly creates ComputeServiceContexts 
+    (Adrian Cole via asavu)
+
 Release 0.5.0 - 2011-05-16
 
   INCOMPATIBLE CHANGES
