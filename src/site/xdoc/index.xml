@@ -120,6 +120,17 @@ xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 http://maven.apache.org/xsd
     <p>Download a release of Whirr from a 
     <a class="externalLink" href="http://www.apache.org/dyn/closer.cgi/incubator/whirr/">nearby
     mirror</a> .</p>
+
+    <subsection name="Known Limitations"></subsection>
+
+    We are striving to make each release as good as possible but there are still a set of 
+    limitations that you should be aware of. The following issues are known to exist in the 0.6.0 release of Whirr.
+
+    <ul>
+      <li>When using BlobCache on regions besides us-east-1 inside Amazon AWS, server errors occur during upload. <a href="http://code.google.com/p/jclouds/issues/detail?id=656">JCLOUDS-656</a> See <a href="https://issues.apache.org/jira/browse/WHIRR-349#comment-13084590">WHIRR-349</a> for a configuration workaround.</li> 
+      <li>The Hadoop namenode and the jobtracker must share the same machine. <a href="https://issues.apache.org/jira/browse/WHIRR-337">WHIRR-337</a></li>
+      <li>The HBase thrift server can only run on a machine that it's also running a different HBase role like hbase-master or hbase-regionserver. <a href="https://issues.apache.org/jira/browse/WHIRR-342">WHIRR-342</a></li>
+    </ul>
     
     <subsection name="History"></subsection>
 

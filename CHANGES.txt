@@ -58,6 +58,8 @@ Trunk (unreleased changes)
     WHIRR-349. Test that blobstore put works outside US with a 
     configuration workaround (asavu)
 
+    WHIRR-359. Document known limitations for Whirr 0.6.0 (Adrian Cole and asavu)
+
   BUG FIXES
 
     WHIRR-315. Temporary override Providers#withIds until jclouds 
