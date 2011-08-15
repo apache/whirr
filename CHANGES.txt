@@ -77,6 +77,8 @@ Trunk (unreleased changes)
 
     WHIRR-364. [voldemort] 0.90.RC3 build artifact no longer available (asavu)
 
+    WHIRR-361. Add Guava as an explicit dependency (Adrian Cole via asavu)
+
 Release 0.5.0 - 2011-05-16
 
   INCOMPATIBLE CHANGES

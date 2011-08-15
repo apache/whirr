@@ -57,6 +57,11 @@
   <dependencyManagement>
     <dependencies>
       <dependency>
+        <groupId>com.google.guava</groupId>
+        <artifactId>guava</artifactId>
+        <version>r09</version>
+      </dependency>
+      <dependency>
         <groupId>ca.juliusdavies</groupId>
         <artifactId>not-yet-commons-ssl</artifactId>
         <version>0.3.11</version>
