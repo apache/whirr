@@ -25,9 +25,96 @@
     <!-- Paste release notes from https://issues.apache.org/jira/browse/WHIRR here. -->
 
 
+            <h1>Release Notes - Whirr - Version 0.6.0</h1>
+         
+     <h2>        Sub-task
+     </h2>
+     <ul>
+     <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-341'>WHIRR-341</a>] -         Improve automatic OS image selection
+     </li>
+     </ul>
+                 
+     <h2>        Bug
+     </h2>
+     <ul>
+     <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-249'>WHIRR-249</a>] -         Firewall authorization should be idempotent
+     </li>
+     <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-315'>WHIRR-315</a>] -         Temporary override Providers#withIds until jclouds beta-10 is out
+     </li>
+     <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-330'>WHIRR-330</a>] -         BYON doesn&#39;t work with HadoopConfigurationBuilder
+     </li>
+     <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-334'>WHIRR-334</a>] -         Support for CDH3u0 HBase
+     </li>
+     <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-363'>WHIRR-363</a>] -         ComputeCache redundantly creates ComputeServiceContexts
+     </li>
+     <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-364'>WHIRR-364</a>] -         [voldemort] 0.90.RC3 build artifact no longer available 
+     </li>
+     <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-365'>WHIRR-365</a>] -         Too verbose command line interface logging
+     </li>
+     </ul>
+                 
+     <h2>        Improvement
+     </h2>
+     <ul>
+     <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-28'>WHIRR-28</a>] -         Add examples module
+     </li>
+     <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-311'>WHIRR-311</a>] -         Allow services to register new CLI commands
+     </li>
+     <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-319'>WHIRR-319</a>] -         Run rat &amp; checkstyle before packaging 
+     </li>
+     <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-320'>WHIRR-320</a>] -         Convert site documentation to xdoc format
+     </li>
+     <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-323'>WHIRR-323</a>] -         Allow user to specify a blobstore container to be used for caching local files
+     </li>
+     <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-327'>WHIRR-327</a>] -         Upgrade to jclouds 1.0.0
+     </li>
+     <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-331'>WHIRR-331</a>] -         Add the ability to specify tarball URLs that are local to the remote machine
+     </li>
+     <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-338'>WHIRR-338</a>] -         byon cluster with hostnames defined in /etc/hosts
+     </li>
+     <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-339'>WHIRR-339</a>] -         Allow to specify hbase-site.xml properties through cluster configuration file
+     </li>
+     <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-345'>WHIRR-345</a>] -         Add Hama service information to the website
+     </li>
+     <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-349'>WHIRR-349</a>] -         Retry if blobstore put fails
+     </li>
+     <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-350'>WHIRR-350</a>] -         Update Hama service to 0.3 version
+     </li>
+     <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-354'>WHIRR-354</a>] -         Upgrade to jclouds 1.1.0
+     </li>
+     <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-359'>WHIRR-359</a>] -         Document known limitations for Whirr 0.6.0
+     </li>
+     <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-361'>WHIRR-361</a>] -         refactor jclouds dependencies
+     </li>
+     <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-362'>WHIRR-362</a>] -         BlobStore contexts are redundantly created
+     </li>
+     </ul>
+         
+     <h2>        New Feature
+     </h2>
+     <ul>
+     <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-76'>WHIRR-76</a>] -         Support spot instances in python scripts
+     </li>
+     <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-240'>WHIRR-240</a>] -         [HBase] Enable support for HBase 0.90.x
+     </li>
+     <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-260'>WHIRR-260</a>] -         Support Spot Instances
+     </li>
+     <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-313'>WHIRR-313</a>] -         Add Hama as a Service
+     </li>
+     <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-326'>WHIRR-326</a>] -         Use jclouds provider metadata to help with cloud provider configuration
+     </li>
+     </ul>
+                                             
+     <h2>        Wish
+     </h2>
+     <ul>
+     <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-257'>WHIRR-257</a>] -         Remove outdated Python contrib
+     </li>
+     </ul>
+
 	        <h1>Release Notes - Whirr - Version 0.5.0</h1>
 
-	<h2>        Sub-task
+    <h2>        Sub-task
 	</h2>
 	<ul>
 	<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-277'>WHIRR-277</a>] -         Support multiple versions of ZooKeeper
