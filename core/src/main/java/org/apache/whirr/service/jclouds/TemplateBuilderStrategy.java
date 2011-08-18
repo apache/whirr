@@ -36,6 +36,10 @@ public class TemplateBuilderStrategy {
       templateBuilder.os64Bit(true);
       templateBuilder.osFamily(OsFamily.UBUNTU);
       templateBuilder.osVersionMatches("10.04");
+
+      // canonical images, but not testing ones
+      if ("aws-ec2".equals(clusterSpec.getProvider()))
+        templateBuilder.imageDescriptionMatches("/ubuntu-images/");
     }
     
     if (clusterSpec.getHardwareId() != null) {
