@@ -82,7 +82,7 @@ public enum ComputeCache implements Function<ClusterSpec, ComputeServiceContext>
           ComputeServiceContext context = new IgnoreCloseComputeServiceContext(factory.createContext(
             arg0.provider, arg0.identity, arg0.credential,
             wiring, arg0.overrides));
-          LOG.info("created new ComputeServiceContext {}", context);
+          LOG.debug("created new ComputeServiceContext {}", context);
           return context;
         }
     

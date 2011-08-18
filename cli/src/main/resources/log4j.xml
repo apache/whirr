@@ -51,6 +51,11 @@
     <appender-ref ref="ROLLINGFILE" />
   </category>
 
+  <category name="net.schmizz.sshj">
+    <priority value="ERROR" />
+    <appender-ref ref="CONSOLE" />
+  </category>
+
   <root>
     <priority value="INFO" />
     <appender-ref ref="CONSOLE" />

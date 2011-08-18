@@ -84,6 +84,8 @@ Trunk (unreleased changes)
     WHIRR-361. Emergency upgrade to jclouds 1.1.1 and improved configure phase 
     logging (Adrian Cole via asavu)
 
+    WHIRR-365. Too verbose command line interface logging (asavu)
+
 Release 0.5.0 - 2011-05-16
 
   INCOMPATIBLE CHANGES
