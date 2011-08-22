@@ -36,6 +36,11 @@
     <appender-ref ref="CONSOLE" />
   </category>
 
+  <category name="net.schmizz.sshj">
+    <priority value="ERROR" />
+    <appender-ref ref="CONSOLE" />
+  </category>
+
   <root>
     <priority value="DEBUG" />
     <appender-ref ref="CONSOLE" />
