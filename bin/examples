@@ -17,11 +17,12 @@
 
 bin=`dirname "$0"`
 bin=`cd "$bin"; pwd`
+opts="-Dlog4j.configuration=log4j-example.xml"
 
 if [ -d "$bin/../examples/target/lib" ]; then
-  classpath="$bin/..:$bin/../examples/target/lib/*:$bin/../examples/target/*"
+  classpath="$bin/../conf/:$bin/..:$bin/../examples/target/lib/*:$bin/../examples/target/*"
 else
-  classpath="$bin/..:$bin/../lib/*"
+  classpath="$bin/../conf/:$bin/..:$bin/../lib/*"
 fi
 
 java -cp "$classpath" org.apache.whirr.examples.Main "$@"
