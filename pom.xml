@@ -42,6 +42,7 @@
     <module>examples</module>
     <module>services/cassandra</module>
     <module>services/cdh</module>
+    <module>services/ganglia</module>
     <module>services/hadoop</module>
     <module>services/zookeeper</module>
     <module>services/hbase</module>
@@ -123,6 +124,11 @@
         <artifactId>mockito-all</artifactId>
         <version>1.8.5</version>
         <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>commons-httpclient</groupId>
+        <artifactId>commons-httpclient</artifactId>
+        <version>3.1</version>
       </dependency>
       <dependency>
         <groupId>commons-configuration</groupId>
@@ -356,6 +362,8 @@
             <exclude>docs/**</exclude>
             <exclude>**/*.log*</exclude>
             <exclude>.idea/**</exclude>
+            <exclude>**/.project</exclude>
+            <exclude>**/.classpath</exclude>
             <exclude>src/site/resources/images/whirr-logo.ai</exclude> <!-- binary -->
           </excludes>
         </configuration>

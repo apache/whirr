@@ -2,6 +2,10 @@ Apache Whirr Change Log
 
 Trunk (unreleased changes)
 
+  NEW FEATURES
+
+    WHIRR-258. Add Ganglia as a service (Karel Vervaeke via asavu)
+
 Release 0.6.0 - 2011-08-17
 
   NEW FEATURES
