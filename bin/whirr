@@ -15,15 +15,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-bin=`dirname "$0"`
-bin=`cd "$bin"; pwd`
-opts="-Dlog4j.configuration=log4j-cli.xml"
+BIN=$(cd $(dirname "$0"); pwd)
+LOGGING_OPTS="-Dlog4j.configuration=log4j-cli.xml"
 
-if [ -d "$bin/../cli/target/lib" ]; then
-  classpath="$bin/../conf/:$bin/..:$bin/../cli/target/lib/*:$bin/../cli/target/*"
+if [ -d "$BIN/../cli/target/lib" ]; then
+  CLASSPATH="$BIN/../conf/:$BIN/..:$BIN/../cli/target/lib/*:$BIN/../cli/target/*"
 else
-  classpath="$bin/../conf/:$bin/..:$bin/../lib/*"
+  CLASSPATH="$BIN/../conf/:$BIN/..:$BIN/../lib/*"
 fi
 
-java $WHIRR_CLI_OPTS -cp "$classpath" org.apache.whirr.cli.Main "$@"
+java $LOGGING_OPTS $WHIRR_CLI_OPTS -cp "$CLASSPATH" org.apache.whirr.cli.Main "$@"
  

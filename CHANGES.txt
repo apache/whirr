@@ -6,6 +6,12 @@ Trunk (unreleased changes)
 
     WHIRR-258. Add Ganglia as a service (Karel Vervaeke via asavu)
 
+  IMPROVEMENTS
+
+  BUG FIXES
+
+    WHIRR-377. Fix broken CLI logging config. (asavu via tomwhite)
+
 Release 0.6.0 - 2011-08-17
 
   NEW FEATURES
