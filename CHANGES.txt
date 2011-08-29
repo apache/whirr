@@ -1,5 +1,11 @@
 Apache Whirr Change Log
 
+Release 0.6.1 (unreleased changes)
+
+  IMPROVEMENTS
+
+    WHIRR-116. Site should have docs for each released version. (tomwhite)
+
 Release 0.6.0 - 2011-08-17
 
   NEW FEATURES

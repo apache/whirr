@@ -18,18 +18,17 @@
 <document xmlns="http://maven.apache.org/XDOC/2.0"
 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 http://maven.apache.org/xsd/xdoc-2.0.xsd">
-  <properties></properties>
   <body>
-    <section name="API Guide"></section>
-    <p>Whirr provides a Java API for stopping and starting clusters. Please see the 
-    <a href="apidocs/index.html">javadoc</a> and the unit test source code for how to achieve
-    this.</p>
+    <section name="Know Limitations"></section>
 
-    <p>The downloaded artifact contains a example project that shows how Whirr can be used 
-    for various tasks .Check the <i>examples</i> subfolder.</p>
+    <p>We are striving to make each release as good as possible but there are still a set of 
+    limitations that you should be aware of. The following issues are known to exist in the 0.6.0 release of Whirr.</p>
 
-    <p>You can execute an example by running:
-    <source>$ ./bin/example [example-name]</source></p>
+    <ul>
+      <li>The Hadoop namenode and the jobtracker must share the same machine. <a href="https://issues.apache.org/jira/browse/WHIRR-337">WHIRR-337</a></li>
+      <li>The HBase thrift server can only run on a machine that it's also running a different HBase role like hbase-master or hbase-regionserver. <a href="https://issues.apache.org/jira/browse/WHIRR-342">WHIRR-342</a></li>
+      <li>The "jclouds.aws-s3.endpoint" property is needed in order to use BlobCache with Amazon AWS in a region besides us-east-1. See <a href="https://issues.apache.org/jira/browse/WHIRR-349#comment-13084590">WHIRR-349</a> for more details</li>
+    </ul>
 
   </body>
 </document>

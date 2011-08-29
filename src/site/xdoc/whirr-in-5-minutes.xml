@@ -24,7 +24,7 @@ xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 http://maven.apache.org/xsd
     <p>The following commands install Whirr and start a 3 node ZooKeeper cluster on Amazon EC2 in 5
     minutes or less. You need to have Java 6 and an SSH client already installed. Help on finding
     your AWS credentials can be found in the 
-    <a href="faq.html#how-do-i-find-my-cloud-credentials">FAQ</a>.</p>
+    <a href="http://whirr.apache.org/faq.html#how-do-i-find-my-cloud-credentials">FAQ</a>.</p>
     <source>
 export AWS_ACCESS_KEY_ID=... 
 export AWS_SECRET_ACCESS_KEY=... 

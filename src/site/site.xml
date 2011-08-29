@@ -18,12 +18,12 @@
 <project name="Whirr">
   <bannerLeft>
     <name>Whirr</name>
-    <src>http://incubator.apache.org/whirr/images/whirr-logo.png</src>
-    <href>http://incubator.apache.org/whirr/</href>
+    <src>http://whirr.apache.org/images/whirr-logo.png</src>
+    <href>http://whirr.apache.org/</href>
   </bannerLeft>
   <bannerRight>
-    <src>http://incubator.apache.org/images/apache-incubator-logo.png</src>
-    <href>http://incubator.apache.org/</href>
+    <src>http://www.apache.org/images/asf_logo_wide.png</src>
+    <href>http://www.apache.org/</href>
   </bannerRight>
 
   <publishDate position="right"/>
@@ -39,39 +39,42 @@
     <links position="left">
       <item name="Wiki" href="https://cwiki.apache.org/confluence/display/WHIRR" />
       <item name="JIRA" href="https://issues.apache.org/jira/browse/WHIRR" />
-      <item name="SVN" href="https://svn.apache.org/repos/asf/incubator/whirr/" />
+      <item name="SVN" href="https://svn.apache.org/repos/asf/whirr/" />
     </links>
 
     <breadcrumbs position="left">
       <item name="Apache" href="http://www.apache.org/" />
-      <item name="Apache Incubator" href="http://incubator.apache.org/" />
-      <item name="Whirr" href="http://incubator.apache.org/whirr/"/>
+      <item name="Whirr" href="http://whirr.apache.org/"/>
+      <item name="0.6.0" href="http://whirr.apache.org/docs/0.6.0/"/>
     </breadcrumbs>
 
     <menu name="Whirr">
-      <item name="About" href="index.html"/>
+      <item name="About" href="http://whirr.apache.org/"/>
       <item name="Download" href="http://www.apache.org/dyn/closer.cgi/incubator/whirr/"/>
-      <item name="Release Notes" href="release-notes.html" />
       <item name="Road Map" href="https://cwiki.apache.org/confluence/display/WHIRR/RoadMap" />
       <item name="Wiki" href="https://cwiki.apache.org/confluence/display/WHIRR" />
-      <item name="FAQ" href="faq.html"/>
+      <item name="FAQ" href="http://whirr.apache.org/faq.html"/>
     </menu>
 
     <menu name="Project Information">
-      <item name="Summary" href="project-info.html" />
-      <item name="Mailing Lists" href="mail-lists.html" />
+      <item name="Summary" href="http://whirr.apache.org/project-info.html" />
+      <item name="Mailing Lists" href="http://whirr.apache.org/mail-lists.html" />
       <item name="IRC" href="https://cwiki.apache.org/confluence/display/WHIRR/IRC+Channel" />
-      <item name="Team" href="team-list.html" />
-      <item name="Issue Tracking" href="issue-tracking.html" />
-      <item name="License" href="license.html" />
+      <item name="Team" href="http://whirr.apache.org/team-list.html" />
+      <item name="Issue Tracking" href="http://whirr.apache.org/issue-tracking.html" />
+      <item name="License" href="http://whirr.apache.org/license.html" />
     </menu>
 
     <menu name="Documentation">
+      <item name="Home" href="index.html"/>
       <item name="Whirr in 5 Minutes" href="whirr-in-5-minutes.html"/>
       <item name="Quick Start Guide" href="quick-start-guide.html"/>
       <item name="Configuration Guide" href="configuration-guide.html"/>
       <item name="API Guide" href="api-guide.html"/>
       <item name="Javadoc" href="apidocs/index.html"/>
+      <item name="Release Notes" href="release-notes.html" />
+      <item name="Known Limitations" href="known-limitations.html" />
+      <item name="Supported Services and Clouds" href="supported-services-and-clouds.html" />
     </menu>
 
   </body>
