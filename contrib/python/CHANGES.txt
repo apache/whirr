@@ -1,0 +1,20 @@
+Trunk (unreleased changes)
+
+    WHIRR-4. hadoop-cloud push command invokes proxy creation.
+    (Andrew Klochkov via tomwhite)
+
+    WHIRR-5. Run namenode and jobtracker on separate EC2 instances.
+    (tomwhite)
+
+    WHIRR-7. Add a ZooKeeper service to the cloud scripts. (tomwhite)
+
+    WHIRR-6. Write a Rackspace cloud provider. (tomwhite)
+
+    WHIRR-10. Create setup.py for EC2 cloud scripts. (tomwhite)
+
+    WHIRR-9. Support additional security group option in hadoop-ec2 script.
+    (Paul Egan via tomwhite)
+
+    WHIRR-8. Create ant build for running EC2 unit tests. (tomwhite)
+
+    WHIRR-3. Add support for EBS storage on EC2. (tomwhite)

@@ -1,0 +1,74 @@
+h1. Getting Started with Whirr
+
+h2. Whirr CLI
+
+h3. Pre-requisites
+You need to install Java 6 on your machine. Also, you need to have an account with a cloud provider,
+such as Amazon EC2.
+
+h3. Install Whirr
+
+[Download|http://www.apache.org/dyn/closer.cgi/incubator/whirr/] or
+[build|https://cwiki.apache.org/confluence/display/WHIRR/How+To+Contribute] Whirr. Call the directory
+which contains the Whirr JAR files {{WHIRR\_HOME}} (you might like to define this as an environment variable).
+
+You can test that Whirr is working by running
+(this is for version {{0.1.0-incubating}}):
+
+{code}
+% java -jar $WHIRR_HOME/whirr-cli-0.1.0-incubating.jar
+{code}
+
+It is handy to create an alias for whirr:
+
+{code}
+% alias whirr='java -jar $WHIRR_HOME/whirr-cli-0.1.0-incubating.jar'
+{code}
+
+h3. Launch a cluster
+
+First, create a properties file to define the cluster. The name doesn't matter,
+but here we will assume it is called _hadoop.properties_ and located in your home directory.
+This file defines a cluster
+with a single machine for the namenode and jobtracker, and
+a further machine for a datanode and tasktracker.
+
+{code}
+whirr.service-name=hadoop
+whirr.cluster-name=myhadoopcluster
+whirr.instance-templates=1 jt+nn,1 dn+tt
+whirr.provider=ec2
+whirr.identity=<cloud-provider-identity>
+whirr.credential=<cloud-provider-credential>
+whirr.private-key-file=${sys:user.home}/.ssh/id_rsa
+{code}
+
+Run the following command to launch a cluster:
+
+{code}
+% whirr launch-cluster --config hadoop.properties
+{code}
+
+Once the cluster has launched you can browse it by connecting to http://master-host:50030.
+
+h3. Configuration
+
+Whirr is configured using a properties file, and optionally using command line arguments when using the CLI. Command line arguments take precedence over properties specified in a properties file.
+
+See the [Configuration Guide|configuration-guide] for details.
+
+h3. Destroy a cluster
+
+When you've finished using a cluster you can terminate the instances and clean up resources with
+
+{code}
+% whirr destroy-cluster --config hadoop.properties
+{code}
+
+h2. Whirr API
+
+Whirr provides a Java API for stopping and starting clusters. Please see the unit test source code for
+how to achieve this.
+
+There's also some example code at [http://github.com/hammer/whirr-demo].
+

@@ -1,0 +1,84 @@
+Apache Whirr Change Log
+
+Release 0.1.0 - 2010-09-02
+
+  INCOMPATIBLE CHANGES
+
+  NEW FEATURES
+
+    WHIRR-33. Add a CLI. (tomwhite)
+
+    WHIRR-54. Implement service/cdh. To run CDH rather than Apache Hadoop, set
+    the property whirr.hadoop-install-runurl to cloudera/cdh/install (tomwhite)
+
+  IMPROVEMENTS
+
+    WHIRR-2. Import initial Java source code. (tomwhite)
+
+    WHIRR-20. Generate RAT report. (phunt via tomwhite)
+
+    WHIRR-32. Update POM to point to Apache RAT 0.8-SNAPSHOT.
+    (Jeff Hammerbacher via tomwhite)
+
+    WHIRR-21. Enforce source code style. (tomwhite)
+
+    WHIRR-34. Open up ports 50010 (JobTracker) and 50070 (NameNode) for the
+    Hadoop Service. (Jeff Hammerbacher via tomwhite)
+
+    WHIRR-26. Allow script locations to be overridden.
+    (Jeff Hammerbacher via tomwhite)
+
+    WHIRR-22. Separate unit and integration (system) tests. (tomwhite)
+
+    WHIRR-37. Don't require manual installation of Apache RAT to compile.
+    (tomwhite)
+
+    WHIRR-38. Add core javadoc. (tomwhite)
+
+    WHIRR-47. Create a Service factory. (tomwhite)
+
+    WHIRR-51. Allow the Hadoop service to be run on Rackspace Cloud servers.
+    (tomwhite)
+
+    WHIRR-53. Adopt the standard Java SPI interface. (tomwhite)
+
+    WHIRR-23. Upgrade to jclouds 1.0-beta-6. (Adrian Cole via tomwhite)
+
+    WHIRR-64. Unify ClusterSpec and ServiceSpec. (tomwhite)
+
+    WHIRR-58. Introduce naming consistency for cloud service providers.
+    (Adrian Cole via tomwhite)
+
+    WHIRR-75. Use Commons Configuration to manage cluster specs. (tomwhite)
+
+    WHIRR-40. Fill in getting started documentation. (tomwhite)
+
+    WHIRR-77. Document and implement release process. (tomwhite)
+
+    WHIRR-70. decouple keypairs from the files that hold them.
+    (Adrian Cole via tomwhite)
+
+    WHIRR-80. Clean up POM dependencies. (tomwhite)
+
+    WHIRR-85. Publish Maven artifacts to http://repository.apache.org.
+    (tomwhite)
+
+  BUG FIXES
+
+    WHIRR-50. Cassandra POM should depend on top-level. (tomwhite)
+
+    WHIRR-48. Fix RAT warnings due to site files. (tomwhite)
+
+    WHIRR-65. Workaround bug 331 in jclouds (Some EC2ComputeService operations
+    fail for stopped instances). (tomwhite)
+
+    WHIRR-71. Only allow access to clusters from defined networks. (tomwhite)
+
+    WHIRR-79. Hadoop service is broken. (tomwhite)
+
+    WHIRR-82. Integration tests should not run on "mvn install". (tomwhite)
+
+    WHIRR-84. Log4j is missing from the CLI JAR. (tomwhite)
+
+    WHIRR-86. Update quick start documentation to work with release 0.1.0.
+    (tomwhite)
