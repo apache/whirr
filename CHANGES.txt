@@ -8,6 +8,8 @@ Trunk (unreleased changes)
 
   IMPROVEMENTS
 
+    WHIRR-116. Site should have docs for each released version. (tomwhite)
+
   BUG FIXES
 
     WHIRR-377. Fix broken CLI logging config. (asavu via tomwhite)

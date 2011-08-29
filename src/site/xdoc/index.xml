@@ -20,10 +20,9 @@ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 http://maven.apache.org/xsd/xdoc-2.0.xsd">
   <properties></properties>
   <body>
-
-    <section name="Apache Whirr"></section>
-    <p>Apache Whirr is a set of libraries for running cloud services. Whirr is currently in the 
-    <a class="externalLink" href="http://incubator.apache.org/">Apache Incubator</a> .</p>
+  
+    <section name="Apache Whirr 0.6.0"></section>
+    <p>Apache Whirr is a set of libraries for running cloud services.</p>
     <p>Whirr provides:</p>
     <ul>
       <li>A cloud-neutral way to run services. You don't have to worry about the idiosyncrasies of
@@ -33,120 +32,15 @@ xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 http://maven.apache.org/xsd
       while still being able to override settings as needed.</li>
     </ul>
     <p>You can also use Whirr as a command line tool for deploying clusters.</p>
-    <p>Find out more about Whirr at our 
-    <a class="externalLink" href="https://cwiki.apache.org/confluence/display/WHIRR">wiki</a> .</p>
-    
+
     <subsection name="Getting Started"></subsection>
 
-    <p>You can use Whirr's CLI or APIs to 
-    <a href="quick-start-guide.html">get started with Whirr</a> .</p>
+    <p>Start with <a href="whirr-in-5-minutes.html">Whirr in 5 Minutes</a>
+    or the  
+    <a href="quick-start-guide.html">Quick Start Guide</a>.</p>
     <p>There is also an 
-    <a href="faq.html">FAQ</a> which covers how to achieve common tasks with Whirr, and a 
+    <a href="http://whirr.apache.org/faq.html">FAQ</a> which covers how to achieve common tasks with Whirr, and a 
     <a href="configuration-guide.html">configuration guide</a> for reference.</p>
-    
-    <subsection name="Getting Involved"></subsection>
 
-    <p>Have you got a suggestion for improving Whirr? It's easy to 
-    <a class="externalLink"
-    href="https://cwiki.apache.org/confluence/display/WHIRR/How+To+Contribute">get
-    involved</a> .</p>
-    
-    <subsection name="Which services and cloud providers are supported?"></subsection>
-
-    <p>Whirr uses 
-    <a class="externalLink" href="http://code.google.com/p/jclouds/">jclouds</a> for provisioning,
-    so in principle it should support all the cloud providers that jclouds supports. The following
-    table shows the cloud provider and service combinations that have been tested.</p>
-    <table align="center" border="0">
-      <tr valign="top">
-        <th align="center">
-          <b>Cloud provider</b>
-        </th>
-        <th align="center">
-          <b>Cassandra</b>
-        </th>
-        <th align="center">
-          <b>Hadoop</b>
-        </th>
-        <th align="center">
-          <b>ZooKeeper</b>
-        </th>
-        <th align="center">
-          <b>HBase</b>
-        </th>
-        <th align="center">
-          <b>elasticsearch</b>
-        </th>
-        <th align="center">
-          <b>Voldemort</b>
-        </th>
-        <th align="center">
-          <b>Hama</b>
-        </th>
-      </tr>
-      <tr valign="top">
-        <td align="center">Amazon EC2</td>
-        <td align="center">Yes</td>
-        <td align="center">Yes</td>
-        <td align="center">Yes</td>
-        <td align="center">Yes</td>
-        <td align="center">Yes</td>
-        <td align="center">Yes</td>
-        <td align="center">Yes</td>        
-      </tr>
-      <tr valign="top">
-        <td align="center">Rackspace Cloud Servers</td>
-        <td align="center">Yes</td>
-        <td align="center">Yes</td>
-        <td align="center">Yes</td>
-        <td align="center">Yes</td>
-        <td align="center">Yes</td>
-        <td align="center">Yes</td>
-        <td align="center">Yes</td>
-      </tr>
-    </table>
-    <p>For development and local testing we are also supporting the BYON (bring your own nodes)
-    jclouds provider. Check the 
-    <i>recipes</i> folder for a configuration sample.</p>
-    
-    <subsection name="What server operating systems are supported?"></subsection>
-
-    <p>Each release is tested by running the integration tests on Ubuntu Server 10.04. All setup
-    scripts should also work on Centos 5.x but we don't have a formal testing procedure in place
-    right now.</p>
-    
-    <subsection name="Download"></subsection>
-
-    <p>Download a release of Whirr from a 
-    <a class="externalLink" href="http://www.apache.org/dyn/closer.cgi/incubator/whirr/">nearby
-    mirror</a> .</p>
-
-    <subsection name="Known Limitations"></subsection>
-
-    We are striving to make each release as good as possible but there are still a set of 
-    limitations that you should be aware of. The following issues are known to exist in the 0.6.0 release of Whirr.
-
-    <ul>
-      <li>The Hadoop namenode and the jobtracker must share the same machine. <a href="https://issues.apache.org/jira/browse/WHIRR-337">WHIRR-337</a></li>
-      <li>The HBase thrift server can only run on a machine that it's also running a different HBase role like hbase-master or hbase-regionserver. <a href="https://issues.apache.org/jira/browse/WHIRR-342">WHIRR-342</a></li>
-      <li>The "jclouds.aws-s3.endpoint" property is needed in order to use BlobCache with Amazon AWS in a region besides us-east-1. See <a href="https://issues.apache.org/jira/browse/WHIRR-349#comment-13084590">WHIRR-349</a> for more details</li>
-    </ul>
-    
-    <subsection name="History"></subsection>
-
-    <p>The code that would become Whirr started out in 2007 as some 
-    <a class="externalLink" href="https://issues.apache.org/jira/browse/HADOOP-884">bash scripts in
-    Apache Hadoop</a> for running Hadoop clusters on EC2. Later the scripts were 
-    <a class="externalLink" href="https://issues.apache.org/jira/browse/WHIRR-3">ported to
-    Python</a> for extra features (such as EBS support) and a wider range of cloud providers. These
-    Python scripts are no longer supported, but can be found in the 0.5.0 release and the
-    <i>contrib-python</i> SVN branch.</p>
-    <p>In May 2010 the 
-    <a class="externalLink" href="http://incubator.apache.org/whirr">Apache Whirr
-    Incubator</a> project was started to give a home to the existing work that had been done, but
-    also to create a Java version using 
-    <a class="externalLink" href="http://code.google.com/p/jclouds/">jclouds</a> as the cloud
-    provisioning library. jclouds supports many providers and has a very rich API for running code
-    on instances, so it provides a very solid foundation for building Whirr on.</p>
   </body>
 </document>

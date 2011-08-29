@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!--
+ Licensed to the Apache Software Foundation (ASF) under one or more
+ contributor license agreements.  See the NOTICE file distributed with
+ this work for additional information regarding copyright ownership.
+ The ASF licenses this file to You under the Apache License, Version 2.0
+ (the "License"); you may not use this file except in compliance with
+ the License.  You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+<document xmlns="http://maven.apache.org/XDOC/2.0"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 http://maven.apache.org/xsd/xdoc-2.0.xsd">
+  <body>
+
+    <section name="Which Services and Cloud Providers Are Supported?"></section>
+
+    <p>Whirr uses 
+    <a class="externalLink" href="http://code.google.com/p/jclouds/">jclouds</a> for provisioning,
+    so in principle it should support all the cloud providers that jclouds supports. The following
+    table shows the cloud provider and service combinations that have been tested.</p>
+    <table align="center" border="0">
+      <tr valign="top">
+        <th align="center">
+          <b>Cloud provider</b>
+        </th>
+        <th align="center">
+          <b>Cassandra</b>
+        </th>
+        <th align="center">
+          <b>Hadoop</b>
+        </th>
+        <th align="center">
+          <b>ZooKeeper</b>
+        </th>
+        <th align="center">
+          <b>HBase</b>
+        </th>
+        <th align="center">
+          <b>elasticsearch</b>
+        </th>
+        <th align="center">
+          <b>Voldemort</b>
+        </th>
+        <th align="center">
+          <b>Hama</b>
+        </th>
+      </tr>
+      <tr valign="top">
+        <td align="center">Amazon EC2</td>
+        <td align="center">Yes</td>
+        <td align="center">Yes</td>
+        <td align="center">Yes</td>
+        <td align="center">Yes</td>
+        <td align="center">Yes</td>
+        <td align="center">Yes</td>
+        <td align="center">Yes</td>        
+      </tr>
+      <tr valign="top">
+        <td align="center">Rackspace Cloud Servers</td>
+        <td align="center">Yes</td>
+        <td align="center">Yes</td>
+        <td align="center">Yes</td>
+        <td align="center">Yes</td>
+        <td align="center">Yes</td>
+        <td align="center">Yes</td>
+        <td align="center">Yes</td>
+      </tr>
+    </table>
+    <p>For development and local testing we are also supporting the BYON (bring your own nodes)
+    jclouds provider. Check the 
+    <i>recipes</i> folder for a configuration sample.</p>
+    
+    <subsection name="What server operating systems are supported?"></subsection>
+
+    <p>Each release is tested by running the integration tests on Ubuntu Server 10.04. All setup
+    scripts should also work on Centos 5.x but we don't have a formal testing procedure in place
+    right now.</p>
+  </body>
+</document>
