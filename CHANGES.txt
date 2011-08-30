@@ -10,6 +10,8 @@ Trunk (unreleased changes)
 
     WHIRR-116. Site should have docs for each released version. (tomwhite)
 
+    WHIRR-356. Upgrade elasticsearch to 0.17.4 (asavu)
+
   BUG FIXES
 
     WHIRR-377. Fix broken CLI logging config. (asavu via tomwhite)

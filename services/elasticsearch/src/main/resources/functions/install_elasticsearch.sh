@@ -19,7 +19,7 @@ function install_elasticsearch() {
     # TODO Run ElasticSearch as non-root-user
     # http://www.elasticsearch.org/tutorials/2011/02/22/running-elasticsearch-as-a-non-root-user.html
 
-    local ES_URL=${1:-http://github.com/downloads/elasticsearch/elasticsearch/elasticsearch-0.15.2.tar.gz}
+    local ES_URL=${1:-https://github.com/downloads/elasticsearch/elasticsearch/elasticsearch-0.17.6.tar.gz}
     install_tarball $ES_URL
 
     # install the latest service wrapper for elasticsearch
