@@ -16,20 +16,40 @@
 #
 function install_elasticsearch() {
 
-    # TODO Run ElasticSearch as non-root-user
-    # http://www.elasticsearch.org/tutorials/2011/02/22/running-elasticsearch-as-a-non-root-user.html
-
     local ES_URL=${1:-https://github.com/downloads/elasticsearch/elasticsearch/elasticsearch-0.17.6.tar.gz}
     install_tarball $ES_URL
+
+    # get the name of the home folder
+    local ES_HOME=$(cd /usr/local/elasticsearch-*; pwd)
 
     # install the latest service wrapper for elasticsearch
     local ES_WRAPPER=https://github.com/elasticsearch/elasticsearch-servicewrapper/tarball/master
     install_tarball $ES_WRAPPER /tmp/
 
     # move the service wrapper in place
-    mv /tmp/elasticsearch-elasticsearch-servicewrapper-*/service /usr/local/elasticsearch-*/bin/
-    cd /usr/local/elasticsearch-*
+    mv /tmp/elasticsearch-elasticsearch-servicewrapper-*/service $ES_HOME/bin/
+
+    # create a user for running the service
+    cat >> /etc/profile <<EOF
+export ES_HOME=$ES_HOME
+EOF
+    useradd -d $ES_HOME elasticsearch
+
+    # update the wrapper configuration files 
+    sed -i "s@#RUN_AS_USER=@RUN_AS_USER=elasticsearch@g" $ES_HOME/bin/service/elasticsearch
+    sed -i "s@LOCKDIR=.*@LOCKDIR=\"$ES_HOME/lock\"@" $ES_HOME/bin/service/elasticsearch
+
+    # create required folders and update permisions
+    mkdir $ES_HOME/lock
+    chown -R elasticsearch $ES_HOME
+
+    # increase the max number of open files for this user
+    cat >> /etc/security/limits.conf <<EOF
+elasticsearch soft nofile 32000
+elasticsearch hard nofile 32000
+EOF
 
     # ensure that elasticsearch will start after reboot
+    cd $ES_HOME
     ./bin/service/elasticsearch install
 }

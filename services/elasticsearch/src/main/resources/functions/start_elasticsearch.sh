@@ -15,6 +15,7 @@
 # limitations under the License.
 #
 function start_elasticsearch() {
-    cd /usr/local/elasticsearch-*
+    . /etc/profile
+    cd $ES_HOME
     ./bin/service/elasticsearch start
 }

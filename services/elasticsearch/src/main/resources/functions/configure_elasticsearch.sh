@@ -15,16 +15,25 @@
 # limitations under the License.
 #
 function configure_elasticsearch() {
-    cd /usr/local/elasticsearch-*
+    . /etc/profile
 
+    cd $ES_HOME
     for plugin in $@
     do
         ./bin/plugin install $plugin
     done
 
-    # TODO allow user to set the amount of memory to use
-    # local MAXMEM=$(($(free|awk '/^Mem:/{print $2}') * 8 / 10 / 1024))m
+    # Use no more than 70% of the available RAM for heap
+    local ES_MIN_MEM=256
+    local ES_MAX_MEM=$(($(free|awk '/^Mem:/{print $2}') * 7 / 10 / 1024))
+
+    cat >> /etc/profile <<EOF
+export ES_MIN_MEM=256
+export ES_MAX_MEM=$ES_MAX_MEM
+EOF
 
     cp /tmp/elasticsearch.yml config/elasticsearch.yml
+
+    chown -R elasticsearch $ES_HOME
 }
 

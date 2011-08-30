@@ -12,6 +12,8 @@ Trunk (unreleased changes)
 
     WHIRR-356. Upgrade elasticsearch to 0.17.4 (asavu)
 
+    WHIRR-357. Run elasticsearch as a non-root-user (asavu)
+
   BUG FIXES
 
     WHIRR-377. Fix broken CLI logging config. (asavu via tomwhite)
