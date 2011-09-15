@@ -6,6 +6,8 @@ Trunk (unreleased changes)
 
     WHIRR-258. Add Ganglia as a service (Karel Vervaeke via asavu)
 
+    WHIRR-386. Remove references to the Apache Incubator (asavu)
+
   IMPROVEMENTS
 
     WHIRR-116. Site should have docs for each released version. (tomwhite)

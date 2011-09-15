@@ -32,7 +32,7 @@
   
   <name>Whirr</name>
   <description>Libraries for running cloud services</description>
-  <url>http://incubator.apache.org/whirr</url>
+  <url>http://whirr.apache.org/</url>
   <inceptionYear>2010</inceptionYear>
 
   <modules>
