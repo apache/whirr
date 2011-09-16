@@ -321,5 +321,18 @@ public class ClusterSpecTest {
     assertThat(spec.copy(), is(spec));
     assertThat(spec.copy().hashCode(), is(spec.hashCode()));
   }
+  
+  @Test
+  public void testFirewallRules() throws Exception {
+    PropertiesConfiguration conf = new PropertiesConfiguration("whirr-core-test.properties");
+    conf.setProperty("whirr.firewall-rules", "8000,8001");
+    conf.setProperty("whirr.firewall-rules-serviceA", "9000,9001");
+    ClusterSpec spec = ClusterSpec.withTemporaryKeys(
+        conf);
+    
+    Map<String, List<String>> firewallRules = spec.getFirewallRules();
+    assertThat(firewallRules.get(null).equals(Lists.<String>newArrayList("8000","8001")), is(true));
+    assertThat(firewallRules.get("serviceA").equals(Lists.<String>newArrayList("9000","9001")), is(true));
+  }
 
 }

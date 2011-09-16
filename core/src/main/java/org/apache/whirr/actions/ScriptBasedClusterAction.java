@@ -59,8 +59,8 @@ public abstract class ScriptBasedClusterAction extends ClusterAction {
     for (InstanceTemplate instanceTemplate : clusterSpec.getInstanceTemplates()) {
       StatementBuilder statementBuilder = new StatementBuilder();
 
-      ComputeServiceContext computServiceContext = getCompute().apply(clusterSpec);
-      FirewallManager firewallManager = new FirewallManager(computServiceContext,
+      ComputeServiceContext computeServiceContext = getCompute().apply(clusterSpec);
+      FirewallManager firewallManager = new FirewallManager(computeServiceContext,
           clusterSpec, newCluster);
 
       ClusterActionEvent event = new ClusterActionEvent(getAction(),

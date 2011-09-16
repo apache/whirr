@@ -547,6 +547,26 @@ xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 http://maven.apache.org/xsd
         CIDR</a>blocks. E.g. 
         <tt>208.128.0.0/11,108.128.0.0/11</tt></td>
       </tr>
+      <tr valign="top">
+        <td>
+          <tt>whirr.firewall-rules</tt>
+        </td>
+        <td>
+          <tt>--firewall-rules</tt>
+        </td>
+        <td>none</td>
+        <td>A comma-separated list of port numbers to open. E.g. <tt>8080,8181</tt>.</td>
+      </tr>
+      <tr valign="top">
+        <td>
+          <tt>whirr.firewall-rules-{role}</tt>
+        </td>
+        <td>
+          <tt>--firewall-rules-{role}</tt>
+        </td>
+        <td>none</td>
+        <td>A comma-separated list of port numbers to open on instances with a specific role. Replace {role} the actual role name. E.g. <tt>whirr.firewall-rules-hbase-master=10101</tt>.</td>
+      </tr>
     </table>
     <p>
       <a name="cloud-provider-config"></a>

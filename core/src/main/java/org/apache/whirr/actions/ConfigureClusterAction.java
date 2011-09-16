@@ -20,13 +20,8 @@ package org.apache.whirr.actions;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.google.common.base.Function;
-import com.google.common.base.Predicate;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Maps;
-
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -38,6 +33,7 @@ import org.apache.whirr.InstanceTemplate;
 import org.apache.whirr.RolePredicates;
 import org.apache.whirr.service.ClusterActionEvent;
 import org.apache.whirr.service.ClusterActionHandler;
+import org.apache.whirr.service.FirewallManager.Rule;
 import org.apache.whirr.service.jclouds.StatementBuilder;
 import org.jclouds.compute.ComputeService;
 import org.jclouds.compute.ComputeServiceContext;
@@ -49,6 +45,14 @@ import org.jclouds.domain.Credentials;
 import org.jclouds.scriptbuilder.domain.OsFamily;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.base.Function;
+import com.google.common.base.Predicate;
+import com.google.common.collect.Collections2;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Maps;
+import com.google.common.primitives.Ints;
 
 /**
  * A {@link org.apache.whirr.ClusterAction} for running a configuration script on instances
@@ -72,8 +76,10 @@ public class ConfigureClusterAction extends ScriptBasedClusterAction {
   @Override
   protected void doAction(Map<InstanceTemplate, ClusterActionEvent> eventMap)
       throws IOException {
-    
+
     for (Entry<InstanceTemplate, ClusterActionEvent> entry : eventMap.entrySet()) {
+      applyFirewallRules(entry.getValue());
+      
       ClusterSpec clusterSpec = entry.getValue().getClusterSpec();
       Cluster cluster = entry.getValue().getCluster();
 
@@ -175,4 +181,33 @@ public class ConfigureClusterAction extends ScriptBasedClusterAction {
       }
    };
   }
+  
+  /**
+   * Apply the firewall rules specified via configuration.
+   */
+  private void applyFirewallRules(ClusterActionEvent event) throws IOException {
+    ClusterSpec clusterSpec = event.getClusterSpec();
+    
+    Map<String, List<String>> firewallRules = clusterSpec.getFirewallRules();
+    for (String role: firewallRules.keySet()) {
+      Rule rule = Rule.create();
+      
+      if (role == null) {
+        rule.destination(event.getCluster().getInstances());
+      } else {
+        rule.destination(RolePredicates.role(role));
+      }
+      
+      List<String> ports = firewallRules.get(role);
+      rule.ports(Ints.toArray(Collections2.transform(ports, new Function<String,Integer>() {
+        @Override
+        public Integer apply(String input) {
+          return Integer.valueOf(input);
+        }
+      })));
+
+      event.getFirewallManager().addRule(rule);
+    }
+  }
+
 }

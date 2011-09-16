@@ -16,6 +16,8 @@ Trunk (unreleased changes)
 
     WHIRR-357. Run elasticsearch as a non-root-user (asavu)
 
+    WHIRR-371. Allow defining additional firewall rules (kve)
+
   BUG FIXES
 
     WHIRR-377. Fix broken CLI logging config. (asavu via tomwhite)

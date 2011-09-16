@@ -18,10 +18,6 @@
 
 package org.apache.whirr.service;
 
-import com.google.common.base.Predicate;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
-
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
@@ -34,6 +30,10 @@ import org.apache.whirr.service.jclouds.FirewallSettings;
 import org.jclouds.compute.ComputeServiceContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.base.Predicate;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 public class FirewallManager {
 

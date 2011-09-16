@@ -22,22 +22,16 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.apache.whirr.util.KeyPair.sameKeyPair;
 
-import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Objects;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
-import com.jcraft.jsch.JSch;
-import com.jcraft.jsch.JSchException;
-import com.jcraft.jsch.KeyPair;
-
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.Configuration;
@@ -50,6 +44,16 @@ import org.apache.commons.lang.text.StrLookup;
 import org.jclouds.predicates.validators.DnsNameValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Objects;
+import com.google.common.collect.Iterators;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
+import com.jcraft.jsch.JSch;
+import com.jcraft.jsch.JSchException;
+import com.jcraft.jsch.KeyPair;
 
 /**
  * This class represents the specification of a cluster. It is used to describe
@@ -159,6 +163,12 @@ public class ClusterSpec {
     CLIENT_CIDRS(String.class, true, "A comma-separated list of CIDR" +
       " blocks. E.g. 208.128.0.0/11,108.128.0.0/11"),
       
+    FIREWALL_RULES(String.class, true, "A comma-separated list of port" +
+      " numbers. E.g. 8080,8181"),
+          
+    FIREWALL_RULES_ROLE(String.class, true, "A comma-separated list of port" +
+      " numbers. E.g. 8080,8181. Replace 'role' with an actual role name"),
+              
     VERSION(String.class, false, ""),
     
     RUN_URL_BASE(String.class, false, "The base URL for forming run " + 
@@ -273,6 +283,8 @@ public class ClusterSpec {
   private int hardwareMinRam;
 
   private List<String> clientCidrs;
+  private Map<String, List<String>> firewallRules;
+  
   private String version;
   private String runUrlBase;
 
@@ -331,7 +343,19 @@ public class ClusterSpec {
     setLocationId(getString(Property.LOCATION_ID));
     setBlobStoreLocationId(getString(Property.BLOBSTORE_LOCATION_ID));
     setClientCidrs(getList(Property.CLIENT_CIDRS));
+    
+    Map<String, List<String>> fr = new HashMap<String, List<String>>();
+    String firewallPrefix = Property.FIREWALL_RULES.getConfigName();
+    Pattern firewallRuleKeyPattern = Pattern.compile("^".concat(Pattern.quote(firewallPrefix).concat("(?:-(.+))?$")));
+    for (String key: Iterators.toArray(config.getKeys(), String.class)) {
+      Matcher m = firewallRuleKeyPattern.matcher(key);
+      if (!m.matches()) continue;
 
+      String role = m.group(1);
+      fr.put(role, config.getList(key));
+    }
+    setFirewallRules(fr);
+    
     setVersion(getString(Property.VERSION));
     setRunUrlBase(getString(Property.RUN_URL_BASE));
   }
@@ -592,6 +616,10 @@ public class ClusterSpec {
     return clientCidrs;
   }
 
+  public Map<String, List<String>> getFirewallRules() {
+    return firewallRules;
+  }
+
   public String getVersion() {
     return version;
   }
@@ -772,6 +800,10 @@ public class ClusterSpec {
     this.clientCidrs = clientCidrs;
   }
   
+  public void setFirewallRules(Map<String,List<String>> firewallRules) {
+    this.firewallRules = firewallRules;
+  }
+  
   public void setVersion(String version) {
     this.version = version;
   }
@@ -802,6 +834,18 @@ public class ClusterSpec {
         Iterator<String> it = config.getKeys(prefix); it.hasNext(); ) {
       String key = it.next();
       c.setProperty(key, config.getProperty(key));
+    }
+    return c;
+  }
+  
+  public Configuration getConfigurationForKeysMatching(Pattern pattern) {
+    Configuration c = new PropertiesConfiguration();
+    for (@SuppressWarnings("unchecked")
+        Iterator<String> it = config.getKeys(); it.hasNext(); ) {
+      String key = it.next();
+      if (pattern.matcher(key).matches()) {
+        c.setProperty(key, config.getProperty(key));
+      }
     }
     return c;
   }
