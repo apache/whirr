@@ -147,7 +147,7 @@ public abstract class ClusterActionHandlerSupport extends ClusterActionHandler {
    * @param rawUrl    raw url as provided in the configuration file
    * @return  an URL visible to the install / configure scripts
    */
-  public String prepareRemoteFileUrl(ClusterActionEvent event, String rawUrl)
+  public static String prepareRemoteFileUrl(ClusterActionEvent event, String rawUrl)
       throws IOException {
     if (rawUrl != null && rawUrl.startsWith("file://")) {
       try {

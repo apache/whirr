@@ -49,6 +49,7 @@
     <module>services/voldemort</module>
     <module>services/elasticsearch</module>
     <module>services/hama</module>
+    <module>services/puppet</module>
   </modules>
 
   <properties>
@@ -358,6 +359,7 @@
             <exclude>.git/**</exclude>
             <exclude>.gitignore</exclude>
             <exclude>**/*.json</exclude>
+            <exclude>**/src/test/resources/*.txt</exclude>
             <exclude>**/src/main/resources/version-banner.txt</exclude>
             <exclude>docs/**</exclude>
             <exclude>**/*.log*</exclude>

@@ -64,15 +64,15 @@ public abstract class ScriptBasedClusterAction extends ClusterAction {
           clusterSpec, newCluster);
 
       ClusterActionEvent event = new ClusterActionEvent(getAction(),
-          clusterSpec, newCluster, statementBuilder, getCompute(), firewallManager);
+          clusterSpec, instanceTemplate, newCluster, statementBuilder, getCompute(), firewallManager);
 
       eventMap.put(instanceTemplate, event);
       for (String role : instanceTemplate.getRoles()) {
-        ClusterActionHandler handler = handlerMap.get(role);
-        if (handler == null) {
+        try {
+          handlerMap.get(role).beforeAction(event);
+        } catch (NullPointerException e) {
           throw new IllegalArgumentException("No handler for role " + role);
         }
-        handler.beforeAction(event);
       }
       newCluster = event.getCluster(); // cluster may have been updated by handler 
     }
@@ -84,13 +84,13 @@ public abstract class ScriptBasedClusterAction extends ClusterAction {
 
     for (InstanceTemplate instanceTemplate : clusterSpec.getInstanceTemplates()) {
       for (String role : instanceTemplate.getRoles()) {
-        ClusterActionHandler handler = handlerMap.get(role);
-        if (handler == null) {
-          throw new IllegalArgumentException("No handler for role " + role);
-        }
         ClusterActionEvent event = eventMap.get(instanceTemplate);
         event.setCluster(newCluster);
-        handler.afterAction(event);
+        try {
+          handlerMap.get(role).afterAction(event);
+        } catch (NullPointerException e) {
+          throw new IllegalArgumentException("No handler for role " + role);
+        }
         newCluster = event.getCluster(); // cluster may have been updated by handler 
       }
     }

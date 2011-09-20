@@ -20,6 +20,8 @@ package org.apache.whirr.service;
 
 import java.io.IOException;
 
+import com.google.common.base.Objects;
+
 /**
  * A callback interface for cluster actions that apply to instances in a
  * given role.
@@ -53,4 +55,26 @@ public abstract class ClusterActionHandler {
   public void afterAction(ClusterActionEvent event)
       throws IOException, InterruptedException {
   }
+
+  /**
+   * this uses the inefficient {@link Objects} implementation as the object count will be
+   * relatively small and therefore efficiency is not a concern.
+   */
+  @Override
+  public int hashCode() {
+     return Objects.hashCode(getRole());
+  }
+
+  @Override
+  public boolean equals(Object that) {
+     if (that == null)
+        return false;
+     return Objects.equal(this.toString(), that.toString());
+  }
+
+  @Override
+  public String toString() {
+     return Objects.toStringHelper(this).add("role", getRole()).toString();
+  }
+
 }

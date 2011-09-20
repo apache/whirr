@@ -310,6 +310,24 @@ public class ClusterSpecTest {
       assertThat(spec.getBlobStoreProvider(), is(parts[1]));
     }
   }
+  
+  @Test
+  public void testApplySubroleAliases() {
+    CompositeConfiguration c = new CompositeConfiguration();
+    Configuration config = new PropertiesConfiguration();
+    config.addProperty("whirr.instance-templates", 
+        "1 puppet:somepup::pet+something-else, 1 something-else-only");
+    c.addConfiguration(config);    
+    InstanceTemplate template = InstanceTemplate.parse(c).get(0);
+    Set<String> expected = Sets.newLinkedHashSet(Arrays.asList(new String[]{
+        "puppet:somepup::pet", "something-else"}));
+    assertThat(template.getRoles(), is(expected));
+    
+    InstanceTemplate template2 = InstanceTemplate.parse(c).get(1);
+    Set<String> expected2 = Sets.newLinkedHashSet(Arrays.asList(new String[]{
+        "something-else-only"}));
+    assertThat(template2.getRoles(), is(expected2));
+  }
 
   @Test
   public void testCopySpec() throws Exception {

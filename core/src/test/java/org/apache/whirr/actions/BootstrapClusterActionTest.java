@@ -43,7 +43,9 @@ import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.whirr.ClusterSpec;
+import org.apache.whirr.HandlerMapFactory;
 import org.apache.whirr.service.ClusterActionHandler;
+import org.apache.whirr.service.ClusterActionHandlerFactory;
 import org.jclouds.compute.ComputeService;
 import org.jclouds.compute.ComputeServiceContext;
 import org.jclouds.compute.RunNodesException;
@@ -316,4 +318,122 @@ public class BootstrapClusterActionTest {
       return nodes;
     }
   }
+  
+  @Test
+  @SuppressWarnings("unchecked")
+  public void testSubroleInvoked() throws Exception {
+    CompositeConfiguration config = new CompositeConfiguration();
+    if (System.getProperty("config") != null) {
+      config.addConfiguration(new PropertiesConfiguration(System.getProperty("config")));
+    }
+    Configuration conf = new PropertiesConfiguration();
+    conf.addProperty("whirr.service-name", "test-service");
+    conf.addProperty("whirr.cluster-name", "test-cluster");
+    conf.addProperty("whirr.instance-templates", "1 puppet:module::manifest+something-else");
+    conf.addProperty("whirr.provider", "ec2");
+    config.addConfiguration(conf);
+    ClusterSpec clusterSpec = ClusterSpec.withTemporaryKeys(conf);
+
+    Set<String> nn = new HashSet<String>();
+    nn.add("puppet:module::manifest"); 
+    nn.add("something-else");     
+
+    TestNodeStarterFactory nodeStarterFactory = null;
+    
+    ClusterActionHandlerFactory puppetHandlerFactory = mock(ClusterActionHandlerFactory.class);
+    ClusterActionHandler handler = mock(ClusterActionHandler.class);
+    when(puppetHandlerFactory.getRolePrefix()).thenReturn("puppet:");
+    when(puppetHandlerFactory.create("module::manifest")).thenReturn(handler);
+    when(handler.getRole()).thenReturn("something-else");
+
+    Map<String, ClusterActionHandler> handlerMap = HandlerMapFactory.create(ImmutableSet.of(puppetHandlerFactory),
+          ImmutableSet.of(handler));
+
+    Function<ClusterSpec, ComputeServiceContext> getCompute = mock(Function.class);
+    ComputeServiceContext serviceContext = mock(ComputeServiceContext.class);
+    ComputeService computeService = mock(ComputeService.class);
+    TemplateBuilder templateBuilder = mock(TemplateBuilder.class);
+    Template template = mock(Template.class);
+
+    when(getCompute.apply(clusterSpec)).thenReturn(serviceContext);
+    when(serviceContext.getComputeService()).thenReturn(computeService);
+    when(computeService.templateBuilder()).thenReturn(templateBuilder);
+    when(templateBuilder.options((TemplateOptions) any())).thenReturn(templateBuilder);
+    when(templateBuilder.build()).thenReturn(template);
+    
+    Map<Set<String>, Stack<Integer>> reaction = Maps.newHashMap();
+    Stack<Integer> nnStack = new Stack<Integer>();
+    nnStack.push(new Integer(1));
+    reaction.put(nn, nnStack);
+    
+    nodeStarterFactory = new TestNodeStarterFactory(reaction);
+    BootstrapClusterAction bootstrapper = new BootstrapClusterAction(getCompute, handlerMap, nodeStarterFactory);
+    
+    bootstrapper.execute(clusterSpec, null);
+    
+    if (nodeStarterFactory != null) {
+      nodeStarterFactory.validateCompletion();
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  @Test(expected = IllegalArgumentException.class)
+  /** test is the same as previous (SubroleInvoked) except it knows puppet, not puppet:, as the role;
+   * the colon in the role def'n is the indication it accepts subroles,
+   * so this should throw IllegalArgument when we refer to puppet:module...
+   */
+  public void testSubroleNotSupported() throws Exception {
+    CompositeConfiguration config = new CompositeConfiguration();
+    if (System.getProperty("config") != null) {
+      config.addConfiguration(new PropertiesConfiguration(System.getProperty("config")));
+    }
+    Configuration conf = new PropertiesConfiguration();
+    conf.addProperty("whirr.service-name", "test-service");
+    conf.addProperty("whirr.cluster-name", "test-cluster");
+    conf.addProperty("whirr.instance-templates", "1 puppet:module::manifest+something-else");
+    conf.addProperty("whirr.provider", "ec2");
+    config.addConfiguration(conf);
+    ClusterSpec clusterSpec = ClusterSpec.withTemporaryKeys(conf);
+
+    Set<String> nn = new HashSet<String>();
+    nn.add("puppet:module::manifest"); 
+    nn.add("something-else");     
+
+    TestNodeStarterFactory nodeStarterFactory = null;
+    
+    ClusterActionHandlerFactory puppetHandlerFactory = mock(ClusterActionHandlerFactory.class);
+    ClusterActionHandler handler = mock(ClusterActionHandler.class);
+    when(puppetHandlerFactory.getRolePrefix()).thenReturn("puppet");
+    when(handler.getRole()).thenReturn("something-else");
+
+    Map<String, ClusterActionHandler> handlerMap = HandlerMapFactory.create(ImmutableSet.of(puppetHandlerFactory),
+          ImmutableSet.of(handler));
+
+    Function<ClusterSpec, ComputeServiceContext> getCompute = mock(Function.class);
+    ComputeServiceContext serviceContext = mock(ComputeServiceContext.class);
+    ComputeService computeService = mock(ComputeService.class);
+    TemplateBuilder templateBuilder = mock(TemplateBuilder.class);
+    Template template = mock(Template.class);
+
+
+    when(getCompute.apply(clusterSpec)).thenReturn(serviceContext);
+    when(serviceContext.getComputeService()).thenReturn(computeService);
+    when(computeService.templateBuilder()).thenReturn(templateBuilder);
+    when(templateBuilder.options((TemplateOptions) any())).thenReturn(templateBuilder);
+    when(templateBuilder.build()).thenReturn(template);
+    
+    Map<Set<String>, Stack<Integer>> reaction = Maps.newHashMap();
+    Stack<Integer> nnStack = new Stack<Integer>();
+    nnStack.push(new Integer(1));
+    reaction.put(nn, nnStack);
+    
+    nodeStarterFactory = new TestNodeStarterFactory(reaction);
+    BootstrapClusterAction bootstrapper = new BootstrapClusterAction(getCompute, handlerMap, nodeStarterFactory);
+    
+    bootstrapper.execute(clusterSpec, null);
+    
+    if (nodeStarterFactory != null) {
+      nodeStarterFactory.validateCompletion();
+    }
+  }  
 }

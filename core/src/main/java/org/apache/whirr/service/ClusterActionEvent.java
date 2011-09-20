@@ -20,6 +20,7 @@ package org.apache.whirr.service;
 
 import org.apache.whirr.Cluster;
 import org.apache.whirr.ClusterSpec;
+import org.apache.whirr.InstanceTemplate;
 import org.apache.whirr.service.jclouds.StatementBuilder;
 import org.apache.whirr.service.jclouds.TemplateBuilderStrategy;
 import org.jclouds.compute.ComputeServiceContext;
@@ -33,6 +34,7 @@ public class ClusterActionEvent {
   
   private String action;
   private ClusterSpec clusterSpec;
+  private InstanceTemplate instanceTemplate;
   private Cluster cluster;
   private StatementBuilder statementBuilder;
   private TemplateBuilderStrategy templateBuilderStrategy =
@@ -41,17 +43,19 @@ public class ClusterActionEvent {
   private Function<ClusterSpec, ComputeServiceContext> getCompute;
   
   public ClusterActionEvent(String action, ClusterSpec clusterSpec,
-      Cluster cluster, Function<ClusterSpec, ComputeServiceContext> getCompute,
+      InstanceTemplate instanceTemplate, Cluster cluster, 
+      Function<ClusterSpec, ComputeServiceContext> getCompute,
       FirewallManager firewallManager) {
-    this(action, clusterSpec, cluster, null, getCompute, firewallManager);
+    this(action, clusterSpec, instanceTemplate, cluster, null, getCompute, firewallManager);
   }
   
   public ClusterActionEvent(String action, ClusterSpec clusterSpec,
-      Cluster cluster, StatementBuilder statementBuilder,
+      InstanceTemplate instanceTemplate, Cluster cluster, StatementBuilder statementBuilder,
       Function<ClusterSpec, ComputeServiceContext> getCompute,
       FirewallManager firewallManager) {
     this.action = action;
     this.clusterSpec = clusterSpec;
+    this.instanceTemplate = instanceTemplate;
     this.cluster = cluster;
     this.statementBuilder = statementBuilder;
     this.getCompute = getCompute;
@@ -72,6 +76,10 @@ public class ClusterActionEvent {
 
   public ClusterSpec getClusterSpec() {
     return clusterSpec;
+  }
+  
+  public InstanceTemplate getInstanceTemplate() {
+    return instanceTemplate;
   }
   
   public Function<ClusterSpec, ComputeServiceContext> getCompute() {
