@@ -559,13 +559,13 @@ xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 http://maven.apache.org/xsd
       </tr>
       <tr valign="top">
         <td>
-          <tt>whirr.firewall-rules-{role}</tt>
+          <tt>whirr.firewall-rules.{role}</tt>
         </td>
         <td>
-          <tt>--firewall-rules-{role}</tt>
+          <tt>--firewall-rules.{role}</tt>
         </td>
         <td>none</td>
-        <td>A comma-separated list of port numbers to open on instances with a specific role. Replace {role} the actual role name. E.g. <tt>whirr.firewall-rules-hbase-master=10101</tt>.</td>
+        <td>A comma-separated list of port numbers to open on instances with a specific role. Replace {role} the actual role name. E.g. <tt>whirr.firewall-rules.hbase-master=10101</tt>.</td>
       </tr>
     </table>
     <p>

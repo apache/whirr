@@ -346,7 +346,7 @@ public class ClusterSpec {
     
     Map<String, List<String>> fr = new HashMap<String, List<String>>();
     String firewallPrefix = Property.FIREWALL_RULES.getConfigName();
-    Pattern firewallRuleKeyPattern = Pattern.compile("^".concat(Pattern.quote(firewallPrefix).concat("(?:-(.+))?$")));
+    Pattern firewallRuleKeyPattern = Pattern.compile("^".concat(Pattern.quote(firewallPrefix).concat("(?:\\.(.+))?$")));
     for (String key: Iterators.toArray(config.getKeys(), String.class)) {
       Matcher m = firewallRuleKeyPattern.matcher(key);
       if (!m.matches()) continue;

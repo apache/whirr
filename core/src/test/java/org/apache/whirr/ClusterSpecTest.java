@@ -344,7 +344,7 @@ public class ClusterSpecTest {
   public void testFirewallRules() throws Exception {
     PropertiesConfiguration conf = new PropertiesConfiguration("whirr-core-test.properties");
     conf.setProperty("whirr.firewall-rules", "8000,8001");
-    conf.setProperty("whirr.firewall-rules-serviceA", "9000,9001");
+    conf.setProperty("whirr.firewall-rules.serviceA", "9000,9001");
     ClusterSpec spec = ClusterSpec.withTemporaryKeys(
         conf);
     
