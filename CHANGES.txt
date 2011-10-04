@@ -22,6 +22,8 @@ Trunk (unreleased changes)
 
     WHIRR-382. Upgrade to Commons Configuration 1.7 (asavu)
 
+    WHIRR-340. Use spot instances for testing (asavu)
+
   BUG FIXES
 
     WHIRR-377. Fix broken CLI logging config. (asavu via tomwhite)
