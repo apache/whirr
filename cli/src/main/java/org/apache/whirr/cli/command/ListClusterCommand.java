@@ -70,7 +70,7 @@ public class ListClusterCommand extends AbstractClusterCommand {
       ClusterController controller = createClusterController(clusterSpec.getServiceName());
 
       for (Cluster.Instance instance : controller.getInstances(clusterSpec, stateStore)) {
-        out.println(Joiner.on('\t').join(
+        out.println(Joiner.on('\t').useForNull("-").join(
             instance.getId(),
             instance.getNodeMetadata().getImageId(),
             instance.getPublicIp(),

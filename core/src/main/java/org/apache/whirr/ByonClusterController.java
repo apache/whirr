@@ -23,19 +23,37 @@ import static org.apache.whirr.service.ClusterActionHandler.CONFIGURE_ACTION;
 import static org.apache.whirr.service.ClusterActionHandler.DESTROY_ACTION;
 
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.whirr.Cluster.Instance;
 import org.apache.whirr.actions.ByonClusterAction;
 import org.apache.whirr.service.ClusterActionHandler;
+import org.jclouds.compute.ComputeService;
+import org.jclouds.compute.ComputeServiceContext;
+import org.jclouds.compute.RunScriptOnNodesException;
+import org.jclouds.compute.domain.ExecResponse;
 import org.jclouds.compute.domain.NodeMetadata;
+import org.jclouds.compute.domain.NodeState;
+import org.jclouds.compute.options.RunScriptOptions;
+import org.jclouds.scriptbuilder.domain.Statement;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.base.Function;
+import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
+import com.google.common.collect.Collections2;
 
 /**
  * Equivalent of {@link ClusterController}, but for execution in BYON mode
  * ("bring your own nodes").
  */
 public class ByonClusterController extends ClusterController {
-  
+
+  private static final Logger LOG = LoggerFactory.getLogger(ClusterController.class);
+
   @Override
   public String getName() {
     return "byon";
@@ -53,6 +71,8 @@ public class ByonClusterController extends ClusterController {
     ClusterAction configurer = new ByonClusterAction(CONFIGURE_ACTION, getCompute(), handlerMap);
     cluster = configurer.execute(clusterSpec, cluster);
 
+    getClusterStateStore(clusterSpec).save(cluster);
+    
     return cluster;
   }
 
@@ -65,6 +85,32 @@ public class ByonClusterController extends ClusterController {
     destroyer.execute(clusterSpec, null);
   }
   
+  public Map<? extends NodeMetadata, ExecResponse> runScriptOnNodesMatching(final ClusterSpec spec,
+      Predicate<NodeMetadata> condition, final Statement statement) throws IOException, RunScriptOnNodesException {
+    
+    ComputeServiceContext computeServiceContext = getCompute().apply(spec);
+    ComputeService computeService = computeServiceContext.getComputeService();
+    Cluster cluster = getClusterStateStore(spec).load();
+
+    RunScriptOptions options = RunScriptOptions.Builder.runAsRoot(false).wrapInInitScript(false);
+    return computeService.runScriptOnNodesMatching(Predicates.<NodeMetadata>and(condition, runningIn(cluster)), statement, options);
+  }
+
+  private Predicate<NodeMetadata> runningIn(Cluster cluster) {
+    final Set<String> instanceIds = new HashSet<String>(Collections2.transform(cluster.getInstances(), new Function<Instance, String>() {
+      @Override
+      public String apply(Instance instance) {
+        return instance.getId();
+      }
+    }));
+    return new Predicate<NodeMetadata>() {
+      @Override
+      public boolean apply(final NodeMetadata nodeMetadata) {
+        return instanceIds.contains(nodeMetadata.getId()) && nodeMetadata.getState().equals(NodeState.RUNNING);
+      }
+    };
+  }
+
   @Override
   public void destroyInstance(ClusterSpec clusterSpec, String instanceId)
       throws IOException {
@@ -74,7 +120,8 @@ public class ByonClusterController extends ClusterController {
   @Override
   public Set<? extends NodeMetadata> getNodes(ClusterSpec clusterSpec)
       throws IOException, InterruptedException {
-    // TODO return singleton with trivial NodeMetadata for localhost?
-    return null;
+    ComputeServiceContext computeServiceContext = getCompute().apply(clusterSpec);
+    ComputeService computeService = computeServiceContext.getComputeService();
+    return computeService.listNodesDetailsMatching(Predicates.in(computeService.listNodes()));
   }
 }

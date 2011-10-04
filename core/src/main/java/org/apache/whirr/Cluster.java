@@ -65,9 +65,11 @@ public class Cluster {
       this.publicIp = checkNotNull(publicIp, "publicIp");
       checkArgument(InetAddresses.isInetAddress(publicIp),
           "invalid IP address: %s", publicIp);
-      this.privateIp = checkNotNull(privateIp, "privateIp");
-      checkArgument(InetAddresses.isInetAddress(privateIp),
-          "invalid IP address: %s", privateIp);
+      this.privateIp = privateIp;
+      if (privateIp != null) {
+        checkArgument(InetAddresses.isInetAddress(privateIp),
+            "invalid IP address: %s", privateIp);
+      }
       this.id = checkNotNull(id, "id");
       this.nodeMetadata = nodeMetadata;
     }

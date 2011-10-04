@@ -108,7 +108,7 @@ public class ClusterController {
     ConfigureClusterAction configurer = new ConfigureClusterAction(getCompute(), handlerMap);
     cluster = configurer.execute(clusterSpec, cluster);
 
-    stateStoreFactory.create(clusterSpec).save(cluster);
+    getClusterStateStore(clusterSpec).save(cluster);
 
     return cluster;
   }
@@ -126,7 +126,7 @@ public class ClusterController {
     DestroyClusterAction destroyer = new DestroyClusterAction(getCompute());
     destroyer.execute(clusterSpec, null);
 
-    stateStoreFactory.create(clusterSpec).destroy();
+    getClusterStateStore(clusterSpec).destroy();
   }
 
   public void destroyInstance(ClusterSpec clusterSpec, String instanceId) throws IOException {
@@ -137,12 +137,16 @@ public class ClusterController {
     computeService.destroyNode(instanceId);
 
     /* .. and update the cluster state storage */
-    ClusterStateStore store = stateStoreFactory.create(clusterSpec);
+    ClusterStateStore store = getClusterStateStore(clusterSpec);
     Cluster cluster = store.load();
     cluster.removeInstancesMatching(withIds(instanceId));
     store.save(cluster);
 
     LOG.info("Instance {} destroyed", instanceId);
+  }
+  
+  public ClusterStateStore getClusterStateStore(ClusterSpec clusterSpec) {
+    return stateStoreFactory.create(clusterSpec);
   }
 
   public Map<? extends NodeMetadata, ExecResponse> runScriptOnNodesMatching(ClusterSpec spec,

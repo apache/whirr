@@ -18,6 +18,8 @@ Trunk (unreleased changes)
 
     WHIRR-371. Allow defining additional firewall rules (kve)
 
+    WHIRR-376. Launching a BYON cluster doesn't produce an instances file. (kve)
+
   BUG FIXES
 
     WHIRR-377. Fix broken CLI logging config. (asavu via tomwhite)
