@@ -20,6 +20,8 @@ Trunk (unreleased changes)
 
     WHIRR-376. Launching a BYON cluster doesn't produce an instances file. (kve)
 
+    WHIRR-382. Upgrade to Commons Configuration 1.7 (asavu)
+
   BUG FIXES
 
     WHIRR-377. Fix broken CLI logging config. (asavu via tomwhite)

@@ -100,12 +100,15 @@ public class ClusterSpecTest {
   public void testEnvVariableInterpolation() {
     Map<String, String> envMap = System.getenv();
     assertThat(envMap.isEmpty(), is(false));
+
     String undefinedEnvVar = "UNDEFINED_ENV_VAR";
     assertThat(envMap.containsKey(undefinedEnvVar), is(false));
+
     Entry<String, String> firstEntry = Iterables.get(envMap.entrySet(), 0);
     Configuration conf = new PropertiesConfiguration();
     conf.setProperty("a", String.format("${env:%s}", firstEntry.getKey()));
     conf.setProperty("b", String.format("${env:%s}", undefinedEnvVar));
+
     assertThat(conf.getString("a"), is(firstEntry.getValue()));
     assertThat(conf.getString("b"),
         is(String.format("${env:%s}", undefinedEnvVar)));

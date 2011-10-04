@@ -62,19 +62,7 @@ import com.jcraft.jsch.KeyPair;
 public class ClusterSpec {
   
   private static final Logger LOG = LoggerFactory.getLogger(ClusterSpec.class);
-  
-  static {
-    // Environment variable interpolation (e.g. {env:MY_VAR}) is supported
-    // natively in Commons Configuration 1.7, but until it's released we
-    // do it ourselves here
-    ConfigurationInterpolator.registerGlobalLookup("env", new StrLookup() {
-      @Override
-      public String lookup(String key) {
-        return System.getenv(key);
-      }
-    });
-  }
-  
+
   public enum Property {
     CLUSTER_NAME(String.class, false,  "The name of the cluster " +
       "to operate on. E.g. hadoopcluster."),
