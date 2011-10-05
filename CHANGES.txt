@@ -24,6 +24,8 @@ Trunk (unreleased changes)
 
     WHIRR-340. Use spot instances for testing (asavu)
 
+    WHIRR-387. Add Website Navigation Links (asavu)
+
   BUG FIXES
 
     WHIRR-377. Fix broken CLI logging config. (asavu via tomwhite)
