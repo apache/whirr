@@ -6,6 +6,8 @@ Release 0.6.1 (unreleased changes)
 
     WHIRR-116. Site should have docs for each released version. (tomwhite)
 
+    WHIRR-387. Add Website Navigation Links. (asavu)
+
 Release 0.6.0 - 2011-08-17
 
   NEW FEATURES
