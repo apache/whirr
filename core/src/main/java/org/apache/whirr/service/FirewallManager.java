@@ -23,6 +23,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
+import com.google.common.base.Function;
+import com.google.common.collect.Iterables;
 import org.apache.whirr.Cluster;
 import org.apache.whirr.Cluster.Instance;
 import org.apache.whirr.ClusterSpec;
@@ -34,6 +36,8 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+
+import javax.annotation.Nullable;
 
 public class FirewallManager {
 
@@ -133,10 +137,11 @@ public class FirewallManager {
   }
   
   /**
-   * Rules are additive. If no
-   * source is set then it will default to {@link ClusterSpec#getClientCidrs()},
-   * or, if that is not set, to the client's originating IP.
-   * If no destinations or ports are set then the rule has not effect.
+   * Rules are additive. If no source is set then it will default
+   * to {@link ClusterSpec#getClientCidrs()}, or, if that is not set,
+   * to the client's originating IP. If no destinations or ports
+   * are set then the rule has not effect.
+   *
    * @param rule The rule to add to the firewall. 
    * @throws IOException
    */
@@ -157,8 +162,18 @@ public class FirewallManager {
     } else {
       cidrs = Lists.newArrayList(rule.source + "/32");
     }
+
+    Iterable<String> instanceIds =
+      Iterables.transform(instances, new Function<Instance, String>() {
+        @Override
+        public String apply(@Nullable Instance instance) {
+          return instance == null ? "<null>" : instance.getId();
+        }
+      });
+
     LOG.info("Authorizing firewall ingress to {} on ports {} for {}",
-        new Object[] { instances, rule.ports, cidrs });
+        new Object[] { instanceIds, rule.ports, cidrs });
+
     FirewallSettings.authorizeIngress(computeServiceContext, instances,
         clusterSpec, cidrs, rule.ports);
   }

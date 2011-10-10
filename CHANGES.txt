@@ -26,6 +26,9 @@ Trunk (unreleased changes)
 
     WHIRR-387. Add Website Navigation Links (asavu)
 
+    WHIRR-395. Less verbose logging when setting firewall rules.
+    (asavu via tomwhite)
+
   BUG FIXES
 
     WHIRR-377. Fix broken CLI logging config. (asavu via tomwhite)
