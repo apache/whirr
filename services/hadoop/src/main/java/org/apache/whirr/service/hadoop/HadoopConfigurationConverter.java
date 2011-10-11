@@ -38,7 +38,7 @@ public class HadoopConfigurationConverter {
   private static final String FINAL_SUFFIX = ".final";
 
   @VisibleForTesting
-  static List<String> asLinesInFile(Configuration hadoopConfig) {
+  static List<String> asXmlConfigurationLines(Configuration hadoopConfig) {
     List<String> lines = Lists.newArrayList();
     lines.add("<configuration>");
     for (@SuppressWarnings("unchecked")
@@ -64,9 +64,36 @@ public class HadoopConfigurationConverter {
     return lines;
   }
   
-  public static Statement asCreateFileStatement(String path, 
+  public static Statement asCreateXmlConfigurationFileStatement(String path, 
       Configuration hadoopConfig) {
-    return Statements.appendFile(path, asLinesInFile(hadoopConfig));
+    return Statements.appendFile(path, asXmlConfigurationLines(hadoopConfig));
   }
 
+  @VisibleForTesting
+  static List<String> asEnvironmentVariablesLines(Configuration hadoopConfig) {
+    List<String> lines = Lists.newArrayList();
+    
+    for (@SuppressWarnings("unchecked")
+        Iterator<String> it = hadoopConfig.getKeys(); it.hasNext(); ) {
+      String key = it.next();
+      if (key.endsWith(FINAL_SUFFIX)) {
+        continue;
+      }
+
+      // Write the export line. We only allow one value per key 
+      String value = hadoopConfig.getString(key);
+      lines.add(new StringBuilder("export ")
+            .append(key)
+            .append("=\"")
+            .append(value)
+            .append("\"").toString());
+    }
+    return lines;
+  }
+  
+  public static Statement asCreateEnvironmentVariablesFileStatement(String path, 
+      Configuration config) {
+    return Statements.appendFile(path, asEnvironmentVariablesLines(config));
+  }
+  
 }

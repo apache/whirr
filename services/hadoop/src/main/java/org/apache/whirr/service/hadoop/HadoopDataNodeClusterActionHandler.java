@@ -21,6 +21,7 @@ package org.apache.whirr.service.hadoop;
 import static org.apache.whirr.service.hadoop.HadoopConfigurationBuilder.buildCommon;
 import static org.apache.whirr.service.hadoop.HadoopConfigurationBuilder.buildHdfs;
 import static org.apache.whirr.service.hadoop.HadoopConfigurationBuilder.buildMapReduce;
+import static org.apache.whirr.service.hadoop.HadoopConfigurationBuilder.buildHadoopEnv;
 import static org.jclouds.scriptbuilder.domain.Statements.call;
 
 import java.io.IOException;
@@ -49,7 +50,8 @@ public class HadoopDataNodeClusterActionHandler extends HadoopClusterActionHandl
       event.getStatementBuilder().addStatements(
         buildCommon("/tmp/core-site.xml", clusterSpec, cluster),
         buildHdfs("/tmp/hdfs-site.xml", clusterSpec, cluster),
-        buildMapReduce("/tmp/mapred-site.xml", clusterSpec, cluster)
+        buildMapReduce("/tmp/mapred-site.xml", clusterSpec, cluster),
+        buildHadoopEnv("/tmp/hadoop-env.sh", clusterSpec, cluster)
       );
     } catch (ConfigurationException e) {
       throw new IOException(e);

@@ -36,7 +36,7 @@ public class HadoopConfigurationConverterTest {
     Configuration conf = new PropertiesConfiguration();
     conf.setProperty("p1", "v1,v2");
     conf.setProperty("p2", "v3");
-    List<String> lines = HadoopConfigurationConverter.asLinesInFile(conf);
+    List<String> lines = HadoopConfigurationConverter.asXmlConfigurationLines(conf);
     assertThat(lines, is((List<String>) Lists.newArrayList(
         "<configuration>",
         "  <property>",
@@ -57,7 +57,7 @@ public class HadoopConfigurationConverterTest {
     conf.setProperty("p1", "v1");
     conf.setProperty("p2", "v2");
     conf.setProperty("p2.final", "true");
-    List<String> lines = HadoopConfigurationConverter.asLinesInFile(conf);
+    List<String> lines = HadoopConfigurationConverter.asXmlConfigurationLines(conf);
     assertThat(lines, is((List<String>) Lists.newArrayList(
         "<configuration>",
         "  <property>",

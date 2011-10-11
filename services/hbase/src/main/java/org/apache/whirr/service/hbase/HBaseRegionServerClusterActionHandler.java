@@ -20,12 +20,14 @@ package org.apache.whirr.service.hbase;
 
 import static org.apache.whirr.RolePredicates.role;
 import static org.apache.whirr.service.FirewallManager.Rule;
+import static org.apache.whirr.service.hbase.HBaseConfigurationBuilder.buildHBaseEnv;
 import static org.apache.whirr.service.hbase.HBaseConfigurationBuilder.buildHBaseSite;
 import static org.jclouds.scriptbuilder.domain.Statements.call;
 
 import java.io.IOException;
 import java.net.InetAddress;
 
+import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.whirr.Cluster;
 import org.apache.whirr.Cluster.Instance;
@@ -70,6 +72,7 @@ public class HBaseRegionServerClusterActionHandler extends HBaseClusterActionHan
       throws IOException, InterruptedException {
     ClusterSpec clusterSpec = event.getClusterSpec();
     Cluster cluster = event.getCluster();
+    Configuration conf = getConfiguration(clusterSpec);
 
     Instance instance = cluster.getInstanceMatching(
       role(HBaseMasterClusterActionHandler.ROLE));
@@ -82,8 +85,9 @@ public class HBaseRegionServerClusterActionHandler extends HBaseClusterActionHan
     );
 
     try {
-      event.getStatementBuilder().addStatement(
-        buildHBaseSite("/tmp/hbase-site.xml", clusterSpec, cluster)
+      event.getStatementBuilder().addStatements(
+          buildHBaseSite("/tmp/hbase-site.xml", clusterSpec, cluster),
+          buildHBaseEnv("/tmp/hbase-env.sh", clusterSpec, cluster)
       );
     } catch (ConfigurationException e) {
       throw new IOException(e);
@@ -93,10 +97,10 @@ public class HBaseRegionServerClusterActionHandler extends HBaseClusterActionHan
     String quorum = ZooKeeperCluster.getHosts(cluster);
 
     String tarurl = prepareRemoteFileUrl(event,
-      getConfiguration(clusterSpec).getString(HBaseConstants.KEY_TARBALL_URL));
+      conf.getString(HBaseConstants.KEY_TARBALL_URL));
 
     addStatement(event, call(
-      getConfigureFunction(getConfiguration(clusterSpec)),
+      getConfigureFunction(conf),
       ROLE,
       HBaseConstants.PARAM_MASTER, master,
       HBaseConstants.PARAM_QUORUM, quorum,

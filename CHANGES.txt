@@ -29,6 +29,9 @@ Trunk (unreleased changes)
     WHIRR-395. Less verbose logging when setting firewall rules.
     (asavu via tomwhite)
 
+    WHIRR-368. Add the ability to adjust contents of hadoop-env.sh from 
+    a cluster properties file (Karel Vervaeke via asavu)
+
   BUG FIXES
 
     WHIRR-377. Fix broken CLI logging config. (asavu via tomwhite)

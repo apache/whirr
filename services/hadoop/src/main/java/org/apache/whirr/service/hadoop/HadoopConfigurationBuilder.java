@@ -56,21 +56,28 @@ public class HadoopConfigurationBuilder {
       Cluster cluster) throws ConfigurationException, IOException {
     Configuration config = buildCommonConfiguration(clusterSpec, cluster,
         new PropertiesConfiguration(WHIRR_HADOOP_DEFAULT_PROPERTIES));
-    return HadoopConfigurationConverter.asCreateFileStatement(path, config);
+    return HadoopConfigurationConverter.asCreateXmlConfigurationFileStatement(path, config);
   }
   
   public static Statement buildHdfs(String path, ClusterSpec clusterSpec,
       Cluster cluster) throws ConfigurationException, IOException {
     Configuration config = buildHdfsConfiguration(clusterSpec, cluster,
         new PropertiesConfiguration(WHIRR_HADOOP_DEFAULT_PROPERTIES));
-    return HadoopConfigurationConverter.asCreateFileStatement(path, config);
+    return HadoopConfigurationConverter.asCreateXmlConfigurationFileStatement(path, config);
   }
   
   public static Statement buildMapReduce(String path, ClusterSpec clusterSpec,
       Cluster cluster) throws ConfigurationException, IOException {
     Configuration config = buildMapReduceConfiguration(clusterSpec, cluster,
         new PropertiesConfiguration(WHIRR_HADOOP_DEFAULT_PROPERTIES));
-    return HadoopConfigurationConverter.asCreateFileStatement(path, config);
+    return HadoopConfigurationConverter.asCreateXmlConfigurationFileStatement(path, config);
+  }
+  
+  public static Statement buildHadoopEnv(String path, ClusterSpec clusterSpec,
+      Cluster cluster) throws ConfigurationException, IOException {
+    Configuration config = buildHadoopEnvConfiguration(clusterSpec, cluster,
+        new PropertiesConfiguration(WHIRR_HADOOP_DEFAULT_PROPERTIES));
+    return HadoopConfigurationConverter.asCreateEnvironmentVariablesFileStatement(path, config);
   }
   
   @VisibleForTesting
@@ -130,6 +137,12 @@ public class HadoopConfigurationBuilder {
     config.setProperty("mapred.job.tracker", String.format("%s:8021",
         jobtracker.getPublicAddress().getHostName()));
     return config;
+  }
+
+  @VisibleForTesting
+  static Configuration buildHadoopEnvConfiguration(ClusterSpec clusterSpec,
+      Cluster cluster, Configuration defaults) throws ConfigurationException {
+    return build(clusterSpec, cluster, defaults, "hadoop-env");
   }
   
   private static void setIfAbsent(Configuration config, String property, String value) {

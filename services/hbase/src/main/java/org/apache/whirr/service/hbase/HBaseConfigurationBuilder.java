@@ -37,7 +37,7 @@ public class HBaseConfigurationBuilder {
       throws ConfigurationException, IOException {
     Configuration config = buildHBaseSiteConfiguration(clusterSpec, cluster,
         new PropertiesConfiguration(HBaseConstants.FILE_HBASE_DEFAULT_PROPERTIES));
-    return HadoopConfigurationConverter.asCreateFileStatement(path, config);
+    return HadoopConfigurationConverter.asCreateXmlConfigurationFileStatement(path, config);
   }
 
   static Configuration buildHBaseSiteConfiguration(ClusterSpec clusterSpec, Cluster cluster, Configuration defaults)
@@ -50,6 +50,20 @@ public class HBaseConfigurationBuilder {
 
     config.setProperty("hbase.rootdir", String.format("hdfs://%s:8020/hbase", masterHostName));
     config.setProperty("hbase.zookeeper.quorum", ZooKeeperCluster.getHosts(cluster));
+
+    return config;
+  }
+
+  public static Statement buildHBaseEnv(String path, ClusterSpec clusterSpec, Cluster cluster)
+      throws ConfigurationException, IOException {
+    Configuration config = buildHBaseEnvConfiguration(clusterSpec, cluster,
+        new PropertiesConfiguration(HBaseConstants.FILE_HBASE_DEFAULT_PROPERTIES));
+    return HadoopConfigurationConverter.asCreateEnvironmentVariablesFileStatement(path, config);
+  }
+
+  static Configuration buildHBaseEnvConfiguration(ClusterSpec clusterSpec, Cluster cluster, Configuration defaults)
+      throws ConfigurationException, IOException {
+    Configuration config = build(clusterSpec, cluster, defaults, "hbase-env");
 
     return config;
   }

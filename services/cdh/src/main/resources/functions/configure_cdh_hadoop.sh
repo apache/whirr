@@ -51,6 +51,7 @@ function configure_cdh_hadoop() {
 
   # Copy generated configuration files in place
   cp /tmp/{core,hdfs,mapred}-site.xml $HADOOP_CONF_DIR
+  cp /tmp/hadoop-env.sh $HADOOP_CONF_DIR
 
   # Expose /metrics URL endpoint
   cat > $HADOOP_CONF_DIR/hadoop-metrics.properties <<EOF
@@ -61,21 +62,26 @@ jvm.class=org.apache.hadoop.metrics.spi.NoEmitMetricsContext
 rpc.class=org.apache.hadoop.metrics.spi.NoEmitMetricsContext
 EOF
 
-  # Set SSH options within the cluster
-  sed -i -e 's|# export HADOOP_SSH_OPTS=.*|export HADOOP_SSH_OPTS="-o StrictHostKeyChecking=no"|' \
-    $HADOOP_CONF_DIR/hadoop-env.sh
-    
-  # Disable IPv6
-  sed -i -e 's|# Extra Java runtime options.  Empty by default.|# Extra Java runtime options.  Empty by default.\nexport HADOOP_OPTS="$HADOOP_OPTS -Djava.net.preferIPv4Stack=true"|' \
-    $HADOOP_CONF_DIR/hadoop-env.sh
+  # Keep PID files in a non-temporary directory
+  HADOOP_PID_DIR=$(. /tmp/hadoop-env.sh; echo $HADOOP_PID_DIR)
+  HADOOP_PID_DIR=${HADOOP_PID_DIR:-/var/run/hadoop}
+  mkdir -p $HADOOP_PID_DIR
+  chgrp -R hadoop $HADOOP_PID_DIR
+  chmod -R g+w $HADOOP_PID_DIR
 
-  # Hadoop logs should be on the /data partition
-  rm -rf /var/log/hadoop-0.20
+  # Create the actual log dir
   mkdir -p /data/hadoop/logs
-  chmod g+w /data/hadoop/logs
   chgrp -R hadoop /data/hadoop/logs
-  ln -s /data/hadoop/logs /var/log/hadoop-0.20
-  chgrp -R hadoop /var/log/hadoop /var/log/hadoop-0.20
+  chmod -R g+w /data/hadoop/logs
+
+  # Create a symlink at $HADOOP_LOG_DIR
+  HADOOP_LOG_DIR=$(. /tmp/hadoop-env.sh; echo $HADOOP_LOG_DIR)
+  HADOOP_LOG_DIR=${HADOOP_LOG_DIR:-/var/log/hadoop/logs}
+  rm -rf $HADOOP_LOG_DIR
+  mkdir -p $(dirname $HADOOP_LOG_DIR)
+  ln -s /data/hadoop/logs $HADOOP_LOG_DIR
+  chgrp -R hadoop $HADOOP_LOG_DIR
+  chmod -R $HADOOP_LOG_DIR
 
   for role in $(echo "$ROLES" | tr "," "\n"); do
     case $role in
