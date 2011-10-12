@@ -30,7 +30,6 @@ public class HamaConstants {
   public static final String FUNCTION_POST_CONFIGURE = "configure_hama";
   public static final String FUNCTION_START = "start_hama";
   
-  public static final String PARAM_PROVIDER = "-c";
   public static final String PARAM_MASTER = "-m";
   public static final String PARAM_QUORUM = "-q";
   public static final String PARAM_TARBALL_URL = "-u";

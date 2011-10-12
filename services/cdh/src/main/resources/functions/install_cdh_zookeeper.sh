@@ -40,15 +40,6 @@ function install_cdh_zookeeper() {
   local OPTIND
   local OPTARG
   
-  CLOUD_PROVIDER=
-  while getopts "c:u:" OPTION; do
-    case $OPTION in
-    c)
-      CLOUD_PROVIDER="$OPTARG"
-      ;;
-    esac
-  done
-  
   case $CLOUD_PROVIDER in
     ec2 | aws-ec2 )
       # Alias /mnt as /data

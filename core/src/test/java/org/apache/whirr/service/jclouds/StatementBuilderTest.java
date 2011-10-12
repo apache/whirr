@@ -23,25 +23,32 @@ import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
-import java.io.IOException;
-
+import org.apache.whirr.ClusterSpec;
 import org.jclouds.scriptbuilder.domain.OsFamily;
 import org.junit.Test;
 
 public class StatementBuilderTest {
   
   @Test
-  public void testDeduplication() throws IOException {
+  public void testDeduplication() throws Exception {
+    ClusterSpec clusterSpec = ClusterSpec.withTemporaryKeys();
+
+    clusterSpec.setClusterName("test-cluster");
+    clusterSpec.setProvider("test-provider");
+
     StatementBuilder builder = new StatementBuilder();
+
     builder.addStatement(
         new RunUrlStatement(false, "http://example.org/", "a/b", "c"));
     builder.addStatement(
         new RunUrlStatement(false, "http://example.org/", "d/e", "f"));
     builder.addStatement(
         new RunUrlStatement(false, "http://example.org/", "a/b", "c"));
-    String script = builder.render(OsFamily.UNIX);
+
+    String script = builder.build(clusterSpec).render(OsFamily.UNIX);
     int first = script.indexOf("runurl http://example.org/a/b c");
     assertThat(first, greaterThan(-1));
+
     int second = script.indexOf("runurl http://example.org/a/b c", first + 1);
     assertThat("No second occurrence", second, is(-1));
     assertThat(script, containsString("runurl http://example.org/d/e f"));

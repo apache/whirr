@@ -44,8 +44,7 @@ public abstract class HamaClusterActionHandler extends
   protected void beforeBootstrap(ClusterActionEvent event) throws IOException {
     ClusterSpec clusterSpec = event.getClusterSpec();
 
-    addStatement(event, call("configure_hostnames",
-        HamaConstants.PARAM_PROVIDER, clusterSpec.getProvider()));
+    addStatement(event, call("configure_hostnames"));
     addStatement(event, call("install_java"));
     addStatement(event, call("install_tarball"));
 
@@ -55,7 +54,8 @@ public abstract class HamaClusterActionHandler extends
     String tarurl = prepareRemoteFileUrl(event, getConfiguration(clusterSpec)
         .getString(HamaConstants.KEY_TARBALL_URL));
 
-    addStatement(event, call(hamaInstallFunction, HamaConstants.PARAM_PROVIDER,
-        clusterSpec.getProvider(), HamaConstants.PARAM_TARBALL_URL, tarurl));
+    addStatement(event,
+        call(hamaInstallFunction, HamaConstants.PARAM_TARBALL_URL, tarurl)
+    );
   }
 }

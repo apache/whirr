@@ -79,7 +79,6 @@ public class HamaMasterClusterActionHandler extends HamaClusterActionHandler {
 
     addStatement(event, call(hamaConfigureFunction, ROLE,
         HamaConstants.PARAM_MASTER, master, HamaConstants.PARAM_QUORUM, quorum,
-        HamaConstants.PARAM_PROVIDER, clusterSpec.getProvider(),
         HamaConstants.PARAM_TARBALL_URL, tarurl));
 
     String hamaStartFunction = getConfiguration(clusterSpec).getString(

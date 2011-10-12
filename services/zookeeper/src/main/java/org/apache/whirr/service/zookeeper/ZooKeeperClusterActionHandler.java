@@ -79,7 +79,6 @@ public class ZooKeeperClusterActionHandler extends ClusterActionHandlerSupport {
 
     String tarurl = config.getString("whirr.zookeeper.tarball.url");
     addStatement(event, call(getInstallFunction(config),
-      "-c", clusterSpec.getProvider(),
       "-u", prepareRemoteFileUrl(event, tarurl))
     );
   }
@@ -102,8 +101,7 @@ public class ZooKeeperClusterActionHandler extends ClusterActionHandlerSupport {
     Configuration config = getConfiguration(clusterSpec);
     String configureFunction = getConfigureFunction(config);
 
-    addStatement(event, call(configureFunction, "-c",
-        clusterSpec.getProvider(), servers));
+    addStatement(event, call(configureFunction, servers));
 
     if (configureFunction.equals("configure_zookeeper")) { //default zookeeper.configure-function
       addStatement(event, call(getStartFunction(config)));

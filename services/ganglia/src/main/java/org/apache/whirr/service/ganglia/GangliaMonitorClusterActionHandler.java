@@ -18,6 +18,7 @@ package org.apache.whirr.service.ganglia;
  */
 
 import static org.apache.whirr.RolePredicates.role;
+import static org.apache.whirr.service.ganglia.GangliaMetadClusterActionHandler.GANGLIA_METAD_ROLE;
 import static org.jclouds.scriptbuilder.domain.Statements.call;
 
 import java.io.IOException;
@@ -28,7 +29,6 @@ import org.apache.commons.configuration.Configuration;
 import org.apache.whirr.Cluster;
 import org.apache.whirr.Cluster.Instance;
 import org.apache.whirr.ClusterSpec;
-import org.apache.whirr.RolePredicates;
 import org.apache.whirr.service.ClusterActionEvent;
 import org.apache.whirr.service.ClusterActionHandlerSupport;
 import org.apache.whirr.service.FirewallManager.Rule;
@@ -71,7 +71,6 @@ public class GangliaMonitorClusterActionHandler extends ClusterActionHandlerSupp
     Configuration config = getConfiguration(clusterSpec);
 
     addStatement(event, call(getInstallFunction(config),
-      "-c", clusterSpec.getProvider(),
       "-r", GANGLIA_MONITOR_ROLE)
     );
   }
@@ -89,10 +88,8 @@ public class GangliaMonitorClusterActionHandler extends ClusterActionHandlerSupp
     String configureFunction = getConfigureFunction(config);
 
     // Call the configure function.
-    addStatement(event, call(configureFunction,
-            "-c", clusterSpec.getProvider(),
-            "-m", cluster.getInstanceMatching(RolePredicates.role(GangliaMetadClusterActionHandler.GANGLIA_METAD_ROLE)).getPrivateIp()));
-
+    String metadHost = cluster.getInstanceMatching(role(GANGLIA_METAD_ROLE)).getPrivateIp();
+    addStatement(event, call(configureFunction, "-m", metadHost));
   }
   
   @Override

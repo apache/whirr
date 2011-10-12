@@ -18,16 +18,94 @@
 
 package org.apache.whirr.service.jclouds;
 
+import com.google.common.base.Joiner;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-
-import java.util.List;
-
+import com.google.common.collect.Maps;
+import org.apache.whirr.Cluster.Instance;
+import org.apache.whirr.ClusterSpec;
 import org.jclouds.scriptbuilder.ScriptBuilder;
 import org.jclouds.scriptbuilder.domain.OsFamily;
 import org.jclouds.scriptbuilder.domain.Statement;
+import org.jclouds.scriptbuilder.util.Utils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class StatementBuilder implements Statement {
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+
+import static org.jclouds.scriptbuilder.domain.Statements.exec;
+
+public class StatementBuilder {
+  
+  private static final Logger LOG =
+    LoggerFactory.getLogger(StatementBuilder.class);
+  
+  class ConsolidatedStatement implements Statement {
+    
+    private ClusterSpec clusterSpec;
+    private Instance instance;
+    
+    public ConsolidatedStatement(ClusterSpec clusterSpec, Instance instance) {
+      this.clusterSpec = clusterSpec;
+      this.instance = instance;
+    }
+    
+    @Override
+    public Iterable<String> functionDependencies(OsFamily family) {
+       List<String> functions = Lists.newArrayList();
+       for (Statement statement : statements) {
+          Iterables.addAll(functions, statement.functionDependencies(family));
+       }
+       return functions;
+    }
+
+    @Override
+    public String render(OsFamily family) {
+      ScriptBuilder scriptBuilder = new ScriptBuilder();
+      Map<String, String> metadataMap = Maps.newHashMap();
+      metadataMap.putAll(
+        ImmutableMap.of(
+          "clusterName", clusterSpec.getClusterName(),
+          "cloudProvider", clusterSpec.getProvider()
+        )
+      );
+      if (instance != null) {
+        metadataMap.putAll(
+          ImmutableMap.of(
+            "roles", Joiner.on(",").join(instance.getRoles()),
+            "publicIp", instance.getPublicIp(),
+            "privateIp", instance.getPrivateIp()
+          )
+        );
+        try {
+          metadataMap.putAll(
+            ImmutableMap.of(
+              "publicHostName", instance.getPublicHostName(),
+              "privateHostName", instance.getPrivateHostName()
+            )
+          );
+        } catch (IOException e) {
+          LOG.warn("Could not resolve hostname for " + instance, e);
+        }
+      }
+      // Write export statements out directly
+      // Using InitBuilder would be a possible improvement
+      String writeVariableExporters = Utils.writeVariableExporters(metadataMap, family);
+      scriptBuilder.addStatement(exec(writeVariableExporters));
+      for (Statement statement : statements) {
+        scriptBuilder.addStatement(statement);
+      }
+
+      // Quick fix: jclouds considers that a script that runs for <2 seconds failed
+      scriptBuilder.addStatement(exec("sleep 4"));
+
+      return scriptBuilder.render(family);
+    }
+  }
+  
   protected List<Statement> statements = Lists.newArrayList();
   
   public void addStatement(Statement statement) {
@@ -41,23 +119,13 @@ public class StatementBuilder implements Statement {
       addStatement(statement);
     }
   }
-  
-  @Override
-  public Iterable<String> functionDependencies(OsFamily family) {
-     List<String> functions = Lists.newArrayList();
-     for (Statement statement : statements) {
-        Iterables.addAll(functions, statement.functionDependencies(family));
-     }
-     return functions;
+
+  public Statement build(ClusterSpec clusterSpec) {
+    return build(clusterSpec, null);
   }
 
-  @Override
-  public String render(OsFamily family) {
-    ScriptBuilder scriptBuilder = new ScriptBuilder();
-    for (Statement statement : statements) {
-      scriptBuilder.addStatement(statement);
-    }
-    return scriptBuilder.render(family);
+  public Statement build(ClusterSpec clusterSpec, Instance instance) {
+    return new ConsolidatedStatement(clusterSpec, instance);
   }
 
 }

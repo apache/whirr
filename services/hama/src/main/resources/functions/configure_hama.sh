@@ -25,9 +25,8 @@ function configure_hama() {
   MASTER_HOST=
   ZOOKEEKER_QUORUM=
   PORT=
-  CLOUD_PROVIDER=
   HAMA_TAR_URL=
-  while getopts "m:q:c:u:" OPTION; do
+  while getopts "m:q:u:" OPTION; do
     case $OPTION in
     m)
       MASTER_HOST="$OPTARG"
@@ -35,25 +34,11 @@ function configure_hama() {
     q)
       ZOOKEEPER_QUORUM="$OPTARG"
       ;;
-    c)
-      CLOUD_PROVIDER="$OPTARG"
-      ;;
     u)
       HAMA_TAR_URL="$OPTARG"
       ;;
     esac
   done
-
-  # determine machine name
-  case $CLOUD_PROVIDER in
-    ec2 | aws-ec2 )
-      # Use public hostname for EC2
-      SELF_HOST=`wget -q -O - http://169.254.169.254/latest/meta-data/public-hostname`
-      ;;
-    *)
-      SELF_HOST=`/sbin/ifconfig eth0 | grep 'inet addr:' | cut -d: -f2 | awk '{ print $1}'`
-      ;;
-  esac
   
   # assign default URL if no other given (optional)
   HAMA_TAR_URL=${HAMA_TAR_URL:-http://archive.apache.org/dist/incubator/hama/0.3-incubating/hama-0.3.0-incubating.tar.gz}

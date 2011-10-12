@@ -19,37 +19,15 @@ function configure_ganglia() {
   local OPTARG
 
   GRID_NAME=WhirrGrid  
-  CLOUD_PROVIDER=
   METAD_HOST=localhost
-  CLUSTER_NAME=whirrcluster
-  while getopts "c:m:n:" OPTION; do
+  while getopts "m:" OPTION; do
     case $OPTION in
-    c)
-      CLOUD_PROVIDER="$OPTARG"
-      shift $((OPTIND-1)); OPTIND=1
-      ;;
     m)
       METAD_HOST="$OPTARG"
       ;;
-    n)
-      CLUSTER_NAME="$OPTARG"
-      ;;
     esac
   done
-  
-  # Use private IP for SELF_HOST
-  case $CLOUD_PROVIDER in
-    ec2 | aws-ec2 )
-      SELF_HOST=`wget -q -O - http://169.254.169.254/latest/meta-data/local-ipv4`
-      ;;
-    cloudservers-uk | cloudservers-us)
-      SELF_HOST=`/sbin/ifconfig eth1 | grep 'inet addr:' | cut -d: -f2 | awk '{ print $1}'`
-      ;;
-    *)
-      SELF_HOST=`/sbin/ifconfig eth0 | grep 'inet addr:' | cut -d: -f2 | awk '{ print $1}'`
-      ;;
-  esac
-  
+
   # The service scripts have different names on different distros
   SVC_APACHE=apache2
   SVC_GMOND=ganglia-monitor
@@ -71,8 +49,8 @@ function configure_ganglia() {
   mkdir -p /etc/ganglia/conf.d
     
   # On the master, update gmond and gmetad
-  echo "Comparing self with metad_host: $SELF_HOST == $METAD_HOST"
-  if [ "$SELF_HOST" == "$METAD_HOST" ]; then
+  echo "Comparing self with metad_host: $PRIVATE_IP == $METAD_HOST"
+  if [ "$PRIVATE_IP" == "$METAD_HOST" ]; then
     
     ### Configure the gmetad instance
     

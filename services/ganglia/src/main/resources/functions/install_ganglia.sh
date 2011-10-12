@@ -29,14 +29,9 @@ function install_ganglia() {
   local OPTIND
   local OPTARG
   
-  CLOUD_PROVIDER=
-  ROLE=
-  while getopts "c:r:" OPTION; do
+  local ROLE=
+  while getopts "r:" OPTION; do
     case $OPTION in
-    c)
-      CLOUD_PROVIDER="$OPTARG"
-      shift $((OPTIND-1)); OPTIND=1
-      ;;
     r)
       ROLE="$OPTARG"
       ;;
@@ -45,19 +40,6 @@ function install_ganglia() {
 
   update_repo_ganglia
     
-  # set SELF_HOST to private ip address
-  case $CLOUD_PROVIDER in
-    ec2 | aws-ec2 )
-      SELF_HOST=`wget -q -O - http://169.254.169.254/latest/meta-data/local-ipv4`
-      ;;
-    cloudservers-uk | cloudservers-us)
-      SELF_HOST=`/sbin/ifconfig eth1 | grep 'inet addr:' | cut -d: -f2 | awk '{ print $1}'`
-      ;;
-    *)
-      SELF_HOST=`/sbin/ifconfig eth0 | grep 'inet addr:' | cut -d: -f2 | awk '{ print $1}'`
-      ;;
-  esac
-
   PACKAGES=()
 
   # add ganglia-monitor to the list of packages to install.

@@ -26,10 +26,8 @@ import static org.apache.whirr.service.voldemort.VoldemortConstants.FUNCTION_INS
 import static org.apache.whirr.service.voldemort.VoldemortConstants.HTTP_PORT;
 import static org.apache.whirr.service.voldemort.VoldemortConstants.KEY_CONF_URL;
 import static org.apache.whirr.service.voldemort.VoldemortConstants.KEY_TARBALL_URL;
-import static org.apache.whirr.service.voldemort.VoldemortConstants.PARAM_CLUSTER_NAME;
 import static org.apache.whirr.service.voldemort.VoldemortConstants.PARAM_CONF_URL;
 import static org.apache.whirr.service.voldemort.VoldemortConstants.PARAM_PARTITIONS_PER_NODE;
-import static org.apache.whirr.service.voldemort.VoldemortConstants.PARAM_PROVIDER;
 import static org.apache.whirr.service.voldemort.VoldemortConstants.PARAM_TARBALL_URL;
 import static org.apache.whirr.service.voldemort.VoldemortConstants.ROLE;
 import static org.jclouds.scriptbuilder.domain.Statements.call;
@@ -89,7 +87,6 @@ public class VoldemortClusterActionHandler extends ClusterActionHandlerSupport {
 
   @Override
   protected void beforeConfigure(ClusterActionEvent event) throws IOException, InterruptedException {
-    ClusterSpec clusterSpec = event.getClusterSpec();
     Cluster cluster = event.getCluster();
 
     LOG.info("Authorizing firewall");
@@ -103,13 +100,10 @@ public class VoldemortClusterActionHandler extends ClusterActionHandlerSupport {
 
     Configuration config = event.getClusterSpec().getConfiguration();
     int partitionsPerNode = config.getInt(PARAM_PARTITIONS_PER_NODE, 10);
+
     addStatement(event, call(FUNCTION_CONFIGURE,
-                             PARAM_PROVIDER,
-                             clusterSpec.getProvider(),
                              PARAM_PARTITIONS_PER_NODE,
                              Integer.toString(partitionsPerNode),
-                             PARAM_CLUSTER_NAME,
-                             clusterSpec.getClusterName(),
                              servers));
     addStatement(event, call("start_voldemort"));
   }
@@ -121,7 +115,8 @@ public class VoldemortClusterActionHandler extends ClusterActionHandlerSupport {
 
     String servers = Joiner.on(' ').join(getPrivateIps(cluster.getInstances()));
 
-    LOG.info("Completed setup of Voldemort {} with servers {}", clusterSpec.getClusterName(), servers);
+    LOG.info("Completed setup of Voldemort {} with servers {}",
+        clusterSpec.getClusterName(), servers);
   }
 
   /**

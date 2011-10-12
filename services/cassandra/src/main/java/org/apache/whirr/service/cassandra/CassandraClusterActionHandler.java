@@ -33,7 +33,6 @@ import java.util.Set;
 import org.apache.commons.configuration.Configuration;
 import org.apache.whirr.Cluster;
 import org.apache.whirr.Cluster.Instance;
-import org.apache.whirr.ClusterSpec;
 import org.apache.whirr.service.ClusterActionEvent;
 import org.apache.whirr.service.ClusterActionHandlerSupport;
 
@@ -74,7 +73,6 @@ public class CassandraClusterActionHandler extends ClusterActionHandlerSupport {
   @Override
   protected void beforeConfigure(ClusterActionEvent event)
       throws IOException, InterruptedException {
-    ClusterSpec clusterSpec = event.getClusterSpec();
     Cluster cluster = event.getCluster();
 
     event.getFirewallManager().addRule(
@@ -85,8 +83,7 @@ public class CassandraClusterActionHandler extends ClusterActionHandlerSupport {
 
     List<Instance> seeds = getSeeds(cluster.getInstances());
     String servers = Joiner.on(' ').join(getPrivateIps(seeds));
-    addStatement(event, call("configure_cassandra", "-c",
-        clusterSpec.getProvider(), servers));
+    addStatement(event, call("configure_cassandra", servers));
     addStatement(event, call("start_cassandra"));
   }
 

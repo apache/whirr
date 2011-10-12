@@ -19,7 +19,6 @@
 package org.apache.whirr.actions;
 
 import com.google.common.base.Function;
-import com.google.common.base.Predicates;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -50,6 +49,7 @@ import org.jclouds.compute.domain.ComputeMetadata;
 import org.jclouds.compute.domain.NodeMetadata;
 import org.jclouds.domain.Credentials;
 import org.jclouds.scriptbuilder.domain.OsFamily;
+import org.jclouds.scriptbuilder.domain.Statement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -81,13 +81,16 @@ public class ByonClusterAction extends ScriptBasedClusterAction {
 
     List<NodeMetadata> nodes = Lists.newArrayList();
     int numberAllocated = 0;
-    Set<Instance> instances = Sets.newLinkedHashSet();
+    Set<Instance> allInstances = Sets.newLinkedHashSet();
+
     for (Entry<InstanceTemplate, ClusterActionEvent> entry : eventMap.entrySet()) {
 
-      ClusterSpec clusterSpec = entry.getValue().getClusterSpec();
+      final ClusterSpec clusterSpec = entry.getValue().getClusterSpec();
       final StatementBuilder statementBuilder = entry.getValue().getStatementBuilder();
-      ComputeServiceContext computeServiceContext = getCompute().apply(clusterSpec);
+
+      final ComputeServiceContext computeServiceContext = getCompute().apply(clusterSpec);
       final ComputeService computeService = computeServiceContext.getComputeService();
+
       Credentials credentials = new Credentials(clusterSpec.getIdentity(), clusterSpec.getCredential());
       
       if (numberAllocated == 0) {
@@ -98,27 +101,36 @@ public class ByonClusterAction extends ScriptBasedClusterAction {
           nodes.add((NodeMetadata) compute);
         }
       }
+
       int num = entry.getKey().getNumberOfInstances();
       final List<NodeMetadata> templateNodes =
         nodes.subList(numberAllocated, numberAllocated + num);
       numberAllocated += num;
       
-      instances.addAll(getInstances(credentials,
-          entry.getKey().getRoles(), templateNodes));
+      final Set<Instance> templateInstances = getInstances(
+          credentials, entry.getKey().getRoles(), templateNodes
+      );
+      allInstances.addAll(templateInstances);
       
-      futures.add(executorService.submit(new Callable<Void>() {
-        @Override
-        public Void call() throws Exception {
-          LOG.info("Running script");
-          if (LOG.isDebugEnabled())
-            LOG.debug("Running script:\n{}", statementBuilder.render(OsFamily.UNIX));
-          computeService.runScriptOnNodesMatching(
-              Predicates.in(templateNodes),
-              statementBuilder);
-          LOG.info("Script run completed");
-          return null;
-        }
-      }));
+      for (final Instance instance : templateInstances) {
+        final Statement statement = statementBuilder.build(clusterSpec, instance);
+
+        futures.add(executorService.submit(new Callable<Void>() {
+          @Override
+          public Void call() throws Exception {
+            LOG.info("Running script on: {}", instance.getId());
+
+            if (LOG.isDebugEnabled()) {
+              LOG.debug("Running script:\n{}", statement.render(OsFamily.UNIX));
+            }
+
+            computeService.runScriptOnNode(instance.getId(), statement);
+            LOG.info("Script run completed on: {}", instance.getId());
+
+            return null;
+          }
+        }));
+      }
     }
     
     for (Future<Void> future : futures) {
@@ -130,7 +142,7 @@ public class ByonClusterAction extends ScriptBasedClusterAction {
     }
       
     if (action.equals(ClusterActionHandler.BOOTSTRAP_ACTION)) {
-      Cluster cluster = new Cluster(instances);
+      Cluster cluster = new Cluster(allInstances);
       for (ClusterActionEvent event : eventMap.values()) {
         event.setCluster(cluster);
       }
@@ -141,12 +153,15 @@ public class ByonClusterAction extends ScriptBasedClusterAction {
       Collection<NodeMetadata> nodes) {
     return Sets.newLinkedHashSet(Collections2.transform(Sets.newLinkedHashSet(nodes),
         new Function<NodeMetadata, Instance>() {
-      @Override
-      public Instance apply(NodeMetadata node) {
-        String publicIp = Iterables.get(node.getPublicAddresses(), 0);
-        return new Instance(credentials, roles, publicIp, publicIp, node.getId(), node);
-      }
-    }));
+          @Override
+          public Instance apply(NodeMetadata node) {
+            String publicIp = Iterables.get(node.getPublicAddresses(), 0);
+            return new Instance(
+                credentials, roles, publicIp, publicIp, node.getId(), node
+            );
+          }
+        }
+    ));
   }
   
 }

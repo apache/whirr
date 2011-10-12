@@ -15,33 +15,6 @@
 # limitations under the License.
 #
 function configure_zookeeper() {
-  local OPTIND
-  local OPTARG
-  
-  CLOUD_PROVIDER=
-  while getopts "c:" OPTION; do
-    case $OPTION in
-    c)
-      CLOUD_PROVIDER="$OPTARG"
-      shift $((OPTIND-1)); OPTIND=1
-      ;;
-    esac
-  done
-  
-  case $CLOUD_PROVIDER in
-    # Use private IP for SELF_HOST
-    # ZooKeeper listens on all addresses, not just the one specified in server.<id>
-    ec2 | aws-ec2 )
-      SELF_HOST=`wget -q -O - http://169.254.169.254/latest/meta-data/local-ipv4`
-      ;;
-    cloudservers-uk | cloudservers-us)
-      SELF_HOST=`/sbin/ifconfig eth1 | grep 'inet addr:' | cut -d: -f2 | awk '{ print $1}'`
-      ;;
-    *)
-      SELF_HOST=`/sbin/ifconfig eth0 | grep 'inet addr:' | cut -d: -f2 | awk '{ print $1}'`
-      ;;
-  esac
-  
   myid_file=/var/log/zookeeper/txlog/myid
   config_file=/etc/zookeeper/conf/zoo.cfg
   
@@ -64,7 +37,7 @@ EOF
   if [[ $# -gt 1 ]]; then
     id=1
     for server in "$@"; do
-      if [ $server == $SELF_HOST ]; then
+      if [ $server == $PRIVATE_IP ]; then
         myid=$id
       fi
       echo "server.$id=$server:2888:3888" >> $config_file
@@ -72,7 +45,7 @@ EOF
     done
   
     if [ -z $myid ]; then
-      echo "Could not determine id for my host $SELF_HOST against servers $@."
+      echo "Could not determine id for my host $PRIVATE_IP against servers $@."
       exit 1
     fi
     echo $myid > $myid_file

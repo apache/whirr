@@ -152,14 +152,16 @@ public class BootstrapClusterAction extends ScriptBasedClusterAction {
       throws MalformedURLException {
 
     LOG.info("Configuring template");
+    
+    Statement statement = statementBuilder.build(clusterSpec);
     if (LOG.isDebugEnabled())
-      LOG.debug("Running script:\n{}", statementBuilder.render(OsFamily.UNIX));
+      LOG.debug("Running script:\n{}", statement.render(OsFamily.UNIX));
 
     Statement runScript = addUserAndAuthorizeSudo(
         clusterSpec.getClusterUser(),
         clusterSpec.getPublicKey(),
         clusterSpec.getPrivateKey(),
-        statementBuilder);
+        statement);
 
     TemplateBuilder templateBuilder = computeService.templateBuilder()
       .options(runScript(runScript));

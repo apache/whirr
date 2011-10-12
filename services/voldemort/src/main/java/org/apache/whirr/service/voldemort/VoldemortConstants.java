@@ -30,15 +30,11 @@ public final class VoldemortConstants {
 
   public static final String FUNCTION_CONFIGURE = "configure_voldemort";
 
-  public static final String PARAM_PROVIDER = "-c";
-
   public static final String PARAM_TARBALL_URL = "-u";
 
   public static final String PARAM_CONF_URL = "-f";
 
   public static final String PARAM_PARTITIONS_PER_NODE = "-p";
-
-  public static final String PARAM_CLUSTER_NAME = "-n";
 
   public static final String ROLE = "voldemort";
 

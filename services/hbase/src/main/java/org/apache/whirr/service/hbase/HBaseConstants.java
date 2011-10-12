@@ -25,7 +25,6 @@ public final class HBaseConstants {
   public static final String FUNCTION_INSTALL = "install_hbase";
   public static final String FUNCTION_CONFIGURE = "configure_hbase";
 
-  public static final String PARAM_PROVIDER = "-c";
   public static final String PARAM_MASTER = "-m";
   public static final String PARAM_QUORUM = "-q";
   public static final String PARAM_PORT = "-p";

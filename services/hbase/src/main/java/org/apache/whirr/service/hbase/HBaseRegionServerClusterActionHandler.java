@@ -51,8 +51,7 @@ public class HBaseRegionServerClusterActionHandler extends HBaseClusterActionHan
   protected void beforeBootstrap(ClusterActionEvent event) throws IOException {
     ClusterSpec clusterSpec = event.getClusterSpec();
 
-    addStatement(event, call("configure_hostnames",
-      HBaseConstants.PARAM_PROVIDER, clusterSpec.getProvider()));
+    addStatement(event, call("configure_hostnames"));
 
     addStatement(event, call("install_java"));
     addStatement(event, call("install_tarball"));
@@ -62,7 +61,6 @@ public class HBaseRegionServerClusterActionHandler extends HBaseClusterActionHan
 
     addStatement(event, call(
       getInstallFunction(getConfiguration(clusterSpec)),
-      HBaseConstants.PARAM_PROVIDER, clusterSpec.getProvider(),
       HBaseConstants.PARAM_TARBALL_URL, tarurl)
     );
   }
@@ -104,7 +102,6 @@ public class HBaseRegionServerClusterActionHandler extends HBaseClusterActionHan
       ROLE,
       HBaseConstants.PARAM_MASTER, master,
       HBaseConstants.PARAM_QUORUM, quorum,
-      HBaseConstants.PARAM_PROVIDER, clusterSpec.getProvider(),
       HBaseConstants.PARAM_TARBALL_URL, tarurl)
     );
   }

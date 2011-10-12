@@ -18,14 +18,12 @@
 
 package org.apache.whirr.actions;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-
+import com.google.common.base.Function;
+import com.google.common.base.Joiner;
+import com.google.common.collect.Collections2;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Sets;
+import com.google.common.primitives.Ints;
 import org.apache.whirr.Cluster;
 import org.apache.whirr.Cluster.Instance;
 import org.apache.whirr.ClusterSpec;
@@ -37,22 +35,28 @@ import org.apache.whirr.service.FirewallManager.Rule;
 import org.apache.whirr.service.jclouds.StatementBuilder;
 import org.jclouds.compute.ComputeService;
 import org.jclouds.compute.ComputeServiceContext;
-import org.jclouds.compute.RunScriptOnNodesException;
-import org.jclouds.compute.domain.NodeMetadata;
-import org.jclouds.compute.options.RunScriptOptions;
-import org.jclouds.compute.predicates.NodePredicates;
+import org.jclouds.compute.domain.ExecResponse;
 import org.jclouds.domain.Credentials;
 import org.jclouds.scriptbuilder.domain.OsFamily;
+import org.jclouds.scriptbuilder.domain.Statement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Function;
-import com.google.common.base.Predicate;
-import com.google.common.collect.Collections2;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Maps;
-import com.google.common.primitives.Ints;
+import javax.annotation.Nullable;
+import java.io.IOException;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+
+import static org.apache.whirr.RolePredicates.onlyRolesIn;
+import static org.jclouds.compute.options.RunScriptOptions.Builder.overrideCredentialsWith;
 
 /**
  * A {@link org.apache.whirr.ClusterAction} for running a configuration script on instances
@@ -75,7 +79,10 @@ public class ConfigureClusterAction extends ScriptBasedClusterAction {
   
   @Override
   protected void doAction(Map<InstanceTemplate, ClusterActionEvent> eventMap)
-      throws IOException {
+      throws IOException, InterruptedException {
+
+    final ExecutorService executorService = Executors.newCachedThreadPool();
+    final Collection<Future<ExecResponse>> futures = Sets.newHashSet();
 
     for (Entry<InstanceTemplate, ClusterActionEvent> entry : eventMap.entrySet()) {
       applyFirewallRules(entry.getValue());
@@ -86,102 +93,71 @@ public class ConfigureClusterAction extends ScriptBasedClusterAction {
       StatementBuilder statementBuilder = entry.getValue().getStatementBuilder();
 
       ComputeServiceContext computeServiceContext = getCompute().apply(clusterSpec);
-      ComputeService computeService = computeServiceContext.getComputeService();
+      final ComputeService computeService = computeServiceContext.getComputeService();
 
-      Credentials credentials = new Credentials(
+      final Credentials credentials = new Credentials(
           clusterSpec.getClusterUser(),
-          clusterSpec.getPrivateKey());
+          clusterSpec.getPrivateKey()
+      );
 
+      Set<Instance> instances = cluster.getInstancesMatching(
+          onlyRolesIn(entry.getKey().getRoles()));
+
+      String instanceIds = Joiner.on(", ").join(Iterables.transform(instances,
+          new Function<Instance, String>() {
+            @Override
+            public String apply(@Nullable Instance instance) {
+              return instance == null ? "<null>" : instance.getId();
+            }
+          })
+      );
+
+      LOG.info("Starting to run configuration scripts on cluster " +
+          "instances: {}", instanceIds);
+
+      for (final Instance instance : instances) {
+        final Statement statement = statementBuilder.build(clusterSpec, instance);
+
+        futures.add(executorService.submit(new Callable<ExecResponse>() {
+          @Override
+          public ExecResponse call() {
+
+            LOG.info("Running configuration script on: {}", instance.getId());
+            if (LOG.isDebugEnabled()) {
+              LOG.debug("Configuration script for {}:\n{}", instance.getId(),
+                statement.render(OsFamily.UNIX));
+            }
+
+            try {
+              return computeService.runScriptOnNode(
+                instance.getId(),
+                statement,
+                overrideCredentialsWith(credentials).runAsRoot(true)
+              );
+
+            } finally {
+              LOG.info("Configuration script run completed on: {}", instance.getId());
+            }
+          }
+        }));
+      }
+    }
+
+    for (Future<ExecResponse> future : futures) {
       try {
-        Map<String, ? extends NodeMetadata> nodesInCluster = getNodesForInstanceIdsInCluster(cluster, computeService);
-        
-        if (LOG.isDebugEnabled()) {
-          LOG.debug("Nodes in cluster: {}", nodesInCluster.values());
+        ExecResponse execResponse = future.get();
+        if (execResponse.getExitCode() != 0) {
+          LOG.error("Error running script: {}\n{}", execResponse.getError(),
+              execResponse.getOutput());
         }
-        
-        Map<String, ? extends NodeMetadata> nodesToApply = Maps.uniqueIndex(
-            Iterables.filter(nodesInCluster.values(),
-                toNodeMetadataPredicate(clusterSpec, cluster, entry.getKey().getRoles())),
-            getNodeId
-        );
-
-        LOG.info("Running configuration script on nodes: {}", nodesToApply.keySet());
-        if (LOG.isDebugEnabled())
-          LOG.debug("script:\n{}", statementBuilder.render(OsFamily.UNIX));
-        
-        computeService.runScriptOnNodesMatching(
-            withIds(nodesToApply.keySet()),
-            statementBuilder,
-            RunScriptOptions.Builder.overrideCredentialsWith(credentials)
-        );
-        
-        LOG.info("Configuration script run completed");
-      } catch (RunScriptOnNodesException e) {
-        // TODO: retry
-        throw new IOException(e);
+      } catch (ExecutionException e) {
+        throw new IOException(e.getCause());
       }
     }
+
+    LOG.info("Finished running configuration scripts on all cluster instances");
   }
 
-  private Map<String, ? extends NodeMetadata> getNodesForInstanceIdsInCluster(Cluster cluster,
-        ComputeService computeService) {
-    Iterable<String> ids = Iterables.transform(cluster.getInstances(), new Function<Instance, String>() {
-
-      @Override
-      public String apply(Instance arg0) {
-        return arg0.getId();
-      }
-
-    });
-    
-    Set<? extends NodeMetadata> nodes = computeService.listNodesDetailsMatching(
-        NodePredicates.withIds(Iterables.toArray(ids, String.class)));
-    
-    return Maps.uniqueIndex(nodes, getNodeId);
-  }
-
-  public static Predicate<NodeMetadata> withIds(Iterable<String> ids) {
-    checkNotNull(ids, "ids must be defined");
-    final Set<String> search = ImmutableSet.copyOf(ids);
-    return new Predicate<NodeMetadata>() {
-      @Override
-      public boolean apply(NodeMetadata nodeMetadata) {
-        return search.contains(nodeMetadata.getId());
-      }
-    };
-  }
-  
-  private static Function<NodeMetadata, String> getNodeId = new Function<NodeMetadata, String>() {
-
-    @Override
-    public String apply(NodeMetadata arg0) {
-      return arg0.getId();
-    }
-     
-  };
-  
-  private Predicate<NodeMetadata> toNodeMetadataPredicate(final ClusterSpec clusterSpec, final Cluster cluster, final Set<String> roles) {
-    final Map<String, Instance> nodeIdToInstanceMap = Maps.newHashMap();
-    for (Instance instance : cluster.getInstances()) {
-      nodeIdToInstanceMap.put(instance.getId(), instance);
-    }
-    return new Predicate<NodeMetadata>() {
-      @Override
-      public boolean apply(NodeMetadata nodeMetadata) {
-        Instance instance = nodeIdToInstanceMap.get(nodeMetadata.getId());
-        if (instance == null) {
-          LOG.debug("No instance for {} found in map", nodeMetadata);
-          return false;
-        }
-        return RolePredicates.onlyRolesIn(roles).apply(instance);
-      }
-      @Override
-      public String toString() {
-         return "roles(" + roles + ")";
-      }
-   };
-  }
-  
   /**
    * Apply the firewall rules specified via configuration.
    */

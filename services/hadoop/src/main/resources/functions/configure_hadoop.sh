@@ -21,15 +21,6 @@ function configure_hadoop() {
   ROLES=$1
   shift
   
-  CLOUD_PROVIDER=
-  while getopts "c:" OPTION; do
-    case $OPTION in
-    c)
-      CLOUD_PROVIDER="$OPTARG"
-      ;;
-    esac
-  done
-  
   case $CLOUD_PROVIDER in
     ec2 | aws-ec2 )
       # Alias /mnt as /data

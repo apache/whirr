@@ -16,9 +16,9 @@
 #
 
 function download() {
-  tar_url=$1
-  tar_file=`basename $tar_url`
-  dest_dir=$2
+  local tar_url=$1
+  local tar_file=`basename $tar_url`
+  local dest_dir=$2
 
   for i in `seq 1 3`; do
     curl -L --retry 3 --show-error --fail -O $tar_url

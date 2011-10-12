@@ -18,21 +18,9 @@
 
 package org.apache.whirr.service.hbase;
 
-import static org.apache.whirr.RolePredicates.role;
-import static org.apache.whirr.service.hbase.HBaseConfigurationBuilder.buildHBaseEnv;
-import static org.apache.whirr.service.hbase.HBaseConfigurationBuilder.buildHBaseSite;
-import static org.jclouds.scriptbuilder.domain.Statements.call;
-
 import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
 import com.google.common.io.Files;
-
-import java.io.File;
-import java.io.IOException;
-import java.net.InetAddress;
-import java.util.Map.Entry;
-import java.util.Properties;
-
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.whirr.Cluster;
@@ -44,6 +32,17 @@ import org.apache.whirr.service.hadoop.HadoopProxy;
 import org.apache.whirr.service.zookeeper.ZooKeeperCluster;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.InetAddress;
+import java.util.Map.Entry;
+import java.util.Properties;
+
+import static org.apache.whirr.RolePredicates.role;
+import static org.apache.whirr.service.hbase.HBaseConfigurationBuilder.buildHBaseEnv;
+import static org.apache.whirr.service.hbase.HBaseConfigurationBuilder.buildHBaseSite;
+import static org.jclouds.scriptbuilder.domain.Statements.call;
 
 public class HBaseMasterClusterActionHandler extends HBaseClusterActionHandler {
 
@@ -64,8 +63,7 @@ public class HBaseMasterClusterActionHandler extends HBaseClusterActionHandler {
   protected void beforeBootstrap(ClusterActionEvent event) throws IOException {
     ClusterSpec clusterSpec = event.getClusterSpec();    
 
-    addStatement(event, call("configure_hostnames",
-      HBaseConstants.PARAM_PROVIDER, clusterSpec.getProvider()));
+    addStatement(event, call("configure_hostnames"));
 
     addStatement(event, call("install_java"));
     addStatement(event, call("install_tarball"));
@@ -75,7 +73,6 @@ public class HBaseMasterClusterActionHandler extends HBaseClusterActionHandler {
 
     addStatement(event, call(
       getInstallFunction(getConfiguration(clusterSpec)),
-      HBaseConstants.PARAM_PROVIDER, clusterSpec.getProvider(),
       HBaseConstants.PARAM_TARBALL_URL, tarurl)
     );
   }
@@ -116,7 +113,6 @@ public class HBaseMasterClusterActionHandler extends HBaseClusterActionHandler {
       ROLE,
       HBaseConstants.PARAM_MASTER, master,
       HBaseConstants.PARAM_QUORUM, quorum,
-      HBaseConstants.PARAM_PROVIDER, clusterSpec.getProvider(),
       HBaseConstants.PARAM_TARBALL_URL, tarurl
     ));
   }

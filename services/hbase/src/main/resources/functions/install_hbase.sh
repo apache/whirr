@@ -26,13 +26,9 @@ function install_hbase() {
   local OPTIND
   local OPTARG
   
-  CLOUD_PROVIDER=
   HBASE_TAR_URL=
-  while getopts "c:u:" OPTION; do
+  while getopts "u:" OPTION; do
     case $OPTION in
-    c)
-      CLOUD_PROVIDER="$OPTARG"
-      ;;
     u)
       HBASE_TAR_URL="$OPTARG"
       ;;

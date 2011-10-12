@@ -18,13 +18,9 @@ function install_zookeeper() {
   local OPTIND
   local OPTARG
   
-  CLOUD_PROVIDER=
   ZK_TARBALL_URL=
-  while getopts "c:u:" OPTION; do
+  while getopts "u:" OPTION; do
     case $OPTION in
-    c)
-      CLOUD_PROVIDER="$OPTARG"
-      ;;
     u)
       ZK_TARBALL_URL="$OPTARG"
       ;;

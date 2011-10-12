@@ -26,13 +26,9 @@ function install_hama() {
   local OPTIND
   local OPTARG
   
-  CLOUD_PROVIDER=
   HAMA_TAR_URL=
-  while getopts "c:u:" OPTION; do
+  while getopts "u:" OPTION; do
     case $OPTION in
-    c)
-      CLOUD_PROVIDER="$OPTARG"
-      ;;
     u)
       HAMA_TAR_URL="$OPTARG"
       ;;

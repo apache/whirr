@@ -54,9 +54,7 @@ public class BasicServerClusterActionHandler extends HBaseClusterActionHandler {
   protected void beforeBootstrap(ClusterActionEvent event) throws IOException {
     ClusterSpec clusterSpec = event.getClusterSpec();
 
-    addStatement(event, call("configure_hostnames",
-      HBaseConstants.PARAM_PROVIDER, clusterSpec.getProvider()));
-
+    addStatement(event, call("configure_hostnames"));
     addStatement(event, call("install_java"));
     addStatement(event, call("install_tarball"));
 
@@ -65,7 +63,6 @@ public class BasicServerClusterActionHandler extends HBaseClusterActionHandler {
 
     addStatement(event, call(
       getInstallFunction(getConfiguration(clusterSpec)),
-      HBaseConstants.PARAM_PROVIDER, clusterSpec.getProvider(),
       HBaseConstants.PARAM_TARBALL_URL, tarurl)
     );
   }
@@ -99,7 +96,6 @@ public class BasicServerClusterActionHandler extends HBaseClusterActionHandler {
       HBaseConstants.PARAM_MASTER, master,
       HBaseConstants.PARAM_QUORUM, quorum,
       HBaseConstants.PARAM_PORT, Integer.toString(port),
-      HBaseConstants.PARAM_PROVIDER, clusterSpec.getProvider(),
       HBaseConstants.PARAM_TARBALL_URL, tarurl)
     );
   }

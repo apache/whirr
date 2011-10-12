@@ -25,9 +25,8 @@ function configure_hbase() {
   MASTER_HOST=
   ZOOKEEKER_QUORUM=
   PORT=
-  CLOUD_PROVIDER=
   HBASE_TAR_URL=
-  while getopts "m:q:p:c:u:" OPTION; do
+  while getopts "m:q:p:u:" OPTION; do
     case $OPTION in
     m)
       MASTER_HOST="$OPTARG"
@@ -38,25 +37,11 @@ function configure_hbase() {
     p)
       PORT="$OPTARG"
       ;;
-    c)
-      CLOUD_PROVIDER="$OPTARG"
-      ;;
     u)
       HBASE_TAR_URL="$OPTARG"
       ;;
     esac
   done
-  
-  # determine machine name
-  case $CLOUD_PROVIDER in
-    ec2 | aws-ec2 )
-      # Use public hostname for EC2
-      SELF_HOST=`wget -q -O - http://169.254.169.254/latest/meta-data/public-hostname`
-      ;;
-    *)
-      SELF_HOST=`/sbin/ifconfig eth0 | grep 'inet addr:' | cut -d: -f2 | awk '{ print $1}'`
-      ;;
-  esac
   
   # assign default URL if no other given (optional)
   HBASE_TAR_URL=${HBASE_TAR_URL:-http://archive.apache.org/dist/hbase/hbase-0.90.0/hbase-0.90.0.tar.gz}

@@ -32,6 +32,8 @@ Trunk (unreleased changes)
     WHIRR-368. Add the ability to adjust contents of hadoop-env.sh from 
     a cluster properties file (Karel Vervaeke via asavu)
 
+    WHIRR-325. Reduce cloud provider-specific code in scripts (asavu)
+
   BUG FIXES
 
     WHIRR-377. Fix broken CLI logging config. (asavu via tomwhite)

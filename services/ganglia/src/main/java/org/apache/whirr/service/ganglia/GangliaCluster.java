@@ -24,6 +24,9 @@ import org.apache.whirr.RolePredicates;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableSet;
 
+import static org.apache.whirr.service.ganglia.GangliaMetadClusterActionHandler.GANGLIA_METAD_ROLE;
+import static org.apache.whirr.service.ganglia.GangliaMonitorClusterActionHandler.GANGLIA_MONITOR_ROLE;
+
 public class GangliaCluster {
 
   public static final String INSTALL_FUNCTION = "install_ganglia";
@@ -32,8 +35,10 @@ public class GangliaCluster {
   public static String getHosts(Cluster cluster) {
     return Joiner.on(',').join(
       GangliaMonitorClusterActionHandler.getHosts(cluster.getInstancesMatching(
-        RolePredicates.anyRoleIn(ImmutableSet.<String>of(GangliaMonitorClusterActionHandler.GANGLIA_MONITOR_ROLE,
-                                                         GangliaMetadClusterActionHandler.GANGLIA_METAD_ROLE)))));
+        RolePredicates.anyRoleIn(
+          ImmutableSet.<String>of(GANGLIA_MONITOR_ROLE, GANGLIA_METAD_ROLE))
+        )
+      ));
   }
   
 }

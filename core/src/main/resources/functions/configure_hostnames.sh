@@ -18,16 +18,6 @@ function configure_hostnames() {
   local OPTIND
   local OPTARG
   
-  CLOUD_PROVIDER=
-  while getopts "c:" OPTION; do
-    case $OPTION in
-    c)
-      CLOUD_PROVIDER="$OPTARG"
-      shift $((OPTIND-1)); OPTIND=1
-      ;;
-    esac
-  done
-  
   case $CLOUD_PROVIDER in
     cloudservers | cloudservers-uk | cloudservers-us )
       if which dpkg &> /dev/null; then
