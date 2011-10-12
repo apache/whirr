@@ -18,32 +18,17 @@
 
 package org.apache.whirr.actions;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-
-import java.io.IOException;
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.Stack;
-import java.util.concurrent.atomic.AtomicInteger;
-
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.whirr.ClusterSpec;
 import org.apache.whirr.HandlerMapFactory;
+import org.apache.whirr.compute.NodeStarter;
+import org.apache.whirr.compute.NodeStarterFactory;
 import org.apache.whirr.service.ClusterActionHandler;
 import org.apache.whirr.service.ClusterActionHandlerFactory;
 import org.jclouds.compute.ComputeService;
@@ -70,6 +55,22 @@ import org.jclouds.domain.internal.LocationImpl;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.Stack;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class BootstrapClusterActionTest {
 
@@ -132,7 +133,8 @@ public class BootstrapClusterActionTest {
     reaction.put(dntt, ddttStack);
     
     nodeStarterFactory = new TestNodeStarterFactory(reaction);
-    BootstrapClusterAction bootstrapper = new BootstrapClusterAction(getCompute, handlerMap, nodeStarterFactory);
+    BootstrapClusterAction bootstrapper =
+        new BootstrapClusterAction(getCompute, handlerMap, nodeStarterFactory);
     
     bootstrapper.execute(clusterSpec, null);
     if (nodeStarterFactory != null) {
@@ -221,10 +223,10 @@ public class BootstrapClusterActionTest {
     TestNodeStarterFactory(final Map<Set<String>, Stack<Integer>> plan) {
       this.plan = plan;
     }
-    
+
     @Override
-    NodeStarter create(ComputeService computeService, String clusterName,
-        Set<String> roles, int num, Template template) {
+    public NodeStarter create(final ComputeService computeService, final String clusterName,
+        final Set<String> roles, final int num, final Template template) {
       NodeStarter result = null;
       Stack<Integer> stack = plan.get(roles);
       if (stack != null) {

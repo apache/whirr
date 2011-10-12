@@ -21,20 +21,14 @@ package org.apache.whirr;
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
-
-import java.io.IOException;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Set;
-
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 import org.apache.whirr.actions.BootstrapClusterAction;
 import org.apache.whirr.actions.ConfigureClusterAction;
 import org.apache.whirr.actions.DestroyClusterAction;
+import org.apache.whirr.service.ClusterActionHandler;
 import org.apache.whirr.service.ClusterStateStore;
 import org.apache.whirr.service.ClusterStateStoreFactory;
-import org.apache.whirr.service.ClusterActionHandler;
 import org.apache.whirr.service.ComputeCache;
 import org.jclouds.compute.ComputeService;
 import org.jclouds.compute.ComputeServiceContext;
@@ -47,6 +41,11 @@ import org.jclouds.domain.Credentials;
 import org.jclouds.scriptbuilder.domain.Statement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Set;
 
 import static org.apache.whirr.RolePredicates.withIds;
 import static org.jclouds.compute.options.RunScriptOptions.Builder.overrideCredentialsWith;

@@ -18,24 +18,23 @@
 
 package org.apache.whirr;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.google.common.base.Objects;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 import com.google.common.net.InetAddresses;
+import org.apache.whirr.util.DnsUtil;
+import org.jclouds.compute.domain.NodeMetadata;
+import org.jclouds.domain.Credentials;
 
 import java.io.IOException;
 import java.net.InetAddress;
 import java.util.Properties;
 import java.util.Set;
 
-import org.apache.whirr.util.DnsUtil;
-import org.jclouds.compute.domain.NodeMetadata;
-import org.jclouds.domain.Credentials;
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * This class represents a real cluster of {@link Instance}s.

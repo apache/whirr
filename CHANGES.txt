@@ -34,6 +34,9 @@ Trunk (unreleased changes)
 
     WHIRR-325. Reduce cloud provider-specific code in scripts (tomwhite and asavu)
 
+    WHIRR-214. First iteration on refactoring the core to support the 
+    addition of nodes to running clusters (asavu)
+
   BUG FIXES
 
     WHIRR-377. Fix broken CLI logging config. (asavu via tomwhite)
