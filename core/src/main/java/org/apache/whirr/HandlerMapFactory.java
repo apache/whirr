@@ -56,24 +56,33 @@ public class HandlerMapFactory {
       public ClusterActionHandler apply(String arg0) {
          checkNotNull(arg0, "role");
          for (String prefix : factoryMap.keySet()) {
-            if (arg0.startsWith(prefix))
-               return factoryMap.get(prefix).create(arg0.substring(prefix.length()));
+            if (arg0.startsWith(prefix)) {
+               return checkNotNull(
+                 factoryMap.get(prefix).create(arg0.substring(prefix.length())),
+                 "Unable to create the action handler"
+               );
+            }
          }
-         return handlerMap.get(arg0);
+         return checkNotNull(handlerMap.get(arg0), "Action handler not found");
       }
    }
 
    public static Map<String, ClusterActionHandler> create() {
-      return create(ServiceLoader.load(ClusterActionHandlerFactory.class), ServiceLoader
-               .load(ClusterActionHandler.class));
+      return create(ServiceLoader.load(ClusterActionHandlerFactory.class),
+        ServiceLoader.load(ClusterActionHandler.class));
    }
 
-   public static Map<String, ClusterActionHandler> create(Iterable<ClusterActionHandlerFactory> factories,
-            Iterable<ClusterActionHandler> handlers) {
-      Map<String, ClusterActionHandlerFactory> factoryMap = indexFactoriesByRolePrefix(checkNotNull(factories,
-               "factories"));
-      Map<String, ClusterActionHandler> handlerMap = indexHandlersByRole(checkNotNull(handlers, "handlers"));
-      return new MapMaker().makeComputingMap(new ReturnHandlerByRoleOrPrefix(factoryMap, handlerMap));
+   public static Map<String, ClusterActionHandler> create(
+      Iterable<ClusterActionHandlerFactory> factories,
+      Iterable<ClusterActionHandler> handlers
+   ) {
+      Map<String, ClusterActionHandlerFactory> factoryMap =
+          indexFactoriesByRolePrefix(checkNotNull(factories, "factories"));
+      Map<String, ClusterActionHandler> handlerMap =
+          indexHandlersByRole(checkNotNull(handlers, "handlers"));
+
+      return new MapMaker().makeComputingMap(
+        new ReturnHandlerByRoleOrPrefix(factoryMap, handlerMap));
    }
 
    static Map<String, ClusterActionHandlerFactory> indexFactoriesByRolePrefix(

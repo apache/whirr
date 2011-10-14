@@ -19,6 +19,7 @@
 package org.apache.whirr.actions;
 
 import com.google.common.base.Function;
+import com.google.common.collect.ComputationException;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 
@@ -35,6 +36,8 @@ import org.apache.whirr.service.FirewallManager;
 import org.apache.whirr.service.jclouds.StatementBuilder;
 import org.jclouds.compute.ComputeServiceContext;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
  * A {@link ClusterAction} that provides the base functionality for running
  * scripts on instances in the cluster.
@@ -46,7 +49,7 @@ public abstract class ScriptBasedClusterAction extends ClusterAction {
   protected ScriptBasedClusterAction(Function<ClusterSpec, ComputeServiceContext> getCompute,
       final Map<String, ClusterActionHandler> handlerMap) {
     super(getCompute);
-    this.handlerMap = handlerMap;
+    this.handlerMap = checkNotNull(handlerMap, "handlerMap");
   }
   
   protected abstract void doAction(Map<InstanceTemplate, ClusterActionEvent> eventMap)
@@ -68,13 +71,11 @@ public abstract class ScriptBasedClusterAction extends ClusterAction {
 
       eventMap.put(instanceTemplate, event);
       for (String role : instanceTemplate.getRoles()) {
-        try {
-          handlerMap.get(role).beforeAction(event);
-        } catch (NullPointerException e) {
-          throw new IllegalArgumentException("No handler for role " + role);
-        }
+        safeGetActionHandler(role).beforeAction(event);
       }
-      newCluster = event.getCluster(); // cluster may have been updated by handler 
+
+      // cluster may have been updated by handler
+      newCluster = event.getCluster();
     }
     
     doAction(eventMap);
@@ -83,19 +84,34 @@ public abstract class ScriptBasedClusterAction extends ClusterAction {
     newCluster = Iterables.get(eventMap.values(), 0).getCluster();
 
     for (InstanceTemplate instanceTemplate : clusterSpec.getInstanceTemplates()) {
+      ClusterActionEvent event = eventMap.get(instanceTemplate);
       for (String role : instanceTemplate.getRoles()) {
-        ClusterActionEvent event = eventMap.get(instanceTemplate);
         event.setCluster(newCluster);
-        try {
-          handlerMap.get(role).afterAction(event);
-        } catch (NullPointerException e) {
-          throw new IllegalArgumentException("No handler for role " + role);
-        }
-        newCluster = event.getCluster(); // cluster may have been updated by handler 
+        safeGetActionHandler(role).afterAction(event);
+
+        // cluster may have been updated by handler
+        newCluster = event.getCluster();
       }
     }
     
     return newCluster;
+  }
+
+  /**
+   * Try to get an {@see ClusterActionHandler } instance or throw an
+   * IllegalArgumentException if not found for this role name
+   */
+  private ClusterActionHandler safeGetActionHandler(String role) {
+    try {
+      ClusterActionHandler handler = handlerMap.get(role);
+      if (handler == null) {
+        throw new IllegalArgumentException("No handler for role " + role);
+      }
+      return handler;
+
+    } catch (ComputationException e) {
+      throw new IllegalArgumentException(e.getCause());
+    }
   }
 
 }

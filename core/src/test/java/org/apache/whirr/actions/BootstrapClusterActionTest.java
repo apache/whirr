@@ -78,7 +78,7 @@ public class BootstrapClusterActionTest {
     LoggerFactory.getLogger(BootstrapClusterActionTest.class);
 
   @SuppressWarnings("unchecked")
-@Test
+  @Test
   public void testDoActionRetriesSucceed() throws Exception {
     CompositeConfiguration config = new CompositeConfiguration();
     if (System.getProperty("config") != null) {
@@ -408,8 +408,8 @@ public class BootstrapClusterActionTest {
     when(puppetHandlerFactory.getRolePrefix()).thenReturn("puppet");
     when(handler.getRole()).thenReturn("something-else");
 
-    Map<String, ClusterActionHandler> handlerMap = HandlerMapFactory.create(ImmutableSet.of(puppetHandlerFactory),
-          ImmutableSet.of(handler));
+    Map<String, ClusterActionHandler> handlerMap = HandlerMapFactory.create(
+      ImmutableSet.of(puppetHandlerFactory), ImmutableSet.of(handler));
 
     Function<ClusterSpec, ComputeServiceContext> getCompute = mock(Function.class);
     ComputeServiceContext serviceContext = mock(ComputeServiceContext.class);
@@ -426,7 +426,7 @@ public class BootstrapClusterActionTest {
     
     Map<Set<String>, Stack<Integer>> reaction = Maps.newHashMap();
     Stack<Integer> nnStack = new Stack<Integer>();
-    nnStack.push(new Integer(1));
+    nnStack.push(1);
     reaction.put(nn, nnStack);
     
     nodeStarterFactory = new TestNodeStarterFactory(reaction);
