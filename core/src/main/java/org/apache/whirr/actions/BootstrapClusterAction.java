@@ -19,6 +19,7 @@
 package org.apache.whirr.actions;
 
 import com.google.common.base.Function;
+import com.google.common.base.Joiner;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
@@ -98,7 +99,12 @@ public class BootstrapClusterAction extends ScriptBasedClusterAction {
 
       final Template template = BootstrapTemplate.build(clusterSpec, computeService,
         statementBuilder, entry.getValue().getTemplateBuilderStrategy());
-      
+
+      if (template.getOptions() != null) {
+        template.getOptions()
+          .nameTask("bootstrap-" + Joiner.on('_').join(entry.getKey().getRoles()));
+      }
+
       Future<Set<? extends NodeMetadata>> nodesFuture = executorService.submit(
           new StartupProcess(
               clusterSpec.getClusterName(),

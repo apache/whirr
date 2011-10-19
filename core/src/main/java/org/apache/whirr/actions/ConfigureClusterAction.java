@@ -58,6 +58,7 @@ import java.util.concurrent.Future;
 import static org.apache.whirr.RolePredicates.onlyRolesIn;
 import static org.jclouds.compute.options.RunScriptOptions.Builder.overrideCredentialsWith;
 
+
 /**
  * A {@link org.apache.whirr.ClusterAction} for running a configuration script on instances
  * in the cluster after it has been bootstrapped.
@@ -133,6 +134,7 @@ public class ConfigureClusterAction extends ScriptBasedClusterAction {
                 instance.getId(),
                 statement,
                 overrideCredentialsWith(credentials).runAsRoot(true)
+                .nameTask("configure-" + Joiner.on('_').join(instance.getRoles()))
               );
 
             } finally {

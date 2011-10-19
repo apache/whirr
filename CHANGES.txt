@@ -37,6 +37,9 @@ Trunk (unreleased changes)
     WHIRR-214. First iteration on refactoring the core to support the 
     addition of nodes to running clusters (asavu)
 
+    WHIRR-243. Allow to run component tests in memory 
+    (David Alves, Adrian Cole via asavu)
+
   BUG FIXES
 
     WHIRR-377. Fix broken CLI logging config. (asavu via tomwhite)

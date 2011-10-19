@@ -21,6 +21,7 @@ package org.apache.whirr.service;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Function;
 import com.google.common.base.Objects;
+import com.google.common.base.Throwables;
 import com.google.common.collect.ForwardingObject;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
@@ -71,13 +72,27 @@ public enum ComputeCache implements Function<ClusterSpec, ComputeServiceContext>
   final Map<Key, ComputeServiceContext> cache = new MapMaker().makeComputingMap(
       new Function<Key, ComputeServiceContext>(){
         private final ComputeServiceContextFactory factory =  new ComputeServiceContextFactory();
-        private final Set<AbstractModule> wiring = ImmutableSet.of(
-              new SshjSshClientModule(),
-              new SLF4JLoggingModule(), 
-              new EnterpriseConfigurationModule(),
-              new BindLoginCredentialsPatchForEC2());        
+        private Set<AbstractModule> wiring;
+               
         @Override
         public ComputeServiceContext apply(Key arg0) {
+          if (wiring == null) {
+            if (arg0.provider.equals("stub")) {
+              try {
+                wiring = ImmutableSet.of(
+                    new SLF4JLoggingModule(),
+                    (AbstractModule) Class.forName("org.apache.whirr.service.DryRunModule").newInstance());
+              } catch (Exception e) {
+                Throwables.propagate(e);
+              }
+            } else {
+              wiring = ImmutableSet.of(
+                  new SshjSshClientModule(),
+                  new SLF4JLoggingModule(), 
+                  new EnterpriseConfigurationModule(),
+                  new BindLoginCredentialsPatchForEC2());  
+            }
+          }
           LOG.debug("creating new ComputeServiceContext {}", arg0);
           ComputeServiceContext context = new IgnoreCloseComputeServiceContext(factory.createContext(
             arg0.provider, arg0.identity, arg0.credential,
