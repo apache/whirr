@@ -42,6 +42,8 @@ Trunk (unreleased changes)
 
     WHIRR-401. Use regular instances for testing on aws-ec2 (asavu)
 
+    WHIRR-397. Automatic template selection is too restrictive (asavu) 
+
   BUG FIXES
 
     WHIRR-377. Fix broken CLI logging config. (asavu via tomwhite)

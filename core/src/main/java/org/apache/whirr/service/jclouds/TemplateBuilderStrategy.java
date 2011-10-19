@@ -33,19 +33,20 @@ public class TemplateBuilderStrategy {
     if (clusterSpec.getImageId() != null) {
       templateBuilder.imageId(clusterSpec.getImageId());
     } else {
-      templateBuilder.os64Bit(true);
       templateBuilder.osFamily(OsFamily.UBUNTU);
       templateBuilder.osVersionMatches("10.04");
 
       // canonical images, but not testing ones
       if ("aws-ec2".equals(clusterSpec.getProvider()))
-        templateBuilder.imageDescriptionMatches("/ubuntu-images/");
+        templateBuilder.imageDescriptionMatches("ubuntu-images/");
     }
     
     if (clusterSpec.getHardwareId() != null) {
       templateBuilder.hardwareId(clusterSpec.getHardwareId());
+
     } else if(clusterSpec.getHardwareMinRam() != 0) {
       templateBuilder.minRam(clusterSpec.getHardwareMinRam());
+
     } else {
       templateBuilder.minRam(1024);
     }
