@@ -40,6 +40,8 @@ Trunk (unreleased changes)
     WHIRR-243. Allow to run component tests in memory 
     (David Alves, Adrian Cole via asavu)
 
+    WHIRR-401. Use regular instances for testing on aws-ec2 (asavu)
+
   BUG FIXES
 
     WHIRR-377. Fix broken CLI logging config. (asavu via tomwhite)
