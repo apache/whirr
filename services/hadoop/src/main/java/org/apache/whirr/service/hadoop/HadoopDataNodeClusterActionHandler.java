@@ -18,20 +18,18 @@
 
 package org.apache.whirr.service.hadoop;
 
-import static org.apache.whirr.service.hadoop.HadoopConfigurationBuilder.buildCommon;
-import static org.apache.whirr.service.hadoop.HadoopConfigurationBuilder.buildHdfs;
-import static org.apache.whirr.service.hadoop.HadoopConfigurationBuilder.buildMapReduce;
-import static org.apache.whirr.service.hadoop.HadoopConfigurationBuilder.buildHadoopEnv;
-import static org.jclouds.scriptbuilder.domain.Statements.call;
-
 import java.io.IOException;
 
-import org.apache.commons.configuration.ConfigurationException;
 import org.apache.whirr.Cluster;
 import org.apache.whirr.ClusterSpec;
 import org.apache.whirr.service.ClusterActionEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class HadoopDataNodeClusterActionHandler extends HadoopClusterActionHandler {
+
+  private static final Logger LOG =
+      LoggerFactory.getLogger(HadoopDataNodeClusterActionHandler.class);
 
   public static final String ROLE = "hadoop-datanode";
   
@@ -39,29 +37,19 @@ public class HadoopDataNodeClusterActionHandler extends HadoopClusterActionHandl
   public String getRole() {
     return ROLE;
   }
-  
+
   @Override
-  protected void beforeConfigure(ClusterActionEvent event)
-      throws IOException, InterruptedException {
+  protected void afterConfigure(ClusterActionEvent event) throws IOException,
+      InterruptedException {
     ClusterSpec clusterSpec = event.getClusterSpec();
     Cluster cluster = event.getCluster();
     
-    try {
-      event.getStatementBuilder().addStatements(
-        buildCommon("/tmp/core-site.xml", clusterSpec, cluster),
-        buildHdfs("/tmp/hdfs-site.xml", clusterSpec, cluster),
-        buildMapReduce("/tmp/mapred-site.xml", clusterSpec, cluster),
-        buildHadoopEnv("/tmp/hadoop-env.sh", clusterSpec, cluster)
-      );
-    } catch (ConfigurationException e) {
-      throw new IOException(e);
-    }
+    // TODO: wait for TTs to come up (done in test for the moment)
+    
+    LOG.info("Completed configuration of {} role {}", clusterSpec.getClusterName(), getRole());
 
-    addStatement(event, call(
-      getConfigureFunction(getConfiguration(clusterSpec)),
-      "hadoop-datanode,hadoop-tasktracker",
-      "-c", clusterSpec.getProvider())
-    );
+    // TODO: List data nodes + url to their WEB UI?
   }
+  
   
 }

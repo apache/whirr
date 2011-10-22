@@ -18,16 +18,29 @@
 
 package org.apache.whirr.service.hadoop;
 
+import static org.apache.whirr.service.hadoop.HadoopConfigurationBuilder.buildCommon;
+import static org.apache.whirr.service.hadoop.HadoopConfigurationBuilder.buildHdfs;
+import static org.apache.whirr.service.hadoop.HadoopConfigurationBuilder.buildMapReduce;
+import static org.apache.whirr.service.hadoop.HadoopConfigurationBuilder.buildHadoopEnv;
 import static org.jclouds.scriptbuilder.domain.Statements.call;
+
+import com.google.common.base.Joiner;
 
 import java.io.IOException;
 
 import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration.ConfigurationException;
+import org.apache.whirr.Cluster;
 import org.apache.whirr.ClusterSpec;
 import org.apache.whirr.service.ClusterActionEvent;
 import org.apache.whirr.service.ClusterActionHandlerSupport;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class HadoopClusterActionHandler extends ClusterActionHandlerSupport {
+
+  private static final Logger LOG =
+      LoggerFactory.getLogger(HadoopClusterActionHandler.class);
 
   /**
    * Returns a composite configuration that is made up from the global
@@ -63,4 +76,38 @@ public abstract class HadoopClusterActionHandler extends ClusterActionHandlerSup
     addStatement(event, call(getInstallFunction(conf),
         "-u", tarball));
   }
+  
+  @Override
+  protected void beforeConfigure(ClusterActionEvent event)
+      throws IOException, InterruptedException {
+    ClusterSpec clusterSpec = event.getClusterSpec();
+    Cluster cluster = event.getCluster();
+    
+    doBeforeConfigure(event);
+
+    createHadoopConfigFiles(event, clusterSpec, cluster);
+    
+    addStatement(event, call(
+      getConfigureFunction(getConfiguration(clusterSpec)),
+      Joiner.on(",").join(event.getInstanceTemplate().getRoles()),
+      "-c", clusterSpec.getProvider())
+    );
+  }
+
+  protected void doBeforeConfigure(ClusterActionEvent event) throws IOException {};
+
+  private void createHadoopConfigFiles(ClusterActionEvent event,
+      ClusterSpec clusterSpec, Cluster cluster) throws IOException {
+    try {
+      event.getStatementBuilder().addStatements(
+        buildCommon("/tmp/core-site.xml", clusterSpec, cluster),
+        buildHdfs("/tmp/hdfs-site.xml", clusterSpec, cluster),
+        buildMapReduce("/tmp/mapred-site.xml", clusterSpec, cluster),
+        buildHadoopEnv("/tmp/hadoop-env.sh", clusterSpec, cluster)
+      );
+    } catch (ConfigurationException e) {
+      throw new IOException(e);
+    }
+  }
+
 }

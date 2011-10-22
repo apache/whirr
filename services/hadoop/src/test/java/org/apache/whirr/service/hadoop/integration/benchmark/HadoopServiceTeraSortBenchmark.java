@@ -47,12 +47,11 @@ public class HadoopServiceTeraSortBenchmark {
     LoggerFactory.getLogger(HadoopServiceTeraSortBenchmark.class);
   
   private static boolean shutdownClusterOnTearDown;
-  private static HadoopServiceController controller =
-    HadoopServiceController.getInstance();
-
+  private static HadoopServiceController controller;
   
   @BeforeClass
   public static void setUp() throws Exception {
+    controller = HadoopServiceController.getInstance("whirr-hadoop-test.properties");
     shutdownClusterOnTearDown = controller.ensureClusterRunning();
   }
   

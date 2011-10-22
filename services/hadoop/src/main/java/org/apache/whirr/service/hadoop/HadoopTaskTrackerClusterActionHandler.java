@@ -18,15 +18,59 @@
 
 package org.apache.whirr.service.hadoop;
 
-import org.apache.whirr.service.ClusterActionHandlerSupport;
+import static org.apache.whirr.RolePredicates.role;
 
-// Currently the tasktracker is started by HadoopDataNodeClusterActionHandler
-public class HadoopTaskTrackerClusterActionHandler extends ClusterActionHandlerSupport {
+import java.io.IOException;
 
+import org.apache.whirr.Cluster;
+import org.apache.whirr.Cluster.Instance;
+import org.apache.whirr.ClusterSpec;
+import org.apache.whirr.service.ClusterActionEvent;
+import org.apache.whirr.service.FirewallManager.Rule;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+
+
+public class HadoopTaskTrackerClusterActionHandler extends HadoopClusterActionHandler {
+
+  private static final Logger LOG =
+      LoggerFactory.getLogger(HadoopTaskTrackerClusterActionHandler.class);
+    
   public static final String ROLE = "hadoop-tasktracker";
   
   @Override
   public String getRole() {
     return ROLE;
   }
+
+  @Override
+  protected void doBeforeConfigure(ClusterActionEvent event) throws IOException {
+    Cluster cluster = event.getCluster();
+    
+    Instance jobtracker = cluster.getInstanceMatching(role(ROLE));
+    event.getFirewallManager().addRules(
+        Rule.create()
+          .destination(jobtracker)
+          .ports(HadoopCluster.JOBTRACKER_WEB_UI_PORT),
+        Rule.create()
+          .source(HadoopCluster.getNamenodePublicAddress(cluster).getHostAddress())
+          .destination(jobtracker)
+          .ports(HadoopCluster.JOBTRACKER_PORT)
+    );
+    
+  }
+
+  @Override
+  protected void afterConfigure(ClusterActionEvent event) throws IOException,
+      InterruptedException {
+    ClusterSpec clusterSpec = event.getClusterSpec();
+    
+    // TODO: wait for TTs to come up (done in test for the moment)
+    
+    LOG.info("Completed configuration of {} role {}", clusterSpec.getClusterName(), getRole());
+
+    // TODO: List task trackers + url to their WEB UI?
+  }
+  
 }

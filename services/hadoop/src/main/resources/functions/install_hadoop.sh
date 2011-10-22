@@ -25,6 +25,11 @@ function update_repo() {
 function install_hadoop() {
   local OPTIND
   local OPTARG
+
+  if [ "$INSTALL_HADOOP_DONE" == "1" ]; then
+    echo "Hadoop is already installed."
+    return;
+  fi
   
   HADOOP_TAR_URL=
   while getopts "u:" OPTION; do
@@ -48,5 +53,7 @@ function install_hadoop() {
 
   echo "export HADOOP_HOME=$HADOOP_HOME" >> ~root/.bashrc
   echo 'export PATH=$JAVA_HOME/bin:$HADOOP_HOME/bin:$PATH' >> ~root/.bashrc
+  
+  INSTALL_HADOOP_DONE=1
 }
 

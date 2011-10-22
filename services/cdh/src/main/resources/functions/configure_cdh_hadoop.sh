@@ -18,6 +18,11 @@ function configure_cdh_hadoop() {
   local OPTIND
   local OPTARG
   
+  if [ "$CONFIGURE_HADOOP_DONE" == "1" ]; then
+    echo "Hadoop is already configured."
+    return;
+  fi
+  
   ROLES=$1
   shift
   
@@ -93,6 +98,9 @@ EOF
       ;;
     esac
   done
+  
+    CONFIGURE_HADOOP_DONE=1
+  
 }
 
 function start_namenode() {

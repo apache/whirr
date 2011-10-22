@@ -27,8 +27,8 @@ import java.util.List;
 import org.apache.commons.configuration.AbstractConfiguration;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
+import org.apache.whirr.service.jclouds.CreateFileStatement;
 import org.jclouds.scriptbuilder.domain.Statement;
-import org.jclouds.scriptbuilder.domain.Statements;
 
 /**
  * Helper class to convert between Hadoop configuration representations.
@@ -66,7 +66,7 @@ public class HadoopConfigurationConverter {
   
   public static Statement asCreateXmlConfigurationFileStatement(String path, 
       Configuration hadoopConfig) {
-    return Statements.appendFile(path, asXmlConfigurationLines(hadoopConfig));
+    return new CreateFileStatement(path, asXmlConfigurationLines(hadoopConfig));
   }
 
   @VisibleForTesting
@@ -93,7 +93,7 @@ public class HadoopConfigurationConverter {
   
   public static Statement asCreateEnvironmentVariablesFileStatement(String path, 
       Configuration config) {
-    return Statements.appendFile(path, asEnvironmentVariablesLines(config));
+    return new CreateFileStatement(path, asEnvironmentVariablesLines(config));
   }
   
 }

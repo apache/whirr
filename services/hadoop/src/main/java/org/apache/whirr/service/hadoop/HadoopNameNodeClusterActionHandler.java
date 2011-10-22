@@ -19,11 +19,6 @@
 package org.apache.whirr.service.hadoop;
 
 import static org.apache.whirr.RolePredicates.role;
-import static org.apache.whirr.service.hadoop.HadoopConfigurationBuilder.buildCommon;
-import static org.apache.whirr.service.hadoop.HadoopConfigurationBuilder.buildHadoopEnv;
-import static org.apache.whirr.service.hadoop.HadoopConfigurationBuilder.buildHdfs;
-import static org.apache.whirr.service.hadoop.HadoopConfigurationBuilder.buildMapReduce;
-import static org.jclouds.scriptbuilder.domain.Statements.call;
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
@@ -35,7 +30,6 @@ import java.net.InetAddress;
 import java.util.Map.Entry;
 import java.util.Properties;
 
-import org.apache.commons.configuration.ConfigurationException;
 import org.apache.whirr.Cluster;
 import org.apache.whirr.Cluster.Instance;
 import org.apache.whirr.ClusterSpec;
@@ -51,48 +45,26 @@ public class HadoopNameNodeClusterActionHandler extends HadoopClusterActionHandl
   
   public static final String ROLE = "hadoop-namenode";
   
-  public static final int NAMENODE_PORT = 8020;
-  public static final int JOBTRACKER_PORT = 8021;
-  public static final int NAMENODE_WEB_UI_PORT = 50070;
-  public static final int JOBTRACKER_WEB_UI_PORT = 50030;
-    
   @Override
   public String getRole() {
     return ROLE;
   }
   
   @Override
-  protected void beforeConfigure(ClusterActionEvent event) throws IOException, InterruptedException {
-    ClusterSpec clusterSpec = event.getClusterSpec();
+  protected void doBeforeConfigure(ClusterActionEvent event) throws IOException {
     Cluster cluster = event.getCluster();
     
     Instance namenode = cluster.getInstanceMatching(role(ROLE));
     event.getFirewallManager().addRules(
         Rule.create()
           .destination(namenode)
-          .ports(NAMENODE_WEB_UI_PORT, JOBTRACKER_WEB_UI_PORT),
+          .ports(HadoopCluster.NAMENODE_WEB_UI_PORT),
         Rule.create()
           .source(namenode.getPublicAddress().getHostAddress())
           .destination(namenode)
-          .ports(NAMENODE_PORT, JOBTRACKER_PORT)
+          .ports(HadoopCluster.NAMENODE_PORT, HadoopCluster.JOBTRACKER_PORT)
     );
     
-    try {
-      event.getStatementBuilder().addStatements(
-        buildCommon("/tmp/core-site.xml", clusterSpec, cluster),
-        buildHdfs("/tmp/hdfs-site.xml", clusterSpec, cluster),
-        buildMapReduce("/tmp/mapred-site.xml", clusterSpec, cluster),
-        buildHadoopEnv("/tmp/hadoop-env.sh", clusterSpec, cluster)
-      );
-    } catch (ConfigurationException e) {
-      throw new IOException(e);
-    }
-    
-    addStatement(event, call(
-      getConfigureFunction(getConfiguration(clusterSpec)),
-      "hadoop-namenode,hadoop-jobtracker",
-      "-c", clusterSpec.getProvider())
-    );
   }
   
   @Override
@@ -102,15 +74,13 @@ public class HadoopNameNodeClusterActionHandler extends HadoopClusterActionHandl
     
     // TODO: wait for TTs to come up (done in test for the moment)
     
-    LOG.info("Completed configuration of {}", clusterSpec.getClusterName());
-    Instance instance = cluster.getInstanceMatching(role(ROLE));
-    InetAddress namenodePublicAddress = instance.getPublicAddress();
-    InetAddress jobtrackerPublicAddress = namenodePublicAddress;
+    LOG.info("Completed configuration of {} role {}", clusterSpec.getClusterName(), getRole());
+    InetAddress namenodePublicAddress = HadoopCluster.getNamenodePublicAddress(cluster);
+    InetAddress jobtrackerPublicAddress = HadoopCluster.getJobTrackerPublicAddress(cluster);
 
     LOG.info("Namenode web UI available at http://{}:{}",
-      namenodePublicAddress.getHostName(), NAMENODE_WEB_UI_PORT);
-    LOG.info("Jobtracker web UI available at http://{}:{}",
-      jobtrackerPublicAddress.getHostName(), JOBTRACKER_WEB_UI_PORT);
+      namenodePublicAddress.getHostName(), HadoopCluster.NAMENODE_WEB_UI_PORT);
+
     Properties config = createClientSideProperties(clusterSpec, namenodePublicAddress, jobtrackerPublicAddress);
     createClientSideHadoopSiteFile(clusterSpec, config);
     createProxyScript(clusterSpec, cluster);

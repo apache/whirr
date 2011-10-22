@@ -16,16 +16,14 @@
  * limitations under the License.
  */
 
-package org.apache.whirr.service.hadoop.integration;
+package org.apache.whirr.service.hbase.integration;
 
 import org.junit.BeforeClass;
 
-public class HadoopServiceTest extends AbstractHadoopServiceTest {
-
+public class HBase090SingleNodeServiceTest extends HBaseServiceTest {
   @BeforeClass
   public static void setUp() throws Exception {
-    controller = HadoopServiceController.getInstance("whirr-hadoop-test.properties");
+    controller = HBaseServiceController.getInstance("whirr-hbase-0.90-singlenode-test.properties");
     controller.ensureClusterRunning();
   }
-
 }

@@ -25,9 +25,30 @@ import org.apache.whirr.Cluster;
 import org.apache.whirr.RolePredicates;
 
 public class HadoopCluster {
+  
+  public static final int NAMENODE_PORT = 8020;
+  public static final int NAMENODE_WEB_UI_PORT = 50070;
+  public static final int JOBTRACKER_PORT = 8021;
+  public static final int JOBTRACKER_WEB_UI_PORT = 50030;
+  
   public static InetAddress getNamenodePublicAddress(Cluster cluster) throws IOException {
     return cluster.getInstanceMatching(
         RolePredicates.role(HadoopNameNodeClusterActionHandler.ROLE))
         .getPublicAddress();
+  }
+  public static InetAddress getNamenodePrivateAddress(Cluster cluster) throws IOException {
+    return cluster.getInstanceMatching(
+        RolePredicates.role(HadoopNameNodeClusterActionHandler.ROLE))
+        .getPrivateAddress();
+  }
+  public static InetAddress getJobTrackerPublicAddress(Cluster cluster) throws IOException {
+    return cluster.getInstanceMatching(
+        RolePredicates.role(HadoopJobTrackerClusterActionHandler.ROLE))
+        .getPublicAddress();
+  }
+  public static InetAddress getJobTrackerPrivateAddress(Cluster cluster) throws IOException {
+    return cluster.getInstanceMatching(
+        RolePredicates.role(HadoopJobTrackerClusterActionHandler.ROLE))
+        .getPrivateAddress();
   }
 }

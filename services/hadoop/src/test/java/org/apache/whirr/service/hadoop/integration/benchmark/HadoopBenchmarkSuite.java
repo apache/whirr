@@ -30,11 +30,11 @@ import org.junit.runners.Suite;
 })
 public class HadoopBenchmarkSuite {
   
-  private static HadoopServiceController controller =
-    HadoopServiceController.getInstance();
+  private static HadoopServiceController controller;
   
   @BeforeClass
   public static void setUp() throws Exception {
+    controller = HadoopServiceController.getInstance("whirr-hadoop-test");
     controller.ensureClusterRunning();
   }
   

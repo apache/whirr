@@ -44,6 +44,8 @@ Trunk (unreleased changes)
 
     WHIRR-397. Automatic template selection is too restrictive (asavu) 
 
+    WHIRR-342. hadoop/hbase configuration & active roles on a node (kve via asavu)
+
   BUG FIXES
 
     WHIRR-377. Fix broken CLI logging config. (asavu via tomwhite)

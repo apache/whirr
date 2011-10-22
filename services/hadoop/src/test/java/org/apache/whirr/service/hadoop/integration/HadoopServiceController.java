@@ -19,9 +19,12 @@
 package org.apache.whirr.service.hadoop.integration;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.commons.configuration.CompositeConfiguration;
+import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
@@ -42,20 +45,27 @@ public class HadoopServiceController {
   private static final Logger LOG =
     LoggerFactory.getLogger(HadoopServiceController.class);
 
-  private static final HadoopServiceController INSTANCE =
-    new HadoopServiceController();
+  private static final Map<String, HadoopServiceController> INSTANCES =
+    new HashMap<String, HadoopServiceController>();
   
-  public static HadoopServiceController getInstance() {
-    return INSTANCE;
+  public static HadoopServiceController getInstance(String config) throws ConfigurationException {
+    if (!INSTANCES.containsKey("config")) {
+      PropertiesConfiguration configuration = new PropertiesConfiguration(config);
+      INSTANCES.put(config, new HadoopServiceController(configuration));
+    }
+    return INSTANCES.get(config);
   }
   
+  private org.apache.commons.configuration.Configuration configuration;
+
   private boolean running;
   private ClusterSpec clusterSpec;
   private ClusterController controller;
   private HadoopProxy proxy;
   private Cluster cluster;
   
-  private HadoopServiceController() {
+  private HadoopServiceController(org.apache.commons.configuration.Configuration configuration) {
+    this.configuration = configuration;
   }
   
   public synchronized boolean ensureClusterRunning() throws Exception {
@@ -74,7 +84,7 @@ public class HadoopServiceController {
     if (System.getProperty("config") != null) {
       config.addConfiguration(new PropertiesConfiguration(System.getProperty("config")));
     }
-    config.addConfiguration(new PropertiesConfiguration("whirr-hadoop-test.properties"));
+    config.addConfiguration(configuration);
     clusterSpec = ClusterSpec.withTemporaryKeys(config);
     controller = new ClusterController();
     

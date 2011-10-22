@@ -20,11 +20,11 @@ package org.apache.whirr.service.hadoop.integration;
 
 import org.junit.BeforeClass;
 
-public class HadoopServiceTest extends AbstractHadoopServiceTest {
+public class HadoopSingleNodeServiceTest extends AbstractHadoopServiceTest {
 
   @BeforeClass
   public static void setUp() throws Exception {
-    controller = HadoopServiceController.getInstance("whirr-hadoop-test.properties");
+    controller = HadoopServiceController.getInstance("whirr-hadoop-test-single.properties");
     controller.ensureClusterRunning();
   }
 

@@ -57,4 +57,6 @@ function install_cdh_hadoop() {
     cp -r /etc/$HADOOP/conf.empty $HADOOP_CONF_DIR
     alternatives --install /etc/$HADOOP/conf $HADOOP-conf $HADOOP_CONF_DIR 90
   fi
+  
+  INSTALL_HADOOP_DONE=1
 }

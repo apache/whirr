@@ -17,7 +17,12 @@
 function configure_hadoop() {
   local OPTIND
   local OPTARG
-  
+
+  if [ "$CONFIGURE_HADOOP_DONE" == "1" ]; then
+    echo "Hadoop is already configured."
+    return;
+  fi
+
   ROLES=$1
   shift
   
@@ -84,6 +89,8 @@ function configure_hadoop() {
     esac
   done
 
+  CONFIGURE_HADOOP_DONE=1
+
 }
 
 function start_namenode() {
@@ -119,5 +126,6 @@ function start_hadoop_daemon() {
     AS_HADOOP="/sbin/runuser -s /bin/bash - hadoop -c"
   fi
   $AS_HADOOP "$HADOOP_HOME/bin/hadoop-daemon.sh start $1"
+  
 }
 
