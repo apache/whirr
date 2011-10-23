@@ -48,7 +48,7 @@ public class HadoopTaskTrackerClusterActionHandler extends HadoopClusterActionHa
   protected void doBeforeConfigure(ClusterActionEvent event) throws IOException {
     Cluster cluster = event.getCluster();
     
-    Instance jobtracker = cluster.getInstanceMatching(role(ROLE));
+    Instance jobtracker = cluster.getInstanceMatching(role(HadoopJobTrackerClusterActionHandler.ROLE));
     event.getFirewallManager().addRules(
         Rule.create()
           .destination(jobtracker)
