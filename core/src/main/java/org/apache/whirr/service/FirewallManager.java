@@ -23,21 +23,20 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Iterables;
 import org.apache.whirr.Cluster;
-import org.apache.whirr.Cluster.Instance;
 import org.apache.whirr.ClusterSpec;
+import org.apache.whirr.Cluster.Instance;
 import org.apache.whirr.service.jclouds.FirewallSettings;
 import org.jclouds.compute.ComputeServiceContext;
+import org.jclouds.javax.annotation.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Function;
 import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-
-import javax.annotation.Nullable;
 
 public class FirewallManager {
 

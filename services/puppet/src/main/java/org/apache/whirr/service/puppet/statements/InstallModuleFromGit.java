@@ -26,8 +26,7 @@ import static org.jclouds.scriptbuilder.domain.Statements.exec;
 
 import java.net.URI;
 
-import javax.annotation.Nullable;
-
+import org.jclouds.javax.annotation.Nullable;
 import org.jclouds.scriptbuilder.domain.OsFamily;
 import org.jclouds.scriptbuilder.domain.Statement;
 

@@ -18,6 +18,23 @@
 
 package org.apache.whirr.util;
 
+import com.google.common.base.Function;
+import com.google.common.collect.Maps;
+import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.lang.RandomStringUtils;
+import org.apache.whirr.ClusterSpec;
+import org.apache.whirr.service.BlobStoreContextBuilder;
+import org.jclouds.blobstore.BlobStore;
+import org.jclouds.blobstore.BlobStoreContext;
+import org.jclouds.blobstore.domain.Blob;
+import org.jclouds.compute.ComputeServiceContext;
+import org.jclouds.domain.Location;
+import org.jclouds.http.HttpRequest;
+import org.jclouds.scriptbuilder.domain.SaveHttpResponseTo;
+import org.jclouds.scriptbuilder.domain.Statement;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -25,24 +42,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Map;
 import java.util.Set;
-
-import org.apache.commons.configuration.ConfigurationException;
-import org.apache.commons.lang.RandomStringUtils;
-import org.apache.whirr.ClusterSpec;
-import org.apache.whirr.service.BlobStoreContextBuilder;
-import org.apache.whirr.service.jclouds.SaveHttpResponseTo;
-import org.jclouds.blobstore.BlobStore;
-import org.jclouds.blobstore.BlobStoreContext;
-import org.jclouds.blobstore.domain.Blob;
-import org.jclouds.compute.ComputeServiceContext;
-import org.jclouds.domain.Location;
-import org.jclouds.http.HttpRequest;
-import org.jclouds.scriptbuilder.domain.Statement;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.google.common.base.Function;
-import com.google.common.collect.Maps;
 
 import static org.jclouds.blobstore.options.PutOptions.Builder.multipart;
 

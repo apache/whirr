@@ -20,15 +20,15 @@ package org.apache.whirr.service.hadoop;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Lists;
+import org.apache.commons.configuration.AbstractConfiguration;
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.lang.StringUtils;
+import org.jclouds.scriptbuilder.domain.Statement;
 
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.commons.configuration.AbstractConfiguration;
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.lang.StringUtils;
-import org.apache.whirr.service.jclouds.CreateFileStatement;
-import org.jclouds.scriptbuilder.domain.Statement;
+import static org.jclouds.scriptbuilder.domain.Statements.createOrOverwriteFile;
 
 /**
  * Helper class to convert between Hadoop configuration representations.
@@ -66,7 +66,7 @@ public class HadoopConfigurationConverter {
   
   public static Statement asCreateXmlConfigurationFileStatement(String path, 
       Configuration hadoopConfig) {
-    return new CreateFileStatement(path, asXmlConfigurationLines(hadoopConfig));
+    return createOrOverwriteFile(path, asXmlConfigurationLines(hadoopConfig));
   }
 
   @VisibleForTesting
@@ -93,7 +93,7 @@ public class HadoopConfigurationConverter {
   
   public static Statement asCreateEnvironmentVariablesFileStatement(String path, 
       Configuration config) {
-    return new CreateFileStatement(path, asEnvironmentVariablesLines(config));
+    return createOrOverwriteFile(path, asEnvironmentVariablesLines(config));
   }
   
 }

@@ -18,17 +18,26 @@
 
 package org.apache.whirr.actions;
 
-import com.google.common.base.Function;
-import com.google.common.base.Joiner;
-import com.google.common.collect.Collections2;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Sets;
-import com.google.common.primitives.Ints;
+import static org.apache.whirr.RolePredicates.onlyRolesIn;
+import static org.jclouds.compute.options.RunScriptOptions.Builder.overrideCredentialsWith;
+
+import java.io.IOException;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.Map.Entry;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+
 import org.apache.whirr.Cluster;
-import org.apache.whirr.Cluster.Instance;
 import org.apache.whirr.ClusterSpec;
 import org.apache.whirr.InstanceTemplate;
 import org.apache.whirr.RolePredicates;
+import org.apache.whirr.Cluster.Instance;
 import org.apache.whirr.service.ClusterActionEvent;
 import org.apache.whirr.service.ClusterActionHandler;
 import org.apache.whirr.service.FirewallManager.Rule;
@@ -37,26 +46,18 @@ import org.jclouds.compute.ComputeService;
 import org.jclouds.compute.ComputeServiceContext;
 import org.jclouds.compute.domain.ExecResponse;
 import org.jclouds.domain.Credentials;
+import org.jclouds.javax.annotation.Nullable;
 import org.jclouds.scriptbuilder.domain.OsFamily;
 import org.jclouds.scriptbuilder.domain.Statement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nullable;
-import java.io.IOException;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-
-import static org.apache.whirr.RolePredicates.onlyRolesIn;
-import static org.jclouds.compute.options.RunScriptOptions.Builder.overrideCredentialsWith;
+import com.google.common.base.Function;
+import com.google.common.base.Joiner;
+import com.google.common.collect.Collections2;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Sets;
+import com.google.common.primitives.Ints;
 
 
 /**

@@ -18,15 +18,14 @@
 
 package org.apache.whirr;
 
-import com.google.common.base.Predicate;
-import com.google.common.collect.Sets;
-
 import java.util.Collections;
 import java.util.Set;
 
 import org.apache.whirr.Cluster.Instance;
+import org.jclouds.javax.annotation.Nullable;
 
-import javax.annotation.Nullable;
+import com.google.common.base.Predicate;
+import com.google.common.collect.Sets;
 
 /**
  * {@link Predicate}s for matching {@link Instance}s with certain cluster roles.

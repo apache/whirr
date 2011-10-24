@@ -46,6 +46,8 @@ Trunk (unreleased changes)
 
     WHIRR-342. hadoop/hbase configuration & active roles on a node (kve via asavu)
 
+    WHIRR-400. Upgrade to jclouds 1.2.1 (Adrian Cole and asavu)
+
   BUG FIXES
 
     WHIRR-377. Fix broken CLI logging config. (asavu via tomwhite)
