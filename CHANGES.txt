@@ -48,6 +48,8 @@ Trunk (unreleased changes)
 
     WHIRR-400. Upgrade to jclouds 1.2.1 (Adrian Cole and asavu)
 
+    WHIRR-411. put install_git, install_ruby scripts in core (Alex Heneveld via asavu)
+
   BUG FIXES
 
     WHIRR-377. Fix broken CLI logging config. (asavu via tomwhite)

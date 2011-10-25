@@ -45,8 +45,10 @@ public class PuppetInstallClusterActionHandler extends ClusterActionHandlerSuppo
     InterruptedException {
    
    // install ruby and ruby-gems in the nodes
-   // (NB script is same as that in whirr-chef patch, WHIRR-49)
    addStatement(event, call("install_ruby"));
+
+   // install git
+   addStatement(event, call("install_git"));
 
    // install puppet
    addStatement(event, call("install_puppet"));
