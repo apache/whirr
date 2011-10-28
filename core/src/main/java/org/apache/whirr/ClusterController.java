@@ -37,6 +37,7 @@ import org.jclouds.compute.domain.ComputeMetadata;
 import org.jclouds.compute.domain.ExecResponse;
 import org.jclouds.compute.domain.NodeMetadata;
 import org.jclouds.compute.domain.NodeState;
+import org.jclouds.compute.options.RunScriptOptions;
 import org.jclouds.domain.Credentials;
 import org.jclouds.scriptbuilder.domain.Statement;
 import org.slf4j.Logger;
@@ -151,12 +152,34 @@ public class ClusterController {
   public Map<? extends NodeMetadata, ExecResponse> runScriptOnNodesMatching(ClusterSpec spec,
         Predicate<NodeMetadata> condition, Statement statement) throws IOException, RunScriptOnNodesException {
 
-    Credentials credentials = new Credentials(spec.getClusterUser(), spec.getPrivateKey());
-    ComputeServiceContext context = getCompute().apply(spec);
+    return runScriptOnNodesMatching(spec, condition, statement, null);
+  }
+  
+  public Map<? extends NodeMetadata, ExecResponse> runScriptOnNodesMatching(
+      ClusterSpec spec, Predicate<NodeMetadata> condition, Statement statement,
+      RunScriptOptions options) throws IOException, RunScriptOnNodesException {
 
-    condition = Predicates.and(runningInGroup(spec.getClusterName()), condition);
+    Credentials credentials = new Credentials(spec.getClusterUser(),
+        spec.getPrivateKey());
+
+    if (options == null) {
+      options = defaultRunScriptOptionsForSpec(spec);
+    } else if (options.getOverridingCredentials() == null) {
+      options = options.overrideCredentialsWith(credentials);
+    }
+    condition = Predicates
+        .and(runningInGroup(spec.getClusterName()), condition);
+
+    ComputeServiceContext context = getCompute().apply(spec);
     return context.getComputeService().runScriptOnNodesMatching(condition,
-      statement, overrideCredentialsWith(credentials).wrapInInitScript(false).runAsRoot(false));
+        statement, options);
+  }
+  
+  public RunScriptOptions defaultRunScriptOptionsForSpec(ClusterSpec spec) {
+    Credentials credentials = new Credentials(spec.getClusterUser(),
+        spec.getPrivateKey());
+    return overrideCredentialsWith(credentials).wrapInInitScript(false)
+        .runAsRoot(false);
   }
 
   @Deprecated

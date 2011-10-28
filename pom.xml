@@ -50,6 +50,7 @@
     <module>services/elasticsearch</module>
     <module>services/hama</module>
     <module>services/puppet</module>
+    <module>services/chef</module>
   </modules>
 
   <properties>
