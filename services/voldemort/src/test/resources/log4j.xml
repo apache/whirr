@@ -132,6 +132,17 @@
         </layout>
     </appender>
 
+    <!-- A time/date based rolling appender -->
+    <appender name="SSHFILE" class="org.apache.log4j.DailyRollingFileAppender">
+        <param name="File" value="target/test-data/jclouds-ssh.log" />
+        <param name="Append" value="true" />
+        <param name="DatePattern" value="'.'yyyy-MM-dd" />
+        <param name="Threshold" value="TRACE" />
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="%d %-5p [%c] (%t) %m%n" />
+        </layout>
+    </appender>
+    
     <appender name="ASYNCCOMPUTE" class="org.apache.log4j.AsyncAppender">
         <appender-ref ref="COMPUTEFILE" />
     </appender>
@@ -145,6 +156,10 @@
 
     <appender name="ASYNCBLOBSTORE" class="org.apache.log4j.AsyncAppender">
         <appender-ref ref="BLOBSTOREFILE" />
+    </appender>
+
+    <appender name="ASYNCSSH" class="org.apache.log4j.AsyncAppender">
+        <appender-ref ref="SSHFILE" />
     </appender>
     <!-- ================ -->
     <!-- Limit categories -->
@@ -171,6 +186,11 @@
     <category name="jclouds.compute">
         <priority value="DEBUG" />
         <appender-ref ref="ASYNCCOMPUTE" />
+    </category>
+
+    <category name="jclouds.ssh">
+        <priority value="TRACE" />
+        <appender-ref ref="ASYNCSSH" />
     </category>
 
     <category name="jclouds.wire">

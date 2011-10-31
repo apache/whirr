@@ -52,6 +52,8 @@ Trunk (unreleased changes)
 
     WHIRR-411. put install_git, install_ruby scripts in core (Alex Heneveld via asavu)
 
+    WHIRR-418. Add ssh debug logs to tests (Adrian Cole via asavu)
+
   BUG FIXES
 
     WHIRR-377. Fix broken CLI logging config. (asavu via tomwhite)
