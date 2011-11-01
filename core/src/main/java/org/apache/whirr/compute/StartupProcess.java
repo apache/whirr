@@ -18,6 +18,7 @@
 
 package org.apache.whirr.compute;
 
+import com.google.common.base.Predicates;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.jclouds.compute.ComputeService;
@@ -28,8 +29,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -143,31 +144,19 @@ public class StartupProcess implements Callable<Set<? extends NodeMetadata>> {
 
   void cleanupFailedNodes() throws InterruptedException {
     if (lostNodes.size() > 0) {
-      // parallel destroy of failed nodes
-      Set<Future<NodeMetadata>> deletingNodeFutures = Sets.newLinkedHashSet();
-      Iterator<?> it = lostNodes.keySet().iterator();
-      while (it.hasNext()) {
-        final NodeMetadata badNode = (NodeMetadata) it.next();
-        deletingNodeFutures.add(executorService.submit(
-            new Callable<NodeMetadata>() {
-              public NodeMetadata call() throws Exception {
-                final String nodeId = badNode.getId();
-                LOG.info("Deleting failed node node {}", nodeId);
-                computeService.destroyNode(nodeId);
-                LOG.info("Node deleted: {}", nodeId);
-                return badNode;
-              }
-            }
-          ));
+      Set<String> lostIds = Sets.newLinkedHashSet();
+      for (Entry<NodeMetadata, Throwable> lostNode : lostNodes.entrySet()) {
+        LOG.debug("Will destroy failed node {}", lostNode.getKey(), lostNode.getValue());
+        lostIds.add(lostNode.getKey().getId());
       }
-      Iterator<Future<NodeMetadata>> results = deletingNodeFutures.iterator();
-      while (results.hasNext()) {
-        try {
-          results.next().get();
-        } catch (ExecutionException e) {
-          LOG.warn("Error while destroying failed node:", e);
-        }
+      LOG.info("Destroying failed nodes {}", lostIds);
+      Set<? extends NodeMetadata> destroyedNodes = computeService.destroyNodesMatching(
+        Predicates.in(lostNodes.keySet()));
+      lostIds.clear();
+      for (NodeMetadata destroyed : destroyedNodes) {
+        lostIds.add(destroyed.getId());
       }
+      LOG.info("Destroyed failed nodes {}", lostIds);
     }
   }
 }

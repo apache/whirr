@@ -54,6 +54,8 @@ Trunk (unreleased changes)
 
     WHIRR-418. Add ssh debug logs to tests (Adrian Cole via asavu)
 
+    WHIRR-423. Refactor StartupProcess.cleanupFailedNodes (Adrian Cole via asavu)
+
   BUG FIXES
 
     WHIRR-377. Fix broken CLI logging config. (asavu via tomwhite)
