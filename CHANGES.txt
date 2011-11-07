@@ -62,6 +62,9 @@ Trunk (unreleased changes)
     WHIRR-399. Move common script setup and script execution fork/join outside of 
     ConfigureClusterAction and DestroyClusterAction (David Alves via asavu)
 
+    WHIRR-417. Allow users to choose their own jclouds modules with properties 
+    (Adrian Cole via asavu)
+
   BUG FIXES
 
     WHIRR-377. Fix broken CLI logging config. (asavu via tomwhite)

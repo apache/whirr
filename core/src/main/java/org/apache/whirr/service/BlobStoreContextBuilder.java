@@ -20,7 +20,6 @@ package org.apache.whirr.service;
 
 import java.util.Map;
 import java.util.Properties;
-import java.util.Set;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationConverter;
@@ -34,8 +33,6 @@ import org.jclouds.blobstore.BlobStoreContextFactory;
 import org.jclouds.blobstore.InputStreamMap;
 import org.jclouds.blobstore.attr.ConsistencyModel;
 import org.jclouds.blobstore.options.ListContainerOptions;
-import org.jclouds.enterprise.config.EnterpriseConfigurationModule;
-import org.jclouds.logging.slf4j.config.SLF4JLoggingModule;
 import org.jclouds.providers.ProviderMetadata;
 import org.jclouds.providers.Providers;
 import org.jclouds.rest.RestContext;
@@ -50,7 +47,7 @@ import com.google.common.collect.ForwardingObject;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.MapMaker;
-import com.google.inject.AbstractModule;
+import com.google.inject.Module;
 
 public class BlobStoreContextBuilder {
 
@@ -71,16 +68,12 @@ public class BlobStoreContextBuilder {
        new Function<Key, BlobStoreContext>(){
         private final BlobStoreContextFactory factory =  new BlobStoreContextFactory();
         
-        private final Set<AbstractModule> wiring = ImmutableSet.of(
-            new SLF4JLoggingModule(), 
-            new EnterpriseConfigurationModule());        
-        
         @Override
         public BlobStoreContext apply(Key arg0) {
           LOG.debug("creating new BlobStoreContext {}", arg0);
           BlobStoreContext context = new IgnoreCloseBlobStoreContext(
               factory.createContext(arg0.provider, arg0.identity, arg0.credential,
-                                    wiring, arg0.overrides));
+                                    ImmutableSet.<Module>of(), arg0.overrides));
           LOG.info("created new BlobStoreContext {}", context);
           return context;
        }
