@@ -59,6 +59,9 @@ Trunk (unreleased changes)
     WHIRR-398. Implement the execution of scripts on DestroyClusterAction 
     (David Alves via asavu)
 
+    WHIRR-399. Move common script setup and script execution fork/join outside of 
+    ConfigureClusterAction and DestroyClusterAction (David Alves via asavu)
+
   BUG FIXES
 
     WHIRR-377. Fix broken CLI logging config. (asavu via tomwhite)
