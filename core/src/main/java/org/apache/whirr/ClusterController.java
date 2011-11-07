@@ -116,15 +116,22 @@ public class ClusterController {
 
   /**
    * Stop the cluster and destroy all resources associated with it.
-   *
-   * @throws IOException if there is a problem while stopping the cluster. The
-   * cluster may or may not have been stopped.
-   * @throws InterruptedException if the thread is interrupted.
+   * 
+   * @throws IOException
+   *           if there is a problem while stopping the cluster. The cluster may
+   *           or may not have been stopped.
+   * @throws InterruptedException
+   *           if the thread is interrupted.
    */
   public void destroyCluster(ClusterSpec clusterSpec) throws IOException,
       InterruptedException {
-    DestroyClusterAction destroyer = new DestroyClusterAction(getCompute());
-    destroyer.execute(clusterSpec, null);
+
+    ClusterStateStore store = getClusterStateStore(clusterSpec);
+    Cluster cluster = store.load();
+
+    DestroyClusterAction destroyer = new DestroyClusterAction(getCompute(),
+        HandlerMapFactory.create());
+    destroyer.execute(clusterSpec, cluster);
 
     getClusterStateStore(clusterSpec).destroy();
   }

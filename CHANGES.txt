@@ -56,6 +56,9 @@ Trunk (unreleased changes)
 
     WHIRR-423. Refactor StartupProcess.cleanupFailedNodes (Adrian Cole via asavu)
 
+    WHIRR-398. Implement the execution of scripts on DestroyClusterAction 
+    (David Alves via asavu)
+
   BUG FIXES
 
     WHIRR-377. Fix broken CLI logging config. (asavu via tomwhite)
