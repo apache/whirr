@@ -615,5 +615,131 @@ xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 http://maven.apache.org/xsd
         <td>Warning: clusters do not run behind a firewall.</td>
       </tr>
     </table>
+    <p>
+      <a name="jclouds-specific-config"></a>
+    </p>
+    <subsection name="Relevant jclouds configuration options"></subsection>
+    <table border="0">
+      <tr valign="top">
+        <th>
+          <b>Name</b>
+        </th>
+        <th>
+          <b>Default</b>
+        </th>
+        <th>
+          <b>Unit</b>
+        </th>
+        <th>
+          <b>Description</b>
+        </th>
+      </tr>
+      <tr valign="top">
+        <td>
+          <tt>jclouds.compute.timeout.node-terminated</tt>
+        </td>
+        <td>
+          <tt>30000 (30 sec.)</tt>
+        </td>
+        <td>
+          <tt>msec</tt>
+        </td>
+        <td>The max. time to wait for nodes to be terminated</td>
+      </tr>
+      <tr valign="top">
+        <td>
+          <tt>jclouds.compute.timeout.node-running</tt>
+        </td>
+        <td>
+          <tt>120000 (2 min.)</tt>
+        </td>
+        <td>
+          <tt>msec</tt>
+        </td>
+        <td>The max. time to wait for nodes to be in running state</td>
+      </tr>
+      <tr valign="top">
+        <td>
+          <tt>jclouds.compute.timeout.script-complete</tt>
+        </td>
+        <td>
+          <tt>600000 (10 min.)</tt>
+        </td>
+        <td>
+          <tt>msec</tt>
+        </td>
+        <td>The max. time to wait for a script to complete execution</td>
+      </tr>
+      <tr valign="top">
+        <td>
+          <tt>jclouds.compute.timeout.port-open</tt>
+        </td>
+        <td>
+          <tt>30000 (30 sec.)</tt>
+        </td>
+        <td>
+          <tt>msec</tt>
+        </td>
+        <td>The max. time to wait for nodes to wait for the ssh port to open on newly
+        lauched nodes</td>
+      </tr>
+      <tr valign="top">
+        <td>
+          <tt>jclouds.ssh.retryable-messages</tt>
+        </td>
+        <td>
+          failed to send channel request,
+          channel is not opened,
+          invalid data,
+          End of IO Stream Read,
+          Connection reset,
+          connection is closed by foreign host,
+          socket is not established
+        </td>
+        <td>
+          <tt>--</tt>
+        </td>
+        <td>Comma-separated list of error messages upon receiving which jclouds retries
+         the ssh action.</td>
+      </tr>
+      <tr valign="top">
+        <td>
+          <tt>jclouds.ssh.max-retries</tt>
+        </td>
+        <td>
+          <tt>7</tt>
+        </td>
+        <td>
+          <tt>times</tt>
+        </td>
+        <td>The max. number of retries jclouds will attempt a failed ssh action. 
+        The period between tries increases from 200ms -> 2 seconds per math.pow(attempt, 2)</td>
+      </tr>
+      <tr valign="top">
+        <td>
+          <tt>jclouds.ssh.retry-auth</tt>
+        </td>
+        <td>
+          <tt>true</tt>
+        </td>
+        <td>
+          <tt>boolean</tt>
+        </td>
+        <td>Wether jclouds should retry ssh actions on authentication failed errors.</td>
+      </tr>
+      <tr valign="top">
+        <td>
+          <tt>jclouds.compute.blacklist-nodes</tt>
+        </td>
+        <td>
+        </td>
+        <td>
+          <tt>--</tt>
+        </td>
+        <td>Comma-separated list of nodes that we shouldn't attempt to list 
+        as they are dead in the provider for some reason.</td>
+      </tr>
+      
+    </table>
   </body>
 </document>

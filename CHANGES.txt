@@ -65,6 +65,8 @@ Trunk (unreleased changes)
     WHIRR-417. Allow users to choose their own jclouds modules with properties 
     (Adrian Cole via asavu)
 
+    WHIRR-420. Document jclouds specific configuration options (David Alves via asavu)
+
   BUG FIXES
 
     WHIRR-377. Fix broken CLI logging config. (asavu via tomwhite)
