@@ -31,6 +31,7 @@ import org.apache.whirr.ClusterController;
 import org.apache.whirr.ClusterControllerFactory;
 import org.apache.whirr.ClusterSpec;
 import org.apache.whirr.command.AbstractClusterCommand;
+import org.apache.whirr.util.WhirrUtils;
 
 /**
  * A command to launch a new cluster.
@@ -63,6 +64,11 @@ public class LaunchClusterCommand extends AbstractClusterCommand {
       out.printf("Started cluster of %s instances\n",
           cluster.getInstances().size());
       out.println(cluster);
+      
+      // print ssh command. do it for the first 20 instances so that the console
+      // won't be overflooded when launching a 1000 node cluster
+      WhirrUtils.printAccess(out, clusterSpec, cluster, 20);
+      
       return 0;
     } catch (IllegalArgumentException e) {
       err.println(e.getMessage());

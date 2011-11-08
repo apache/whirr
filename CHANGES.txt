@@ -67,6 +67,8 @@ Trunk (unreleased changes)
 
     WHIRR-420. Document jclouds specific configuration options (David Alves via asavu)
 
+    WHIRR-419. Display how to connect to remote machines (David Alves via asavu)
+
   BUG FIXES
 
     WHIRR-377. Fix broken CLI logging config. (asavu via tomwhite)
