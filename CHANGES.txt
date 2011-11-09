@@ -75,6 +75,11 @@ Trunk (unreleased changes)
 
     WHIRR-394. NPE used for flow control (David Alves via asavu)
 
+    WHIRR-410. Review automatic image selection 
+    (Adrian Cole, Alex Heneveld, David Alves and Andrei Savu)
+    * we have discovered that we are flooding the remote machines with status 
+    requests and a small instance like t1.micro is unable to cope with that
+
 Release 0.6.0 - 2011-08-17
 
   NEW FEATURES
