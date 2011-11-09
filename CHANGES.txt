@@ -86,6 +86,8 @@ Trunk (unreleased changes)
     * we have discovered that we are flooding the remote machines with status 
     requests and a small instance like t1.micro is unable to cope with that
 
+    WHIRR-352. mvn package assembly:assembly fails (David Alves via asavu)
+
 Release 0.6.0 - 2011-08-17
 
   NEW FEATURES

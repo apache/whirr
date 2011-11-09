@@ -18,8 +18,10 @@
 
 package org.apache.whirr.util.integration;
 
-import static org.junit.Assert.*;
 import static java.lang.System.out;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.net.Inet4Address;

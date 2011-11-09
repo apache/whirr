@@ -48,7 +48,7 @@ public class StatementToInstallModule implements Function<Map<String, String>, S
   private final PrepareRemoteFileUrl prepareRemoteFileUrl;
 
   @VisibleForTesting
-  public static interface PrepareRemoteFileUrl {
+  public interface PrepareRemoteFileUrl {
     /**
      * Prepare the file url for the remote machine.
      * 
