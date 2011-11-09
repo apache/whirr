@@ -69,6 +69,9 @@ Trunk (unreleased changes)
 
     WHIRR-419. Display how to connect to remote machines (David Alves via asavu)
 
+    WHIRR-426. Create a convention for naming clusters used for integration 
+    tests (asavu)
+
   BUG FIXES
 
     WHIRR-377. Fix broken CLI logging config. (asavu via tomwhite)
