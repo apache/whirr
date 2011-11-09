@@ -75,6 +75,8 @@ Trunk (unreleased changes)
     WHIRR-409. Add an integration test that shows that there is no overlap 
     between install & configure scripts on the remote machine (asavu)
 
+    WHIRR-408. Upgrade elasticsearch to 0.18.2 (asavu)
+
   BUG FIXES
 
     WHIRR-377. Fix broken CLI logging config. (asavu via tomwhite)
