@@ -207,8 +207,9 @@ public abstract class ScriptBasedClusterAction extends ClusterAction {
       try {
         ExecResponse execResponse = future.get();
         if (execResponse.getExitCode() != 0) {
-          LOG.error("Error running script: {}\n{}", execResponse.getError(),
-              execResponse.getOutput());
+          LOG.error("Error running " + phaseName + " script: {}", execResponse);
+        } else {
+          LOG.info("Successfully executed {} script: {}", phaseName, execResponse);
         }
       } catch (ExecutionException e) {
         throw new IOException(e.getCause());
@@ -222,11 +223,11 @@ public abstract class ScriptBasedClusterAction extends ClusterAction {
 
   protected void eventSpecificActions(
       Entry<InstanceTemplate, ClusterActionEvent> entry) throws IOException {
-  };
+  }
 
   protected void postRunScriptsActions(
       Map<InstanceTemplate, ClusterActionEvent> eventMap) throws IOException {
-  };
+  }
 
   /**
    * Try to get an {@see ClusterActionHandler } instance or throw an

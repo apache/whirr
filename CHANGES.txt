@@ -72,6 +72,9 @@ Trunk (unreleased changes)
     WHIRR-426. Create a convention for naming clusters used for integration 
     tests (asavu)
 
+    WHIRR-409. Add an integration test that shows that there is no overlap 
+    between install & configure scripts on the remote machine (asavu)
+
   BUG FIXES
 
     WHIRR-377. Fix broken CLI logging config. (asavu via tomwhite)
