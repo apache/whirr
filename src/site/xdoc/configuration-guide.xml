@@ -77,6 +77,17 @@ xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 http://maven.apache.org/xsd
         <tt>hadoopcluster</tt>. The cluster name is used to tag the instances in some
         cloud-specific way. For example, in Amazon it is used to form the security group name.</td>
       </tr>
+      <tr valign="top">
+        <td>
+          <tt>whirr.terminate-all-on-launch-failure</tt>
+        </td>
+        <td>
+          <tt>--terminate-all-on-launch-failure</tt>
+        </td>
+        <td>true</td>
+        <td>Whether or not to automatically terminate all nodes when cluster
+         launch fails for some reason.</td>
+      </tr>
     </table>
     <subsection name="Instance Templates Options"></subsection>
     <table border="0">
@@ -725,7 +736,7 @@ xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 http://maven.apache.org/xsd
         <td>
           <tt>boolean</tt>
         </td>
-        <td>Wether jclouds should retry ssh actions on authentication failed errors.</td>
+        <td>Whether jclouds should retry ssh actions on authentication failed errors.</td>
       </tr>
       <tr valign="top">
         <td>

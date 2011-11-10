@@ -158,7 +158,10 @@ public class ClusterSpec {
     VERSION(String.class, false, ""),
     
     RUN_URL_BASE(String.class, false, "The base URL for forming run " + 
-      "urls from. Change this to host your own set of launch scripts.");
+      "urls from. Change this to host your own set of launch scripts."),
+      
+    TERMINATE_ALL_ON_LAUNCH_FAILURE(Boolean.class, false, "Whether or not to " +
+      "automatically terminate all nodes when cluster launch fails for some reason.");
     
     private Class<?> type;
     private boolean multipleArguments;
@@ -273,6 +276,8 @@ public class ClusterSpec {
   
   private String version;
   private String runUrlBase;
+  
+  private boolean terminateAllOnLaunchFailure;
 
   private Configuration config;
   
@@ -329,6 +334,9 @@ public class ClusterSpec {
     setLocationId(getString(Property.LOCATION_ID));
     setBlobStoreLocationId(getString(Property.BLOBSTORE_LOCATION_ID));
     setClientCidrs(getList(Property.CLIENT_CIDRS));
+    
+    setTerminateAllOnLaunchFailure(config.getBoolean(
+        Property.TERMINATE_ALL_ON_LAUNCH_FAILURE.getConfigName(), Boolean.TRUE));
     
     Map<String, List<String>> fr = new HashMap<String, List<String>>();
     String firewallPrefix = Property.FIREWALL_RULES.getConfigName();
@@ -391,6 +399,8 @@ public class ClusterSpec {
 
     r.setVersion(getVersion());
     r.setRunUrlBase(getRunUrlBase());
+    
+    r.setTerminateAllOnLaunchFailure(isTerminateAllOnLaunchFailure());
 
     return r;
   }
@@ -704,6 +714,13 @@ public class ClusterSpec {
   public void setServiceName(String serviceName) {
     this.serviceName = serviceName;
   }
+  
+  public boolean isTerminateAllOnLaunchFailure() {
+    return terminateAllOnLaunchFailure;
+  }
+  public void setTerminateAllOnLaunchFailure(boolean terminateAllOnLaunchFailure) {
+    this.terminateAllOnLaunchFailure = terminateAllOnLaunchFailure;
+  }
 
   /**
    * The rsa public key which is authorized to login to your on the cloud nodes.
@@ -943,6 +960,7 @@ public class ClusterSpec {
       .add("stateStoreContainer", getStateStoreContainer())
       .add("stateStoreBlob", getStateStoreBlob())
       .add("awsEc2SpotPrice", getAwsEc2SpotPrice())
+      .add("terminateAllOnLauchFailure",isTerminateAllOnLaunchFailure())
       .toString();
   }
 }

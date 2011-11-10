@@ -99,18 +99,31 @@ public class ClusterController {
    */
   public Cluster launchCluster(ClusterSpec clusterSpec)
       throws IOException, InterruptedException {
-    
-    Map<String, ClusterActionHandler> handlerMap = new HandlerMapFactory().create();
+    try {
+      Map<String, ClusterActionHandler> handlerMap = HandlerMapFactory.create();
 
-    BootstrapClusterAction bootstrapper = new BootstrapClusterAction(getCompute(), handlerMap);
-    Cluster cluster = bootstrapper.execute(clusterSpec, null);
+      BootstrapClusterAction bootstrapper = new BootstrapClusterAction(getCompute(), handlerMap);
+      Cluster cluster = bootstrapper.execute(clusterSpec, null);
 
-    ConfigureClusterAction configurer = new ConfigureClusterAction(getCompute(), handlerMap);
-    cluster = configurer.execute(clusterSpec, cluster);
+      ConfigureClusterAction configurer = new ConfigureClusterAction(getCompute(), handlerMap);
+      cluster = configurer.execute(clusterSpec, cluster);
 
-    getClusterStateStore(clusterSpec).save(cluster);
+      getClusterStateStore(clusterSpec).save(cluster);
+      return cluster;
 
-    return cluster;
+    } catch(Throwable e) {
+
+      if (clusterSpec.isTerminateAllOnLaunchFailure()) {
+        LOG.error("Unable to start the cluster. Terminating all nodes.", e);
+        destroyCluster(clusterSpec);
+
+      } else {
+        LOG.error("*CRITICAL* the cluster failed to launch and the automated node termination" +
+            " option was not selected, there might be orphaned nodes.", e);
+      }
+
+      throw new RuntimeException(e);
+    }
   }
 
 

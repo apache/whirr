@@ -77,6 +77,9 @@ Trunk (unreleased changes)
 
     WHIRR-408. Upgrade elasticsearch to 0.18.2 (asavu)
 
+    WHIRR-414. Wirr can have a non-zero return code and unterminated 
+    (orphaned) host instances (David Alves and asavu)
+
   BUG FIXES
 
     WHIRR-377. Fix broken CLI logging config. (asavu via tomwhite)
