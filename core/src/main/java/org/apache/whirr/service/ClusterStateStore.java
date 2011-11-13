@@ -31,12 +31,16 @@ import org.apache.whirr.Cluster;
 import org.apache.whirr.ClusterSpec;
 import org.apache.whirr.util.DnsUtil;
 import org.jclouds.domain.Credentials;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Interface for cluster state storage facilities.
  * 
  */
 public abstract class ClusterStateStore {
+
+  private static final Logger LOG = LoggerFactory.getLogger(ClusterStateStore.class);
 
   /**
    * Deserializes cluster state from storage.
@@ -45,6 +49,21 @@ public abstract class ClusterStateStore {
    * @throws IOException
    */
   public abstract Cluster load() throws IOException;
+
+  /**
+   * Try to load the cluster state or return an empty instance
+   *
+   * @return
+   */
+  public Cluster tryLoadOrEmpty() {
+    try {
+      return load();
+
+    } catch (Exception e) {
+      LOG.info("Unable to load cluster state, assuming it has no running nodes.", e);
+      return Cluster.empty();
+    }
+  }
 
   /**
    * Saves cluster state to storage.

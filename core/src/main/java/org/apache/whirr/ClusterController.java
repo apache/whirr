@@ -139,14 +139,14 @@ public class ClusterController {
   public void destroyCluster(ClusterSpec clusterSpec) throws IOException,
       InterruptedException {
 
-    ClusterStateStore store = getClusterStateStore(clusterSpec);
-    Cluster cluster = store.load();
+    ClusterStateStore stateStore = getClusterStateStore(clusterSpec);
+    Cluster cluster = stateStore.tryLoadOrEmpty();
 
     DestroyClusterAction destroyer = new DestroyClusterAction(getCompute(),
         HandlerMapFactory.create());
     destroyer.execute(clusterSpec, cluster);
 
-    getClusterStateStore(clusterSpec).destroy();
+    stateStore.destroy();
   }
 
   public void destroyInstance(ClusterSpec clusterSpec, String instanceId) throws IOException {

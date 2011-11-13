@@ -135,6 +135,10 @@ public class Cluster {
     }
   }
 
+  public static Cluster empty() {
+    return new Cluster(Sets.<Instance>newHashSet());
+  }
+
   private Set<Instance> instances;
   private Properties configuration;
 
