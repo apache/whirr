@@ -60,6 +60,12 @@ function configure_ganglia() {
     remove_ganglia_conf_section udp_recv_channel /etc/ganglia/gmond.conf
     remove_ganglia_conf_section tcp_accept_channel /etc/ganglia/gmond.conf
     
+    cat > /etc/ganglia/conf.d/globals.conf <<EOF
+globals {
+  send_metadata_interval = 30
+}
+EOF
+
     cat > /etc/ganglia/conf.d/cluster.conf <<EOF
 cluster {
   name = "$CLUSTER_NAME"
@@ -121,6 +127,12 @@ EOF
     remove_ganglia_conf_section udp_recv_channel /etc/ganglia/gmond.conf
     remove_ganglia_conf_section tcp_accept_channel /etc/ganglia/gmond.conf
     
+    cat > /etc/ganglia/conf.d/globals.conf <<EOF
+globals {
+  send_metadata_interval = 30
+}
+EOF
+
     cat > /etc/ganglia/conf.d/cluster.conf <<EOF
 cluster {
   name = "$CLUSTER_NAME"
