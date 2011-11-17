@@ -98,6 +98,8 @@ Trunk (unreleased changes)
     WHIRR-396. service/ganglia needs non-zero send_metadata_interval= in 
     gmond.conf (Joris Bontje via asavu)
 
+    WHIRR-432. Puppet integration tests failing (Alex Heneveld via asavu)
+    
 Release 0.6.0 - 2011-08-17
 
   NEW FEATURES

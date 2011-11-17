@@ -40,6 +40,7 @@ function install_ruby_rpm() {
 }
 
 function install_ruby_deb() {
+  apt-get update -qq
   apt-get install -y ruby ruby-dev rubygems libopenssl-ruby rdoc ri irb build-essential wget ssl-cert
 }
 
