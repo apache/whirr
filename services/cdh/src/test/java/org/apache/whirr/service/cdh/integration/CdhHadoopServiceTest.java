@@ -20,6 +20,7 @@ package org.apache.whirr.service.cdh.integration;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNull;
+import static junit.framework.Assert.failNotEquals;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -27,8 +28,11 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.util.Map;
 import java.util.Map.Entry;
 
+import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.hadoop.conf.Configuration;
@@ -48,24 +52,39 @@ import org.apache.whirr.Cluster;
 import org.apache.whirr.ClusterController;
 import org.apache.whirr.ClusterSpec;
 import org.apache.whirr.service.hadoop.HadoopProxy;
-import org.junit.After;
-import org.junit.Before;
+import org.jclouds.compute.domain.ExecResponse;
+import org.jclouds.compute.domain.NodeMetadata;
+import org.jclouds.scriptbuilder.domain.Statement;
+import org.jclouds.scriptbuilder.domain.Statements;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class CdhHadoopServiceTest {
+
+  private static final Logger LOG = LoggerFactory
+      .getLogger(CdhHadoopServiceTest.class);
+
+  private final static Predicate<NodeMetadata> ALL = Predicates.alwaysTrue();
+
+  protected static ClusterSpec clusterSpec;
+  protected static ClusterController controller;
+  protected static HadoopProxy proxy;
+  protected static Cluster cluster;
+
+  protected static String getPropertiesFilename() {
+    return "whirr-hadoop-test.properties";
+  }
   
-  private ClusterSpec clusterSpec;
-  private ClusterController controller;
-  private HadoopProxy proxy;
-  private Cluster cluster;
-  
-  @Before
-  public void setUp() throws Exception {
+  @BeforeClass
+  public static void setUp() throws Exception {
     CompositeConfiguration config = new CompositeConfiguration();
     if (System.getProperty("config") != null) {
       config.addConfiguration(new PropertiesConfiguration(System.getProperty("config")));
     }
-    config.addConfiguration(new PropertiesConfiguration("whirr-hadoop-test.properties"));
+    config.addConfiguration(new PropertiesConfiguration(getPropertiesFilename()));
     clusterSpec = ClusterSpec.withTemporaryKeys(config);
     controller = new ClusterController();
     
@@ -73,15 +92,37 @@ public class CdhHadoopServiceTest {
     proxy = new HadoopProxy(clusterSpec, cluster);
     proxy.start();
   }
-  
+
+  @AfterClass
+  public static void tearDown() throws IOException, InterruptedException {
+    if (proxy != null) {
+      proxy.stop();
+    }
+    controller.destroyCluster(clusterSpec);
+  }
+
   @Test
-  public void test() throws Exception {
+  public void testVersion() throws Exception {
+    Statement checkVersion = Statements.exec("ls /etc/alternatives/hadoop-lib");
+    Map<? extends NodeMetadata, ExecResponse> responses =
+       controller.runScriptOnNodesMatching(clusterSpec, ALL, checkVersion);
+
+    printResponses(checkVersion, responses);
+    assertResponsesContain(responses, checkVersion, "cdh3u2");
+  }
+
+  @Test
+  public void testJobExecution() throws Exception {
     Configuration conf = getConfiguration();
     
     JobConf job = new JobConf(conf, CdhHadoopServiceTest.class);
     JobClient client = new JobClient(job);
     waitForTaskTrackers(client);
 
+    checkHadoop(conf, client, job);
+  }
+  
+  protected void checkHadoop(Configuration conf, JobClient client, JobConf job) throws Exception {
     FileSystem fs = FileSystem.get(conf);
     
     OutputStream os = fs.create(new Path("input"));
@@ -104,7 +145,6 @@ public class CdhHadoopServiceTest {
     assertEquals("b\t1", reader.readLine());
     assertNull(reader.readLine());
     reader.close();
-    
   }
   
   private Configuration getConfiguration() {
@@ -130,13 +170,27 @@ public class CdhHadoopServiceTest {
       }
     }
   }
-  
-  @After
-  public void tearDown() throws IOException, InterruptedException {
-    if (proxy != null) {
-      proxy.stop();
+
+  private static void assertResponsesContain(
+      Map<? extends NodeMetadata, ExecResponse> responses, Statement statement,
+      String text) {
+    for (Map.Entry<? extends NodeMetadata, ExecResponse> entry : responses
+        .entrySet()) {
+      if (!entry.getValue().getOutput().contains(text)) {
+        failNotEquals("Node: " + entry.getKey().getId()
+            + " failed to execute the command: " + statement
+            + " as could not find expected text", text, entry.getValue());
+      }
     }
-    controller.destroyCluster(clusterSpec);
+  }
+
+  public static void printResponses(Statement statement,
+      Map<? extends NodeMetadata, ExecResponse> responses) {
+    LOG.info("Responses for Statement: " + statement);
+    for (Map.Entry<? extends NodeMetadata, ExecResponse> entry : responses
+        .entrySet()) {
+      LOG.info("Node[" + entry.getKey().getId() + "]: " + entry.getValue());
+    }
   }
 
 }

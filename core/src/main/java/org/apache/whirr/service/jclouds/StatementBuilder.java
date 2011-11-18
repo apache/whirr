@@ -33,6 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -65,7 +66,7 @@ public class StatementBuilder {
     @Override
     public String render(OsFamily family) {
       ScriptBuilder scriptBuilder = new ScriptBuilder();
-      Map<String, String> metadataMap = Maps.newHashMap();
+      Map<String, String> metadataMap = Maps.newLinkedHashMap();
       metadataMap.putAll(
         ImmutableMap.of(
           "clusterName", clusterSpec.getClusterName(),
@@ -91,6 +92,13 @@ public class StatementBuilder {
           LOG.warn("Could not resolve hostname for " + instance, e);
         }
       }
+      for (Iterator<?> it = clusterSpec.getConfiguration().getKeys("whirr.env"); it.hasNext(); ) {
+        String key = (String)it.next();
+        String value = clusterSpec.getConfiguration().getString(key);
+        metadataMap.put(key.substring("whirr.env.".length()), value);
+      }
+      metadataMap.putAll(exports);
+      
       // Write export statements out directly
       // Using InitBuilder would be a possible improvement
       String writeVariableExporters = Utils.writeVariableExporters(metadataMap, family);
@@ -107,6 +115,7 @@ public class StatementBuilder {
   }
   
   protected List<Statement> statements = Lists.newArrayList();
+  protected Map<String,String> exports = Maps.newLinkedHashMap();
   
   public void addStatement(Statement statement) {
     if (!statements.contains(statement)) {
@@ -118,6 +127,10 @@ public class StatementBuilder {
     for (Statement statement : statements) {
       addStatement(statement);
     }
+  }
+  
+  public void addExport(String key, String value) {
+    exports.put(key, value);
   }
 
   public Statement build(ClusterSpec clusterSpec) {

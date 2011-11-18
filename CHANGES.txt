@@ -82,6 +82,9 @@ Trunk (unreleased changes)
 
     WHIRR-416. Enable lazy image fetching when the image-id is known (asavu)
 
+    WHIRR-415. Let users specify the CDH release (cdh3u1, cdh3u2) 
+    (Alex Heneveld and asavu)
+
   BUG FIXES
 
     WHIRR-377. Fix broken CLI logging config. (asavu via tomwhite)
