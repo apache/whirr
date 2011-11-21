@@ -85,6 +85,8 @@ Trunk (unreleased changes)
     WHIRR-415. Let users specify the CDH release (cdh3u1, cdh3u2) 
     (Alex Heneveld and asavu)
 
+    WHIRR-404. Add Project Metadata (Jean-Baptiste Onofré and asavu)
+
   BUG FIXES
 
     WHIRR-377. Fix broken CLI logging config. (asavu via tomwhite)
