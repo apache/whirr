@@ -81,15 +81,17 @@ public class StatementBuilder {
             "privateIp", instance.getPrivateIp()
           )
         );
-        try {
-          metadataMap.putAll(
-            ImmutableMap.of(
-              "publicHostName", instance.getPublicHostName(),
-              "privateHostName", instance.getPrivateHostName()
-            )
-          );
-        } catch (IOException e) {
-          LOG.warn("Could not resolve hostname for " + instance, e);
+        if (!clusterSpec.isStub()) {
+          try {
+            metadataMap.putAll(
+              ImmutableMap.of(
+                "publicHostName", instance.getPublicHostName(),
+                "privateHostName", instance.getPrivateHostName()
+              )
+            );
+          } catch (IOException e) {
+            LOG.warn("Could not resolve hostname for " + instance, e);
+          }
         }
       }
       for (Iterator<?> it = clusterSpec.getConfiguration().getKeys("whirr.env"); it.hasNext(); ) {
@@ -106,9 +108,6 @@ public class StatementBuilder {
       for (Statement statement : statements) {
         scriptBuilder.addStatement(statement);
       }
-
-      // Quick fix: jclouds considers that a script that runs for <2 seconds failed
-      scriptBuilder.addStatement(exec("sleep 4"));
 
       return scriptBuilder.render(family);
     }

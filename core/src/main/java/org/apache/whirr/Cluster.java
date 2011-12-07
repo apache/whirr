@@ -24,7 +24,8 @@ import com.google.common.base.Predicates;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 import com.google.common.net.InetAddresses;
-import org.apache.whirr.util.DnsUtil;
+import org.apache.whirr.net.DnsResolver;
+import org.apache.whirr.net.FastDnsResolver;
 import org.jclouds.compute.domain.NodeMetadata;
 import org.jclouds.domain.Credentials;
 
@@ -41,13 +42,14 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  */
 public class Cluster {
-  
+
   /**
    * This class represents a real node running in a cluster. An instance has
    * one or more roles.
    * @see InstanceTemplate
    */
   public static class Instance {
+
     private final Credentials loginCredentials;
     private final Set<String> roles;
     private final String publicIp;
@@ -56,9 +58,15 @@ public class Cluster {
     private String privateHostName;
     private final String id;
     private final NodeMetadata nodeMetadata;
+    private final DnsResolver dnsResolver;
 
     public Instance(Credentials loginCredentials, Set<String> roles, String publicIp,
         String privateIp, String id, NodeMetadata nodeMetadata) {
+      this(loginCredentials, roles, publicIp, privateIp, id, nodeMetadata, new FastDnsResolver());
+    }
+
+    public Instance(Credentials loginCredentials, Set<String> roles, String publicIp,
+        String privateIp, String id, NodeMetadata nodeMetadata, DnsResolver dnsResolver) {
       this.loginCredentials = checkNotNull(loginCredentials, "loginCredentials");
       this.roles = checkNotNull(roles, "roles");
       this.publicIp = checkNotNull(publicIp, "publicIp");
@@ -71,12 +79,13 @@ public class Cluster {
       }
       this.id = checkNotNull(id, "id");
       this.nodeMetadata = nodeMetadata;
+      this.dnsResolver = dnsResolver;
     }
 
     public Credentials getLoginCredentials() {
       return loginCredentials;
     }
-    
+
     public Set<String> getRoles() {
       return roles;
     }
@@ -88,42 +97,42 @@ public class Cluster {
     public InetAddress getPrivateAddress() throws IOException {
       return resolveIpAddress(getPrivateIp(), getPrivateHostName());
     }
-    
+
     private InetAddress resolveIpAddress(String ip, String host) throws IOException {
       byte[] addr = InetAddresses.forString(ip).getAddress();
       return InetAddress.getByAddress(host, addr);
     }
-    
+
     public String getPublicIp() {
       return publicIp;
     }
-    
+
     public synchronized String getPublicHostName() throws IOException {
       if (publicHostName == null) {
-        publicHostName = DnsUtil.resolveAddress(publicIp);
+        publicHostName = dnsResolver.apply(publicIp);
       }
       return publicHostName;
     }
-    
+
     public String getPrivateIp() {
       return privateIp;
     }
-    
+
     public synchronized String getPrivateHostName() throws IOException {
       if (privateHostName == null) {
-        privateHostName = DnsUtil.resolveAddress(privateIp);
+        privateHostName = dnsResolver.apply(privateIp);
       }
       return privateHostName;
     }
-    
+
     public String getId() {
       return id;
     }
-    
+
     public NodeMetadata getNodeMetadata() {
       return nodeMetadata;
     }
-    
+
     public String toString() {
       return Objects.toStringHelper(this)
         .add("roles", roles)
@@ -150,10 +159,10 @@ public class Cluster {
     this.instances = instances;
     this.configuration = configuration;
   }
-  
+
   public Set<Instance> getInstances() {
     return instances;
-  }  
+  }
   public Properties getConfiguration() {
     return configuration;
   }
@@ -176,5 +185,5 @@ public class Cluster {
       .add("configuration", configuration)
       .toString();
   }
-  
+
 }

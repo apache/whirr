@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.apache.whirr.util;
+package org.apache.whirr.net;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -34,33 +34,38 @@ import org.xbill.DNS.Type;
 /**
  * Utility functions for DNS.
  */
-public class DnsUtil {
+public class FastDnsResolver implements DnsResolver {
 
   /**
-   * resolve the reverse dns name for the given IP address
+   * Resolve the reverse dns name for the given IP address
    * 
    * @param hostIp
    * @return The resolved DNS name.
    * @throws IOException
    */
-  public static String resolveAddress(String hostIp) throws IOException {
-    Resolver res = new ExtendedResolver();
-    res.setTimeout(5); // seconds
+  @Override
+  public String apply(String hostIp) {
+    try {
+      Resolver res = new ExtendedResolver();
+      res.setTimeout(5); // seconds
 
-    Name name = ReverseMap.fromAddress(hostIp);
-    int type = Type.PTR;
-    int dclass = DClass.IN;
-    Record rec = Record.newRecord(name, type, dclass);
-    Message query = Message.newQuery(rec);
-    Message response = res.send(query);
+      Name name = ReverseMap.fromAddress(hostIp);
+      Record rec = Record.newRecord(name, Type.PTR, DClass.IN);
+      Message query = Message.newQuery(rec);
+      Message response = res.send(query);
 
-    Record[] answers = response.getSectionArray(Section.ANSWER);
-    if (answers.length == 0) {
-      // Fall back to standard Java: in contrast to dnsjava, this also reads /etc/hosts
-      return new InetSocketAddress(hostIp, 0).getAddress().getCanonicalHostName();
-    } else {
-      String revaddr = answers[0].rdataToString();
-      return revaddr.endsWith(".") ? revaddr.substring(0, revaddr.length() - 1) : revaddr;
+      Record[] answers = response.getSectionArray(Section.ANSWER);
+      if (answers.length == 0) {
+        // Fall back to standard Java: in contrast to dnsjava, this also reads /etc/hosts
+        return new InetSocketAddress(hostIp, 0).getAddress().getCanonicalHostName();
+      } else {
+        String revaddr = answers[0].rdataToString();
+        return revaddr.endsWith(".") ? revaddr.substring(0, revaddr.length() - 1) : revaddr;
+      }
+    } catch(IOException e) {
+        throw new DnsException(e);
     }
   }
+
 }
+

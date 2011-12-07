@@ -16,10 +16,11 @@
  * limitations under the License.
  */
 
-package org.apache.whirr.service;
+package org.apache.whirr.state;
 
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.configuration.PropertiesConfiguration;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
 import org.apache.whirr.Cluster;
 import org.apache.whirr.ClusterSpec;
 import org.slf4j.Logger;
@@ -29,44 +30,52 @@ import java.io.IOException;
 
 /**
  * A factory for ClusterStateStores.
- * 
  */
 public class ClusterStateStoreFactory {
 
   private static final Logger LOG = LoggerFactory
     .getLogger(ClusterStateStoreFactory.class);
 
-  private class NoopClusterStateStore extends ClusterStateStore {
+  private static class NoopClusterStateStore extends ClusterStateStore {
     public NoopClusterStateStore() {
       LOG.warn("No cluster state is going to be persisted. There is no easy " +
         "way to retrieve instance roles after launch.");
     }
+
     @Override
     public Cluster load() throws IOException {
       return null;
     }
+
     @Override
     public void save(Cluster cluster) throws IOException {
     }
+
     @Override
     public void destroy() throws IOException {
     }
   }
 
+  private Cache<ClusterSpec, ClusterStateStore> storeCache = CacheBuilder.newBuilder().build(
+    new CacheLoader<ClusterSpec, ClusterStateStore>() {
+      @Override
+      public ClusterStateStore load(ClusterSpec spec) throws Exception {
+        if ("local".equals(spec.getStateStore())) {
+          return new FileClusterStateStore(spec);
+
+        } else if ("blob".equals(spec.getStateStore())) {
+          return new BlobClusterStateStore(spec);
+
+        } else if ("memory".equals(spec.getStateStore())) {
+          return new MemoryClusterStateStore();
+
+        } else {
+          return new NoopClusterStateStore();
+        }
+      }
+    });
+
   public ClusterStateStore create(ClusterSpec spec) {
-    return create(spec, new PropertiesConfiguration());
+    return storeCache.getUnchecked(spec);
   }
-
-  public ClusterStateStore create(ClusterSpec spec, Configuration conf) {
-    if ("local".equals(spec.getStateStore())) {
-      return new FileClusterStateStore(spec);
-
-    } else if("blob".equals(spec.getStateStore())) {
-      return new BlobClusterStateStore(spec);
-
-    } else {
-      return new NoopClusterStateStore();
-    }
-  }
-
 }

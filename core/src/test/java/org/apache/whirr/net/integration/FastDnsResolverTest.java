@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.apache.whirr.util.integration;
+package org.apache.whirr.net.integration;
 
 import static java.lang.System.out;
 import static org.junit.Assert.assertEquals;
@@ -31,11 +31,14 @@ import java.net.UnknownHostException;
 import java.util.Collections;
 import java.util.Enumeration;
 
-import org.apache.whirr.util.DnsUtil;
+import org.apache.whirr.net.DnsResolver;
+import org.apache.whirr.net.FastDnsResolver;
 import org.junit.Test;
 import org.xbill.DNS.Address;
 
-public class DnsUtilTest {
+public class FastDnsResolverTest {
+
+  private static final DnsResolver DNS_RESOLVER = new FastDnsResolver();
 
   @Test
   public void testResolveAddress() throws IOException {
@@ -47,12 +50,12 @@ public class DnsUtilTest {
       for (InetAddress inetAddress : Collections.list(inetAddresses)) {
         if (inetAddress instanceof Inet4Address) {
           long start = System.currentTimeMillis();
-          String reverse = DnsUtil.resolveAddress(inetAddress.getHostAddress());
+          String reverse = DNS_RESOLVER.apply(inetAddress.getHostAddress());
           long end = System.currentTimeMillis();
           // we know that java.net.InetAddress's getHostName takes > 4.5s if
           // there is no reverse address assigned to it
-          // DnsUtil should resolve any address in less than 5 seconds or fail
-          assertTrue("DnsUtil.resolveAddress takes " + (end - start)
+          // FastDnsResolver should resolve any address in less than 5 seconds or fail
+          assertTrue("FastDnsResolver.resolveAddress takes " + (end - start)
               + " millis, it should be shorter than five seconds",
               end - start < 5000);
           if (inetAddress.toString().substring(1).equals(reverse)) {

@@ -494,6 +494,10 @@ public class ClusterSpec {
     return provider;
   }
 
+  public boolean isStub() {
+    return "stub".equals(getProvider());
+  }
+
   public String getIdentity() {
     return identity;
   }
@@ -682,7 +686,7 @@ public class ClusterSpec {
 
   public void setStateStore(String type) {
     if (type != null) {
-      checkArgument(Sets.newHashSet("local", "blob", "none").contains(type),
+      checkArgument(Sets.newHashSet("local", "blob", "memory", "none").contains(type),
         "Invalid state store. Valid values are local, blob or none.");
     }
     this.stateStore = type;

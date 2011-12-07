@@ -33,8 +33,8 @@ import org.apache.whirr.ClusterController;
 import org.apache.whirr.ClusterControllerFactory;
 import org.apache.whirr.ClusterSpec;
 import org.apache.whirr.command.AbstractClusterCommand;
-import org.apache.whirr.service.ClusterStateStore;
-import org.apache.whirr.service.ClusterStateStoreFactory;
+import org.apache.whirr.state.ClusterStateStore;
+import org.apache.whirr.state.ClusterStateStoreFactory;
 
 /**
  * A command to list the nodes in a cluster.

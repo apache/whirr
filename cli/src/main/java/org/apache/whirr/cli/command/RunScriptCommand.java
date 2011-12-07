@@ -33,7 +33,7 @@ import org.apache.whirr.ClusterController;
 import org.apache.whirr.ClusterControllerFactory;
 import org.apache.whirr.ClusterSpec;
 import org.apache.whirr.command.AbstractClusterCommand;
-import org.apache.whirr.service.ClusterStateStoreFactory;
+import org.apache.whirr.state.ClusterStateStoreFactory;
 import org.jclouds.compute.domain.ExecResponse;
 import org.jclouds.compute.domain.NodeMetadata;
 import org.jclouds.scriptbuilder.domain.Statement;

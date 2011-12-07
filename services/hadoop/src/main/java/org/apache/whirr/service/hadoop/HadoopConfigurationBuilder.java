@@ -89,7 +89,7 @@ public class HadoopConfigurationBuilder {
     Instance namenode = cluster
         .getInstanceMatching(role(HadoopNameNodeClusterActionHandler.ROLE));
     config.setProperty("fs.default.name", String.format("hdfs://%s:8020/",
-        namenode.getPublicAddress().getHostName()));
+        namenode.getPublicHostName()));
     return config;
   }
   
@@ -135,7 +135,7 @@ public class HadoopConfigurationBuilder {
     Instance jobtracker = cluster
         .getInstanceMatching(role(HadoopJobTrackerClusterActionHandler.ROLE));
     config.setProperty("mapred.job.tracker", String.format("%s:8021",
-        jobtracker.getPublicAddress().getHostName()));
+        jobtracker.getPublicHostName()));
     return config;
   }
 

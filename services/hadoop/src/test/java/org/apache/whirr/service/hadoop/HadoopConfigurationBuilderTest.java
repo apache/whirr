@@ -36,6 +36,8 @@ import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.whirr.Cluster;
 import org.apache.whirr.Cluster.Instance;
 import org.apache.whirr.ClusterSpec;
+import org.apache.whirr.net.DnsResolver;
+import org.apache.whirr.net.integration.FakeDnsResolver;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.jclouds.compute.domain.Hardware;
@@ -48,7 +50,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class HadoopConfigurationBuilderTest {
-  
+
   static class RegexMatcher extends BaseMatcher<String> {
     private final String regex;
 
@@ -87,6 +89,8 @@ public class HadoopConfigurationBuilderTest {
   }
   
   private Cluster newCluster(int numberOfWorkers) {
+    DnsResolver fakeDnsResolver = new FakeDnsResolver();
+
     NodeMetadata node = mock(NodeMetadata.class);
     List<Processor> processors = ImmutableList.of(new Processor(4, 1.0));
     Hardware hardware = new HardwareImpl(null, null, "id", null, null,
@@ -98,14 +102,14 @@ public class HadoopConfigurationBuilderTest {
     Instance master = new Instance(new Credentials("", ""),
         ImmutableSet.of(HadoopNameNodeClusterActionHandler.ROLE,
             HadoopJobTrackerClusterActionHandler.ROLE),
-            "10.0.0.1", "10.0.0.1", "1", node);
+            "10.0.0.1", "10.0.0.1", "1", node, fakeDnsResolver);
     instances.add(master);
     for (int i = 0; i < numberOfWorkers; i++) {
       int id = i + 2;
       instances.add(new Instance(new Credentials("", ""),
         ImmutableSet.of(HadoopDataNodeClusterActionHandler.ROLE,
               HadoopTaskTrackerClusterActionHandler.ROLE),
-              "10.0.0." + id, "10.0.0." + id, id + "", node));
+              "10.0.0." + id, "10.0.0." + id, id + "", node, fakeDnsResolver));
     }
     return new Cluster(instances.build());
   }

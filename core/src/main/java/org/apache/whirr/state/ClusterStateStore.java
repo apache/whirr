@@ -16,10 +16,9 @@
  * limitations under the License.
  */
 
-package org.apache.whirr.service;
+package org.apache.whirr.state;
 
 import java.io.IOException;
-import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Iterator;
 import java.util.Set;
@@ -29,7 +28,6 @@ import com.google.common.base.Splitter;
 import com.google.common.collect.Sets;
 import org.apache.whirr.Cluster;
 import org.apache.whirr.ClusterSpec;
-import org.apache.whirr.util.DnsUtil;
 import org.jclouds.domain.Credentials;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -95,14 +93,10 @@ public abstract class ClusterStateStore {
       String id = instance.getId();
       String roles = Joiner.on(',').join(instance.getRoles());
 
-      String publicAddress = DnsUtil.resolveAddress(instance.getPublicAddress()
-        .getHostAddress());
-      String privateAddress = instance.getPrivateAddress().getHostAddress();
-
       sb.append(id).append("\t");
       sb.append(roles).append("\t");
-      sb.append(publicAddress).append("\t");
-      sb.append(privateAddress).append("\n");
+      sb.append(instance.getPublicIp()).append("\t");
+      sb.append(instance.getPrivateIp()).append("\n");
     }
 
     return sb.toString();
@@ -126,12 +120,11 @@ public abstract class ClusterStateStore {
 
       String id = fields.next();
       Set<String> roles = Sets.newLinkedHashSet(Splitter.on(",").split(fields.next()));
-      String publicAddress = fields.next();
-      String privateAddress = fields.next();
+      String publicIPAddress = fields.next();
+      String privateIPAddress = fields.next();
 
       instances.add(new Cluster.Instance(credentials, roles,
-        InetAddress.getByName(publicAddress).getHostAddress(),
-        privateAddress, id, null));
+        publicIPAddress, privateIPAddress, id, null));
     }
 
     return new Cluster(instances);

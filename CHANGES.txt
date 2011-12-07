@@ -87,6 +87,8 @@ Trunk (unreleased changes)
 
     WHIRR-404. Add Project Metadata (Jean-Baptiste Onofré and asavu)
 
+    WHIRR-440. Unit tests improvements (less bound to external services) (asavu)
+
   BUG FIXES
 
     WHIRR-377. Fix broken CLI logging config. (asavu via tomwhite)

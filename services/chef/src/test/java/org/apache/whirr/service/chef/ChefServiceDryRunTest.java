@@ -80,10 +80,11 @@ public class ChefServiceDryRunTest {
     Configuration config = new PropertiesConfiguration();
     config.setProperty("whirr.provider", "stub");
     config.setProperty("whirr.cluster-name", "stub-test");
+    config.setProperty("whirr.state-store", "memory");
     return config;
   }
 
-  private ClusterController lauchWithConfig(Configuration config)
+  private ClusterController launchWithConfig(Configuration config)
       throws IOException, InterruptedException, ConfigurationException,
       JSchException {
     ClusterSpec clusterSpec = ClusterSpec.withTemporaryKeys(config);
@@ -98,7 +99,7 @@ public class ChefServiceDryRunTest {
    */
   @Test
   public void testChefOnly() throws Exception {
-    lauchWithConfig(chefOnly);
+    launchWithConfig(chefOnly);
     assertInstallFunctionsWereExecuted(DryRun.INSTANCE);
     // chef only install should not contain any chef-solo executions
     assertScriptPredicateOnPhase(DryRun.INSTANCE, "configure",
@@ -117,7 +118,7 @@ public class ChefServiceDryRunTest {
    */
   @Test
   public void testChefWithDefaultRecipe() throws Exception {
-    lauchWithConfig(cookbookWithDefaultRecipe);
+    launchWithConfig(cookbookWithDefaultRecipe);
     assertInstallFunctionsWereExecuted(DryRun.INSTANCE);
     // chef execution with a default cookbook recipe should contain a
     // particular string
@@ -136,7 +137,7 @@ public class ChefServiceDryRunTest {
    */
   @Test
   public void testChefWithAttributes() throws Exception {
-    lauchWithConfig(cookbookWithSpecificRecipe);
+    launchWithConfig(cookbookWithSpecificRecipe);
     assertInstallFunctionsWereExecuted(DryRun.INSTANCE);
     // chef execution with a default cookbook recipe should contain a
     // particular string
@@ -155,7 +156,7 @@ public class ChefServiceDryRunTest {
    */
   @Test
   public void testChefWithParticularRecipe() throws Exception {
-    lauchWithConfig(cookbookWithAttributes);
+    launchWithConfig(cookbookWithAttributes);
     assertInstallFunctionsWereExecuted(DryRun.INSTANCE);
     // chef execution with a default cookbook recipe should contain a
     // particular string

@@ -80,6 +80,7 @@ public class DryRunModuleTest {
     config.setProperty("whirr.cluster-name", "stub-test");
     config.setProperty("whirr.instance-templates",
         "10 noop+noop3,10 noop2+noop,10 noop3+noop2");
+    config.setProperty("whirr.state-store", "memory");
 
     ClusterSpec clusterSpec = ClusterSpec.withTemporaryKeys(config);
     ClusterController controller = new ClusterController();

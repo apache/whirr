@@ -40,8 +40,8 @@ import org.apache.whirr.ClusterController;
 import org.apache.whirr.ClusterControllerFactory;
 import org.apache.whirr.ClusterSpec;
 import org.apache.whirr.ClusterSpec.Property;
-import org.apache.whirr.service.ClusterStateStore;
-import org.apache.whirr.service.ClusterStateStoreFactory;
+import org.apache.whirr.state.ClusterStateStore;
+import org.apache.whirr.state.ClusterStateStoreFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

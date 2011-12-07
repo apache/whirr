@@ -16,11 +16,12 @@
  * limitations under the License.
  */
 
-package org.apache.whirr.service;
+package org.apache.whirr.state;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.whirr.Cluster;
 import org.apache.whirr.ClusterSpec;
+import org.apache.whirr.service.BlobStoreContextBuilder;
 import org.jclouds.blobstore.BlobStore;
 import org.jclouds.blobstore.BlobStoreContext;
 import org.jclouds.blobstore.domain.Blob;

@@ -16,32 +16,12 @@
  * limitations under the License.
  */
 
-package org.apache.whirr.cli;
+package org.apache.whirr.net;
 
-import org.apache.whirr.Cluster;
-import org.apache.whirr.service.ClusterStateStore;
-
-import java.io.IOException;
+import com.google.common.base.Function;
 
 /**
- * Memory only cluster state storage useful for testing
+ * Marker interface for a reverse DNS resolver
  */
-public class MemoryClusterStateStore extends ClusterStateStore {
-
-  private Cluster cluster;
-
-  @Override
-  public Cluster load() throws IOException {
-    return cluster;
-  }
-
-  @Override
-  public void save(Cluster cluster) throws IOException {
-    this.cluster = cluster;
-  }
-
-  @Override
-  public void destroy() throws IOException {
-    cluster = null;
-  }
+public interface DnsResolver extends Function<String, String> {
 }
