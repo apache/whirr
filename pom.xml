@@ -46,7 +46,6 @@
     <module>services/hadoop</module>
     <module>services/zookeeper</module>
     <module>services/hbase</module>
-    <module>services/voldemort</module>
     <module>services/elasticsearch</module>
     <module>services/hama</module>
     <module>services/puppet</module>
@@ -372,8 +371,11 @@
             <exclude>docs/**</exclude>
             <exclude>**/*.log*</exclude>
             <exclude>.idea/**</exclude>
+            <exclude>**/*.iml</exclude>
             <exclude>**/.project</exclude>
             <exclude>**/.classpath</exclude>
+            <exclude>**/.settings/**</exclude>
+            <exclude>**/target/**</exclude>
             <exclude>src/site/resources/images/whirr-logo.ai</exclude> <!-- binary -->
           </excludes>
         </configuration>
@@ -549,6 +551,16 @@
           </plugin>
         </plugins>
       </build>
+    </profile>
+    <profile>
+      <!-- Activate this profile to build the Voldemort service after manually
+      placing the Voldemort JAR in services/voldemort/lib.
+      See https://issues.apache.org/jira/browse/WHIRR-442
+       -->
+      <id>voldemort</id>
+      <modules>
+        <module>services/voldemort</module>
+      </modules>
     </profile>
   </profiles>
 </project>

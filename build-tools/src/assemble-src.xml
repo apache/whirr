@@ -37,6 +37,7 @@
         <exclude>**/*.rej</exclude>
         <exclude>**/*.classpath</exclude>
         <exclude>**/whirr-logo.ai</exclude>
+        <exclude>services/voldemort/lib/*.jar</exclude>
       </excludes>
     </fileSet>
   </fileSets>

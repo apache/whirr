@@ -62,20 +62,15 @@
       <artifactId>log4j</artifactId>
       <scope>test</scope>
     </dependency>
-    <!-- replace these with just a cassandra entry once it is in a maven repo -->
     <dependency>
-      <groupId>apache</groupId>
-      <artifactId>cassandra</artifactId>
+      <groupId>org.apache.cassandra</groupId>
+      <artifactId>cassandra-all</artifactId>
       <version>0.7.0</version>
-      <scope>system</scope>
-      <systemPath>${basedir}/lib/apache-cassandra-0.7.0.jar</systemPath>
     </dependency>
     <dependency>
-      <groupId>apache</groupId>
-      <artifactId>thrift</artifactId>
-      <version>0.5</version>
-      <scope>system</scope>
-      <systemPath>${basedir}/lib/libthrift-0.5.jar</systemPath>
+      <groupId>org.apache.cassandra.deps</groupId>
+      <artifactId>libthrift</artifactId>
+      <version>0.5.0</version>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
