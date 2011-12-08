@@ -38,6 +38,10 @@
         <exclude>**/*.classpath</exclude>
         <exclude>**/whirr-logo.ai</exclude>
         <exclude>services/voldemort/lib/*.jar</exclude>
+        <exclude>.idea/**</exclude>
+        <exclude>**/*.iml</exclude>
+        <exclude>**/*.ipr</exclude>
+        <exclude>**/*.iws</exclude>
       </excludes>
     </fileSet>
   </fileSets>

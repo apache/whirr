@@ -6,3 +6,5 @@ target
 .idea/
 *.iml
 **/*.log
+services/voldemort/lib/
+whirr.log

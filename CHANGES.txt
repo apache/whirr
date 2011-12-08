@@ -94,6 +94,8 @@ Trunk (unreleased changes)
     WHIRR-442. Release 0.6.0 is in breach of the AL2.0 and general 
     Apache rules in regards to the inclusion of Voldemort (Tom White via asavu)
 
+    WHIRR-446. Upgrade all maven plugins to latest stable release (asavu)
+
   BUG FIXES
 
     WHIRR-377. Fix broken CLI logging config. (asavu via tomwhite)

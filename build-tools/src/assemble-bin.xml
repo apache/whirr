@@ -48,6 +48,10 @@
         <exclude>**/*.rej</exclude>
         <exclude>**/*.classpath</exclude>
         <exclude>**/whirr-logo.ai</exclude>
+        <exclude>.idea/**</exclude>
+        <exclude>**/*.iml</exclude>
+        <exclude>**/*.ipr</exclude>
+        <exclude>**/*.iws</exclude>
       </excludes>
     </fileSet>
     <fileSet>
