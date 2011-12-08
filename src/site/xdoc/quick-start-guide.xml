@@ -21,7 +21,7 @@ xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 http://maven.apache.org/xsd
   <properties></properties>
   <body>
 
-    <section name="Getting Started with Whirr"></section>
+    <section name="Getting Started with Whirr&#153;"></section>
  
    <p>The Whirr CLI provides the most convenient way to launch clusters. For the programmatic
     interface, see the 

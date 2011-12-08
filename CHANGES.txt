@@ -89,6 +89,8 @@ Trunk (unreleased changes)
 
     WHIRR-440. Unit tests improvements (less bound to external services) (asavu)
 
+    WHIRR-403. Add Trademark Attributions (Tom White via asavu)
+
   BUG FIXES
 
     WHIRR-377. Fix broken CLI logging config. (asavu via tomwhite)

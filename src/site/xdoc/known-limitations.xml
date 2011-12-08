@@ -19,7 +19,7 @@
 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 http://maven.apache.org/xsd/xdoc-2.0.xsd">
   <body>
-    <section name="Know Limitations"></section>
+    <section name="Whirr&#153; Know Limitations"></section>
 
     <p>We are striving to make each release as good as possible but there are still a set of 
     limitations that you should be aware of. The following issues are known to exist in the 0.6.0 release of Whirr.</p>

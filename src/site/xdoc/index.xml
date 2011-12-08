@@ -21,7 +21,7 @@ xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 http://maven.apache.org/xsd
   <properties></properties>
   <body>
   
-    <section name="Apache Whirr 0.6.0"></section>
+    <section name="Apache Whirr&#153; 0.6.0"></section>
     <p>Apache Whirr is a set of libraries for running cloud services.</p>
     <p>Whirr provides:</p>
     <ul>

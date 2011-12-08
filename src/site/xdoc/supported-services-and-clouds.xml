@@ -20,7 +20,7 @@ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 http://maven.apache.org/xsd/xdoc-2.0.xsd">
   <body>
 
-    <section name="Which Services and Cloud Providers Are Supported?"></section>
+    <section name="Which Services and Cloud Providers Are Supported by Whirr&#153;?"></section>
 
     <p>Whirr uses 
     <a class="externalLink" href="http://code.google.com/p/jclouds/">jclouds</a> for provisioning,

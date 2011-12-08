@@ -20,7 +20,7 @@ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 http://maven.apache.org/xsd/xdoc-2.0.xsd">
   <properties></properties>
   <body>
-    <section name="API Guide"></section>
+    <section name="Whirr&#153; API Guide"></section>
     <p>Whirr provides a Java API for stopping and starting clusters. Please see the 
     <a href="apidocs/index.html">javadoc</a> and the unit test source code for how to achieve
     this.</p>

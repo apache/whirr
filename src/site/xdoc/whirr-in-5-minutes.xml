@@ -20,7 +20,7 @@ xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 http://maven.apache.org/xsd
 -->  
   <properties></properties>
   <body>
-    <section name="Whirr in 5 minutes"></section>
+    <section name="Whirr&#153; in 5 minutes"></section>
     <p>The following commands install Whirr and start a 3 node ZooKeeper cluster on Amazon EC2 in 5
     minutes or less. You need to have Java 6 and an SSH client already installed. Help on finding
     your AWS credentials can be found in the 

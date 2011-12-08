@@ -388,6 +388,8 @@
           <configuration>
             <!-- Reports are generated at the site level -->
             <generateReports>false</generateReports>
+            <templateDirectory>${basedir}/src/site/resources</templateDirectory>
+            <template>site.vm</template>
           </configuration>
         </plugin>
       </plugins>
