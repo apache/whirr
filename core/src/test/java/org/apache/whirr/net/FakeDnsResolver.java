@@ -16,9 +16,7 @@
  * limitations under the License.
  */
 
-package org.apache.whirr.net.integration;
-
-import org.apache.whirr.net.DnsResolver;
+package org.apache.whirr.net;
 
 import static org.apache.commons.lang.StringUtils.replace;
 

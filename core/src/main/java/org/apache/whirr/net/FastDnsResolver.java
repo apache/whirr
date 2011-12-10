@@ -20,6 +20,7 @@ package org.apache.whirr.net;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.net.SocketTimeoutException;
 
 import org.xbill.DNS.DClass;
 import org.xbill.DNS.ExtendedResolver;
@@ -31,40 +32,70 @@ import org.xbill.DNS.ReverseMap;
 import org.xbill.DNS.Section;
 import org.xbill.DNS.Type;
 
+import static org.xbill.DNS.Message.newQuery;
+
 /**
- * Utility functions for DNS.
+ * Fast DNS resolver
  */
 public class FastDnsResolver implements DnsResolver {
+
+  private int timeoutInSeconds;
+
+  public FastDnsResolver() {
+    this(5);  // default to 5 seconds
+  }
+
+  public FastDnsResolver(int timeoutInSeconds) {
+    this.timeoutInSeconds = timeoutInSeconds;
+  }
 
   /**
    * Resolve the reverse dns name for the given IP address
    * 
    * @param hostIp
-   * @return The resolved DNS name.
-   * @throws IOException
+   *      host IP address
+   * @return
+   *      the resolved DNS name or in some cases the IP address as a string
    */
   @Override
   public String apply(String hostIp) {
     try {
-      Resolver res = new ExtendedResolver();
-      res.setTimeout(5); // seconds
+      Resolver resolver = new ExtendedResolver();
+      resolver.setTimeout(timeoutInSeconds);
+      resolver.setTCP(true);
 
       Name name = ReverseMap.fromAddress(hostIp);
-      Record rec = Record.newRecord(name, Type.PTR, DClass.IN);
-      Message query = Message.newQuery(rec);
-      Message response = res.send(query);
+      Record record = Record.newRecord(name, Type.PTR, DClass.IN);
+      Message response = resolver.send(newQuery(record));
 
       Record[] answers = response.getSectionArray(Section.ANSWER);
       if (answers.length == 0) {
-        // Fall back to standard Java: in contrast to dnsjava, this also reads /etc/hosts
-        return new InetSocketAddress(hostIp, 0).getAddress().getCanonicalHostName();
+        return fallback(hostIp);
+
       } else {
-        String revaddr = answers[0].rdataToString();
-        return revaddr.endsWith(".") ? revaddr.substring(0, revaddr.length() - 1) : revaddr;
+        String reverseAddress = answers[0].rdataToString();
+        return reverseAddress.endsWith(".") ? reverseAddress.substring(0, reverseAddress.length() - 1) : reverseAddress;
       }
+    } catch(SocketTimeoutException e) {
+      return hostIp;  /* same response as standard Java on timeout */
+
     } catch(IOException e) {
-        throw new DnsException(e);
+      throw new DnsException(e);
     }
+  }
+
+  /**
+   * Use standard Java for reverse DNS name resolution. This also
+   * reads /etc/hosts but it may take longer
+   *
+   * @param hostIp
+   *      host IP address
+   * @return
+   *      the fully qualified domain name for this IP address, or if the operation
+   *      is not allowed by the security check, the textual representation of the IP address.
+   */
+  private String fallback(String hostIp) {
+    return new InetSocketAddress(hostIp, 0).getAddress().getCanonicalHostName();
   }
 
 }

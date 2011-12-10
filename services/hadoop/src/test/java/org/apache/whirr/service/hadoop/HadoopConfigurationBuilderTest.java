@@ -37,7 +37,7 @@ import org.apache.whirr.Cluster;
 import org.apache.whirr.Cluster.Instance;
 import org.apache.whirr.ClusterSpec;
 import org.apache.whirr.net.DnsResolver;
-import org.apache.whirr.net.integration.FakeDnsResolver;
+import org.apache.whirr.net.FakeDnsResolver;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.jclouds.compute.domain.Hardware;
