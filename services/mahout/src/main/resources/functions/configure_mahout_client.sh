@@ -14,49 +14,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-function update_repo() {
-  if which dpkg &> /dev/null; then
-    sudo apt-get update
-  elif which rpm &> /dev/null; then
-    yum update -y yum
-  fi
-}
 
-function install_hadoop() {
-  local OPTIND
+function configure_mahout_client() {
   local OPTARG
 
-  if [ "$INSTALL_HADOOP_DONE" == "1" ]; then
-    echo "Hadoop is already installed."
-    return;
-  fi
-  
-  HADOOP_TAR_URL=
+  MAHOUT_TAR_URL=
   while getopts "u:" OPTION; do
     case $OPTION in
     u)
-      HADOOP_TAR_URL="$OPTARG"
+      MAHOUT_TAR_URL="$OPTARG"
       ;;
     esac
   done
 
-  HADOOP_HOME=/usr/local/$(basename $HADOOP_TAR_URL .tar.gz)
+  MAHOUT_HOME=/usr/local/$(basename $MAHOUT_TAR_URL .tar.gz)
 
-  update_repo
+  install_tarball $MAHOUT_TAR_URL
+  ln -s $MAHOUT_HOME /usr/local/mahout
 
-  if ! id hadoop &> /dev/null; then
-    useradd hadoop
-  fi
-  
-  install_tarball $HADOOP_TAR_URL
-  ln -s $HADOOP_HOME /usr/local/hadoop
-
-  echo "export HADOOP_HOME=$HADOOP_HOME" >> ~root/.bashrc
-  echo 'export PATH=$JAVA_HOME/bin:$HADOOP_HOME/bin:$PATH' >> ~root/.bashrc
-
-  echo "export HADOOP_HOME=$HADOOP_HOME" >> /etc/profile
-  echo 'export PATH=$JAVA_HOME/bin:$HADOOP_HOME/bin:$PATH' >> /etc/profile
-
-  INSTALL_HADOOP_DONE=1
+  echo "export MAHOUT_HOME=$MAHOUT_HOME" >> /etc/profile
+  echo 'export PATH=$MAHOUT_HOME/bin:$PATH' >> /etc/profile
 }
-

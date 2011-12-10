@@ -50,6 +50,7 @@
     <module>services/hama</module>
     <module>services/puppet</module>
     <module>services/chef</module>
+    <module>services/mahout</module>
   </modules>
 
   <properties>

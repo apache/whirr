@@ -40,6 +40,7 @@ sun-java6-jre   shared/present-sun-dlj-v1-1     note
   apt-get -y install sun-java6-jdk
   
   echo "export JAVA_HOME=/usr/lib/jvm/java-6-sun" >> /etc/profile
+  echo "export JAVA_HOME=/usr/lib/jvm/java-6-sun" >> ~root/.bashrc
   export JAVA_HOME=/usr/lib/jvm/java-6-sun
   java -version
   

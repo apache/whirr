@@ -10,6 +10,8 @@ Trunk (unreleased changes)
 
     WHIRR-49.  Allow Whirr to use Chef for configuration management
 
+    WHIRR-384. Add Mahout as a service (Frank Scholten via asavu)
+
   IMPROVEMENTS
 
     WHIRR-116. Site should have docs for each released version. (tomwhite)
