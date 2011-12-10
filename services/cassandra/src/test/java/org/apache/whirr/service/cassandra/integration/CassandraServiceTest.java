@@ -43,8 +43,12 @@ import org.apache.whirr.service.cassandra.CassandraClusterActionHandler;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class CassandraServiceTest {
+
+  private static final Logger LOG = LoggerFactory.getLogger(CassandraServiceTest.class);
    
   private ClusterSpec clusterSpec;
   private ClusterController controller;
@@ -62,12 +66,10 @@ public class CassandraServiceTest {
     controller = new ClusterController();
     cluster = controller.launchCluster(clusterSpec);
 
-    // give it a sec to boot up the cluster
     waitForCassandra();
   }
 
-  private Cassandra.Client client(Instance instance) throws TException
-  {
+  private Cassandra.Client client(Instance instance) throws TException {
     TTransport trans = new TFramedTransport(new TSocket(
         instance.getPublicIp(),
         CassandraClusterActionHandler.CLIENT_PORT));
@@ -77,21 +79,29 @@ public class CassandraServiceTest {
   }
 
   private void waitForCassandra() {
+    LOG.info("Waiting for Cassandra to start");
     for (Instance instance : cluster.getInstances()) {
-      while (true) {
+      int tries = 0;
+      while (tries < 10) {
         try {
           Cassandra.Client client = client(instance);
           client.describe_cluster_name();
           client.getOutputProtocol().getTransport().close();
+          LOG.info(instance.getPublicIp() + " is up and running");
           break;
+
         } catch (TException e) {
-          System.out.print(".");
           try {
+            LOG.warn(instance.getPublicIp() + " not reachable, try #" + tries + ", waiting 1s");
             Thread.sleep(1000);
           } catch (InterruptedException e1) {
             break;
           }
+          tries += 1;
         }
+      }
+      if (tries == 10) {
+        LOG.error("Instance " + instance.getPublicIp() + " is still unavailable after 10 retries");
       }
     }
   }
@@ -107,6 +117,7 @@ public class CassandraServiceTest {
       }
       client.getOutputProtocol().getTransport().close();
     }
+    LOG.info("List of endpoints: " + endPoints);
     
     for (Instance instance : cluster.getInstances()) {
       String address = instance.getPrivateAddress().getHostAddress();

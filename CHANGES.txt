@@ -96,8 +96,6 @@ Trunk (unreleased changes)
 
     WHIRR-446. Upgrade all maven plugins to latest stable release (asavu)
 
-    WHIRR-447. FastDnsResolver fails with SocketTimeoutException (asavu)
-
   BUG FIXES
 
     WHIRR-377. Fix broken CLI logging config. (asavu via tomwhite)
@@ -115,6 +113,10 @@ Trunk (unreleased changes)
     gmond.conf (Joris Bontje via asavu)
 
     WHIRR-432. Puppet integration tests failing (Alex Heneveld via asavu)
+
+    WHIRR-447. FastDnsResolver fails with SocketTimeoutException (asavu)
+
+    WHIRR-437, Cassandra integration test is failing (asavu)
     
 Release 0.6.0 - 2011-08-17
 

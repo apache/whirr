@@ -32,7 +32,7 @@ function configure_cassandra() {
     #TODO set replication
     sed -i -e "s|<Seed>127.0.0.1</Seed>|$seeds|" $config_file
     sed -i -e "s|<ListenAddress>localhost</ListenAddress>|<ListenAddress>$PRIVATE_IP</ListenAddress>|" $config_file
-    sed -i -e "s|<ThriftAddress>localhost</ThriftAddress>|<ThriftAddress>$PUBLIC_IP</ThriftAddress>|" $config_file
+    sed -i -e "s|<ThriftAddress>localhost</ThriftAddress>|<ThriftAddress>0.0.0.0</ThriftAddress>|" $config_file
   else
     config_file="/etc/cassandra/conf/cassandra.yaml"
     if [[ "x"`grep -e '^seeds:' $config_file` == "x" ]]; then
@@ -51,7 +51,7 @@ function configure_cassandra() {
     fi
   
     sed -i -e "s|listen_address: localhost|listen_address: $PRIVATE_IP|" $config_file
-    sed -i -e "s|rpc_address: localhost|rpc_address: $PUBLIC_IP|" $config_file
+    sed -i -e "s|rpc_address: localhost|rpc_address: 0.0.0.0|" $config_file
   fi
 }
 
