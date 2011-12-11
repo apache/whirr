@@ -22,4 +22,11 @@
   <packaging>jar</packaging>
   <version>0.8.0-SNAPSHOT</version>
   <name>Apache Whirr Build Tools</name>
+  <distributionManagement>
+    <repository>
+      <id>apache.staging.https</id>
+      <name>Nexus Staging Repo</name>
+      <url>https://repository.apache.org/service/local/staging/deploy/maven2/</url>
+    </repository>
+  </distributionManagement>
 </project>
