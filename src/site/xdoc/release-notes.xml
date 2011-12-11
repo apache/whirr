@@ -25,6 +25,149 @@
     <!-- Paste release notes from https://issues.apache.org/jira/browse/WHIRR here. -->
 
 
+       <h1> Release Notes - Whirr - Version 0.7.0 </h1>
+    
+<h2>        Sub-task
+</h2>
+<ul>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-386'>WHIRR-386</a>] -         Remove references to the Apache Incubator 
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-387'>WHIRR-387</a>] -         Add Website Navigation Links 
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-403'>WHIRR-403</a>] -         Add Trademark Attributions
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-404'>WHIRR-404</a>] -         Add Project Metadata
+</li>
+</ul>
+            
+<h2>        Bug
+</h2>
+<ul>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-352'>WHIRR-352</a>] -         mvn package assembly:assembly fails
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-376'>WHIRR-376</a>] -         Launching a BYON cluster doesn&#39;t produce an instances file.
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-377'>WHIRR-377</a>] -         Fix broken CLI logging config
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-394'>WHIRR-394</a>] -         NPE used for flow control
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-396'>WHIRR-396</a>] -         service/ganglia needs non-zero send_metadata_interval= in gmond.conf
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-397'>WHIRR-397</a>] -         Automatic template selection is too restrictive
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-410'>WHIRR-410</a>] -         Review automatic image selection
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-412'>WHIRR-412</a>] -         cannot set up eclipse at &quot;How To Contribute&quot;
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-414'>WHIRR-414</a>] -         whirr can have a non-zero return code and unterminated (orphaned) host instances
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-427'>WHIRR-427</a>] -         CDH Hadoop integration test fails with malformed reply from SOCKS, may be version issue
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-432'>WHIRR-432</a>] -         Puppet integration tests failing
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-433'>WHIRR-433</a>] -         Chef integration tests failing
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-437'>WHIRR-437</a>] -         Cassandra integration test is failing
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-442'>WHIRR-442</a>] -         release 0.6.0 is in breach of the AL2.0 and general Apache rules in regards to the inclusion of Voldemort
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-447'>WHIRR-447</a>] -         FastDnsResolver fails with SocketTimeoutException
+</li>
+</ul>
+            
+<h2>        Improvement
+</h2>
+<ul>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-116'>WHIRR-116</a>] -         Site should have docs for each released version
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-243'>WHIRR-243</a>] -         Allow to run component tests in memory
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-325'>WHIRR-325</a>] -         Reduce cloud provider-specific code in scripts
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-340'>WHIRR-340</a>] -         Use spot instances for testing 
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-342'>WHIRR-342</a>] -         hadoop/hbase configuration &amp; active roles on a node
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-356'>WHIRR-356</a>] -         Upgrade elasticsearch to 0.17.4
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-357'>WHIRR-357</a>] -         Run elasticsearch as a non-root-user
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-358'>WHIRR-358</a>] -         Enable remote JMX access for HBase
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-366'>WHIRR-366</a>] -         Make website comply with Apache branding guidelines
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-368'>WHIRR-368</a>] -         Add the ability to adjust contents of hadoop-env.sh from a cluster properties file
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-371'>WHIRR-371</a>] -         Allow defining additional firewall rules
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-382'>WHIRR-382</a>] -         Upgrade to Commons Configuration 1.7
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-395'>WHIRR-395</a>] -         Less verbose logging when setting firewall rules
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-399'>WHIRR-399</a>] -         Move common script setup and script execution fork/join outside of ConfigureClusterAction and DestroyClusterAction
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-400'>WHIRR-400</a>] -         Upgrade to jclouds 1.2.1
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-401'>WHIRR-401</a>] -         Use regular instances for testing on aws-ec2
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-402'>WHIRR-402</a>] -         Remove SaveHttpResponseTo and use the class provided by jclouds
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-408'>WHIRR-408</a>] -         Upgrade elasticsearch to 0.18.2.
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-411'>WHIRR-411</a>] -         put install_git, install_ruby scripts in core
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-415'>WHIRR-415</a>] -         Let users specify the CDH release (cdh3u1, cdh3u2)
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-416'>WHIRR-416</a>] -         Enable lazy image fetching when the image-id is known
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-417'>WHIRR-417</a>] -         Allow users to choose their own jclouds modules with properties
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-418'>WHIRR-418</a>] -         add ssh debug logs to tests
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-419'>WHIRR-419</a>] -         Display how to connect to remote machines
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-420'>WHIRR-420</a>] -         Document jclouds specific configuration options
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-423'>WHIRR-423</a>] -         Refactor StartupProcess.cleanupFailedNodes
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-426'>WHIRR-426</a>] -         Create a convention for naming clusters used for integration tests 
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-440'>WHIRR-440</a>] -         Unit tests improvements (less bound to external services)
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-446'>WHIRR-446</a>] -         Upgrade all maven plugins to latest stable release
+</li>
+</ul>
+    
+<h2>        New Feature
+</h2>
+<ul>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-49'>WHIRR-49</a>] -         Allow Whirr to use Chef for configuration management
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-258'>WHIRR-258</a>] -         Add Ganglia as a service
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-384'>WHIRR-384</a>] -         Add Mahout as a service
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-385'>WHIRR-385</a>] -         Implement support for using nodeless, masterless Puppet to provision and run scripts
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-398'>WHIRR-398</a>] -         Implement the execution of scripts on DestroyClusterAction
+</li>
+</ul>
+                                    
+<h2>        Test
+</h2>
+<ul>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-409'>WHIRR-409</a>] -         Add an integration test that shows that there is no overlap between install &amp; configure scripts on the remote machine
+</li>
+</ul>
+        
+<h2>        Wish
+</h2>
+<ul>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-405'>WHIRR-405</a>] -         Read PMC Branding Responsibilities
+</li>
+</ul>
+
+
             <h1>Release Notes - Whirr&#153; - Version 0.6.0</h1>
          
      <h2>        Sub-task
