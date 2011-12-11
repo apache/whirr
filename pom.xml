@@ -423,6 +423,11 @@
     </pluginRepository>
   </pluginRepositories>
   <distributionManagement>
+    <repository>
+      <id>apache.staging.https</id>
+      <name>Nexus Staging Repo</name>
+      <url>https://repository.apache.org/service/local/staging/deploy/maven2/</url>
+    </repository>
     <site>
       <id>apache.website</id>
       <url>scpexe://people.apache.org/www/whirr.apache.org/docs/${project.version}</url>
