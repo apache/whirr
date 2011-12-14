@@ -73,6 +73,8 @@
 </li>
 <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-447'>WHIRR-447</a>] -         FastDnsResolver fails with SocketTimeoutException
 </li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-449'>WHIRR-449</a>] -         slf4j impl is not being copied to the lib dir when executing the binary assembly
+</li>
 </ul>
             
 <h2>        Improvement
