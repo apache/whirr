@@ -23,6 +23,9 @@
   </formats>
   <moduleSets>
     <moduleSet>
+      <includes>
+        <include>org.apache.whirr:whirr-cli</include>
+      </includes>
       <binaries>
         <includeDependencies>true</includeDependencies>
         <outputDirectory>lib</outputDirectory>
