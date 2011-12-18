@@ -142,6 +142,8 @@ public class HadoopNameNodeClusterActionHandler extends HadoopClusterActionHandl
   private void createProxyScript(ClusterSpec clusterSpec, Cluster cluster) {
     File configDir = getConfigDir(clusterSpec);
     File hadoopProxyFile = new File(configDir, "hadoop-proxy.sh");
+    hadoopProxyFile.setExecutable(true);
+    
     try {
       HadoopProxy proxy = new HadoopProxy(clusterSpec, cluster);
       InetAddress namenode = HadoopCluster.getNamenodePublicAddress(cluster);
