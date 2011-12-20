@@ -41,7 +41,7 @@ xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 http://maven.apache.org/xsd
     <h4>Install Whirr</h4>
 
     <p>
-    <a class="externalLink" href="http://www.apache.org/dyn/closer.cgi/incubator/whirr/">
+    <a class="externalLink" href="http://www.apache.org/dyn/closer.cgi/whirr/">
     Download</a> or 
     <a class="externalLink"
     href="https://cwiki.apache.org/confluence/display/WHIRR/How+To+Contribute">build</a> Whirr.</p>

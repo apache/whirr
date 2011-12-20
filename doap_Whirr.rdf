@@ -26,7 +26,7 @@
     <license rdf:resource="http://usefulinc.com/doap/licenses/asl20" />
     <name>Apache Whirr</name>
     <homepage rdf:resource="http://whirr.apache.org" />
-    <asfext:pmc rdf:resource="http://abdera.apache.org" />
+    <asfext:pmc rdf:resource="http://whirr.apache.org" />
     <shortdesc>Apache Whirr is a set of libraries for running cloud services</shortdesc>
     <description>Apache Whirr is a set of libraries for running cloud services
 
@@ -38,7 +38,7 @@ Whirr provides:
 You can also use Whirr as a command line tool for deploying clusters.</description>
     <bug-database rdf:resource="https://issues.apache.org/jira/browse/WHIRR" />
     <mailing-list rdf:resource="http://whirr.apache.org/mail-lists.html" />
-    <download-page rdf:resource="http://www.apache.org/dyn/closer.cgi/incubator/whirr/" />
+    <download-page rdf:resource="http://www.apache.org/dyn/closer.cgi/whirr/" />
     <programming-language>Java</programming-language>
     <programming-language>Bash</programming-language>
     <category rdf:resource="http://projects.apache.org/category/network-server" />
