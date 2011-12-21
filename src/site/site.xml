@@ -29,6 +29,12 @@
   <publishDate position="right"/>
   <version position="right"/>
 
+  <skin>
+    <groupId>org.apache.maven.skins</groupId>
+    <artifactId>maven-stylus-skin</artifactId>
+    <version>1.2</version>
+  </skin>
+
   <body>
     <links position="left">
       <item name="Wiki" href="https://cwiki.apache.org/confluence/display/WHIRR" />
