@@ -396,6 +396,7 @@
             <generateReports>false</generateReports>
             <templateDirectory>${basedir}/src/site/resources</templateDirectory>
             <template>site.vm</template>
+            <relativizeDecorationLinks>false</relativizeDecorationLinks>
           </configuration>
         </plugin>
       </plugins>
