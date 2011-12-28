@@ -156,6 +156,9 @@ public abstract class ScriptBasedClusterAction extends ClusterAction {
 
       StatementBuilder statementBuilder = entry.getValue()
           .getStatementBuilder();
+      if (statementBuilder.isEmpty()) {
+        continue; // skip execution if we have an empty list
+      }
 
       Set<Instance> instances = cluster.getInstancesMatching(onlyRolesIn(entry
           .getKey().getRoles()));
@@ -172,8 +175,7 @@ public abstract class ScriptBasedClusterAction extends ClusterAction {
           + "instances: {}", phaseName, instanceIds);
 
       for (final Instance instance : instances) {
-        final Statement statement = statementBuilder.build(clusterSpec,
-            instance);
+        final Statement statement = statementBuilder.build(clusterSpec, instance);
 
         futures.add(executorService.submit(new Callable<ExecResponse>() {
           @Override

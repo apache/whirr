@@ -37,7 +37,7 @@ function download() {
 
 # -f <configuration URL> -u <voldemort_tar_url>
 function install_voldemort() {
-  VOLDEMORT_VERSION="0.90"
+  VOLDEMORT_VERSION="0.90.1"
   VOLDEMORT_TAR_URL=https://github.com/downloads/voldemort/voldemort/voldemort-${VOLDEMORT_VERSION}.tar.gz
   VOLDEMORT_CONF_URL=
   VOLDEMORT_ROOT=/usr/local/voldemort

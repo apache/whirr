@@ -39,10 +39,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class ZooKeeperClusterActionHandler extends ClusterActionHandlerSupport {
-  
+
   private static final Logger LOG =
     LoggerFactory.getLogger(ZooKeeperClusterActionHandler.class);
-    
+
   public static final String ZOOKEEPER_ROLE = "zookeeper";
   private static final int CLIENT_PORT = 2181;
 
@@ -54,18 +54,6 @@ public class ZooKeeperClusterActionHandler extends ClusterActionHandlerSupport {
   protected Configuration getConfiguration(ClusterSpec spec)
     throws IOException {
     return getConfiguration(spec, "whirr-zookeeper-default.properties");
-  }
-
-  protected String getInstallFunction(Configuration config) {
-    return getInstallFunction(config, getRole(), "install_" + getRole());
-  }
-
-  protected String getConfigureFunction(Configuration config) {
-    return getConfigureFunction(config, getRole(), "configure_" + getRole());
-  }
-
-  protected String getStartFunction(Configuration config) {
-    return getStartFunction(config, getRole(), "start_" + getRole());
   }
 
   @Override
@@ -84,14 +72,16 @@ public class ZooKeeperClusterActionHandler extends ClusterActionHandlerSupport {
   }
 
   @Override
-  protected void beforeConfigure(ClusterActionEvent event) throws IOException, InterruptedException {
+  protected void beforeConfigure(ClusterActionEvent event)
+    throws IOException, InterruptedException {
+
     ClusterSpec clusterSpec = event.getClusterSpec();
     Cluster cluster = event.getCluster();
 
     event.getFirewallManager().addRule(
-        Rule.create().destination(role(ZOOKEEPER_ROLE)).port(CLIENT_PORT)
+      Rule.create().destination(role(ZOOKEEPER_ROLE)).port(CLIENT_PORT)
     );
-    
+
     // Pass list of all servers in ensemble to configure script.
     // Position is significant: i-th server has id i.
 
@@ -99,18 +89,9 @@ public class ZooKeeperClusterActionHandler extends ClusterActionHandlerSupport {
     String servers = Joiner.on(' ').join(getPrivateIps(ensemble));
 
     Configuration config = getConfiguration(clusterSpec);
-    String configureFunction = getConfigureFunction(config);
-
-    addStatement(event, call(configureFunction, servers));
-
-    if (configureFunction.equals("configure_zookeeper")) { //default zookeeper.configure-function
-      addStatement(event, call(getStartFunction(config)));
-    }
-    else {
-      //don't call start_zookeeper, because the CDH config starts the CDH version of zookeeper on its own
-    }
+    addStatement(event, call(getConfigureFunction(config), servers));
   }
-  
+
   @Override
   protected void afterConfigure(ClusterActionEvent event) {
     ClusterSpec clusterSpec = event.getClusterSpec();
@@ -122,29 +103,72 @@ public class ZooKeeperClusterActionHandler extends ClusterActionHandlerSupport {
     LOG.info("Hosts: {}", hosts);
   }
 
-  private List<String> getPrivateIps(Set<Instance> instances) {
-    return Lists.transform(Lists.newArrayList(instances),
-        new Function<Instance, String>() {
-      @Override
-      public String apply(Instance instance) {
-        return instance.getPrivateIp();
-      }
-    });
-  }
-  
-  static List<String> getHosts(Set<Instance> instances) {
-    return Lists.transform(Lists.newArrayList(instances),
-        new Function<Instance, String>() {
-      @Override
-      public String apply(Instance instance) {
-        try {
-          String publicIp = instance.getPublicHostName();
-          return String.format("%s:%d", publicIp, CLIENT_PORT);
-        } catch (IOException e) {
-          throw new IllegalArgumentException(e);
-        }
-      }
-    });
+  @Override
+  protected void beforeStart(ClusterActionEvent event) throws IOException {
+    Configuration config = getConfiguration(event.getClusterSpec());
+    String configureFunction = getConfigureFunction(config);
+
+    if (configureFunction.equals("configure_zookeeper")) {
+      addStatement(event, call(getStartFunction(config)));
+    } else {
+      // don't call start_zookeeper, because the CDH config starts the CDH
+      // version of zookeeper on its own
+    }
   }
 
+  @Override
+  protected void beforeStop(ClusterActionEvent event) throws IOException {
+    addStatement(event, call(getStopFunction(getConfiguration(event.getClusterSpec()))));
+  }
+
+  @Override
+  protected void beforeCleanup(ClusterActionEvent event) throws IOException {
+    addStatement(event, call("remove_service"));
+    addStatement(event, call(getCleanupFunction(getConfiguration(event.getClusterSpec()))));
+  }
+
+  protected String getInstallFunction(Configuration config) {
+    return getInstallFunction(config, getRole(), "install_" + getRole());
+  }
+
+  protected String getConfigureFunction(Configuration config) {
+    return getConfigureFunction(config, getRole(), "configure_" + getRole());
+  }
+
+  protected String getStartFunction(Configuration config) {
+    return getStartFunction(config, getRole(), "start_" + getRole());
+  }
+
+  protected String getStopFunction(Configuration config) {
+    return getStopFunction(config, getRole(), "stop_" + getRole());
+  }
+
+  protected String getCleanupFunction(Configuration config) {
+    return getCleanupFunction(config, getRole(), "cleanup_" + getRole());
+  }
+
+  private List<String> getPrivateIps(Set<Instance> instances) {
+    return Lists.transform(Lists.newArrayList(instances),
+      new Function<Instance, String>() {
+        @Override
+        public String apply(Instance instance) {
+          return instance.getPrivateIp();
+        }
+      });
+  }
+
+  static List<String> getHosts(Set<Instance> instances) {
+    return Lists.transform(Lists.newArrayList(instances),
+      new Function<Instance, String>() {
+        @Override
+        public String apply(Instance instance) {
+          try {
+            String publicIp = instance.getPublicHostName();
+            return String.format("%s:%d", publicIp, CLIENT_PORT);
+          } catch (IOException e) {
+            throw new IllegalArgumentException(e);
+          }
+        }
+      });
+  }
 }

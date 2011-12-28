@@ -70,6 +70,20 @@ public class ElasticSearchHandler extends ClusterActionHandlerSupport {
       ElasticSearchConfigurationBuilder.build("/tmp/elasticsearch.yml", config));
     addStatement(event, call("configure_elasticsearch",
       config.getStringArray("es.plugins")));
+  }
+
+  @Override
+  protected void beforeStart(ClusterActionEvent event) throws IOException {
     addStatement(event, call("start_elasticsearch"));
+  }
+
+  @Override
+  protected void beforeStop(ClusterActionEvent event) throws IOException {
+    addStatement(event, call("stop_elasticsearch"));
+  }
+
+  @Override
+  protected void beforeCleanup(ClusterActionEvent event) throws IOException {
+    addStatement(event, call("cleanup_elasticsearch"));
   }
 }

@@ -87,6 +87,9 @@ public class ByonClusterAction extends ScriptBasedClusterAction {
 
       final ClusterSpec clusterSpec = entry.getValue().getClusterSpec();
       final StatementBuilder statementBuilder = entry.getValue().getStatementBuilder();
+      if (statementBuilder.isEmpty()) {
+        continue; // skip
+      }
 
       final ComputeServiceContext computeServiceContext = getCompute().apply(clusterSpec);
       final ComputeService computeService = computeServiceContext.getComputeService();

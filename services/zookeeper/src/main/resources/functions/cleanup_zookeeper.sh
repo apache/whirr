@@ -17,7 +17,9 @@
 function cleanup_zookeeper() {
     /etc/init.d/zookeeper stop
     remove_service zookeeper
-    # TODO remove cron job
+
+    crontab -l 2>/dev/null | grep -v "PurgeTxnLog" | sort | uniq | crontab -
+
     rm -rf /usr/local/zookeeper* /etc/zookeeper /var/log/zookeeper /mnt/zookeeper
     rm -f /etc/init.d/zookeeper
 }

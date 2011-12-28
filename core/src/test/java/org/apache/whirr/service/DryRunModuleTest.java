@@ -18,14 +18,19 @@
 
 package org.apache.whirr.service;
 
+import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertSame;
 import static junit.framework.Assert.assertTrue;
+import static org.jclouds.scriptbuilder.domain.Statements.exec;
 
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Stack;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.whirr.ClusterController;
@@ -35,6 +40,7 @@ import org.jclouds.compute.callables.RunScriptOnNode;
 import org.jclouds.compute.callables.RunScriptOnNodeAsInitScriptUsingSsh;
 import org.jclouds.compute.domain.NodeMetadata;
 import org.jclouds.scriptbuilder.InitBuilder;
+import org.junit.Before;
 import org.junit.Test;
 
 import com.google.common.collect.ListMultimap;
@@ -50,6 +56,20 @@ public class DryRunModuleTest {
       return "noop2";
     }
 
+    @Override
+    public void beforeConfigure(ClusterActionEvent event) {
+      addStatement(event, exec("echo 1"));
+    }
+
+    @Override
+    public void beforeStart(ClusterActionEvent event) {
+      addStatement(event, exec("echo 2"));
+    }
+
+    @Override
+    public void beforeDestroy(ClusterActionEvent event) {
+      addStatement(event, exec("echo 3"));
+    }
   }
 
   public static class Noop3ClusterActionHandler extends
@@ -59,27 +79,34 @@ public class DryRunModuleTest {
     public String getRole() {
       return "noop3";
     }
+
+    @Override
+    public void beforeConfigure(ClusterActionEvent event) {
+      addStatement(event, exec("echo 1"));
+    }
+
+    @Override
+    public void beforeStart(ClusterActionEvent event) {
+      addStatement(event, exec("echo 2"));
+    }
+
+    @Override
+    public void beforeDestroy(ClusterActionEvent event) {
+      addStatement(event, exec("echo 3"));
+    }
   }
 
-  /**
-   * Simple test that tests dry run module and at the same time enforces clear
-   * separation of script execution phases.
-   * 
-   * @throws ConfigurationException
-   * @throws IOException
-   * @throws JSchException
-   * @throws InterruptedException
-   */
-  @Test
-  public void testNoInitScriptsAfterConfigurationStartedAndNoConfigScriptsAfterDestroy()
-      throws ConfigurationException, JSchException, IOException,
-      InterruptedException {
+  @Before
+  public void setUp() {
+    DryRunModule.resetDryRun();
+  }
 
+  @Test
+  public void testExecuteOnlyBootstrapForNoop() throws Exception {
     CompositeConfiguration config = new CompositeConfiguration();
     config.setProperty("whirr.provider", "stub");
     config.setProperty("whirr.cluster-name", "stub-test");
-    config.setProperty("whirr.instance-templates",
-        "10 noop+noop3,10 noop2+noop,10 noop3+noop2");
+    config.setProperty("whirr.instance-templates", "1 noop");
     config.setProperty("whirr.state-store", "memory");
 
     ClusterSpec clusterSpec = ClusterSpec.withTemporaryKeys(config);
@@ -89,58 +116,73 @@ public class DryRunModuleTest {
     controller.destroyCluster(clusterSpec);
 
     DryRun dryRun = DryRunModule.getDryRun();
-    ListMultimap<NodeMetadata, RunScriptOnNode> perNodeExecutions = dryRun
-        .getExecutions();
-    List<RunScriptOnNode> totalExecutions = dryRun
-        .getTotallyOrderedExecutions();
+    ListMultimap<NodeMetadata, RunScriptOnNode> perNodeExecutions = dryRun.getExecutions();
 
-    // assert that all nodes executed all three phases and in the right order
     for (Entry<NodeMetadata, Collection<RunScriptOnNode>> entry : perNodeExecutions
         .asMap().entrySet()) {
       assertSame("An incorrect number of scripts was executed in the node",
-          entry.getValue().size(), 3);
+          entry.getValue().size(), 1);
+    }
+  }
+
+  /**
+   * Simple test that tests dry run module and at the same time enforces clear
+   * separation of script execution phases.
+   */
+  @Test
+  public void testNoInitScriptsAfterConfigurationStartedAndNoConfigScriptsAfterDestroy()
+      throws ConfigurationException, JSchException, IOException, InterruptedException {
+
+    final List<String> expectedExecutionOrder = ImmutableList.of("setup", "configure", "start", "destroy");
+
+    CompositeConfiguration config = new CompositeConfiguration();
+    config.setProperty("whirr.provider", "stub");
+    config.setProperty("whirr.cluster-name", "stub-test");
+    config.setProperty("whirr.instance-templates", "10 noop+noop3,10 noop2+noop,10 noop3+noop2");
+    config.setProperty("whirr.state-store", "memory");
+
+    ClusterSpec clusterSpec = ClusterSpec.withTemporaryKeys(config);
+    ClusterController controller = new ClusterController();
+
+    controller.launchCluster(clusterSpec);
+    controller.destroyCluster(clusterSpec);
+
+    DryRun dryRun = DryRunModule.getDryRun();
+    ListMultimap<NodeMetadata, RunScriptOnNode> perNodeExecutions = dryRun.getExecutions();
+    List<RunScriptOnNode> totalExecutions = dryRun.getTotallyOrderedExecutions();
+
+    // Assert that all nodes executed all three phases and in the right order
+
+    for (Entry<NodeMetadata, Collection<RunScriptOnNode>> entry : perNodeExecutions
+        .asMap().entrySet()) {
+      assertSame("An incorrect number of scripts was executed in the node",
+          entry.getValue().size(), expectedExecutionOrder.size());
       List<RunScriptOnNode> asList = (List<RunScriptOnNode>) entry.getValue();
-      assertTrue("The bootstrap script was executed in the wrong order",
-          getScriptName(asList.get(0)).startsWith("setup"));
-      assertTrue("The configure script was executed in the wrong order",
-          getScriptName(asList.get(1)).startsWith("configure"));
-      assertTrue("The destroy script was executed in the wrong order",
-          getScriptName(asList.get(2)).startsWith("destroy"));
+
+      int count = 0;
+      for(String phase : expectedExecutionOrder) {
+        assertTrue("The '" + phase + "' script was executed in the wrong order",
+            getScriptName(asList.get(count)).startsWith(phase));
+        count += 1;
+      }
     }
 
-    // this tests the barrier by making sure that once a configure
-    // script is executed no more setup scripts are executed.
+    // This tests the barrier by making sure that once a configure
+    // script is executed no more setup scripts are executed
 
-    boolean bootPhase = true;
-    boolean configPhase = false;
-    boolean destroyPhase = false;
+    Stack<String> executedPhases = new Stack<String>();
     for (RunScriptOnNode script : totalExecutions) {
-      if (bootPhase && !configPhase && getScriptName(script).startsWith("configure")) {
-        configPhase = true;
-        bootPhase = false;
-        continue;
+      String[] parts = getScriptName(script).split("-");
+      if ((!executedPhases.empty() && !executedPhases.peek().equals(parts[0])) || executedPhases.empty()) {
+        executedPhases.push(parts[0]);
       }
-      if (configPhase && !destroyPhase && getScriptName(script).startsWith("destroy")) {
-        destroyPhase = true;
-        configPhase = false;
-        continue;
-      }
-      if (bootPhase) {
-        assertTrue(
-            "A script other than setup was executed in the bootstrap phase",
-            getScriptName(script).startsWith("setup"));
-      }
-      if (configPhase) {
-        assertTrue(
-            "A script other than configure was executed in the configure phase",
-            getScriptName(script).startsWith("configure"));
-      }
-      if (destroyPhase) {
-        assertTrue(
-            "A non-destroy script was executed after the first destroy script. ["
-                + getScriptName(script) + "]", getScriptName(script)
-                .startsWith("destroy"));
-      }
+    }
+
+    // Assert that all scripts executed in the right order with no overlaps
+
+    assertEquals(expectedExecutionOrder.size(), executedPhases.size());
+    for (String phaseName : Lists.reverse(expectedExecutionOrder)) {
+      assertEquals(executedPhases.pop(), phaseName);
     }
   }
 

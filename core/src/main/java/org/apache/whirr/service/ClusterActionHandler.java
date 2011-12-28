@@ -34,6 +34,9 @@ public abstract class ClusterActionHandler {
   
   public static final String BOOTSTRAP_ACTION = "bootstrap";
   public static final String CONFIGURE_ACTION = "configure";
+  public static final String START_ACTION  = "start";
+  public static final String STOP_ACTION = "stop";
+  public static final String CLEANUP_ACTION = "cleanup";
   public static final String DESTROY_ACTION = "destroy";
 
   public abstract String getRole();

@@ -20,6 +20,7 @@ package org.apache.whirr.service.jclouds;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -43,12 +44,25 @@ public class StatementBuilder {
   
   private static final Logger LOG =
     LoggerFactory.getLogger(StatementBuilder.class);
-  
+
+  class EmptyStatement implements Statement {
+
+    @Override
+    public Iterable<String> functionDependencies(OsFamily osFamily) {
+      return ImmutableSet.of();
+    }
+
+    @Override
+    public String render(OsFamily osFamily) {
+      return "";
+    }
+  }
+
   class ConsolidatedStatement implements Statement {
     
     private ClusterSpec clusterSpec;
     private Instance instance;
-    
+
     public ConsolidatedStatement(ClusterSpec clusterSpec, Instance instance) {
       this.clusterSpec = clusterSpec;
       this.instance = instance;
@@ -132,12 +146,20 @@ public class StatementBuilder {
     exports.put(key, value);
   }
 
+  public boolean isEmpty() {
+    return statements.size() == 0;
+  }
+
   public Statement build(ClusterSpec clusterSpec) {
     return build(clusterSpec, null);
   }
 
   public Statement build(ClusterSpec clusterSpec, Instance instance) {
-    return new ConsolidatedStatement(clusterSpec, instance);
+    if (statements.size() == 0) {
+      return new EmptyStatement();
+    } else {
+      return new ConsolidatedStatement(clusterSpec, instance);
+    }
   }
 
 }

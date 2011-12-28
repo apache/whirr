@@ -24,7 +24,7 @@ import org.apache.whirr.Cluster;
 import org.apache.whirr.Cluster.Instance;
 import org.apache.whirr.ClusterSpec;
 
-public class WhirrUtils {
+public class Utils {
 
   /**
    * Prints ssh commands that can be used to login into the nodes

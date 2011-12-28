@@ -84,7 +84,22 @@ public class CassandraClusterActionHandler extends ClusterActionHandlerSupport {
     List<Instance> seeds = getSeeds(cluster.getInstances());
     String servers = Joiner.on(' ').join(getPrivateIps(seeds));
     addStatement(event, call("configure_cassandra", servers));
+  }
+
+  @Override
+  protected void beforeStart(ClusterActionEvent event) {
     addStatement(event, call("start_cassandra"));
+  }
+
+  @Override
+  protected void beforeStop(ClusterActionEvent event) {
+    addStatement(event, call("stop_cassandra"));
+  }
+
+  @Override
+  protected void beforeCleanup(ClusterActionEvent event) {
+    addStatement(event, call("remove_service"));
+    addStatement(event, call("cleanup_cassandra"));
   }
 
   private List<String> getPrivateIps(List<Instance> instances) {

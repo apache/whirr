@@ -19,6 +19,7 @@
 package org.apache.whirr.service.chef;
 
 import static junit.framework.Assert.assertTrue;
+import static junit.framework.Assert.fail;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -101,15 +102,7 @@ public class ChefServiceDryRunTest {
   public void testChefOnly() throws Exception {
     launchWithConfig(chefOnly);
     assertInstallFunctionsWereExecuted(DryRun.INSTANCE);
-    // chef only install should not contain any chef-solo executions
-    assertScriptPredicateOnPhase(DryRun.INSTANCE, "configure",
-        new Predicate<String>() {
-          @Override
-          public boolean apply(String input) {
-            return !input.contains("chef-solo");
-          }
-        });
-
+    assertNoEntryForPhase(DryRun.INSTANCE, "configure");
   }
 
   /**
@@ -201,6 +194,15 @@ public class ChefServiceDryRunTest {
         return input.contains("install_chef");
       }
     });
+  }
+
+  private void assertNoEntryForPhase(DryRun dryRun, String phaseName) throws Exception {
+    try {
+      fail("Found entry: " + getEntryForPhase(dryRun.getExecutions(), phaseName));
+
+    } catch (IllegalStateException e) {
+      // No entry found - OK
+    }
   }
 
   private Entry<NodeMetadata, RunScriptOnNode> getEntryForPhase(

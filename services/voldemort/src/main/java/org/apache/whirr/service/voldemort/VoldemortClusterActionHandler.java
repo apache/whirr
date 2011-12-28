@@ -105,7 +105,6 @@ public class VoldemortClusterActionHandler extends ClusterActionHandlerSupport {
                              PARAM_PARTITIONS_PER_NODE,
                              Integer.toString(partitionsPerNode),
                              servers));
-    addStatement(event, call("start_voldemort"));
   }
 
   @Override
@@ -117,6 +116,22 @@ public class VoldemortClusterActionHandler extends ClusterActionHandlerSupport {
 
     LOG.info("Completed setup of Voldemort {} with servers {}",
         clusterSpec.getClusterName(), servers);
+  }
+
+  @Override
+  protected void beforeStart(ClusterActionEvent event) {
+    addStatement(event, call("start_voldemort"));
+  }
+
+  @Override
+  protected void beforeStop(ClusterActionEvent event) {
+    addStatement(event, call("stop_voldemort"));
+  }
+
+  @Override
+  protected void beforeCleanup(ClusterActionEvent event) {
+    addStatement(event, call("remove_service"));
+    addStatement(event, call("cleanup_voldemort"));
   }
 
   /**

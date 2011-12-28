@@ -51,6 +51,12 @@ public abstract class ClusterActionHandlerSupport extends ClusterActionHandler {
       beforeBootstrap(event);
     } else if (event.getAction().equals(CONFIGURE_ACTION)) {
       beforeConfigure(event);
+    } else if (event.getAction().equals(START_ACTION)) {
+      beforeStart(event);
+    } else if (event.getAction().equals(STOP_ACTION)) {
+      beforeStop(event);
+    } else if (event.getAction().equals(CLEANUP_ACTION)) {
+      beforeCleanup(event);
     } else if (event.getAction().equals(DESTROY_ACTION)) {
       beforeDestroy(event);
     } else {
@@ -65,6 +71,12 @@ public abstract class ClusterActionHandlerSupport extends ClusterActionHandler {
       afterBootstrap(event);
     } else if (event.getAction().equals(CONFIGURE_ACTION)) {
       afterConfigure(event);
+    } else if (event.getAction().equals(START_ACTION)) {
+      afterStart(event);
+    } else if (event.getAction().equals(STOP_ACTION)) {
+      afterStop(event);
+    } else if (event.getAction().equals(CLEANUP_ACTION)) {
+      afterCleanup(event);
     } else if (event.getAction().equals(DESTROY_ACTION)) {
       afterDestroy(event);
     } else {
@@ -78,6 +90,15 @@ public abstract class ClusterActionHandlerSupport extends ClusterActionHandler {
   protected void beforeConfigure(ClusterActionEvent event)
     throws IOException, InterruptedException { }
 
+  protected void beforeStart(ClusterActionEvent event)
+    throws IOException, InterruptedException { }
+
+  protected void beforeStop(ClusterActionEvent event)
+    throws IOException, InterruptedException { }
+
+  protected void beforeCleanup(ClusterActionEvent event)
+    throws IOException, InterruptedException { }
+
   protected void beforeDestroy(ClusterActionEvent event)
     throws IOException, InterruptedException { }
 
@@ -88,6 +109,15 @@ public abstract class ClusterActionHandlerSupport extends ClusterActionHandler {
     throws IOException, InterruptedException { }
   
   protected void afterConfigure(ClusterActionEvent event)
+    throws IOException, InterruptedException { }
+
+  protected void afterStart(ClusterActionEvent event)
+    throws IOException, InterruptedException { }
+
+  protected void afterStop(ClusterActionEvent event)
+    throws IOException, InterruptedException { }
+
+  protected void afterCleanup(ClusterActionEvent event)
     throws IOException, InterruptedException { }
   
   protected void afterDestroy(ClusterActionEvent event)

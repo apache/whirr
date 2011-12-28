@@ -18,34 +18,37 @@
 
 package org.apache.whirr.cli.command;
 
+import joptsimple.OptionParser;
+import joptsimple.OptionSet;
+import org.apache.whirr.ClusterController;
+import org.apache.whirr.ClusterControllerFactory;
+import org.apache.whirr.ClusterSpec;
+import org.apache.whirr.command.AbstractClusterCommand;
+import org.apache.whirr.state.ClusterStateStoreFactory;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.util.List;
 
-import joptsimple.OptionParser;
-import joptsimple.OptionSet;
-
-import org.apache.whirr.Cluster;
-import org.apache.whirr.ClusterController;
-import org.apache.whirr.ClusterControllerFactory;
-import org.apache.whirr.ClusterSpec;
-import org.apache.whirr.command.AbstractClusterCommand;
-import org.apache.whirr.util.Utils;
-
 /**
- * A command to launch a new cluster.
+ * A command to stop the cluster services
  */
-public class LaunchClusterCommand extends AbstractClusterCommand {
+public class StopServicesCommand extends AbstractClusterCommand {
 
-  public LaunchClusterCommand() throws IOException {
+  public StopServicesCommand() throws IOException {
     this(new ClusterControllerFactory());
   }
 
-  public LaunchClusterCommand(ClusterControllerFactory factory) {
-    super("launch-cluster", "Launch a new cluster running a service.", factory);
+  public StopServicesCommand(ClusterControllerFactory factory) {
+    this(factory, new ClusterStateStoreFactory());
   }
 
+  public StopServicesCommand(ClusterControllerFactory factory,
+                             ClusterStateStoreFactory stateStoreFactory) {
+    super("stop-services", "Stop the cluster services.", factory, stateStoreFactory);
+  }
+  
   @Override
   public int run(InputStream in, PrintStream out, PrintStream err,
       List<String> args) throws Exception {
@@ -56,20 +59,12 @@ public class LaunchClusterCommand extends AbstractClusterCommand {
       printUsage(parser, err);
       return -1;
     }
-    
     try {
       ClusterSpec clusterSpec = getClusterSpec(optionSet);
       ClusterController controller = createClusterController(clusterSpec.getServiceName());
-      Cluster cluster = controller.launchCluster(clusterSpec);
-      out.printf("Started cluster of %s instances\n",
-          cluster.getInstances().size());
-      out.println(cluster);
-      
-      // print ssh command. do it for the first 20 instances so that the console
-      // won't be overflooded when launching a 1000 node cluster
-      Utils.printAccess(out, clusterSpec, cluster, 20);
-      
+      controller.stopServices(clusterSpec);
       return 0;
+
     } catch (IllegalArgumentException e) {
       err.println(e.getMessage());
       printUsage(parser, err);
@@ -78,7 +73,7 @@ public class LaunchClusterCommand extends AbstractClusterCommand {
   }
 
   private void printUsage(OptionParser parser, PrintStream stream) throws IOException {
-    stream.println("Usage: whirr launch-cluster [OPTIONS]");
+    stream.println("Usage: whirr stop-services [OPTIONS]");
     stream.println();
     parser.printHelpOn(stream);
   }
