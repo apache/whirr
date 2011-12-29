@@ -23,34 +23,37 @@ import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.whirr.Cluster;
 import org.apache.whirr.ClusterSpec;
 import org.apache.whirr.service.ComputeCache;
-import org.apache.whirr.service.jclouds.FirewallSettings;
+import org.apache.whirr.service.FirewallManager;
 import org.jclouds.compute.ComputeServiceContext;
 import org.jclouds.domain.Credentials;
 import org.jclouds.ec2.EC2Client;
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
 import java.util.Set;
 
-public class FirewallSettingsTest {
+import static org.apache.whirr.service.FirewallManager.Rule;
 
-  private static final String REGION = "us-east-1";
+public class FirewallManagerTest {
 
-  private static ClusterSpec spec;
-  private static Set<Cluster.Instance> instances;
+  private final String region = "us-east-1";
 
-  private static ComputeServiceContext context;
+  private ClusterSpec clusterSpec;
+  private Set<Cluster.Instance> instances;
 
-  private static ClusterSpec getTestClusterSpec() throws Exception {
+  private ComputeServiceContext context;
+  private FirewallManager manager;
+
+  private ClusterSpec getTestClusterSpec() throws Exception {
     return ClusterSpec.withTemporaryKeys(
       new PropertiesConfiguration("whirr-core-test.properties"));
   }
 
-  @BeforeClass
-  public static void setUpClass() throws Exception {
-    spec = getTestClusterSpec();
-    context =  ComputeCache.INSTANCE.apply(spec);
+  @Before
+  public void setUpClass() throws Exception {
+    clusterSpec = getTestClusterSpec();
+    context =  ComputeCache.INSTANCE.apply(clusterSpec);
 
     /* create a dummy instance for testing */
     instances = Sets.newHashSet(new Cluster.Instance(
@@ -58,9 +61,11 @@ public class FirewallSettingsTest {
       Sets.newHashSet("dummy-role"),
       "50.0.0.1",
       "10.0.0.1",
-      REGION + "/i-dummy",
+      region + "/i-dummy",
       null
     ));
+
+    manager = new FirewallManager(context, clusterSpec, new Cluster(instances));
   }
 
   @Test
@@ -68,19 +73,23 @@ public class FirewallSettingsTest {
     if (context.getProviderSpecificContext().getApi() instanceof EC2Client) {
       EC2Client ec2Client = EC2Client.class.cast(
           context.getProviderSpecificContext().getApi());
-      String groupName = "jclouds#" + spec.getClusterName() + "#" + REGION;
+      String groupName = "jclouds#" + clusterSpec.getClusterName() + "#" + region;
 
       ec2Client.getSecurityGroupServices()
-          .createSecurityGroupInRegion(REGION, groupName, "group description");
+          .createSecurityGroupInRegion(region, groupName, "group description");
       try {
-        FirewallSettings.authorizeIngress(context, instances, spec, 23344);
+        manager.addRule(
+          Rule.create().destination(instances).port(23344)
+        );
 
         /* The second call should not throw an exception. */
-        FirewallSettings.authorizeIngress(context, instances, spec, 23344);
+        manager.addRule(
+          Rule.create().destination(instances).port(23344)
+        );
 
       } finally {
         ec2Client.getSecurityGroupServices()
-            .deleteSecurityGroupInRegion(REGION, groupName);
+            .deleteSecurityGroupInRegion(region, groupName);
       }
     }
   }

@@ -9,6 +9,8 @@ Trunk (unreleased changes)
 
     WHIRR-457. Upgrade to jclouds 1.2.2 (asavu)
 
+    WHIRR-458. Remove deprecated code and aliasing mechanism (asavu)
+
 Release 0.7.0 - 2011-12-11
 
   NEW FEATURES

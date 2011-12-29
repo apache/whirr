@@ -19,15 +19,20 @@
 package org.apache.whirr.service;
 
 import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.whirr.Cluster;
 import org.apache.whirr.ClusterSpec;
 import org.apache.whirr.Cluster.Instance;
-import org.apache.whirr.service.jclouds.FirewallSettings;
+import org.jclouds.aws.util.AWSUtils;
 import org.jclouds.compute.ComputeServiceContext;
+import org.jclouds.ec2.EC2Client;
+import org.jclouds.ec2.domain.IpProtocol;
 import org.jclouds.javax.annotation.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -156,7 +161,7 @@ public class FirewallManager {
     if (rule.source == null) {
       cidrs = clusterSpec.getClientCidrs();
       if (cidrs == null || cidrs.isEmpty()) {
-        cidrs = Lists.newArrayList(FirewallSettings.getOriginatingIp());
+        cidrs = Lists.newArrayList(getOriginatingIp());
       }
     } else {
       cidrs = Lists.newArrayList(rule.source + "/32");
@@ -173,8 +178,45 @@ public class FirewallManager {
     LOG.info("Authorizing firewall ingress to {} on ports {} for {}",
         new Object[] { instanceIds, rule.ports, cidrs });
 
-    FirewallSettings.authorizeIngress(computeServiceContext, instances,
+    authorizeIngress(computeServiceContext, instances,
         clusterSpec, cidrs, rule.ports);
   }
 
+  /**
+   * @return the IP address of the client on which this code is running.
+   * @throws IOException
+   */
+  private String getOriginatingIp() throws IOException {
+    URL url = new URL("http://checkip.amazonaws.com/");
+    HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+    connection.connect();
+    return IOUtils.toString(connection.getInputStream()).trim() + "/32";
+  }
+
+  public static void authorizeIngress(ComputeServiceContext computeServiceContext,
+      Set<Instance> instances, ClusterSpec clusterSpec, List<String> cidrs, int... ports) {
+
+    if (computeServiceContext.getProviderSpecificContext().getApi() instanceof
+      EC2Client) {
+      // This code (or something like it) may be added to jclouds (see
+      // http://code.google.com/p/jclouds/issues/detail?id=336).
+      // Until then we need this temporary workaround.
+      String region = AWSUtils.parseHandle(Iterables.get(instances, 0).getId())[0];
+      EC2Client ec2Client = EC2Client.class.cast(
+          computeServiceContext.getProviderSpecificContext().getApi());
+      String groupName = "jclouds#" + clusterSpec.getClusterName() + "#" + region;
+      for (String cidr : cidrs) {
+        for (int port : ports) {
+          try {
+            ec2Client.getSecurityGroupServices()
+              .authorizeSecurityGroupIngressInRegion(region, groupName,
+                IpProtocol.TCP, port, port, cidr);
+          } catch(IllegalStateException e) {
+            LOG.warn(e.getMessage());
+            /* ignore, it means that this permission was already granted */
+          }
+        }
+      }
+    }
+  }
 }

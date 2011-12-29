@@ -213,19 +213,6 @@ public class ClusterSpecTest {
     new InstanceTemplate(1, "a b");
   }
 
-  @Test
-  public void testApplyRoleAliases() {
-    CompositeConfiguration c = new CompositeConfiguration();
-    Configuration config = new PropertiesConfiguration();
-    config.addProperty("whirr.instance-templates", "1 nn+jt+tt+dn+zk");
-    c.addConfiguration(config);    
-    InstanceTemplate template = InstanceTemplate.parse(c).get(0);
-    Set<String> expected = Sets.newLinkedHashSet(Arrays.asList(new String[]{
-        "hadoop-namenode", "hadoop-jobtracker", "hadoop-tasktracker",
-        "hadoop-datanode", "zookeeper"}));
-    assertThat(template.getRoles(), is(expected));
-  }
-
   @Test(expected = IllegalArgumentException.class)
   public void testIllegalArgumentExceptionOnInstancesTemplates() throws Exception {
     Configuration conf = new PropertiesConfiguration();

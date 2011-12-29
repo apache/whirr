@@ -87,8 +87,8 @@ public class BootstrapClusterActionTest {
     Configuration conf = new PropertiesConfiguration();
     conf.addProperty("whirr.service-name", "test-service");
     conf.addProperty("whirr.cluster-name", "test-cluster");
-    conf.addProperty("whirr.instance-templates", "1 jt+nn,4 dn+tt");
-    conf.addProperty("whirr.instance-templates-max-percent-failures", "60 dn+tt");
+    conf.addProperty("whirr.instance-templates", "1 hadoop-namenode+hadoop-jobtracker,4 hadoop-datanode+hadoop-tasktracker");
+    conf.addProperty("whirr.instance-templates-max-percent-failures", "60 hadoop-datanode+hadoop-tasktracker");
     conf.addProperty("whirr.provider", "ec2");
     config.addConfiguration(conf);
     ClusterSpec clusterSpec = ClusterSpec.withTemporaryKeys(conf);
@@ -125,11 +125,11 @@ public class BootstrapClusterActionTest {
     // and from the dn+tt one node fails, then the retry is successful
     Map<Set<String>, Stack<Integer>> reaction = Maps.newHashMap();
     Stack<Integer> jtnnStack = new Stack<Integer>();
-    jtnnStack.push(new Integer(1)); // then ok
-    jtnnStack.push(new Integer(0)); // initially fail
+    jtnnStack.push(1); // then ok
+    jtnnStack.push(0); // initially fail
     reaction.put(jtnn, jtnnStack);
     Stack<Integer> ddttStack = new Stack<Integer>();
-    ddttStack.push(new Integer(3)); // 3 from 4, just enough
+    ddttStack.push(3); // 3 from 4, just enough
     reaction.put(dntt, ddttStack);
     
     nodeStarterFactory = new TestNodeStarterFactory(reaction);
@@ -152,8 +152,8 @@ public class BootstrapClusterActionTest {
     Configuration conf = new PropertiesConfiguration();
     conf.addProperty("whirr.service-name", "test-service");
     conf.addProperty("whirr.cluster-name", "test-cluster");
-    conf.addProperty("whirr.instance-templates", "1 jt+nn,4 dn+tt");
-    conf.addProperty("whirr.instance-templates-max-percent-failures", "60 dn+tt");
+    conf.addProperty("whirr.instance-templates", "1 hadoop-namenode+hadoop-jobtracker,4 hadoop-datanode+hadoop-tasktracker");
+    conf.addProperty("whirr.instance-templates-max-percent-failures", "60 hadoop-datanode+hadoop-tasktracker");
     conf.addProperty("whirr.provider", "ec2");
     config.addConfiguration(conf);
     ClusterSpec clusterSpec = ClusterSpec.withTemporaryKeys(conf);
