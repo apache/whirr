@@ -11,6 +11,10 @@ Trunk (unreleased changes)
 
     WHIRR-458. Remove deprecated code and aliasing mechanism (asavu)
 
+  BUG FIXES
+
+    WHIRR-367. Wrong groupId for zookeeper (Joe Crobak via asavu)
+
 Release 0.7.0 - 2011-12-11
 
   NEW FEATURES
