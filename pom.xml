@@ -54,7 +54,7 @@
   </modules>
 
   <properties>
-    <jclouds.version>1.2.1</jclouds.version>
+    <jclouds.version>1.2.2</jclouds.version>
   </properties>
 
   <dependencyManagement>

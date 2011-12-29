@@ -7,6 +7,8 @@ Trunk (unreleased changes)
     WHIRR-421. Handle more role / service lifecycle events as part 
     of the core functionality (asavu)
 
+    WHIRR-457. Upgrade to jclouds 1.2.2 (asavu)
+
 Release 0.7.0 - 2011-12-11
 
   NEW FEATURES
