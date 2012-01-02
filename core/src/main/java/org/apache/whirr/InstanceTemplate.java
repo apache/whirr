@@ -18,53 +18,101 @@
 package org.apache.whirr;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.collect.Lists.newArrayList;
+import static com.google.common.collect.Sets.newLinkedHashSet;
 
+import com.google.common.base.Function;
+import com.google.common.base.Joiner;
 import com.google.common.base.Objects;
-import com.google.common.collect.Lists;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+import com.google.common.collect.Sets;
 import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * This class describes the type of instances that should be in the cluster.
  * This is done by specifying the number of instances in each role.
  */
 public class InstanceTemplate {
-  private static final Logger LOG = LoggerFactory.getLogger(InstanceTemplate.class);
 
-  private Set<String> roles;
-  private int numberOfInstances;
-  private int minNumberOfInstances;  // some instances may fail, at least a minimum number is required
-
-  public InstanceTemplate(int numberOfInstances, String... roles) {
-    this(numberOfInstances, numberOfInstances, Sets.newLinkedHashSet(Lists.newArrayList(roles)));
+  public static Builder builder() {
+    return new Builder();
   }
 
-  public InstanceTemplate(int numberOfInstances, Set<String> roles) {
-    this(numberOfInstances, numberOfInstances, roles);
-  }
+  public static class Builder {
+    private int numberOfInstances = -1;
+    private int minNumberOfInstances = -1;
+    private String hardwareId;
+    private String imageId;
+    private Set<String> roles;
 
-  public InstanceTemplate(int numberOfInstances, int minNumberOfInstances, String... roles) {
-    this(numberOfInstances, minNumberOfInstances, Sets.newLinkedHashSet(Lists.newArrayList(roles)));
-  }
-
-  public InstanceTemplate(int numberOfInstances, int minNumberOfInstances, Set<String> roles) {
-    for (String role : roles) {
-      checkArgument(!StringUtils.contains(role, " "),
-          "Role '%s' may not contain space characters.", role);
+    public Builder numberOfInstance(int numberOfInstances) {
+      this.numberOfInstances = numberOfInstances;
+      return this;
     }
 
-    this.roles = roles;
+    public Builder minNumberOfInstances(int minNumberOfInstances) {
+      this.minNumberOfInstances = minNumberOfInstances;
+      return this;
+    }
+
+    public Builder hardwareId(String hardwareId) {
+      this.hardwareId = hardwareId;
+      return this;
+    }
+
+    public Builder imageId(String imageId) {
+      this.imageId = imageId;
+      return this;
+    }
+
+    public Builder roles(String... roles) {
+      this.roles = newLinkedHashSet(newArrayList(roles));
+      return this;
+    }
+
+    public Builder roles(Set<String> roles) {
+      this.roles = newLinkedHashSet(roles);
+      return this;
+    }
+
+    public InstanceTemplate build() {
+      if (minNumberOfInstances == -1) {
+        minNumberOfInstances = numberOfInstances;
+      }
+      return new InstanceTemplate(numberOfInstances, minNumberOfInstances, roles, hardwareId, imageId);
+    }
+  }
+
+  private int numberOfInstances;
+  private int minNumberOfInstances;  // some instances may fail, at least a minimum number is required
+  private String hardwareId;
+  private String imageId;
+  private Set<String> roles;
+
+
+  private InstanceTemplate(int numberOfInstances, int minNumberOfInstances,
+                           Set<String> roles, String hardwareId, String imageId) {
+    for (String role : roles) {
+      checkArgument(!StringUtils.contains(role, " "),
+        "Role '%s' may not contain space characters.", role);
+    }
+
     this.numberOfInstances = numberOfInstances;
     this.minNumberOfInstances = minNumberOfInstances;
+    this.hardwareId = hardwareId;
+    this.imageId = imageId;
+    this.roles = roles;
   }
 
   public Set<String> getRoles() {
@@ -79,58 +127,80 @@ public class InstanceTemplate {
     return minNumberOfInstances;
   }
 
+  public String getHardwareId() {
+    return hardwareId;
+  }
+
+  public String getImageId() {
+    return imageId;
+  }
+
   public boolean equals(Object o) {
     if (o instanceof InstanceTemplate) {
       InstanceTemplate that = (InstanceTemplate) o;
-      return Objects.equal(numberOfInstances, that.numberOfInstances)
-        && Objects.equal(minNumberOfInstances, that.minNumberOfInstances)
+      return numberOfInstances == that.numberOfInstances
+        && minNumberOfInstances == that.minNumberOfInstances
+        && Objects.equal(hardwareId, that.hardwareId)
+        && Objects.equal(imageId, that.imageId)
         && Objects.equal(roles, that.roles);
     }
     return false;
   }
 
   public int hashCode() {
-    return Objects.hashCode(numberOfInstances, minNumberOfInstances, roles);
+    return Objects.hashCode(numberOfInstances, minNumberOfInstances,
+      hardwareId, imageId, roles);
   }
 
   public String toString() {
     return Objects.toStringHelper(this)
       .add("numberOfInstances", numberOfInstances)
       .add("minNumberOfInstances", minNumberOfInstances)
+      .add("hardwareId", hardwareId)
+      .add("imageId", imageId)
       .add("roles", roles)
       .toString();
   }
 
   public static Map<String, String> parse(String... strings) {
-    Set<String> roles = Sets.newLinkedHashSet(Lists.newArrayList(strings));
+    Set<String> roles = newLinkedHashSet(newArrayList(strings));
     Map<String, String> templates = Maps.newHashMap();
     for (String s : roles) {
       String[] parts = s.split(" ");
       checkArgument(parts.length == 2,
-          "Invalid instance template syntax for '%s'. Does not match " +
+        "Invalid instance template syntax for '%s'. Does not match " +
           "'<number> <role1>+<role2>+<role3>...', e.g. '1 hadoop-namenode+hadoop-jobtracker'.", s);
       templates.put(parts[1], parts[0]);
     }
     return templates;
   }
 
-  public static List<InstanceTemplate> parse(Configuration cconf) {
-    final String[] strings = cconf.getStringArray(ClusterSpec.Property.INSTANCE_TEMPLATES.getConfigName());
-    Map<String, String> maxPercentFailures = parse(cconf.getStringArray(ClusterSpec.Property.INSTANCE_TEMPLATES_MAX_PERCENT_FAILURES.getConfigName()));
-    Map<String, String> minInstances = parse(cconf.getStringArray(ClusterSpec.Property.INSTANCE_TEMPLATES_MINIMUM_NUMBER_OF_INSTANCES.getConfigName()));
-    List<InstanceTemplate> templates = Lists.newArrayList();
+  public static List<InstanceTemplate> parse(Configuration configuration) throws ConfigurationException {
+    final String[] strings = configuration.getStringArray(
+      ClusterSpec.Property.INSTANCE_TEMPLATES.getConfigName());
+
+    Map<String, String> maxPercentFailures = parse(configuration.getStringArray(
+      ClusterSpec.Property.INSTANCE_TEMPLATES_MAX_PERCENT_FAILURES.getConfigName()));
+    Map<String, String> minInstances = parse(configuration.getStringArray(
+      ClusterSpec.Property.INSTANCE_TEMPLATES_MINIMUM_NUMBER_OF_INSTANCES.getConfigName()));
+
+    List<InstanceTemplate> templates = newArrayList();
     for (String s : strings) {
       String[] parts = s.split(" ");
       checkArgument(parts.length == 2,
-          "Invalid instance template syntax for '%s'. Does not match " +
+        "Invalid instance template syntax for '%s'. Does not match " +
           "'<number> <role1>+<role2>+<role3>...', e.g. '1 hadoop-namenode+hadoop-jobtracker'.", s);
+
       int num = Integer.parseInt(parts[0]);
       int minNumberOfInstances = 0;
-      final String maxPercentFail = maxPercentFailures.get(parts[1]);
+      String maxPercentFail = maxPercentFailures.get(parts[1]);
+      String templateGroup = parts[1];
+
       if (maxPercentFail != null) {
         // round up integer division (a + b -1) / b
         minNumberOfInstances = (Integer.parseInt(maxPercentFail) * num + 99) / 100;
       }
+
       String minNumberOfInst = minInstances.get(parts[1]);
       if (minNumberOfInst != null) {
         int minExplicitlySet = Integer.parseInt(minNumberOfInst);
@@ -140,11 +210,52 @@ public class InstanceTemplate {
           minNumberOfInstances = minExplicitlySet;
         }
       }
+
       if (minNumberOfInstances == 0 || minNumberOfInstances > num) {
         minNumberOfInstances = num;
       }
-      templates.add(new InstanceTemplate(num, minNumberOfInstances, parts[1].split("\\+")));
+
+      String hardwareId = configuration.getString(
+        "whirr.templates." + templateGroup + ".hardware-id", null);
+      String imageId = configuration.getString(
+        "whirr.templates." + templateGroup + ".image-id", null);
+
+      templates.add(InstanceTemplate.builder()
+        .numberOfInstance(num)
+        .minNumberOfInstances(minNumberOfInstances)
+        .hardwareId(hardwareId)
+        .imageId(imageId)
+        .roles(templateGroup.split("\\+"))
+        .build()
+      );
     }
+    validateThatWeHaveNoOtherOverrides(templates, configuration);
     return templates;
+  }
+
+  private static void validateThatWeHaveNoOtherOverrides(
+    List<InstanceTemplate> templates, Configuration configuration) throws ConfigurationException {
+
+    Set<String> groups = Sets.newHashSet(Iterables.transform(templates,
+      new Function<InstanceTemplate, String>() {
+        private final Joiner plusJoiner = Joiner.on("+");
+        @Override
+        public String apply(InstanceTemplate instance) {
+          return plusJoiner.join(instance.getRoles());
+        }
+      }));
+
+    Pattern pattern = Pattern.compile("^whirr\\.templates\\.([^.]+)\\..*$");
+    Iterator iterator = configuration.getKeys("whirr.templates");
+
+    while(iterator.hasNext()) {
+      String key = String.class.cast(iterator.next());
+      Matcher matcher = pattern.matcher(key);
+
+      if (matcher.find() && !groups.contains(matcher.group(1))) {
+        throw new ConfigurationException(String.format("'%s' is referencing a " +
+          "template group not present in 'whirr.instance-templates'", key));
+      }
+    }
   }
 }

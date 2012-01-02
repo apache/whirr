@@ -141,7 +141,7 @@ public class ClusterSpec {
 
     HARDWARE_MIN_RAM(Integer.class, false, "The minimum amount of " +
       "instance memory. E.g. 1024"),
-      
+
     LOCATION_ID(String.class, false, "The location to launch " + 
       "instances in. If not specified then an arbitrary location " + 
       "will be chosen."),

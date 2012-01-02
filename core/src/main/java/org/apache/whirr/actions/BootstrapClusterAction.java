@@ -98,7 +98,7 @@ public class BootstrapClusterAction extends ScriptBasedClusterAction {
         computeServiceContext.getComputeService();
 
       final Template template = BootstrapTemplate.build(clusterSpec, computeService,
-        statementBuilder, entry.getValue().getTemplateBuilderStrategy());
+        statementBuilder, entry.getValue().getTemplateBuilderStrategy(), entry.getKey());
 
       if (template.getOptions() != null) {
         template.getOptions()

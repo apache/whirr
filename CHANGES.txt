@@ -11,6 +11,9 @@ Trunk (unreleased changes)
 
     WHIRR-458. Remove deprecated code and aliasing mechanism (asavu)
 
+    WHIRR-332. Need to specify different instance size/type 
+    depending on role (asavu)
+
   BUG FIXES
 
     WHIRR-367. Wrong groupId for zookeeper (Joe Crobak via asavu)

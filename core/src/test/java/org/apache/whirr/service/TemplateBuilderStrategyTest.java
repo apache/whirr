@@ -20,6 +20,7 @@ package org.apache.whirr.service;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import com.jcraft.jsch.JSchException;
 
@@ -27,34 +28,38 @@ import java.io.IOException;
 
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.whirr.ClusterSpec;
+import org.apache.whirr.InstanceTemplate;
 import org.apache.whirr.service.jclouds.TemplateBuilderStrategy;
+import org.jclouds.compute.domain.OsFamily;
 import org.jclouds.compute.domain.TemplateBuilder;
 import org.junit.Before;
 import org.junit.Test;
 
 public class TemplateBuilderStrategyTest {
-  
+
   private TemplateBuilderStrategy strategy = new TemplateBuilderStrategy();
+  private InstanceTemplate template;
   private ClusterSpec spec;
-  
+
   @Before
   public void setUp() throws ConfigurationException, JSchException, IOException {
     spec = ClusterSpec.withTemporaryKeys();
+    template = mock(InstanceTemplate.class);
   }
-  
+
   @Test
   public void testImageIdIsPassedThrough() {
     spec.setImageId("my-image-id");
     TemplateBuilder builder = mock(TemplateBuilder.class);
-    strategy.configureTemplateBuilder(spec, builder);
+    strategy.configureTemplateBuilder(spec, builder, template);
     verify(builder).imageId("my-image-id");
   }
-  
+
   @Test
   public void testHardwareIdIsPassedThrough() {
     spec.setHardwareId("my-hardware-id");
     TemplateBuilder builder = mock(TemplateBuilder.class);
-    strategy.configureTemplateBuilder(spec, builder);
+    strategy.configureTemplateBuilder(spec, builder, template);
     verify(builder).hardwareId("my-hardware-id");
   }
 
@@ -62,8 +67,47 @@ public class TemplateBuilderStrategyTest {
   public void testLocationIdIsPassedThrough() {
     spec.setLocationId("my-location-id");
     TemplateBuilder builder = mock(TemplateBuilder.class);
-    strategy.configureTemplateBuilder(spec, builder);
+    strategy.configureTemplateBuilder(spec, builder, template);
     verify(builder).locationId("my-location-id");
+  }
+
+  @Test
+  public void testOverrideHardwareId() {
+    spec.setHardwareId("m1.large");
+    spec.setImageId("us-east-1/ami-333");
+
+    when(template.getHardwareId()).thenReturn("t1.micro");
+
+    TemplateBuilder builder = mock(TemplateBuilder.class);
+    strategy.configureTemplateBuilder(spec, builder, template);
+
+    verify(builder).hardwareId("t1.micro");
+    verify(builder).imageId("us-east-1/ami-333");
+  }
+
+  @Test
+  public void testOverrideImageId() {
+    spec.setHardwareId("m1.large");
+    spec.setImageId("us-east-1/ami-333");
+
+    when(template.getImageId()).thenReturn("us-east-1/ami-111");
+
+    TemplateBuilder builder = mock(TemplateBuilder.class);
+    strategy.configureTemplateBuilder(spec, builder, template);
+
+    verify(builder).hardwareId("m1.large");
+    verify(builder).imageId("us-east-1/ami-111");
+  }
+
+  @Test
+  public void testOverrideOnlyHardwareForInstanceTemplate() {
+    when(template.getHardwareId()).thenReturn("t1.micro");
+
+    TemplateBuilder builder = mock(TemplateBuilder.class);
+    strategy.configureTemplateBuilder(spec, builder, template);
+
+    verify(builder).hardwareId("t1.micro");
+    verify(builder).osFamily(OsFamily.UBUNTU);
   }
 
 }

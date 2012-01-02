@@ -23,6 +23,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import org.apache.whirr.ClusterSpec;
+import org.apache.whirr.InstanceTemplate;
 import org.apache.whirr.service.jclouds.StatementBuilder;
 import org.apache.whirr.service.jclouds.TemplateBuilderStrategy;
 import org.jclouds.aws.ec2.AWSEC2Client;
@@ -53,7 +54,8 @@ public class BootstrapTemplate {
     ClusterSpec clusterSpec,
     ComputeService computeService,
     StatementBuilder statementBuilder,
-    TemplateBuilderStrategy strategy
+    TemplateBuilderStrategy strategy,
+    InstanceTemplate instanceTemplate
   ) throws MalformedURLException {
 
     LOG.info("Configuring template");
@@ -70,7 +72,7 @@ public class BootstrapTemplate {
 
     TemplateBuilder templateBuilder = computeService.templateBuilder()
       .options(runScript(runScript));
-    strategy.configureTemplateBuilder(clusterSpec, templateBuilder);
+    strategy.configureTemplateBuilder(clusterSpec, templateBuilder, instanceTemplate);
 
     return setSpotInstancePriceIfSpecified(
       computeService.getContext(), clusterSpec, templateBuilder.build()

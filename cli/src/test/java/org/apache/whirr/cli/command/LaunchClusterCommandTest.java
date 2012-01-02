@@ -26,9 +26,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -105,8 +103,8 @@ public class LaunchClusterCommandTest {
 
     ClusterSpec expectedClusterSpec = ClusterSpec.withTemporaryKeys(conf);
     expectedClusterSpec.setInstanceTemplates(Lists.newArrayList(
-        new InstanceTemplate(1, ImmutableSet.of("role1", "role2")),
-        new InstanceTemplate(2, ImmutableSet.of("role3"))
+      InstanceTemplate.builder().numberOfInstance(1).roles("role1", "role2").build(),
+      InstanceTemplate.builder().numberOfInstance(2).roles("role3").build()
     ));
     expectedClusterSpec.setServiceName("test-service");
     expectedClusterSpec.setProvider("rackspace");
@@ -139,8 +137,8 @@ public class LaunchClusterCommandTest {
     int rc = command.run(null, out, null, Lists.newArrayList(
         "--service-name", "hadoop",
         "--cluster-name", "test-cluster",
-        "--instance-templates", "1 jt+nn,3 dn+tt",
-        "--instance-templates-max-percent-failures", "60 dn+tt",
+        "--instance-templates", "1 hadoop-namenode+hadoop-jobtracker,3 hadoop-datanode+hadoop-tasktracker",
+        "--instance-templates-max-percent-failures", "60 hadoop-datanode+hadoop-tasktracker",
         "--provider", "ec2",
         "--identity", "myusername", "--credential", "mypassword",
         "--private-key-file", keys.get("private").getAbsolutePath(),
@@ -151,12 +149,14 @@ public class LaunchClusterCommandTest {
 
     Configuration conf = new PropertiesConfiguration();
     conf.addProperty("whirr.version", "version-string");
-    conf.addProperty("whirr.instance-templates-max-percent-failure", "60 dn+tt");
+    conf.addProperty("whirr.instance-templates-max-percent-failure", "60 hadoop-datanode+hadoop-tasktracker");
 
     ClusterSpec expectedClusterSpec = ClusterSpec.withTemporaryKeys(conf);
     expectedClusterSpec.setInstanceTemplates(Lists.newArrayList(
-        new InstanceTemplate(1, 1, Sets.newHashSet("jt", "nn")),
-        new InstanceTemplate(3, 2, Sets.newHashSet("dn", "tt"))
+      InstanceTemplate.builder().numberOfInstance(1).minNumberOfInstances(1)
+        .roles("hadoop-namenode", "hadoop-jobtracker").build(),
+      InstanceTemplate.builder().numberOfInstance(3).minNumberOfInstances(2)
+        .roles("hadoop-datanode", "hadoop-tasktracker").build()
     ));
     expectedClusterSpec.setServiceName("hadoop");
     expectedClusterSpec.setProvider("ec2");

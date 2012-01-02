@@ -19,8 +19,10 @@
 package org.apache.whirr.service.jclouds;
 
 import org.apache.whirr.ClusterSpec;
+import org.apache.whirr.InstanceTemplate;
 import org.jclouds.compute.domain.OsFamily;
 import org.jclouds.compute.domain.TemplateBuilder;
+import org.jclouds.javax.annotation.Nullable;
 
 /**
  * A class to configure a {@link TemplateBuilder}.
@@ -28,10 +30,12 @@ import org.jclouds.compute.domain.TemplateBuilder;
 public class TemplateBuilderStrategy {
 
   public void configureTemplateBuilder(ClusterSpec clusterSpec,
-      TemplateBuilder templateBuilder) {
+      TemplateBuilder templateBuilder, InstanceTemplate instanceTemplate) {
 
-    if (clusterSpec.getImageId() != null) {
-      templateBuilder.imageId(clusterSpec.getImageId());
+    if (clusterSpec.getImageId() != null || instanceTemplate.getImageId() != null) {
+      templateBuilder.imageId(
+        or(instanceTemplate.getImageId(), clusterSpec.getImageId())
+      );
     } else {
       templateBuilder.osFamily(OsFamily.UBUNTU);
       templateBuilder.osVersionMatches("10.04");
@@ -41,8 +45,10 @@ public class TemplateBuilderStrategy {
         templateBuilder.imageDescriptionMatches("ubuntu-images/");
     }
     
-    if (clusterSpec.getHardwareId() != null) {
-      templateBuilder.hardwareId(clusterSpec.getHardwareId());
+    if (clusterSpec.getHardwareId() != null || instanceTemplate.getHardwareId() != null) {
+      templateBuilder.hardwareId(
+        or(instanceTemplate.getHardwareId(), clusterSpec.getHardwareId())
+      );
 
     } else if(clusterSpec.getHardwareMinRam() != 0) {
       templateBuilder.minRam(clusterSpec.getHardwareMinRam());
@@ -55,4 +61,9 @@ public class TemplateBuilderStrategy {
       templateBuilder.locationId(clusterSpec.getLocationId());
     }
   }
+
+  private String or(@Nullable String a, @Nullable String b) {
+    return (a == null) ? b : a;
+  }
+
 }

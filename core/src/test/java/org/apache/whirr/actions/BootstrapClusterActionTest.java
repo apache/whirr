@@ -87,7 +87,8 @@ public class BootstrapClusterActionTest {
     Configuration conf = new PropertiesConfiguration();
     conf.addProperty("whirr.service-name", "test-service");
     conf.addProperty("whirr.cluster-name", "test-cluster");
-    conf.addProperty("whirr.instance-templates", "1 hadoop-namenode+hadoop-jobtracker,4 hadoop-datanode+hadoop-tasktracker");
+    conf.addProperty("whirr.instance-templates",
+      "1 hadoop-namenode+hadoop-jobtracker,4 hadoop-datanode+hadoop-tasktracker");
     conf.addProperty("whirr.instance-templates-max-percent-failures", "60 hadoop-datanode+hadoop-tasktracker");
     conf.addProperty("whirr.provider", "ec2");
     config.addConfiguration(conf);
@@ -152,7 +153,8 @@ public class BootstrapClusterActionTest {
     Configuration conf = new PropertiesConfiguration();
     conf.addProperty("whirr.service-name", "test-service");
     conf.addProperty("whirr.cluster-name", "test-cluster");
-    conf.addProperty("whirr.instance-templates", "1 hadoop-namenode+hadoop-jobtracker,4 hadoop-datanode+hadoop-tasktracker");
+    conf.addProperty("whirr.instance-templates",
+      "1 hadoop-namenode+hadoop-jobtracker,4 hadoop-datanode+hadoop-tasktracker");
     conf.addProperty("whirr.instance-templates-max-percent-failures", "60 hadoop-datanode+hadoop-tasktracker");
     conf.addProperty("whirr.provider", "ec2");
     config.addConfiguration(conf);

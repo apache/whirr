@@ -18,7 +18,9 @@
 
 package org.apache.whirr;
 
+import static com.google.common.collect.Iterables.get;
 import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
 import com.google.common.collect.Iterables;
@@ -47,10 +49,10 @@ import org.junit.Assert;
 import org.junit.Test;
 
 public class ClusterSpecTest {
-  
+
   @Test
   public void testDefaultsAreSet()
-  throws ConfigurationException, JSchException, IOException {
+    throws ConfigurationException, JSchException, IOException {
     ClusterSpec spec = ClusterSpec.withTemporaryKeys();
     assertThat(spec.getClusterUser(),
       is(System.getProperty("user.name")));
@@ -59,27 +61,27 @@ public class ClusterSpecTest {
 
   @Test
   public void testDefaultsCanBeOverridden()
-  throws ConfigurationException, JSchException, IOException {
+    throws ConfigurationException, JSchException, IOException {
     Configuration conf = new PropertiesConfiguration();
     conf.setProperty(ClusterSpec.Property.RUN_URL_BASE.getConfigName(),
-        "http://example.org");
+      "http://example.org");
     ClusterSpec spec = ClusterSpec.withNoDefaults(conf);
     assertThat(spec.getRunUrlBase(), is("http://example.org"));
   }
 
   @Test
   public void testLoginUserSetsSystemProperty()
-  throws ConfigurationException {
+    throws ConfigurationException {
     Configuration conf = new PropertiesConfiguration();
     conf.setProperty(ClusterSpec.Property.LOGIN_USER.getConfigName(),
-        "ubuntu");
+      "ubuntu");
     ClusterSpec.withNoDefaults(conf);
     assertThat(System.getProperty("whirr.login-user"), is("ubuntu"));
   }
-  
+
   @Test
   public void testGetConfigurationForKeysWithPrefix()
-  throws ConfigurationException, JSchException, IOException {
+    throws ConfigurationException, JSchException, IOException {
     Configuration conf = new PropertiesConfiguration();
     conf.setProperty("a.b", 1);
     conf.setProperty("b.a", 2);
@@ -95,7 +97,7 @@ public class ClusterSpecTest {
     assertThat(prefixKeys.get(0), is("a.b"));
     assertThat(prefixKeys.get(1), is("a.c"));
   }
-  
+
   @Test
   public void testEnvVariableInterpolation() {
     Map<String, String> envMap = System.getenv();
@@ -111,12 +113,12 @@ public class ClusterSpecTest {
 
     assertThat(conf.getString("a"), is(firstEntry.getValue()));
     assertThat(conf.getString("b"),
-        is(String.format("${env:%s}", undefinedEnvVar)));
+      is(String.format("${env:%s}", undefinedEnvVar)));
   }
 
   @Test
   public void testDefaultPublicKey()
-  throws ConfigurationException, JSchException, IOException {
+    throws ConfigurationException, JSchException, IOException {
     Map<String, File> keys = KeyPair.generateTemporaryFiles();
 
     Configuration conf = new PropertiesConfiguration();
@@ -125,17 +127,17 @@ public class ClusterSpecTest {
 
     ClusterSpec spec = ClusterSpec.withNoDefaults(conf);
     Assert.assertEquals(IOUtils.toString(
-            new FileReader(keys.get("public"))), spec.getPublicKey());
+      new FileReader(keys.get("public"))), spec.getPublicKey());
   }
 
   @Test(expected = ConfigurationException.class)
   public void testDummyPrivateKey()
-  throws JSchException, IOException, ConfigurationException {
+    throws JSchException, IOException, ConfigurationException {
     File privateKeyFile = File.createTempFile("private", "key");
     privateKeyFile.deleteOnExit();
     Files.write(("-----BEGIN RSA PRIVATE KEY-----\n" +
-            "DUMMY FILE\n" +
-            "-----END RSA PRIVATE KEY-----").getBytes(), privateKeyFile);
+      "DUMMY FILE\n" +
+      "-----END RSA PRIVATE KEY-----").getBytes(), privateKeyFile);
 
     Configuration conf = new PropertiesConfiguration();
     conf.setProperty("whirr.private-key-file", privateKeyFile.getAbsolutePath());
@@ -145,7 +147,7 @@ public class ClusterSpecTest {
 
   @Test(expected = ConfigurationException.class)
   public void testEncryptedPrivateKey()
-  throws JSchException, IOException, ConfigurationException {
+    throws JSchException, IOException, ConfigurationException {
     File privateKey = KeyPair.generateTemporaryFiles("dummy").get("private");
 
     Configuration conf = new PropertiesConfiguration();
@@ -159,7 +161,7 @@ public class ClusterSpecTest {
     Configuration conf = new PropertiesConfiguration();
     conf.setProperty("whirr.private-key-file", "/dummy/path/that/does/not/exists");
 
-    ClusterSpec.withNoDefaults(conf);      
+    ClusterSpec.withNoDefaults(conf);
   }
 
   @Test(expected = ConfigurationException.class)
@@ -197,20 +199,23 @@ public class ClusterSpecTest {
     conf.setProperty("whirr.private-key-file", first.get("private").getAbsolutePath());
     conf.setProperty("whirr.public-key-file", second.get("public").getAbsolutePath());
 
-    ClusterSpec.withNoDefaults(conf);      
+    ClusterSpec.withNoDefaults(conf);
   }
-  
+
   @Test(expected = IllegalArgumentException.class)
   public void testMissingCommaInInstanceTemplates() throws Exception {
     Configuration conf = new PropertiesConfiguration();
     conf.setProperty(ClusterSpec.Property.INSTANCE_TEMPLATES.getConfigName(),
-        "1 a+b 2 c+d"); // missing comma
+      "1 a+b 2 c+d"); // missing comma
     ClusterSpec.withTemporaryKeys(conf);
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void testRoleMayNotContainSpaces() {
-    new InstanceTemplate(1, "a b");
+    InstanceTemplate.builder()
+      .numberOfInstance(1)
+      .minNumberOfInstances(1)
+      .roles("a b").build();
   }
 
   @Test(expected = IllegalArgumentException.class)
@@ -225,7 +230,7 @@ public class ClusterSpecTest {
     InstanceTemplate t2 = templates.get(1);
     assertThat(t2.getMinNumberOfInstances(), is(2));
   }
-  
+
   @Test(expected = NumberFormatException.class)
   public void testNumberFormatExceptionOnInstancesTemplates() throws Exception {
     Configuration conf = new PropertiesConfiguration();
@@ -238,7 +243,7 @@ public class ClusterSpecTest {
     InstanceTemplate t2 = templates.get(1);
     assertThat(t2.getMinNumberOfInstances(), is(2));
   }
-  
+
   @Test
   public void testNumberOfInstancesPerTemplate() throws Exception {
     Configuration conf = new PropertiesConfiguration();
@@ -250,7 +255,7 @@ public class ClusterSpecTest {
     assertThat(t1.getMinNumberOfInstances(), is(1));
     InstanceTemplate t2 = templates.get(1);
     assertThat(t2.getMinNumberOfInstances(), is(2));
-    
+
     conf.setProperty("whirr.instance-templates-max-percent-failures", "60 hadoop-datanode+hadoop-tasktracker");
     expectedClusterSpec = ClusterSpec.withNoDefaults(conf);
     templates = expectedClusterSpec.getInstanceTemplates();
@@ -284,13 +289,13 @@ public class ClusterSpecTest {
 
   @Test
   public void testDefaultBlobStoreforComputeProvider() throws Exception {
-    for(String pair : new String[]{
-          "ec2:aws-s3",
-          "aws-ec2:aws-s3",
-          "cloudservers:cloudfiles-us",
-          "cloudservers-us:cloudfiles-us",
-          "cloudservers-uk:cloudfiles-uk"
-      }) {
+    for (String pair : new String[]{
+      "ec2:aws-s3",
+      "aws-ec2:aws-s3",
+      "cloudservers:cloudfiles-us",
+      "cloudservers-us:cloudfiles-us",
+      "cloudservers-uk:cloudfiles-uk"
+    }) {
       String[] parts = pair.split(":");
 
       Configuration config = new PropertiesConfiguration();
@@ -300,22 +305,22 @@ public class ClusterSpecTest {
       assertThat(spec.getBlobStoreProvider(), is(parts[1]));
     }
   }
-  
+
   @Test
-  public void testApplySubroleAliases() {
+  public void testApplySubroleAliases() throws ConfigurationException {
     CompositeConfiguration c = new CompositeConfiguration();
     Configuration config = new PropertiesConfiguration();
-    config.addProperty("whirr.instance-templates", 
-        "1 puppet:somepup::pet+something-else, 1 something-else-only");
-    c.addConfiguration(config);    
+    config.addProperty("whirr.instance-templates",
+      "1 puppet:somepup::pet+something-else, 1 something-else-only");
+    c.addConfiguration(config);
     InstanceTemplate template = InstanceTemplate.parse(c).get(0);
     Set<String> expected = Sets.newLinkedHashSet(Arrays.asList(new String[]{
-        "puppet:somepup::pet", "something-else"}));
+      "puppet:somepup::pet", "something-else"}));
     assertThat(template.getRoles(), is(expected));
-    
+
     InstanceTemplate template2 = InstanceTemplate.parse(c).get(1);
     Set<String> expected2 = Sets.newLinkedHashSet(Arrays.asList(new String[]{
-        "something-else-only"}));
+      "something-else-only"}));
     assertThat(template2.getRoles(), is(expected2));
   }
 
@@ -329,18 +334,52 @@ public class ClusterSpecTest {
     assertThat(spec.copy(), is(spec));
     assertThat(spec.copy().hashCode(), is(spec.hashCode()));
   }
-  
+
   @Test
   public void testFirewallRules() throws Exception {
     PropertiesConfiguration conf = new PropertiesConfiguration("whirr-core-test.properties");
     conf.setProperty("whirr.firewall-rules", "8000,8001");
     conf.setProperty("whirr.firewall-rules.serviceA", "9000,9001");
-    ClusterSpec spec = ClusterSpec.withTemporaryKeys(
-        conf);
-    
+    ClusterSpec spec = ClusterSpec.withTemporaryKeys(conf);
+
     Map<String, List<String>> firewallRules = spec.getFirewallRules();
-    assertThat(firewallRules.get(null).equals(Lists.<String>newArrayList("8000","8001")), is(true));
-    assertThat(firewallRules.get("serviceA").equals(Lists.<String>newArrayList("9000","9001")), is(true));
+    assertThat(firewallRules.get(null).equals(Lists.<String>newArrayList("8000", "8001")), is(true));
+    assertThat(firewallRules.get("serviceA").equals(Lists.<String>newArrayList("9000", "9001")), is(true));
   }
 
+  @Test
+  public void testHardwareIdPerInstanceTemplate() throws Exception {
+    PropertiesConfiguration conf = new PropertiesConfiguration("whirr-core-test.properties");
+    conf.setProperty("whirr.instance-templates", "2 noop, 1 role1+role2, 1 role1");
+    conf.setProperty("whirr.hardware-id", "c1.xlarge");
+
+    conf.setProperty("whirr.templates.noop.hardware-id", "m1.large");
+    conf.setProperty("whirr.templates.role1+role2.hardware-id", "t1.micro");
+    conf.setProperty("whirr.templates.role1+role2.image-id", "us-east-1/ami-123324");
+
+    ClusterSpec spec = ClusterSpec.withTemporaryKeys(conf);
+    List<InstanceTemplate> templates = spec.getInstanceTemplates();
+
+    InstanceTemplate noops = get(templates, 0);
+    assert noops.getRoles().contains("noop");
+    assertEquals(noops.getHardwareId(), "m1.large");
+    assertEquals(noops.getImageId(), null);
+
+    InstanceTemplate second = get(templates, 1);
+    assertEquals(second.getHardwareId(), "t1.micro");
+    assertEquals(second.getImageId(), "us-east-1/ami-123324");
+
+    InstanceTemplate third = get(templates, 2);
+    assertEquals(third.getHardwareId(), null);
+    assertEquals(third.getImageId(), null);
+  }
+
+  @Test(expected = ConfigurationException.class)
+  public void testInstanceTemplateNotFoundForHardwareId() throws Exception {
+    PropertiesConfiguration conf = new PropertiesConfiguration("whirr-core-test.properties");
+    conf.setProperty("whirr.instance-templates", "1 role1+role2");
+    conf.setProperty("whirr.templates.role1.hardware-id", "m1.large");
+
+    ClusterSpec.withTemporaryKeys(conf);
+  }
 }
