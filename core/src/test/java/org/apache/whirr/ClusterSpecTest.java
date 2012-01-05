@@ -350,12 +350,13 @@ public class ClusterSpecTest {
   @Test
   public void testHardwareIdPerInstanceTemplate() throws Exception {
     PropertiesConfiguration conf = new PropertiesConfiguration("whirr-core-test.properties");
-    conf.setProperty("whirr.instance-templates", "2 noop, 1 role1+role2, 1 role1");
+    conf.setProperty("whirr.instance-templates", "2 noop, 1 role1+role2, 1 role1, 3 spots");
     conf.setProperty("whirr.hardware-id", "c1.xlarge");
 
     conf.setProperty("whirr.templates.noop.hardware-id", "m1.large");
     conf.setProperty("whirr.templates.role1+role2.hardware-id", "t1.micro");
     conf.setProperty("whirr.templates.role1+role2.image-id", "us-east-1/ami-123324");
+    conf.setProperty("whirr.templates.spots.aws-ec2-spot-price", 0.5f);
 
     ClusterSpec spec = ClusterSpec.withTemporaryKeys(conf);
     List<InstanceTemplate> templates = spec.getInstanceTemplates();
@@ -372,6 +373,9 @@ public class ClusterSpecTest {
     InstanceTemplate third = get(templates, 2);
     assertEquals(third.getHardwareId(), null);
     assertEquals(third.getImageId(), null);
+
+    InstanceTemplate spots = get(templates, 3);
+    assertEquals(spots.getAwsEc2SpotPrice(), 0.5f, 0.001);
   }
 
   @Test(expected = ConfigurationException.class)

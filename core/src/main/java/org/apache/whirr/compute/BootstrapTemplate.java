@@ -75,7 +75,7 @@ public class BootstrapTemplate {
     strategy.configureTemplateBuilder(clusterSpec, templateBuilder, instanceTemplate);
 
     return setSpotInstancePriceIfSpecified(
-      computeService.getContext(), clusterSpec, templateBuilder.build()
+      computeService.getContext(), clusterSpec, templateBuilder.build(), instanceTemplate
     );
   }
 
@@ -98,16 +98,28 @@ public class BootstrapTemplate {
    * Set maximum spot instance price based on the configuration
    */
   private static Template setSpotInstancePriceIfSpecified(
-      ComputeServiceContext context, ClusterSpec spec, Template template) {
+      ComputeServiceContext context, ClusterSpec spec, Template template, InstanceTemplate instanceTemplate
+  ) {
 
     if (context != null && context.getProviderSpecificContext().getApi() instanceof AWSEC2Client) {
-      if (spec.getAwsEc2SpotPrice() > 0) {
-        template.getOptions().as(AWSEC2TemplateOptions.class)
-          .spotPrice(spec.getAwsEc2SpotPrice());
+      float spotPrice = firstPositiveOrDefault(
+        0,  /* by default use regular instances */
+        instanceTemplate.getAwsEc2SpotPrice(),
+        spec.getAwsEc2SpotPrice()
+      );
+      if (spotPrice > 0) {
+        template.getOptions().as(AWSEC2TemplateOptions.class).spotPrice(spotPrice);
       }
     }
 
     return template;
+  }
+
+  private static float firstPositiveOrDefault(float defaultValue, float... listOfValues) {
+    for(float value : listOfValues) {
+      if (value > 0) return value;
+    }
+    return defaultValue;
   }
 
   // must be used inside InitBuilder, as this sets the shell variables used in this statement

@@ -38,20 +38,20 @@ import org.junit.Test;
 public class TemplateBuilderStrategyTest {
 
   private TemplateBuilderStrategy strategy = new TemplateBuilderStrategy();
-  private InstanceTemplate template;
+  private InstanceTemplate instanceTemplate;
   private ClusterSpec spec;
 
   @Before
   public void setUp() throws ConfigurationException, JSchException, IOException {
     spec = ClusterSpec.withTemporaryKeys();
-    template = mock(InstanceTemplate.class);
+    instanceTemplate = mock(InstanceTemplate.class);
   }
 
   @Test
   public void testImageIdIsPassedThrough() {
     spec.setImageId("my-image-id");
     TemplateBuilder builder = mock(TemplateBuilder.class);
-    strategy.configureTemplateBuilder(spec, builder, template);
+    strategy.configureTemplateBuilder(spec, builder, instanceTemplate);
     verify(builder).imageId("my-image-id");
   }
 
@@ -59,7 +59,7 @@ public class TemplateBuilderStrategyTest {
   public void testHardwareIdIsPassedThrough() {
     spec.setHardwareId("my-hardware-id");
     TemplateBuilder builder = mock(TemplateBuilder.class);
-    strategy.configureTemplateBuilder(spec, builder, template);
+    strategy.configureTemplateBuilder(spec, builder, instanceTemplate);
     verify(builder).hardwareId("my-hardware-id");
   }
 
@@ -67,7 +67,7 @@ public class TemplateBuilderStrategyTest {
   public void testLocationIdIsPassedThrough() {
     spec.setLocationId("my-location-id");
     TemplateBuilder builder = mock(TemplateBuilder.class);
-    strategy.configureTemplateBuilder(spec, builder, template);
+    strategy.configureTemplateBuilder(spec, builder, instanceTemplate);
     verify(builder).locationId("my-location-id");
   }
 
@@ -76,10 +76,10 @@ public class TemplateBuilderStrategyTest {
     spec.setHardwareId("m1.large");
     spec.setImageId("us-east-1/ami-333");
 
-    when(template.getHardwareId()).thenReturn("t1.micro");
+    when(instanceTemplate.getHardwareId()).thenReturn("t1.micro");
 
     TemplateBuilder builder = mock(TemplateBuilder.class);
-    strategy.configureTemplateBuilder(spec, builder, template);
+    strategy.configureTemplateBuilder(spec, builder, instanceTemplate);
 
     verify(builder).hardwareId("t1.micro");
     verify(builder).imageId("us-east-1/ami-333");
@@ -90,10 +90,10 @@ public class TemplateBuilderStrategyTest {
     spec.setHardwareId("m1.large");
     spec.setImageId("us-east-1/ami-333");
 
-    when(template.getImageId()).thenReturn("us-east-1/ami-111");
+    when(instanceTemplate.getImageId()).thenReturn("us-east-1/ami-111");
 
     TemplateBuilder builder = mock(TemplateBuilder.class);
-    strategy.configureTemplateBuilder(spec, builder, template);
+    strategy.configureTemplateBuilder(spec, builder, instanceTemplate);
 
     verify(builder).hardwareId("m1.large");
     verify(builder).imageId("us-east-1/ami-111");
@@ -101,13 +101,12 @@ public class TemplateBuilderStrategyTest {
 
   @Test
   public void testOverrideOnlyHardwareForInstanceTemplate() {
-    when(template.getHardwareId()).thenReturn("t1.micro");
+    when(instanceTemplate.getHardwareId()).thenReturn("t1.micro");
 
     TemplateBuilder builder = mock(TemplateBuilder.class);
-    strategy.configureTemplateBuilder(spec, builder, template);
+    strategy.configureTemplateBuilder(spec, builder, instanceTemplate);
 
     verify(builder).hardwareId("t1.micro");
     verify(builder).osFamily(OsFamily.UBUNTU);
   }
-
 }

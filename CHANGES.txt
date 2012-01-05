@@ -14,6 +14,9 @@ Trunk (unreleased changes)
     WHIRR-332. Need to specify different instance size/type 
     depending on role (asavu)
 
+    WHIRR-461. Allow user to specify spot instance price per 
+    instance template group (asavu)
+
   BUG FIXES
 
     WHIRR-367. Wrong groupId for zookeeper (Joe Crobak via asavu)
