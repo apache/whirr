@@ -18,10 +18,22 @@
 BIN=$(cd $(dirname "$0"); pwd)
 LOGGING_OPTS="-Dlog4j.configuration=log4j-cli.xml"
 
+# Set cygwin to true if running on Cygwin
+cygwin=false;
+case "`uname`" in
+	CYGWIN*) cygwin=true;
+esac
+
 if [ -d "$BIN/../cli/target/lib" ]; then
   CLASSPATH="$BIN/../conf/:$BIN/..:$BIN/../cli/target/lib/*:$BIN/../cli/target/*"
 else
   CLASSPATH="$BIN/../conf/:$BIN/..:$BIN/../lib/*"
+fi
+
+# Java classpath doesn't understand cygwin paths, thus converting the CLASSPATH into 
+# Windows style path.
+if $cygwin; then 
+  CLASSPATH=`cygpath -wp $CLASSPATH`;
 fi
 
 java $LOGGING_OPTS $WHIRR_CLI_OPTS -cp "$CLASSPATH" org.apache.whirr.cli.Main "$@"
