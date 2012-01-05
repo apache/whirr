@@ -107,10 +107,8 @@ public class ClusterController {
     throws IOException, InterruptedException {
     try {
       Cluster cluster = bootstrapCluster(clusterSpec);
-      configureServices(clusterSpec);
-      startServices(clusterSpec);
-
-      return cluster;
+      cluster = configureServices(clusterSpec, cluster);
+      return startServices(clusterSpec, cluster);
 
     } catch (Throwable e) {
 
@@ -140,45 +138,53 @@ public class ClusterController {
   /**
    * Configure cluster services
    */
-  public void configureServices(ClusterSpec clusterSpec) throws IOException, InterruptedException {
-    ClusterStateStore stateStore = getClusterStateStore(clusterSpec);
-    Cluster cluster = stateStore.load();
+  public Cluster configureServices(ClusterSpec spec) throws IOException, InterruptedException {
+    return configureServices(spec, new Cluster(getInstances(spec, getClusterStateStore(spec))));
+  }
 
+  public Cluster configureServices(ClusterSpec clusterSpec, Cluster cluster)
+    throws IOException, InterruptedException {
     ConfigureClusterAction configurer = new ConfigureClusterAction(getCompute(), HANDLERS);
-    configurer.execute(clusterSpec, cluster);
+    return configurer.execute(clusterSpec, cluster);
   }
 
   /**
    * Start the cluster services
    */
-  public void startServices(ClusterSpec clusterSpec) throws IOException, InterruptedException {
-    ClusterStateStore stateStore = getClusterStateStore(clusterSpec);
-    Cluster cluster = stateStore.load();
+  public Cluster startServices(ClusterSpec spec) throws IOException, InterruptedException {
+    return startServices(spec, new Cluster(getInstances(spec, getClusterStateStore(spec))));
+  }
 
+  public Cluster startServices(ClusterSpec clusterSpec, Cluster cluster)
+    throws IOException, InterruptedException {
     StartClusterAction starter = new StartClusterAction(getCompute(), HANDLERS);
-    starter.execute(clusterSpec, cluster);
+    return starter.execute(clusterSpec, cluster);
   }
 
   /**
    * Stop the cluster services
    */
-  public void stopServices(ClusterSpec clusterSpec) throws IOException, InterruptedException {
-    ClusterStateStore stateStore = getClusterStateStore(clusterSpec);
-    Cluster cluster = stateStore.load();
+  public Cluster stopServices(ClusterSpec spec) throws IOException, InterruptedException {
+    return stopServices(spec, new Cluster(getInstances(spec, getClusterStateStore(spec))));
+  }
 
+  public Cluster stopServices(ClusterSpec clusterSpec, Cluster cluster)
+    throws IOException, InterruptedException {
     StopClusterAction stopper = new StopClusterAction(getCompute(), HANDLERS);
-    stopper.execute(clusterSpec, cluster);
+    return stopper.execute(clusterSpec, cluster);
   }
 
   /**
    * Remove the cluster services
    */
-  public void cleanupCluster(ClusterSpec clusterSpec) throws IOException, InterruptedException {
-    ClusterStateStore stateStore = getClusterStateStore(clusterSpec);
-    Cluster cluster = stateStore.load();
+  public Cluster cleanupCluster(ClusterSpec spec) throws IOException, InterruptedException {
+    return cleanupCluster(spec, new Cluster(getInstances(spec, getClusterStateStore(spec))));
+  }
 
+  public Cluster cleanupCluster(ClusterSpec clusterSpec, Cluster cluster)
+    throws IOException, InterruptedException {
     CleanupClusterAction cleanner = new CleanupClusterAction(getCompute(), HANDLERS);
-    cleanner.execute(clusterSpec, cluster);
+    return cleanner.execute(clusterSpec, cluster);
   }
 
   /**
@@ -188,17 +194,17 @@ public class ClusterController {
    *                              or may not have been stopped.
    * @throws InterruptedException if the thread is interrupted.
    */
-  public void destroyCluster(ClusterSpec clusterSpec) throws IOException,
-    InterruptedException {
-
+  public void destroyCluster(ClusterSpec clusterSpec)
+    throws IOException, InterruptedException {
     ClusterStateStore stateStore = getClusterStateStore(clusterSpec);
-    Cluster cluster = stateStore.tryLoadOrEmpty();
-
-    DestroyClusterAction destroyer = new DestroyClusterAction(getCompute(),
-      HandlerMapFactory.create());
-    destroyer.execute(clusterSpec, cluster);
-
+    destroyCluster(clusterSpec, stateStore.tryLoadOrEmpty());
     stateStore.destroy();
+  }
+
+  public void destroyCluster(ClusterSpec clusterSpec, Cluster cluster)
+    throws IOException, InterruptedException {
+    DestroyClusterAction destroyer = new DestroyClusterAction(getCompute(), HANDLERS);
+    destroyer.execute(clusterSpec, cluster);
   }
 
   public void destroyInstance(ClusterSpec clusterSpec, String instanceId) throws IOException {
