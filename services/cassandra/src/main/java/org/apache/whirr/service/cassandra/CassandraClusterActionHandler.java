@@ -40,7 +40,7 @@ public class CassandraClusterActionHandler extends ClusterActionHandlerSupport {
 
   public static final String CASSANDRA_ROLE = "cassandra";
   public static final int CLIENT_PORT = 9160;
-  public static final int JMX_PORT = 8080;
+  public static final int JMX_PORT = 7199;
 
   public static final String BIN_TARBALL = "whirr.cassandra.tarball.url";
   public static final String MAJOR_VERSION = "whirr.cassandra.version.major";
