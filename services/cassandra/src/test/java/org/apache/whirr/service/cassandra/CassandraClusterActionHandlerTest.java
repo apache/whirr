@@ -20,6 +20,7 @@ package org.apache.whirr.service.cassandra;
 
 import static org.junit.Assert.assertEquals;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
 
 import java.net.UnknownHostException;
@@ -61,5 +62,18 @@ public class CassandraClusterActionHandlerTest {
     assertEquals(2, seeds2.size());
     assertEquals(one, seeds2.get(0));
     assertEquals(two, seeds2.get(1));
+  }
+
+  @Test
+  public void testComputeInitialTokens() {
+    List<String> result = new CassandraClusterActionHandler().computeInitialTokens(5);
+
+    assertEquals(result, ImmutableList.of(
+      "0",
+      "34028236692093846346337460743176821145",
+      "68056473384187692692674921486353642290",
+      "102084710076281539039012382229530463435",
+      "136112946768375385385349842972707284580"
+    ));
   }
 }

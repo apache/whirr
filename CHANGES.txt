@@ -17,6 +17,8 @@ Trunk (unreleased changes)
     WHIRR-461. Allow user to specify spot instance price per 
     instance template group (asavu)
 
+    WHIRR-407. Upgrade Cassandra to 1.0.6 (Nathan Milford and Andrei Savu)
+
   BUG FIXES
 
     WHIRR-367. Wrong groupId for zookeeper (Joe Crobak via asavu)

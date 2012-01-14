@@ -82,7 +82,7 @@ public class CassandraServiceTest {
     LOG.info("Waiting for Cassandra to start");
     for (Instance instance : cluster.getInstances()) {
       int tries = 0;
-      while (tries < 10) {
+      while (tries < 30) {
         try {
           Cassandra.Client client = client(instance);
           client.describe_cluster_name();
@@ -93,7 +93,7 @@ public class CassandraServiceTest {
         } catch (TException e) {
           try {
             LOG.warn(instance.getPublicIp() + " not reachable, try #" + tries + ", waiting 1s");
-            Thread.sleep(1000);
+            Thread.sleep(10000);
           } catch (InterruptedException e1) {
             break;
           }
