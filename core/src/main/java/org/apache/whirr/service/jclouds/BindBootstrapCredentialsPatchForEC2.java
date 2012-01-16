@@ -25,11 +25,11 @@ import com.google.inject.AbstractModule;
 /**
  * patch until http://code.google.com/p/jclouds/issues/detail?id=441
  */
-public class BindLoginCredentialsPatchForEC2 extends AbstractModule {
+public class BindBootstrapCredentialsPatchForEC2 extends AbstractModule {
 
   @Override
   protected void configure() {
-    bind(EC2PopulateDefaultLoginCredentialsForImageStrategy.class).to(TakeLoginCredentialsFromWhirrProperties.class);
+    bind(EC2PopulateDefaultLoginCredentialsForImageStrategy.class).to(TakeBootstrapCredentialsFromWhirrProperties.class);
   }
 
 }

@@ -279,10 +279,10 @@ xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 http://maven.apache.org/xsd
       </tr>
       <tr valign="top">
         <td>
-          <tt>whirr.login-user</tt>
+          <tt>whirr.bootstrap-user</tt>
         </td>
         <td>
-          <tt>--login-user</tt>
+          <tt>--bootstrap-user</tt>
         </td>
         <td>none</td>
         <td>Override the default login user used to bootstrap whirr. E.g. ubuntu or

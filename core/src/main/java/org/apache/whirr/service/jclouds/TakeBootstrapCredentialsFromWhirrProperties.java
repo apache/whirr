@@ -30,14 +30,14 @@ import org.jclouds.ec2.compute.strategy.EC2PopulateDefaultLoginCredentialsForIma
 
 @Singleton
 // patch until jclouds http://code.google.com/p/jclouds/issues/detail?id=441
-public class TakeLoginCredentialsFromWhirrProperties extends
+public class TakeBootstrapCredentialsFromWhirrProperties extends
     EC2PopulateDefaultLoginCredentialsForImageStrategy {
 
   @Override
   public Credentials execute(Object resourceToAuthenticate) {
-    if (System.getProperties().containsKey("whirr.login-user") &&
-       !"".equals(System.getProperty("whirr.login-user").trim())) {
-      List<String> creds = Lists.newArrayList(Splitter.on(':').split(System.getProperty("whirr.login-user")));
+    if (System.getProperties().containsKey("whirr.bootstrap-user") &&
+       !"".equals(System.getProperty("whirr.bootstrap-user").trim())) {
+      List<String> creds = Lists.newArrayList(Splitter.on(':').split(System.getProperty("whirr.bootstrap-user")));
       if (creds.size() == 2)
          return new Credentials(creds.get(0), creds.get(1));
       return new Credentials(creds.get(0), null);

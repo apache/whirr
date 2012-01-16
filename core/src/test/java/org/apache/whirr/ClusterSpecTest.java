@@ -70,13 +70,12 @@ public class ClusterSpecTest {
   }
 
   @Test
-  public void testLoginUserSetsSystemProperty()
+  public void testBootstrapUserSetsSystemProperty()
     throws ConfigurationException {
     Configuration conf = new PropertiesConfiguration();
-    conf.setProperty(ClusterSpec.Property.LOGIN_USER.getConfigName(),
-      "ubuntu");
+    conf.setProperty(ClusterSpec.Property.BOOTSTRAP_USER.getConfigName(), "ubuntu");
     ClusterSpec.withNoDefaults(conf);
-    assertThat(System.getProperty("whirr.login-user"), is("ubuntu"));
+    assertThat(System.getProperty("whirr.bootstrap-user"), is("ubuntu"));
   }
 
   @Test

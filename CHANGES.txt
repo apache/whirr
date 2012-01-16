@@ -19,6 +19,8 @@ Trunk (unreleased changes)
 
     WHIRR-407. Upgrade Cassandra to 1.0.6 (Nathan Milford and Andrei Savu)
 
+    WHIRR-475. Rename login-user to bootstrap-user to avoid confusions (asavu)
+
   BUG FIXES
 
     WHIRR-367. Wrong groupId for zookeeper (Joe Crobak via asavu)

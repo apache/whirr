@@ -26,55 +26,55 @@ import java.io.IOException;
 import org.jclouds.domain.Credentials;
 import org.junit.Test;
 
-public class TakeLoginCredentialsFromWhirrPropertiesTest {
-  TakeLoginCredentialsFromWhirrProperties strat = 
-     new TakeLoginCredentialsFromWhirrProperties();
+public class TakeBootstrapCredentialsFromWhirrPropertiesTest {
+  TakeBootstrapCredentialsFromWhirrProperties strat =
+     new TakeBootstrapCredentialsFromWhirrProperties();
 
   @Test
   public synchronized void testNotSetIsDefault() throws IOException {
     try {
-      System.getProperties().remove("whirr.login-user");
+      System.getProperties().remove("whirr.bootstrap-user");
       assertThat(
           strat.execute(null),
           equalTo(new Credentials("root", null)));
     } finally {
-      System.getProperties().remove("whirr.login-user");
+      System.getProperties().remove("whirr.bootstrap-user");
     }
   }
   
   @Test
   public synchronized void testSetEmptyIsDefault() throws IOException {
     try {
-      System.setProperty("whirr.login-user", "");
+      System.setProperty("whirr.bootstrap-user", "");
       assertThat(
           strat.execute(null),
           equalTo(new Credentials("root", null)));
     } finally {
-      System.getProperties().remove("whirr.login-user");
+      System.getProperties().remove("whirr.bootstrap-user");
     }
   }
 
   @Test
   public synchronized void testSetUsername() throws IOException {
     try {
-      System.setProperty("whirr.login-user", "ubuntu");
+      System.setProperty("whirr.bootstrap-user", "ubuntu");
       assertThat(
           strat.execute(null),
           equalTo(new Credentials("ubuntu", null)));
     } finally {
-      System.getProperties().remove("whirr.login-user");
+      System.getProperties().remove("whirr.bootstrap-user");
     }
   }
   
   @Test
   public synchronized void testSetUsernamePassword() throws IOException {
     try {
-      System.setProperty("whirr.login-user", "ubuntu:pass");
+      System.setProperty("whirr.bootstrap-user", "ubuntu:pass");
       assertThat(
           strat.execute(null),
           equalTo(new Credentials("ubuntu", "pass")));
     } finally {
-      System.getProperties().remove("whirr.login-user");
+      System.getProperties().remove("whirr.bootstrap-user");
     }
   }
 }
