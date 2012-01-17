@@ -24,6 +24,7 @@ import java.util.List;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.whirr.command.Command;
+import org.jclouds.JcloudsVersion;
 
 public class VersionCommand extends Command {
 
@@ -40,6 +41,7 @@ public class VersionCommand extends Command {
       return -1;
     }
     out.write(IOUtils.toByteArray(input));
+    out.println("jclouds " + JcloudsVersion.get().toString());
     return 0;
   }
 

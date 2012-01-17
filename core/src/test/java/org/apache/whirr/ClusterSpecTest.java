@@ -70,15 +70,6 @@ public class ClusterSpecTest {
   }
 
   @Test
-  public void testBootstrapUserSetsSystemProperty()
-    throws ConfigurationException {
-    Configuration conf = new PropertiesConfiguration();
-    conf.setProperty(ClusterSpec.Property.BOOTSTRAP_USER.getConfigName(), "ubuntu");
-    ClusterSpec.withNoDefaults(conf);
-    assertThat(System.getProperty("whirr.bootstrap-user"), is("ubuntu"));
-  }
-
-  @Test
   public void testGetConfigurationForKeysWithPrefix()
     throws ConfigurationException, JSchException, IOException {
     Configuration conf = new PropertiesConfiguration();

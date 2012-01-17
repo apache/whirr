@@ -48,6 +48,7 @@ import org.jclouds.compute.domain.NodeMetadata;
 import org.jclouds.compute.domain.internal.NodeMetadataImpl;
 import org.jclouds.crypto.CryptoStreams;
 import org.jclouds.domain.Credentials;
+import org.jclouds.domain.LoginCredentials;
 import org.jclouds.io.Payload;
 import org.jclouds.io.payloads.StringPayload;
 import org.jclouds.net.IPSocket;
@@ -266,14 +267,9 @@ public class DryRunModule extends AbstractModule {
       }
 
       @Override
-      public SshClient create(IPSocket socket, String username, String password) {
-        return create(socket, new Credentials(username, password));
-      }
-
-      @Override
-      public SshClient create(IPSocket socket, String username,
-          byte[] privateKey) {
-        return create(socket, new Credentials(username, new String(privateKey)));
+      public SshClient create(IPSocket socket, LoginCredentials credentials) {
+        return clientMap.get(new Key(socket, credentials, find(nodes.values(),
+            new NodeHasAddress(socket.getAddress()))));
       }
     }
 

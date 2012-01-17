@@ -20,6 +20,7 @@ package org.apache.whirr.state;
 import java.io.File;
 import java.io.IOException;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.whirr.Cluster;
 import org.apache.whirr.ClusterSpec;
 import org.slf4j.Logger;
@@ -57,7 +58,7 @@ public class FileClusterStateStore extends ClusterStateStore {
 
   @Override
   public void destroy() throws IOException {
-    Files.deleteRecursively(spec.getClusterDirectory());
+   FileUtils.deleteDirectory(spec.getClusterDirectory());
   }
 
   @Override

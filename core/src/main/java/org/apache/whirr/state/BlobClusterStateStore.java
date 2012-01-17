@@ -70,8 +70,7 @@ public class BlobClusterStateStore extends ClusterStateStore {
   public void save(Cluster cluster) throws IOException {
     BlobStore store = context.getBlobStore();
 
-    Blob blob = store.newBlob(blobName);
-    blob.setPayload(serialize(cluster));
+    Blob blob = store.blobBuilder(blobName).payload(serialize(cluster)).build();
     store.putBlob(container, blob);
 
     LOG.info("Saved cluster state to '{}' ", context.getSigner()

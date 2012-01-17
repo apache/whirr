@@ -21,6 +21,8 @@ Trunk (unreleased changes)
 
     WHIRR-475. Rename login-user to bootstrap-user to avoid confusions (asavu)
 
+    WHIRR-456. Upgrade to jclouds 1.3.0 (asavu)
+
   BUG FIXES
 
     WHIRR-367. Wrong groupId for zookeeper (Joe Crobak via asavu)

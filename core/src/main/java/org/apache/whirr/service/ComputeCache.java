@@ -202,6 +202,9 @@ public enum ComputeCache implements Function<ClusterSpec, ComputeServiceContext>
         }
       }
       overrides = ConfigurationConverter.getProperties(jcloudsConfig);
+      if (spec.getBootstrapUser() != null) {
+         overrides.put(provider + ".image.login-user", spec.getBootstrapUser());
+      }
 
       if ("aws-ec2".equals(spec.getProvider()) && spec.getImageId() != null) {
         enableAWSEC2LazyImageFetching(spec);

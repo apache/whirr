@@ -839,10 +839,6 @@ public class ClusterSpec {
 
   public void setBootstrapUser(String bootstrapUser) {
     this.bootstrapUser = bootstrapUser;
-    if (this.bootstrapUser != null) {
-      // patch until jclouds 1.0-beta-10
-      System.setProperty("whirr.bootstrap-user", this.bootstrapUser);
-    }
   }
 
   @Deprecated
@@ -880,8 +876,7 @@ public class ClusterSpec {
    * @return the directory for storing cluster-related files
    */
   public File getClusterDirectory() {
-    File clusterDir = new File(new File(System.getProperty("user.home")),
-        ".whirr");
+    File clusterDir = new File(new File(System.getProperty("user.home")), ".whirr");
     clusterDir = new File(clusterDir, getClusterName());
     clusterDir.mkdirs();
     return clusterDir;
