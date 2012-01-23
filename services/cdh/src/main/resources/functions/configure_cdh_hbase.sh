@@ -66,11 +66,11 @@ function configure_cdh_hbase() {
   cp /tmp/hbase-site.xml $HBASE_CONF_DIR
   cp /tmp/hbase-env.sh $HBASE_CONF_DIR
 
-  # HBASE_PID_DIR should exist and be owned by hadoop:hadoop
+  # HBASE_PID_DIR should exist and be owned by hbase:hbase
   HBASE_PID_DIR=$(. $HBASE_CONF_DIR/hbase-env.sh; echo $HBASE_PID_DIR)
   HBASE_PID_DIR=${HBASE_PID_DIR:-/var/run/hbase}
   mkdir -p $HBASE_PID_DIR
-  chown -R hadoop:hadoop $HBASE_PID_DIR
+  chown -R hbase:hbase $HBASE_PID_DIR
 
   # Create the actual log dir
   mkdir -p /data/hbase/logs
