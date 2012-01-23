@@ -46,7 +46,7 @@ You can also use Whirr as a command line tool for deploying clusters.</descripti
       <Version>
         <name>Whirr 0.7.0</name>
         <created>2011-12-20</created>
-        <revision>0.7.0</created>
+        <revision>0.7.0</revision>
       </Version>
     </release>
     <release>
