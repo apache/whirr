@@ -13,6 +13,7 @@ org.apache.whirr.cli.command.LaunchClusterCommand
 org.apache.whirr.cli.command.ConfigureServicesCommand
 org.apache.whirr.cli.command.StartServicesCommand
 org.apache.whirr.cli.command.StopServicesCommand
+org.apache.whirr.cli.command.RestartServicesCommand
 org.apache.whirr.cli.command.CleanupClusterCommand
 org.apache.whirr.cli.command.DestroyClusterCommand
 org.apache.whirr.cli.command.DestroyInstanceCommand

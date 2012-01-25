@@ -30,6 +30,8 @@ Trunk (unreleased changes)
     WHIRR-479. ScriptBasedClusterAction should allow filtering by 
     role and instance-id (asavu) 
 
+    WHIRR-484. Add restart-services command (asavu)
+
   BUG FIXES
 
     WHIRR-367. Wrong groupId for zookeeper (Joe Crobak via asavu)
