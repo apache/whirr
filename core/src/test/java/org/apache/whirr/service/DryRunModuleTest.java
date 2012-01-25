@@ -18,19 +18,10 @@
 
 package org.apache.whirr.service;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertSame;
-import static junit.framework.Assert.assertTrue;
-import static org.jclouds.scriptbuilder.domain.Statements.exec;
-
-import java.io.IOException;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map.Entry;
-import java.util.Stack;
-
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Lists;
+import com.jcraft.jsch.JSchException;
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.whirr.ClusterController;
@@ -43,8 +34,16 @@ import org.jclouds.scriptbuilder.InitBuilder;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.google.common.collect.ListMultimap;
-import com.jcraft.jsch.JSchException;
+import java.io.IOException;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map.Entry;
+import java.util.Stack;
+
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertSame;
+import static junit.framework.Assert.assertTrue;
+import static org.jclouds.scriptbuilder.domain.Statements.exec;
 
 public class DryRunModuleTest {
 
@@ -58,17 +57,27 @@ public class DryRunModuleTest {
 
     @Override
     public void beforeConfigure(ClusterActionEvent event) {
-      addStatement(event, exec("echo 1"));
+      addStatement(event, exec("echo noop2-configure"));
     }
 
     @Override
     public void beforeStart(ClusterActionEvent event) {
-      addStatement(event, exec("echo 2"));
+      addStatement(event, exec("echo noop2-start"));
+    }
+
+    @Override
+    public void beforeStop(ClusterActionEvent event) {
+      addStatement(event, exec("echo noop2-stop"));
+    }
+
+    @Override
+    public void beforeCleanup(ClusterActionEvent event) {
+      addStatement(event, exec("echo noop2-cleanup"));
     }
 
     @Override
     public void beforeDestroy(ClusterActionEvent event) {
-      addStatement(event, exec("echo 3"));
+      addStatement(event, exec("echo noop2-destroy"));
     }
   }
 
@@ -82,17 +91,27 @@ public class DryRunModuleTest {
 
     @Override
     public void beforeConfigure(ClusterActionEvent event) {
-      addStatement(event, exec("echo 1"));
+      addStatement(event, exec("echo noop3-configure"));
     }
 
     @Override
     public void beforeStart(ClusterActionEvent event) {
-      addStatement(event, exec("echo 2"));
+      addStatement(event, exec("echo noop3-start"));
+    }
+
+    @Override
+    public void beforeStop(ClusterActionEvent event) {
+      addStatement(event, exec("echo noop3-stop"));
+    }
+
+    @Override
+    public void beforeCleanup(ClusterActionEvent event) {
+      addStatement(event, exec("echo noop3-cleanup"));
     }
 
     @Override
     public void beforeDestroy(ClusterActionEvent event) {
-      addStatement(event, exec("echo 3"));
+      addStatement(event, exec("echo noop3-destroy"));
     }
   }
 

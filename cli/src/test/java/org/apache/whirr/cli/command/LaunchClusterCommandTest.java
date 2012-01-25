@@ -18,6 +18,24 @@
 
 package org.apache.whirr.cli.command;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration.PropertiesConfiguration;
+import org.apache.whirr.Cluster;
+import org.apache.whirr.ClusterController;
+import org.apache.whirr.ClusterControllerFactory;
+import org.apache.whirr.ClusterSpec;
+import org.apache.whirr.InstanceTemplate;
+import org.apache.whirr.service.DryRunModule;
+import org.apache.whirr.util.KeyPair;
+import org.hamcrest.MatcherAssert;
+import org.junit.Test;
+
+import java.io.File;
+import java.util.Collections;
+import java.util.Map;
+
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
@@ -26,52 +44,14 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.google.common.collect.Lists;
+public class LaunchClusterCommandTest extends BaseCommandTest{
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.PrintStream;
-import java.util.Collections;
-import java.util.Map;
-
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.configuration.PropertiesConfiguration;
-import org.apache.whirr.Cluster;
-import org.apache.whirr.ClusterController;
-import org.apache.whirr.ClusterControllerFactory;
-import org.apache.whirr.ClusterSpec;
-import org.apache.whirr.InstanceTemplate;
-import org.apache.whirr.util.KeyPair;
-import org.hamcrest.Matcher;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.internal.matchers.StringContains;
-
-public class LaunchClusterCommandTest {
-
-  private ByteArrayOutputStream outBytes;
-  private PrintStream out;
-  private ByteArrayOutputStream errBytes;
-  private PrintStream err;
-
-  @Before
-  public void setUp() {
-    outBytes = new ByteArrayOutputStream();
-    out = new PrintStream(outBytes);
-
-    errBytes = new ByteArrayOutputStream();
-    err = new PrintStream(errBytes);
-  }
   @Test
   public void testInsufficientArgs() throws Exception {
     LaunchClusterCommand command = new LaunchClusterCommand();
     int rc = command.run(null, null, err, Collections.<String>emptyList());
     assertThat(rc, is(-1));
-    assertThat(errBytes.toString(), containsUsageString());
-  }
-  
-  private Matcher<String> containsUsageString() {
-    return StringContains.containsString("Usage: whirr launch-cluster [OPTIONS]");
+    assertThat(errBytes.toString(), containsString("Option 'cluster-name' not set."));
   }
   
   @Test
@@ -139,7 +119,7 @@ public class LaunchClusterCommandTest {
         "--cluster-name", "test-cluster",
         "--instance-templates", "1 hadoop-namenode+hadoop-jobtracker,3 hadoop-datanode+hadoop-tasktracker",
         "--instance-templates-max-percent-failures", "60 hadoop-datanode+hadoop-tasktracker",
-        "--provider", "ec2",
+        "--provider", "aws-ec2",
         "--identity", "myusername", "--credential", "mypassword",
         "--private-key-file", keys.get("private").getAbsolutePath(),
         "--version", "version-string"
@@ -159,7 +139,7 @@ public class LaunchClusterCommandTest {
         .roles("hadoop-datanode", "hadoop-tasktracker").build()
     ));
     expectedClusterSpec.setServiceName("hadoop");
-    expectedClusterSpec.setProvider("ec2");
+    expectedClusterSpec.setProvider("aws-ec2");
     expectedClusterSpec.setIdentity("myusername");
     expectedClusterSpec.setCredential("mypassword");
     expectedClusterSpec.setClusterName("test-cluster");
@@ -171,5 +151,24 @@ public class LaunchClusterCommandTest {
     verify(controller).launchCluster(expectedClusterSpec);
     
     assertThat(outBytes.toString(), containsString("Started cluster of 0 instances")); 
+  }
+
+  @Test
+  public void testLaunchClusterUsingDryRun() throws Exception {
+    DryRunModule.resetDryRun();
+
+    ClusterControllerFactory factory = new ClusterControllerFactory();
+    LaunchClusterCommand launchCluster = new LaunchClusterCommand(factory);
+
+    int rc = launchCluster.run(null, out, err, ImmutableList.of(
+        "--cluster-name", "test-cluster-launch",
+        "--state-store", "none",
+        "--instance-templates", "1 zookeeper+cassandra, 1 zookeeper+elasticsearch",
+        "--provider", "stub",
+        "--identity", "dummy"
+    ));
+
+    MatcherAssert.assertThat(rc, is(0));
+    assertExecutedPhases(DryRunModule.DryRun.INSTANCE, "setup", "configure", "start");
   }
 }

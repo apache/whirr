@@ -16,36 +16,44 @@
  * limitations under the License.
  */
 
-package org.apache.whirr.command;
+package org.apache.whirr.cli.command;
+
+import org.apache.whirr.command.Command;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.util.List;
+import java.util.ServiceLoader;
 
-/**
- * A CLI command.
- */
-public abstract class Command {
-  
-  private String name;
-  private String description;
-  
-  public Command(String name, String description) {
-    this.name = name;
-    this.description = description;
-  }
-  
-  public String getName() {
-    return name;
-  }
-  
-  public String getDescription() {
-    return description;
-  }
-  
-  public abstract int run(InputStream in, PrintStream out, PrintStream err,
-      List<String> args) throws Exception;
+public class HelpCommand extends Command {
 
-  public abstract void printUsage(PrintStream stream) throws IOException;
+  public HelpCommand() {
+    super("help", "Show help about an action");
+  }
+
+  @Override
+  public int run(InputStream in, PrintStream out, PrintStream err, List<String> args) throws Exception {
+    if (args.size() == 0) {
+      printUsage(out);
+      return -1;
+    }
+
+    String helpForCommand = args.get(0);
+    ServiceLoader<Command> loader = ServiceLoader.load(Command.class);
+    for(Command command : loader) {
+      if (command.getName().equals(helpForCommand)) {
+        command.printUsage(out);
+        return 0;
+      }
+    }
+
+    err.println("No command found with that name: " + helpForCommand);
+    return -2;
+  }
+
+  @Override
+  public void printUsage(PrintStream stream) throws IOException {
+    stream.println("Usage: whirr help <command>");
+  }
 }

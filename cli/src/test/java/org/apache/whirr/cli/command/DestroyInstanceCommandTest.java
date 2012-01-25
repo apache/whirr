@@ -18,6 +18,17 @@
 
 package org.apache.whirr.cli.command;
 
+import com.google.common.collect.Lists;
+import org.apache.whirr.ClusterController;
+import org.apache.whirr.ClusterControllerFactory;
+import org.apache.whirr.ClusterSpec;
+import org.apache.whirr.util.KeyPair;
+import org.junit.Test;
+
+import java.io.File;
+import java.util.Collections;
+import java.util.Map;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
@@ -27,37 +38,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.google.common.collect.Lists;
-
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.PrintStream;
-import java.util.Collections;
-import java.util.Map;
-
-import org.apache.whirr.ClusterController;
-import org.apache.whirr.ClusterControllerFactory;
-import org.apache.whirr.ClusterSpec;
-import org.apache.whirr.util.KeyPair;
-import org.junit.Before;
-import org.junit.Test;
-
-public class DestroyInstanceCommandTest {
-
-  private ByteArrayOutputStream outBytes;
-  private PrintStream out;
-
-  private ByteArrayOutputStream errBytes;
-  private PrintStream err;
-
-  @Before
-  public void setUp() {
-    outBytes = new ByteArrayOutputStream();
-    out = new PrintStream(outBytes);
-
-    errBytes = new ByteArrayOutputStream();
-    err = new PrintStream(errBytes);
-  }
+public class DestroyInstanceCommandTest extends BaseCommandTest {
 
   @Test
   public void testInstanceIdMandatory() throws Exception {
@@ -66,10 +47,7 @@ public class DestroyInstanceCommandTest {
     assertThat(rc, is(-1));
 
     String errOutput = errBytes.toString();
-    assertThat(errOutput, containsString("You need to specify " +
-        "an instance ID."));
-    assertThat(errOutput, containsString("Usage: whirr destroy-instance" +
-        " --instance-id <region/ID> [OPTIONS]"));
+    assertThat(errOutput, containsString("--instance-id is a mandatory argument"));
   }
 
   @Test

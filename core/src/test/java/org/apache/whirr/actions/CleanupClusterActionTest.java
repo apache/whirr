@@ -22,37 +22,22 @@ import com.google.common.base.Function;
 import org.apache.whirr.ClusterSpec;
 import org.apache.whirr.service.ClusterActionHandler;
 import org.jclouds.compute.ComputeServiceContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 import java.util.Set;
 
-/**
- * A {@link ClusterAction} for cleaning-up the cluster services
- */
-public class CleanupClusterAction extends ScriptBasedClusterAction {
-
-  private static final Logger LOG = LoggerFactory.getLogger(CleanupClusterAction.class);
-
-  public CleanupClusterAction(
-      Function<ClusterSpec, ComputeServiceContext> getCompute,
-      Map<String, ClusterActionHandler> handlerMap
-  ) {
-    super(getCompute, handlerMap);
-  }
-
-  public CleanupClusterAction(
-      Function<ClusterSpec, ComputeServiceContext> getCompute,
-      Map<String, ClusterActionHandler> handlerMap,
-      Set<String> targetRoles,
-      Set<String> targetInstanceIds
-  ) {
-    super(getCompute, handlerMap, targetRoles, targetInstanceIds);
-  }
+public class CleanupClusterActionTest extends ScriptBasedClusterActionTest<CleanupClusterAction> {
 
   @Override
-  protected String getAction() {
+  public String getActionName() {
     return ClusterActionHandler.CLEANUP_ACTION;
+  }
+  
+  @Override
+  public CleanupClusterAction newClusterActionInstance(
+      Function<ClusterSpec, ComputeServiceContext> getCompute, Map<String, ClusterActionHandler> handlerMap,
+      Set<String> targetRoles, Set<String> targetInstanceIds
+  ) {
+    return new CleanupClusterAction(getCompute, handlerMap, targetRoles, targetInstanceIds);
   }
 }

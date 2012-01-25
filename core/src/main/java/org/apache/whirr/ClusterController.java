@@ -21,14 +21,15 @@ package org.apache.whirr;
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 import org.apache.whirr.actions.BootstrapClusterAction;
 import org.apache.whirr.actions.CleanupClusterAction;
-import org.apache.whirr.actions.ConfigureClusterAction;
+import org.apache.whirr.actions.ConfigureServicesAction;
 import org.apache.whirr.actions.DestroyClusterAction;
-import org.apache.whirr.actions.StartClusterAction;
-import org.apache.whirr.actions.StopClusterAction;
+import org.apache.whirr.actions.StartServicesAction;
+import org.apache.whirr.actions.StopServicesAction;
 import org.apache.whirr.service.ClusterActionHandler;
 import org.apache.whirr.state.ClusterStateStore;
 import org.apache.whirr.state.ClusterStateStoreFactory;
@@ -62,6 +63,7 @@ public class ClusterController {
   private static final Logger LOG = LoggerFactory.getLogger(ClusterController.class);
 
   private static final Map<String, ClusterActionHandler> HANDLERS = HandlerMapFactory.create();
+  private static final ImmutableSet<String> EMPTYSET = ImmutableSet.of();
 
   private final Function<ClusterSpec, ComputeServiceContext> getCompute;
   private final ClusterStateStoreFactory stateStoreFactory;
@@ -144,7 +146,13 @@ public class ClusterController {
 
   public Cluster configureServices(ClusterSpec clusterSpec, Cluster cluster)
     throws IOException, InterruptedException {
-    ConfigureClusterAction configurer = new ConfigureClusterAction(getCompute(), HANDLERS);
+    return configureServices(clusterSpec, cluster, EMPTYSET, EMPTYSET);
+  }
+  
+  public Cluster configureServices(ClusterSpec clusterSpec, Cluster cluster, Set<String> targetRoles,
+        Set<String> targetInstanceIds) throws IOException, InterruptedException {
+    ConfigureServicesAction configurer = new ConfigureServicesAction(getCompute(), HANDLERS,
+        targetRoles, targetInstanceIds);
     return configurer.execute(clusterSpec, cluster);
   }
 
@@ -157,7 +165,12 @@ public class ClusterController {
 
   public Cluster startServices(ClusterSpec clusterSpec, Cluster cluster)
     throws IOException, InterruptedException {
-    StartClusterAction starter = new StartClusterAction(getCompute(), HANDLERS);
+    return startServices(clusterSpec, cluster, EMPTYSET, EMPTYSET);
+  }
+  
+  public Cluster startServices(ClusterSpec clusterSpec, Cluster cluster,
+      Set<String> targetRoles, Set<String> targetInstanceIds) throws IOException, InterruptedException {
+    StartServicesAction starter = new StartServicesAction(getCompute(), HANDLERS, targetRoles, targetInstanceIds);
     return starter.execute(clusterSpec, cluster);
   }
 
@@ -170,7 +183,13 @@ public class ClusterController {
 
   public Cluster stopServices(ClusterSpec clusterSpec, Cluster cluster)
     throws IOException, InterruptedException {
-    StopClusterAction stopper = new StopClusterAction(getCompute(), HANDLERS);
+    return stopServices(clusterSpec, cluster, EMPTYSET, EMPTYSET);
+
+  }
+  
+  public Cluster stopServices(ClusterSpec clusterSpec, Cluster cluster, Set<String> targetRoles,
+    Set<String> targetInstanceIds) throws IOException, InterruptedException {
+    StopServicesAction stopper = new StopServicesAction(getCompute(), HANDLERS, targetRoles, targetInstanceIds);
     return stopper.execute(clusterSpec, cluster);
   }
 
@@ -186,7 +205,7 @@ public class ClusterController {
     CleanupClusterAction cleanner = new CleanupClusterAction(getCompute(), HANDLERS);
     return cleanner.execute(clusterSpec, cluster);
   }
-
+  
   /**
    * Stop the cluster and destroy all resources associated with it.
    *

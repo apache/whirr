@@ -18,23 +18,18 @@
 
 package org.apache.whirr.cli.command;
 
-import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import org.apache.whirr.ClusterController;
 import org.apache.whirr.ClusterControllerFactory;
 import org.apache.whirr.ClusterSpec;
-import org.apache.whirr.command.AbstractClusterCommand;
 import org.apache.whirr.state.ClusterStateStoreFactory;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.PrintStream;
-import java.util.List;
 
 /**
  * A command to start the cluster services
  */
-public class StartServicesCommand extends AbstractClusterCommand {
+public class StartServicesCommand extends RoleLifecycleCommand {
 
   public StartServicesCommand() throws IOException {
     this(new ClusterControllerFactory());
@@ -48,33 +43,16 @@ public class StartServicesCommand extends AbstractClusterCommand {
                               ClusterStateStoreFactory stateStoreFactory) {
     super("start-services", "Start the cluster services.", factory, stateStoreFactory);
   }
-  
+
   @Override
-  public int run(InputStream in, PrintStream out, PrintStream err,
-      List<String> args) throws Exception {
-    
-    OptionSet optionSet = parser.parse(args.toArray(new String[0]));
-
-    if (!optionSet.nonOptionArguments().isEmpty()) {
-      printUsage(parser, err);
-      return -1;
-    }
-    try {
-      ClusterSpec clusterSpec = getClusterSpec(optionSet);
-      ClusterController controller = createClusterController(clusterSpec.getServiceName());
-      controller.startServices(clusterSpec);
-      return 0;
-
-    } catch (IllegalArgumentException e) {
-      err.println(e.getMessage());
-      printUsage(parser, err);
-      return -1;
-    }
-  }
-
-  private void printUsage(OptionParser parser, PrintStream stream) throws IOException {
-    stream.println("Usage: whirr start-services [OPTIONS]");
-    stream.println();
-    parser.printHelpOn(stream);
+  public int runLifecycleStep(ClusterSpec clusterSpec, ClusterController controller, OptionSet optionSet)
+      throws IOException, InterruptedException {
+    controller.startServices(
+        clusterSpec,
+        getCluster(clusterSpec, controller),
+        getTargetRolesOrEmpty(optionSet),
+        getTargetInstanceIdsOrEmpty(optionSet)
+    );
+    return 0;
   }
 }

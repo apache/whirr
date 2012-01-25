@@ -22,37 +22,23 @@ import com.google.common.base.Function;
 import org.apache.whirr.ClusterSpec;
 import org.apache.whirr.service.ClusterActionHandler;
 import org.jclouds.compute.ComputeServiceContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 import java.util.Set;
 
-/**
- * A {@link ClusterAction} for cleaning-up the cluster services
- */
-public class CleanupClusterAction extends ScriptBasedClusterAction {
+public class StopServicesActionTest extends ScriptBasedClusterActionTest<StopServicesAction> {
 
-  private static final Logger LOG = LoggerFactory.getLogger(CleanupClusterAction.class);
-
-  public CleanupClusterAction(
-      Function<ClusterSpec, ComputeServiceContext> getCompute,
-      Map<String, ClusterActionHandler> handlerMap
-  ) {
-    super(getCompute, handlerMap);
-  }
-
-  public CleanupClusterAction(
-      Function<ClusterSpec, ComputeServiceContext> getCompute,
-      Map<String, ClusterActionHandler> handlerMap,
-      Set<String> targetRoles,
-      Set<String> targetInstanceIds
-  ) {
-    super(getCompute, handlerMap, targetRoles, targetInstanceIds);
+  @Override
+  public String getActionName() {
+    return ClusterActionHandler.STOP_ACTION;
   }
 
   @Override
-  protected String getAction() {
-    return ClusterActionHandler.CLEANUP_ACTION;
+  public StopServicesAction newClusterActionInstance(
+      Function<ClusterSpec, ComputeServiceContext> getCompute, Map<String, ClusterActionHandler> handlerMap,
+      Set<String> targetRoles, Set<String> targetInstanceIds
+  ) {
+    return new StopServicesAction(getCompute, handlerMap, targetRoles, targetInstanceIds);
   }
+
 }

@@ -24,6 +24,8 @@ import static org.apache.whirr.ClusterSpec.Property.INSTANCE_TEMPLATES;
 
 import com.google.common.collect.Maps;
 
+import java.io.IOException;
+import java.io.PrintStream;
 import java.util.EnumSet;
 import java.util.Map;
 
@@ -36,6 +38,7 @@ import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
+import org.apache.whirr.Cluster;
 import org.apache.whirr.ClusterController;
 import org.apache.whirr.ClusterControllerFactory;
 import org.apache.whirr.ClusterSpec;
@@ -65,14 +68,12 @@ public abstract class AbstractClusterCommand extends Command {
     .describedAs("config.properties")
     .ofType(String.class);
 
-  public AbstractClusterCommand(String name, String description,
-                                ClusterControllerFactory factory) {
+  public AbstractClusterCommand(String name, String description, ClusterControllerFactory factory) {
     this(name, description, factory, new ClusterStateStoreFactory());
   }
 
-  public AbstractClusterCommand(String name, String description,
-                                ClusterControllerFactory factory,
-                                ClusterStateStoreFactory stateStoreFactory) {
+  public AbstractClusterCommand(String name, String description, ClusterControllerFactory factory,
+        ClusterStateStoreFactory stateStoreFactory) {
     super(name, description);
 
     this.factory = factory;
@@ -91,6 +92,9 @@ public abstract class AbstractClusterCommand extends Command {
     }
   }
 
+  /**
+   * Load the cluster spec by parsing the command line option set
+   */
   protected ClusterSpec getClusterSpec(OptionSet optionSet) throws ConfigurationException {
     Configuration optionsConfig = new PropertiesConfiguration();
     for (Map.Entry<Property, OptionSpec<?>> entry : optionSpecs.entrySet()) {
@@ -121,6 +125,15 @@ public abstract class AbstractClusterCommand extends Command {
   }
 
   /**
+   * Get the cluster instance together with NodeMetadata (through API calls)
+   */
+  protected Cluster getCluster(ClusterSpec clusterSpec, ClusterController controller)
+      throws IOException, InterruptedException {
+    return new Cluster(controller.getInstances(
+        clusterSpec, createClusterStateStore(clusterSpec)));
+  }
+
+  /**
    * Create the specified service
    */
   protected ClusterController createClusterController(String serviceName) {
@@ -132,8 +145,28 @@ public abstract class AbstractClusterCommand extends Command {
     return controller;
   }
 
+  /**
+   * Create the cluster state store object
+   */
   protected ClusterStateStore createClusterStateStore(ClusterSpec spec) {
     return stateStoreFactory.create(spec);
   }
 
+  /**
+   * Print command execution error and a hint to help the user get more help
+   */
+  protected void printErrorAndHelpHint(PrintStream stream, Throwable e) {
+    stream.println(e.getMessage());
+    stream.println("Help: whirr help " + getName());
+  }
+
+  /**
+   * Print a generic usage indication for commands
+   */
+  @Override
+  public void printUsage(PrintStream stream) throws IOException {
+    stream.println("Usage: whirr " + getName() + " [OPTIONS]");
+    stream.println();
+    parser.printHelpOn(stream);
+  }
 }

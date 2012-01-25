@@ -18,7 +18,6 @@
 
 package org.apache.whirr.cli.command;
 
-import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import org.apache.whirr.ClusterController;
 import org.apache.whirr.ClusterControllerFactory;
@@ -54,11 +53,11 @@ public class CleanupClusterCommand extends AbstractClusterCommand {
       List<String> args) throws Exception {
     
     OptionSet optionSet = parser.parse(args.toArray(new String[0]));
-
     if (!optionSet.nonOptionArguments().isEmpty()) {
-      printUsage(parser, err);
+      printUsage(err);
       return -1;
     }
+
     try {
       ClusterSpec clusterSpec = getClusterSpec(optionSet);
       ClusterController controller = createClusterController(clusterSpec.getServiceName());
@@ -66,13 +65,13 @@ public class CleanupClusterCommand extends AbstractClusterCommand {
       return 0;
 
     } catch (IllegalArgumentException e) {
-      err.println(e.getMessage());
-      printUsage(parser, err);
+      printErrorAndHelpHint(err, e);
       return -1;
     }
   }
 
-  private void printUsage(OptionParser parser, PrintStream stream) throws IOException {
+  @Override
+  public void printUsage(PrintStream stream) throws IOException {
     stream.println("Usage: whirr cleanup-cluster [OPTIONS]");
     stream.println();
     parser.printHelpOn(stream);

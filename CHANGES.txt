@@ -27,6 +27,9 @@ Trunk (unreleased changes)
 
     WHIRR-483. Upgrade to jclouds 1.3.1 (asavu)
 
+    WHIRR-479. ScriptBasedClusterAction should allow filtering by 
+    role and instance-id (asavu) 
+
   BUG FIXES
 
     WHIRR-367. Wrong groupId for zookeeper (Joe Crobak via asavu)

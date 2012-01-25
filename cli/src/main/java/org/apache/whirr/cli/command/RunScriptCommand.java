@@ -24,7 +24,6 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.common.io.Files;
-import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import joptsimple.OptionSpec;
 import org.apache.commons.lang.StringUtils;
@@ -89,13 +88,13 @@ public class RunScriptCommand extends AbstractClusterCommand {
     OptionSet optionSet = parser.parse(args.toArray(new String[0]));
     if (!optionSet.has(scriptOption)) {
       err.println("Please specify a script file to be executed.");
-      printUsage(parser, err);
+      err.println("Get more help: whirr help " + getName());
       return -1;
     }
 
     if (!(new File(optionSet.valueOf(scriptOption))).exists()) {
       err.printf("Script file '%s' not found.", optionSet.valueOf(scriptOption));
-      printUsage(parser, err);
+      err.println("Get more help: whirr help " + getName());
       return -2;
     }
 
@@ -109,8 +108,7 @@ public class RunScriptCommand extends AbstractClusterCommand {
         spec, condition, execFile(optionSet.valueOf(scriptOption))));
 
     } catch(IllegalArgumentException e) {
-      err.println(e.getMessage());
-      printUsage(parser, err);
+      printErrorAndHelpHint(err, e);
       return -3;
     }
   }
@@ -168,8 +166,8 @@ public class RunScriptCommand extends AbstractClusterCommand {
       "\n");
   }
 
-  private void printUsage(OptionParser parser,
-                          PrintStream stream) throws IOException {
+  @Override
+  public void printUsage(PrintStream stream) throws IOException {
     stream.println("Usage: whirr run-script [OPTIONS] --script <script> " +
       "[--instances id1,id2] [--roles role1,role2]");
     stream.println();

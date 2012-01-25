@@ -18,28 +18,17 @@
 
 package org.apache.whirr.service;
 
-import static com.google.common.collect.Iterables.concat;
-import static com.google.common.collect.Iterables.contains;
-import static com.google.common.collect.Iterables.find;
-import static com.google.common.collect.Multimaps.synchronizedListMultimap;
-import static com.google.common.io.ByteStreams.newInputStreamSupplier;
-import static com.google.inject.matcher.Matchers.identicalTo;
-import static com.google.inject.matcher.Matchers.returns;
-import static com.google.inject.matcher.Matchers.subclassesOf;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.atomic.AtomicInteger;
-
-import javax.annotation.Nullable;
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
+import com.google.common.base.Function;
+import com.google.common.base.Objects;
+import com.google.common.base.Predicate;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableListMultimap;
+import com.google.common.collect.LinkedListMultimap;
+import com.google.common.collect.ListMultimap;
+import com.google.common.collect.MapMaker;
+import com.google.common.collect.Maps;
+import com.google.common.io.InputSupplier;
+import com.google.inject.AbstractModule;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.jclouds.compute.callables.RunScriptOnNode;
@@ -56,17 +45,26 @@ import org.jclouds.ssh.SshClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Function;
-import com.google.common.base.Objects;
-import com.google.common.base.Predicate;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableListMultimap;
-import com.google.common.collect.LinkedListMultimap;
-import com.google.common.collect.ListMultimap;
-import com.google.common.collect.MapMaker;
-import com.google.common.collect.Maps;
-import com.google.common.io.InputSupplier;
-import com.google.inject.AbstractModule;
+import javax.annotation.Nullable;
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import static com.google.common.collect.Iterables.concat;
+import static com.google.common.collect.Iterables.contains;
+import static com.google.common.collect.Iterables.find;
+import static com.google.common.collect.Multimaps.synchronizedListMultimap;
+import static com.google.common.io.ByteStreams.newInputStreamSupplier;
+import static com.google.inject.matcher.Matchers.identicalTo;
+import static com.google.inject.matcher.Matchers.returns;
+import static com.google.inject.matcher.Matchers.subclassesOf;
 
 /**
  * Outputs orchestration jclouds does to INFO logging and saves an ordered list
@@ -105,6 +103,7 @@ public class DryRunModule extends AbstractModule {
 
   public static void resetDryRun() {
     DryRun.INSTANCE.executedScripts.clear();
+    DryRun.INSTANCE.totallyOrderedScripts.clear();
   }
 
   // enum singleton pattern

@@ -18,27 +18,16 @@
 
 package org.apache.whirr.cli.command;
 
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertThat;
 
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
 import java.util.Collections;
 
-import org.junit.Before;
 import org.junit.Test;
 
-public class VersionCommandTest {
-
-  private ByteArrayOutputStream outBytes;
-  private PrintStream out;
-
-  @Before
-  public void setUp() {
-    outBytes = new ByteArrayOutputStream();
-    out = new PrintStream(outBytes);
-  }
+public class VersionCommandTest extends BaseCommandTest{
 
   @Test
   public void testOverrides() throws Exception {
@@ -46,6 +35,7 @@ public class VersionCommandTest {
     int rc = command.run(null, out, null, Collections.<String>emptyList());
     assertThat(rc, is(0));
     assertThat(outBytes.toString(), startsWith("Apache Whirr "));
+    assertThat(outBytes.toString(), containsString("jclouds"));
   }
   
 }

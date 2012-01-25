@@ -26,18 +26,29 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Map;
+import java.util.Set;
 
 /**
  * A {@link ClusterAction} for stopping the cluster services
  */
-public class StopClusterAction extends ScriptBasedClusterAction {
+public class StopServicesAction extends ScriptBasedClusterAction {
 
-  private static final Logger LOG = LoggerFactory.getLogger(StopClusterAction.class);
+  private static final Logger LOG = LoggerFactory.getLogger(StopServicesAction.class);
 
-  public StopClusterAction(
-    final Function<ClusterSpec, ComputeServiceContext> getCompute,
-    final Map<String, ClusterActionHandler> handlerMap) {
+  public StopServicesAction(
+      Function<ClusterSpec, ComputeServiceContext> getCompute,
+      Map<String, ClusterActionHandler> handlerMap
+  ) {
     super(getCompute, handlerMap);
+  }
+
+  public StopServicesAction(
+      Function<ClusterSpec, ComputeServiceContext> getCompute,
+      Map<String, ClusterActionHandler> handlerMap,
+      Set<String> targetRoles,
+      Set<String> targetInstanceIds
+  ) {
+    super(getCompute, handlerMap, targetRoles, targetInstanceIds);
   }
 
   @Override

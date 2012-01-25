@@ -23,7 +23,6 @@ import java.io.InputStream;
 import java.io.PrintStream;
 import java.util.List;
 
-import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 
 import org.apache.whirr.ClusterController;
@@ -51,7 +50,7 @@ public class DestroyClusterCommand extends AbstractClusterCommand {
     OptionSet optionSet = parser.parse(args.toArray(new String[0]));
 
     if (!optionSet.nonOptionArguments().isEmpty()) {
-      printUsage(parser, err);
+      printUsage(err);
       return -1;
     }
     try {
@@ -61,15 +60,9 @@ public class DestroyClusterCommand extends AbstractClusterCommand {
       controller.destroyCluster(clusterSpec);
       return 0;
     } catch (IllegalArgumentException e) {
-      err.println(e.getMessage());
-      printUsage(parser, err);
+      printErrorAndHelpHint(err, e);
       return -1;
     }
   }
 
-  private void printUsage(OptionParser parser, PrintStream stream) throws IOException {
-    stream.println("Usage: whirr destroy-cluster [OPTIONS]");
-    stream.println();
-    parser.printHelpOn(stream);
-  }
 }

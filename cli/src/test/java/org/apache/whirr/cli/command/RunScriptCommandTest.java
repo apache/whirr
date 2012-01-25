@@ -33,13 +33,10 @@ import org.apache.whirr.util.KeyPair;
 import org.jclouds.compute.domain.NodeMetadata;
 import org.jclouds.domain.Credentials;
 import org.jclouds.scriptbuilder.domain.Statement;
-import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.PrintStream;
 import java.util.Map;
 import java.util.Set;
 
@@ -53,22 +50,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public class RunScriptCommandTest {
-
-  private ByteArrayOutputStream outBytes;
-  private PrintStream out;
-
-  private ByteArrayOutputStream errBytes;
-  private PrintStream err;
-
-  @Before
-  public void setUp() {
-    outBytes = new ByteArrayOutputStream();
-    out = new PrintStream(outBytes);
-
-    errBytes = new ByteArrayOutputStream();
-    err = new PrintStream(errBytes);
-  }
+public class RunScriptCommandTest extends BaseCommandTest {
 
   @Test
   public void testScriptPathIsMandatory() throws Exception {

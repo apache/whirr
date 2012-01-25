@@ -18,7 +18,6 @@
 
 package org.apache.whirr.cli;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.apache.whirr.command.Command;
@@ -33,6 +32,8 @@ import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.SortedSet;
 
+import static com.google.common.collect.Lists.newArrayList;
+
 /**
  * The entry point for the Whirr CLI.
  */
@@ -42,6 +43,10 @@ public class Main {
   private int maxLen = 0;
   
   Main(Command... commands) throws IOException {
+    this(newArrayList(commands));
+  }
+  
+  Main(Iterable<Command> commands) throws IOException {
     for (Command command : commands) {
       commandMap.put(command.getName(), command);
       maxLen = Math.max(maxLen, command.getName().length());
@@ -92,7 +97,7 @@ public class Main {
 
   public static void main(String... args) throws Exception {
     ServiceLoader<Command> loader = ServiceLoader.load(Command.class);
-    Main main = new Main(Lists.newArrayList(loader).toArray(new Command[0]));
+    Main main = new Main(loader);
 
     int rc = main.run(System.in, System.out, System.err, Arrays.asList(args));
     System.exit(rc);

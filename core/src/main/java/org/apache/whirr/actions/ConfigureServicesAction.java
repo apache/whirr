@@ -18,11 +18,9 @@
 
 package org.apache.whirr.actions;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
+import com.google.common.base.Function;
+import com.google.common.collect.Collections2;
+import com.google.common.primitives.Ints;
 import org.apache.whirr.ClusterSpec;
 import org.apache.whirr.InstanceTemplate;
 import org.apache.whirr.RolePredicates;
@@ -31,22 +29,35 @@ import org.apache.whirr.service.ClusterActionHandler;
 import org.apache.whirr.service.FirewallManager.Rule;
 import org.jclouds.compute.ComputeServiceContext;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Collections2;
-import com.google.common.primitives.Ints;
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 
 /**
  * A {@link org.apache.whirr.ClusterAction} for running a configuration script on instances
  * in the cluster after it has been bootstrapped.
  */
-public class ConfigureClusterAction extends ScriptBasedClusterAction {
+public class ConfigureServicesAction extends ScriptBasedClusterAction {
 
-  public ConfigureClusterAction(Function<ClusterSpec, ComputeServiceContext> getCompute,
-      Map<String, ClusterActionHandler> handlerMap) {
+  public ConfigureServicesAction(
+      Function<ClusterSpec, ComputeServiceContext> getCompute,
+      Map<String, ClusterActionHandler> handlerMap
+  ) {
     super(getCompute, handlerMap);
   }
-  
+
+  public ConfigureServicesAction(
+      Function<ClusterSpec, ComputeServiceContext> getCompute,
+      Map<String, ClusterActionHandler> handlerMap,
+      Set<String> targetRoles,
+      Set<String> targetInstanceIds
+  ) {
+    super(getCompute, handlerMap, targetRoles, targetInstanceIds);
+  }
+
   @Override
   protected String getAction() {
     return ClusterActionHandler.CONFIGURE_ACTION;
@@ -62,6 +73,9 @@ public class ConfigureClusterAction extends ScriptBasedClusterAction {
     
     Map<String, List<String>> firewallRules = clusterSpec.getFirewallRules();
     for (String role: firewallRules.keySet()) {
+      if (!roleIsInTarget(role)) {
+        continue;   // skip execution for this role
+      }
       Rule rule = Rule.create();
       
       if (role == null) {

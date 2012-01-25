@@ -10,6 +10,7 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 org.apache.whirr.service.NoopClusterActionHandler
+org.apache.whirr.actions.ScriptBasedClusterActionTest$Noop1ClusterActionHandler
 org.apache.whirr.service.DryRunModuleTest$Noop2ClusterActionHandler
 org.apache.whirr.service.DryRunModuleTest$Noop3ClusterActionHandler
 org.apache.whirr.actions.integration.PhaseExecutionBarrierTest$PhaseBarrierTestActionHandler

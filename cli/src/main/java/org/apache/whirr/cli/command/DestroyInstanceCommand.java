@@ -23,7 +23,6 @@ import java.io.InputStream;
 import java.io.PrintStream;
 import java.util.List;
 
-import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import joptsimple.OptionSpec;
 
@@ -57,12 +56,12 @@ public class DestroyInstanceCommand extends AbstractClusterCommand {
 
     OptionSet optionSet = parser.parse(args.toArray(new String[0]));
     if (!optionSet.nonOptionArguments().isEmpty()) {
-      printUsage(parser, err);
+      printUsage(err);
       return -1;
     }
     try {
       if (!optionSet.hasArgument(instanceOption)) {
-        throw new IllegalArgumentException("You need to specify an instance ID.");
+        throw new IllegalArgumentException("--instance-id is a mandatory argument");
       }
       ClusterSpec clusterSpec = getClusterSpec(optionSet);
       ClusterController controller = createClusterController(clusterSpec.getServiceName());
@@ -73,13 +72,13 @@ public class DestroyInstanceCommand extends AbstractClusterCommand {
       return 0;
 
     } catch(IllegalArgumentException e) {
-      err.println(e.getMessage());
-      printUsage(parser, err);
+      printErrorAndHelpHint(err, e);
       return -1;
     }
   }
 
-  private void printUsage(OptionParser parser, PrintStream stream) throws IOException {
+  @Override
+  public void printUsage(PrintStream stream) throws IOException {
     stream.println("Usage: whirr destroy-instance --instance-id <region/ID> [OPTIONS]");
     stream.println();
     parser.printHelpOn(stream);

@@ -59,8 +59,9 @@ public class ListProvidersCommand extends AbstractClusterCommand {
     return 0;
   }
 
-  private void printUsage(PrintStream out) {
-    out.println("whirr list-providers <compute OR blobstore>");
+  @Override
+  public void printUsage(PrintStream out) {
+    out.println("Usage: whirr list-providers <compute OR blobstore>");
   }
 
   private void listBlobstoreProviders(PrintStream out) {

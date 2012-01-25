@@ -18,6 +18,7 @@
 
 package org.apache.whirr.cli.command;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.util.List;
@@ -43,6 +44,10 @@ public class VersionCommand extends Command {
     out.write(IOUtils.toByteArray(input));
     out.println("jclouds " + JcloudsVersion.get().toString());
     return 0;
+  }
+
+  @Override
+  public void printUsage(PrintStream stream) throws IOException {
   }
 
 }

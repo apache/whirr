@@ -19,6 +19,7 @@
 package org.apache.whirr.cli.command;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
@@ -29,9 +30,7 @@ import static org.mockito.Mockito.when;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.PrintStream;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
@@ -44,42 +43,22 @@ import org.apache.whirr.state.ClusterStateStore;
 import org.apache.whirr.state.ClusterStateStoreFactory;
 import org.apache.whirr.state.MemoryClusterStateStore;
 import org.apache.whirr.util.KeyPair;
-import org.hamcrest.Matcher;
 import org.jclouds.compute.domain.NodeMetadata;
 import org.jclouds.compute.domain.NodeMetadataBuilder;
 import org.jclouds.compute.domain.NodeState;
 import org.jclouds.domain.Credentials;
 import org.jclouds.domain.LocationBuilder;
 import org.jclouds.domain.LocationScope;
-import org.junit.Before;
 import org.junit.Test;
-import org.junit.internal.matchers.StringContains;
 
-public class ListClusterCommandTest {
-
-  private ByteArrayOutputStream outBytes;
-  private PrintStream out;
-  private ByteArrayOutputStream errBytes;
-  private PrintStream err;
-
-  @Before
-  public void setUp() {
-    outBytes = new ByteArrayOutputStream();
-    out = new PrintStream(outBytes);
-    errBytes = new ByteArrayOutputStream();
-    err = new PrintStream(errBytes);
-  }
+public class ListClusterCommandTest extends BaseCommandTest {
 
   @Test
   public void testInsufficientOptions() throws Exception {
     ListClusterCommand command = new ListClusterCommand();
     int rc = command.run(null, null, err, Collections.<String>emptyList());
     assertThat(rc, is(-1));
-    assertThat(errBytes.toString(), containsUsageString());
-  }
-
-  private Matcher<String> containsUsageString() {
-    return StringContains.containsString("Usage: whirr list-cluster [OPTIONS]");
+    assertThat(errBytes.toString(), containsString("Option 'cluster-name' not set."));
   }
 
   @Test

@@ -18,6 +18,20 @@
 
 package org.apache.whirr.cli.command;
 
+import com.google.common.collect.Lists;
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration.PropertiesConfiguration;
+import org.apache.whirr.ClusterController;
+import org.apache.whirr.ClusterControllerFactory;
+import org.apache.whirr.ClusterSpec;
+import org.apache.whirr.util.KeyPair;
+import org.junit.Test;
+
+import java.io.File;
+import java.util.Collections;
+import java.util.Map;
+
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
@@ -25,50 +39,14 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.google.common.collect.Lists;
+public class DestroyClusterCommandTest extends BaseCommandTest {
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.PrintStream;
-import java.util.Collections;
-import java.util.Map;
-
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.configuration.PropertiesConfiguration;
-import org.apache.whirr.ClusterController;
-import org.apache.whirr.ClusterControllerFactory;
-import org.apache.whirr.ClusterSpec;
-import org.apache.whirr.util.KeyPair;
-import org.hamcrest.Matcher;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.internal.matchers.StringContains;
-
-public class DestroyClusterCommandTest {
-
-  private ByteArrayOutputStream outBytes;
-  private PrintStream out;
-  private ByteArrayOutputStream errBytes;
-  private PrintStream err;
-
-  @Before
-  public void setUp() {
-    outBytes = new ByteArrayOutputStream();
-    out = new PrintStream(outBytes);
-    errBytes = new ByteArrayOutputStream();
-    err = new PrintStream(errBytes);
-  }
-  
   @Test
   public void testInsufficientOptions() throws Exception {
     DestroyClusterCommand command = new DestroyClusterCommand();
     int rc = command.run(null, null, err, Collections.<String>emptyList());
     assertThat(rc, is(-1));
-    assertThat(errBytes.toString(), containsUsageString());
-  }
-  
-  private Matcher<String> containsUsageString() {
-    return StringContains.containsString("Usage: whirr destroy-cluster [OPTIONS]");
+    assertThat(errBytes.toString(), containsString("Option 'cluster-name' not set"));
   }
   
   @Test

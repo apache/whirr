@@ -26,18 +26,29 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Map;
+import java.util.Set;
 
 /**
  * A {@link ClusterAction} for starting the cluster services
  */
-public class StartClusterAction extends ScriptBasedClusterAction {
+public class StartServicesAction extends ScriptBasedClusterAction {
 
-  private static final Logger LOG = LoggerFactory.getLogger(StartClusterAction.class);
+  private static final Logger LOG = LoggerFactory.getLogger(StartServicesAction.class);
 
-  public StartClusterAction(
-    final Function<ClusterSpec, ComputeServiceContext> getCompute,
-    final Map<String, ClusterActionHandler> handlerMap) {
+  public StartServicesAction(
+      Function<ClusterSpec, ComputeServiceContext> getCompute,
+      Map<String, ClusterActionHandler> handlerMap
+  ) {
     super(getCompute, handlerMap);
+  }
+
+  public StartServicesAction(
+      Function<ClusterSpec, ComputeServiceContext> getCompute,
+      Map<String, ClusterActionHandler> handlerMap,
+      Set<String> targetRoles,
+      Set<String> targetInstanceIds
+  ) {
+    super(getCompute, handlerMap, targetRoles, targetInstanceIds);
   }
 
   @Override

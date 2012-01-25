@@ -28,6 +28,7 @@ import static org.mockito.Mockito.when;
 import com.google.common.collect.Lists;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.util.Collections;
@@ -47,6 +48,10 @@ public class MainTest {
     public int run(InputStream in, PrintStream out, PrintStream err,
         List<String> args) throws Exception {
       return 0;
+    }
+
+    @Override
+    public void printUsage(PrintStream stream) throws IOException {
     }
   }
   
