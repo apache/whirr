@@ -18,19 +18,11 @@
 
 package org.apache.whirr.service.hadoop;
 
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Iterators;
 import com.google.common.collect.ImmutableSet.Builder;
-
-import java.util.List;
-
+import com.google.common.collect.Iterators;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.whirr.Cluster;
@@ -48,6 +40,13 @@ import org.jclouds.compute.domain.internal.HardwareImpl;
 import org.jclouds.domain.Credentials;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.util.List;
+
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class HadoopConfigurationBuilderTest {
 
@@ -158,6 +157,16 @@ public class HadoopConfigurationBuilderTest {
     assertThat(conf.getString("mapred.tasktracker.map.tasks.maximum"), is("4"));
     assertThat(conf.getString("mapred.tasktracker.reduce.tasks.maximum"), is("3"));
     assertThat(conf.getString("mapred.reduce.tasks"), is("15"));
+  }
+
+  @Test
+  public void testOverridesNumberOfMappers() throws Exception {
+    Configuration overrides = new PropertiesConfiguration();
+    overrides.addProperty("hadoop-mapreduce.mapred.tasktracker.map.tasks.maximum", "70");
+    clusterSpec = ClusterSpec.withNoDefaults(overrides);
+    Configuration conf = HadoopConfigurationBuilder.buildMapReduceConfiguration(
+        clusterSpec, cluster, defaults);
+    assertThat(conf.getString("mapred.tasktracker.map.tasks.maximum"), is("70"));
   }
   
   @Test

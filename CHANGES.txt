@@ -34,6 +34,8 @@ Trunk (unreleased changes)
 
     WHIRR-497. Update maven plugins & project deps (asavu)
 
+    WHIRR-493. Test override number of mappers for Hadoop (asavu)
+
   BUG FIXES
 
     WHIRR-367. Wrong groupId for zookeeper (Joe Crobak via asavu)
