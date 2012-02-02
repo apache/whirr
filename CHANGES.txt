@@ -32,6 +32,8 @@ Trunk (unreleased changes)
 
     WHIRR-484. Add restart-services command (asavu)
 
+    WHIRR-497. Update maven plugins & project deps (asavu)
+
   BUG FIXES
 
     WHIRR-367. Wrong groupId for zookeeper (Joe Crobak via asavu)
