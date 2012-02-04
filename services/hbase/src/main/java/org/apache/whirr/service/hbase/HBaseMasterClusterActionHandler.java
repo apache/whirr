@@ -62,10 +62,11 @@ public class HBaseMasterClusterActionHandler extends HBaseClusterActionHandler {
   @Override
   protected void beforeBootstrap(ClusterActionEvent event) throws IOException {
     ClusterSpec clusterSpec = event.getClusterSpec();    
+    Configuration conf = getConfiguration(clusterSpec);
 
     addStatement(event, call("configure_hostnames"));
 
-    addStatement(event, call("install_java"));
+    addStatement(event, call(getInstallFunction(conf, "java", "install_java")));
     addStatement(event, call("install_tarball"));
 
     String tarurl = prepareRemoteFileUrl(event,

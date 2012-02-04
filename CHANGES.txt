@@ -36,6 +36,9 @@ Trunk (unreleased changes)
 
     WHIRR-493. Test override number of mappers for Hadoop (asavu)
 
+    WHIRR-454. Allow openjdk to be installed as an alternative 
+    to sun-java-6 (Karel Vervaeke via asavu)
+
   BUG FIXES
 
     WHIRR-367. Wrong groupId for zookeeper (Joe Crobak via asavu)

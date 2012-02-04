@@ -22,6 +22,8 @@ import static org.apache.whirr.RolePredicates.role;
 import static org.apache.whirr.service.FirewallManager.Rule;
 import static org.jclouds.scriptbuilder.domain.Statements.call;
 
+import org.apache.commons.configuration.Configuration;
+
 import java.io.IOException;
 import java.net.InetAddress;
 
@@ -53,16 +55,17 @@ public class BasicServerClusterActionHandler extends HBaseClusterActionHandler {
   @Override
   protected void beforeBootstrap(ClusterActionEvent event) throws IOException {
     ClusterSpec clusterSpec = event.getClusterSpec();
+    Configuration conf = getConfiguration(clusterSpec);
 
     addStatement(event, call("configure_hostnames"));
-    addStatement(event, call("install_java"));
+    addStatement(event, call(getInstallFunction(conf, "java", "install_java")));
     addStatement(event, call("install_tarball"));
 
     String tarurl = prepareRemoteFileUrl(event,
-      getConfiguration(clusterSpec).getString(HBaseConstants.KEY_TARBALL_URL));
+      conf.getString(HBaseConstants.KEY_TARBALL_URL));
 
     addStatement(event, call(
-      getInstallFunction(getConfiguration(clusterSpec)),
+      getInstallFunction(conf),
       HBaseConstants.PARAM_TARBALL_URL, tarurl)
     );
   }

@@ -22,6 +22,8 @@ import static org.apache.whirr.RolePredicates.role;
 import static org.apache.whirr.service.FirewallManager.Rule;
 import static org.jclouds.scriptbuilder.domain.Statements.call;
 
+import org.apache.whirr.ClusterSpec;
+
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
@@ -55,13 +57,16 @@ public class CassandraClusterActionHandler extends ClusterActionHandlerSupport {
 
   @Override
   protected void beforeBootstrap(ClusterActionEvent event) throws IOException {
-    addStatement(event, call("install_java"));
+    ClusterSpec clusterSpec = event.getClusterSpec();
+    Configuration conf = clusterSpec.getConfiguration();
+    
+    addStatement(event, call(getInstallFunction(conf, "java", "install_java")));
     addStatement(event, call("install_tarball"));
 
     addStatement(event, call("install_service"));
     addStatement(event, call("remove_service"));
 
-    Configuration config = event.getClusterSpec().getConfiguration();
+    Configuration config = clusterSpec.getConfiguration();
 
     String tarball = prepareRemoteFileUrl(event, config.getString(BIN_TARBALL, null));
     String major = config.getString(MAJOR_VERSION, null);
