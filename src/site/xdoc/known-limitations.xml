@@ -25,8 +25,7 @@ xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 http://maven.apache.org/xsd
     limitations that you should be aware of. The following issues are known to exist in the 0.6.0 release of Whirr.</p>
 
     <ul>
-      <li>The Hadoop namenode and the jobtracker must share the same machine. <a href="https://issues.apache.org/jira/browse/WHIRR-337">WHIRR-337</a></li>
-      <li>The HBase thrift server can only run on a machine that it's also running a different HBase role like hbase-master or hbase-regionserver. <a href="https://issues.apache.org/jira/browse/WHIRR-342">WHIRR-342</a></li>
+      <li>The order of the roles is significant. (e.g. hadoop-jobtracker+hadoop-namenode will try to start the jobtracker before starting the namenode)</li>
       <li>The "jclouds.aws-s3.endpoint" property is needed in order to use BlobCache with Amazon AWS in a region besides us-east-1. See <a href="https://issues.apache.org/jira/browse/WHIRR-349#comment-13084590">WHIRR-349</a> for more details</li>
     </ul>
 

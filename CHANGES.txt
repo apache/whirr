@@ -41,6 +41,8 @@ Trunk (unreleased changes)
 
     WHIRR-439. Make proxy files executable (Marco Didonna via asavu)
 
+    WHIRR-498. Update the list of known limitations (asavu)
+
   BUG FIXES
 
     WHIRR-367. Wrong groupId for zookeeper (Joe Crobak via asavu)
