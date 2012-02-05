@@ -56,6 +56,9 @@ Trunk (unreleased changes)
     WHIRR-495. bin/whirr is does not have executable permissions 
     in the 0.7.0 pre-built download (asavu)
 
+    WHIRR-496. Documentation in 5-Minute guide is missing key 
+    option for destroy step (asavu)  
+
 Release 0.7.0 - 2011-12-11
 
   NEW FEATURES

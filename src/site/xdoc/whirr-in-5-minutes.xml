@@ -40,7 +40,7 @@ echo "ruok" | nc $(awk '{print $3}' ~/.whirr/zookeeper/instances | head -1) 2181
     <p>Upon success you should see 
     <tt>imok</tt>echoed to the console, indicating that ZooKeeper is running.</p>
     <p>You can shut down the cluster with</p>
-    <source>bin/whirr destroy-cluster --config recipes/zookeeper-ec2.properties</source>
+    <source>bin/whirr destroy-cluster --config recipes/zookeeper-ec2.properties --private-key-file ~/.ssh/id_rsa_whirr</source>
     <p>The various options are explained in more detail in the 
     <a href="quick-start-guide.html">Quick Start Guide</a>.</p>
   </body>
