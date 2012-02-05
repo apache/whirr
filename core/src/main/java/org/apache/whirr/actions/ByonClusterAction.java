@@ -19,12 +19,16 @@
 package org.apache.whirr.actions;
 
 import com.google.common.base.Function;
+import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -35,7 +39,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-
+import org.apache.commons.lang.StringUtils;
 import org.apache.whirr.Cluster;
 import org.apache.whirr.Cluster.Instance;
 import org.apache.whirr.ClusterSpec;
@@ -80,6 +84,7 @@ public class ByonClusterAction extends ScriptBasedClusterAction {
     Set<Future<Void>> futures = Sets.newHashSet();
 
     List<NodeMetadata> nodes = Lists.newArrayList();
+    List<NodeMetadata> usedNodes = Lists.newArrayList();
     int numberAllocated = 0;
     Set<Instance> allInstances = Sets.newLinkedHashSet();
 
@@ -106,9 +111,16 @@ public class ByonClusterAction extends ScriptBasedClusterAction {
       }
 
       int num = entry.getKey().getNumberOfInstances();
-      final List<NodeMetadata> templateNodes =
-        nodes.subList(numberAllocated, numberAllocated + num);
-      numberAllocated += num;
+      Predicate<NodeMetadata> unused = Predicates.not(Predicates.in(usedNodes));
+      Predicate<NodeMetadata> instancePredicate = new TagsPredicate(StringUtils.split(entry.getKey().getHardwareId()));      
+
+      List<NodeMetadata> templateNodes = new ArrayList(Collections2.filter(nodes, Predicates.and(unused, instancePredicate)));
+      if (templateNodes.size() < num) {
+        LOG.warn("Not enough nodes available for template " + StringUtils.join(entry.getKey().getRoles(), "+"));
+      }
+      templateNodes = templateNodes.subList(0, num);
+      usedNodes.addAll(templateNodes);
+      numberAllocated = usedNodes.size() ;
       
       final Set<Instance> templateInstances = getInstances(
           credentials, entry.getKey().getRoles(), templateNodes
@@ -167,4 +179,21 @@ public class ByonClusterAction extends ScriptBasedClusterAction {
     ));
   }
   
+  private static class TagsPredicate implements Predicate<NodeMetadata>{
+    private String[] tags;
+
+    public TagsPredicate(String[] tags) {
+      this.tags = tags;
+    }
+
+    @Override
+    public boolean apply(NodeMetadata node) {
+      if (tags == null) {
+        return true;
+      } else {
+        return node.getTags().containsAll(Arrays.asList(tags));
+      }
+    }
+
+  }
 }

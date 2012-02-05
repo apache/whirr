@@ -2,6 +2,11 @@ Apache Whirr Change Log
 
 Trunk (unreleased changes)
 
+  NEW FEATURES
+
+    WHIRR-500. Let users control which hardware is used for each 
+    instance template (Karel Vervaeke via asavu)
+
   IMPROVEMENTS
 
     WHIRR-421. Handle more role / service lifecycle events as part 
