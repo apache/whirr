@@ -39,6 +39,8 @@ Trunk (unreleased changes)
     WHIRR-454. Allow openjdk to be installed as an alternative 
     to sun-java-6 (Karel Vervaeke via asavu)
 
+    WHIRR-439. Make proxy files executable (Marco Didonna via asavu)
+
   BUG FIXES
 
     WHIRR-367. Wrong groupId for zookeeper (Joe Crobak via asavu)
