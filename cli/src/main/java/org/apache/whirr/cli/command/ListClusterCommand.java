@@ -19,14 +19,7 @@
 package org.apache.whirr.cli.command;
 
 import com.google.common.base.Joiner;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PrintStream;
-import java.util.List;
-
 import joptsimple.OptionSet;
-
 import org.apache.whirr.Cluster;
 import org.apache.whirr.ClusterController;
 import org.apache.whirr.ClusterControllerFactory;
@@ -34,6 +27,11 @@ import org.apache.whirr.ClusterSpec;
 import org.apache.whirr.command.AbstractClusterCommand;
 import org.apache.whirr.state.ClusterStateStore;
 import org.apache.whirr.state.ClusterStateStoreFactory;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintStream;
+import java.util.List;
 
 /**
  * A command to list the nodes in a cluster.
@@ -52,11 +50,11 @@ public class ListClusterCommand extends AbstractClusterCommand {
                             ClusterStateStoreFactory stateStoreFactory) {
     super("list-cluster", "List the nodes in a cluster.", factory, stateStoreFactory);
   }
-  
+
   @Override
   public int run(InputStream in, PrintStream out, PrintStream err,
-      List<String> args) throws Exception {
-    
+                 List<String> args) throws Exception {
+
     OptionSet optionSet = parser.parse(args.toArray(new String[args.size()]));
 
     if (!optionSet.nonOptionArguments().isEmpty()) {
@@ -65,25 +63,30 @@ public class ListClusterCommand extends AbstractClusterCommand {
     }
     try {
       ClusterSpec clusterSpec = getClusterSpec(optionSet);
-      ClusterStateStore stateStore = createClusterStateStore(clusterSpec);
-      ClusterController controller = createClusterController(clusterSpec.getServiceName());
+      return run(in, out, err, clusterSpec);
 
-      for (Cluster.Instance instance : controller.getInstances(clusterSpec, stateStore)) {
-        out.println(Joiner.on('\t').useForNull("-").join(
-            instance.getId(),
-            instance.getNodeMetadata().getImageId(),
-            instance.getPublicIp(),
-            instance.getPrivateIp(),
-            instance.getNodeMetadata().getState(),
-            instance.getNodeMetadata().getLocation().getId(),
-            Joiner.on(",").join(instance.getRoles())
-          )
-        );
-      }
-      return 0;
     } catch (IllegalArgumentException e) {
       printErrorAndHelpHint(err, e);
       return -1;
     }
+  }
+
+  public int run(InputStream in, PrintStream out, PrintStream err, ClusterSpec clusterSpec) throws Exception {
+    ClusterStateStore stateStore = createClusterStateStore(clusterSpec);
+    ClusterController controller = createClusterController(clusterSpec.getServiceName());
+
+    for (Cluster.Instance instance : controller.getInstances(clusterSpec, stateStore)) {
+      out.println(Joiner.on('\t').useForNull("-").join(
+        instance.getId(),
+        instance.getNodeMetadata().getImageId(),
+        instance.getPublicIp(),
+        instance.getPrivateIp(),
+        instance.getNodeMetadata().getState(),
+        instance.getNodeMetadata().getLocation().getId(),
+        Joiner.on(",").join(instance.getRoles())
+      )
+      );
+    }
+    return 0;
   }
 }

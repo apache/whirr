@@ -76,7 +76,7 @@ public class RunScriptCommand extends AbstractClusterCommand {
   }
 
   public RunScriptCommand(ClusterControllerFactory factory,
-      ClusterStateStoreFactory stateStoreFactory) {
+                          ClusterStateStoreFactory stateStoreFactory) {
     super("run-script", "Run a script on a specific instance or a " +
       "group of instances matching a role name", factory, stateStoreFactory);
   }
@@ -97,46 +97,57 @@ public class RunScriptCommand extends AbstractClusterCommand {
       err.println("Get more help: whirr help " + getName());
       return -2;
     }
-
     try {
-      ClusterSpec spec = getClusterSpec(optionSet);
-      ClusterController controller = createClusterController(spec.getServiceName());
+      ClusterSpec clusterSpec = getClusterSpec(optionSet);
+      String[] ids = null;
+      String[] roles = null;
+      if (optionSet.has(instancesOption)) {
+        ids = optionSet.valueOf(instancesOption).split(",");
+      }
+      if (optionSet.has(rolesOption)) {
+        roles = optionSet.valueOf(rolesOption).split(",");
+      }
+      return run(in, out, err, clusterSpec, ids, roles, optionSet.valueOf(scriptOption));
 
-      Predicate<NodeMetadata> condition = buildFilterPredicate(optionSet, spec);
-
-      return handleScriptOutput(out, err, controller.runScriptOnNodesMatching(
-        spec, condition, execFile(optionSet.valueOf(scriptOption))));
-
-    } catch(IllegalArgumentException e) {
+    } catch (IllegalArgumentException e) {
       printErrorAndHelpHint(err, e);
       return -3;
     }
   }
 
-  private Predicate<NodeMetadata> buildFilterPredicate(OptionSet optionSet, ClusterSpec spec)
-      throws IOException {
+  public int run(InputStream in, PrintStream out, PrintStream err,
+                 ClusterSpec clusterSpec, String[] instances, String[] roles,
+                 String fileName) throws Exception {
+    ClusterController controller = createClusterController(clusterSpec.getServiceName());
+    Predicate<NodeMetadata> condition = buildFilterPredicate(instances, roles, clusterSpec);
+
+    return handleScriptOutput(out, err, controller.runScriptOnNodesMatching(
+      clusterSpec, condition, execFile(fileName)));
+  }
+
+  private Predicate<NodeMetadata> buildFilterPredicate(String[] ids, String[] roles, ClusterSpec spec)
+    throws IOException {
 
     Predicate<NodeMetadata> condition = Predicates.alwaysTrue();
-
-    if (optionSet.has(instancesOption)) {
-      String[] ids = optionSet.valueOf(instancesOption).split(",");
+    if (ids != null && ids.length > 0) {
       return Predicates.and(condition, withIds(ids));
-
-    } else if(optionSet.has(rolesOption)) {
-      String[] roles = optionSet.valueOf(rolesOption).split(",");
-      List<String> ids = Lists.newArrayList();
+    } else if (roles != null && roles.length > 0) {
+      List<String> instanceIds = Lists.newArrayList();
 
       Cluster cluster = createClusterStateStore(spec).load();
       for (Cluster.Instance instance : cluster.getInstancesMatching(
         anyRoleIn(Sets.<String>newHashSet(roles)))) {
-        ids.add(instance.getId());
+        instanceIds.add(instance.getId());
       }
 
       condition = Predicates.and(condition,
-        withIds(ids.toArray(new String[0])));
+        withIds(instanceIds.toArray(new String[0])));
+      return condition;
+    } else {
+      return condition;
     }
-    return condition;
   }
+
 
   private int handleScriptOutput(PrintStream out, PrintStream err,
                                  Map<? extends NodeMetadata, ExecResponse> responses) {
@@ -162,7 +173,7 @@ public class RunScriptCommand extends AbstractClusterCommand {
 
   private String getFileContent(String filePath) throws IOException {
     return StringUtils.join(Files.readLines(new File(filePath),
-        Charset.defaultCharset()),
+      Charset.defaultCharset()),
       "\n");
   }
 

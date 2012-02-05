@@ -25,9 +25,20 @@
   </parent>
   <groupId>org.apache.whirr</groupId>
   <artifactId>whirr-voldemort</artifactId>
-  <packaging>jar</packaging>
+  <packaging>bundle</packaging>
   <version>0.8.0-SNAPSHOT</version>
   <name>Apache Whirr Voldemort</name>
+  <properties>
+    <osgi.import>
+      !org.apache.whirr.service.voldemort*,
+      org.apache.commons.configuration*;version="[1.6,2)",
+      *
+    </osgi.import>
+    <osgi.export>
+      org.apache.whirr.service.voldemort*;version="${project.version}"
+    </osgi.export>
+    <osgi.fragment.host>jclouds-scriptbuilder;bundle-version="${jclouds.version}"</osgi.fragment.host>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
@@ -82,12 +93,12 @@
     <dependency>
       <groupId>com.google.protobuf</groupId>
       <artifactId>protobuf-java</artifactId>
-      <version>2.3.0</version>
+      <version>${protobuff.version}</version>
     </dependency>
     <dependency>
       <groupId>org.jdom</groupId>
       <artifactId>jdom</artifactId>
-      <version>1.1</version>
+      <version>${jdom.version}</version>
     </dependency>
  </dependencies>
   <build>

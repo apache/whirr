@@ -18,18 +18,17 @@
 
 package org.apache.whirr.cli.command;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PrintStream;
-import java.util.List;
-
 import joptsimple.OptionSet;
 import joptsimple.OptionSpec;
-
 import org.apache.whirr.ClusterController;
 import org.apache.whirr.ClusterControllerFactory;
 import org.apache.whirr.ClusterSpec;
 import org.apache.whirr.command.AbstractClusterCommand;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintStream;
+import java.util.List;
 
 /**
  * A command to destroy an instance from a cluster
@@ -37,9 +36,9 @@ import org.apache.whirr.command.AbstractClusterCommand;
 public class DestroyInstanceCommand extends AbstractClusterCommand {
 
   private OptionSpec<String> instanceOption = parser
-      .accepts("instance-id", "Cluster instance ID")
-      .withRequiredArg()
-      .ofType(String.class);
+    .accepts("instance-id", "Cluster instance ID")
+    .withRequiredArg()
+    .ofType(String.class);
 
   public DestroyInstanceCommand() throws IOException {
     this(new ClusterControllerFactory());
@@ -47,14 +46,14 @@ public class DestroyInstanceCommand extends AbstractClusterCommand {
 
   public DestroyInstanceCommand(ClusterControllerFactory factory) {
     super("destroy-instance", "Terminate and cleanup resources " +
-        "for a single instance.", factory);
+      "for a single instance.", factory);
   }
 
   @Override
   public int run(InputStream in, PrintStream out,
                  PrintStream err, List<String> args) throws Exception {
 
-    OptionSet optionSet = parser.parse(args.toArray(new String[0]));
+    OptionSet optionSet = parser.parse(args.toArray(new String[args.size()]));
     if (!optionSet.nonOptionArguments().isEmpty()) {
       printUsage(err);
       return -1;
@@ -64,18 +63,22 @@ public class DestroyInstanceCommand extends AbstractClusterCommand {
         throw new IllegalArgumentException("--instance-id is a mandatory argument");
       }
       ClusterSpec clusterSpec = getClusterSpec(optionSet);
-      ClusterController controller = createClusterController(clusterSpec.getServiceName());
-
       String instanceId = optionSet.valueOf(instanceOption);
-      controller.destroyInstance(clusterSpec, instanceId);
+      return run(in, out, err, clusterSpec, instanceId);
 
-      return 0;
-
-    } catch(IllegalArgumentException e) {
+    } catch (IllegalArgumentException e) {
       printErrorAndHelpHint(err, e);
       return -1;
     }
   }
+
+  public int run(InputStream in, PrintStream out, PrintStream err,
+                 ClusterSpec clusterSpec, String instanceId) throws Exception {
+    ClusterController controller = createClusterController(clusterSpec.getServiceName());
+    controller.destroyInstance(clusterSpec, instanceId);
+    return 0;
+  }
+
 
   @Override
   public void printUsage(PrintStream stream) throws IOException {

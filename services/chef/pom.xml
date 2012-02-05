@@ -24,8 +24,19 @@
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <artifactId>whirr-chef</artifactId>
-  <packaging>jar</packaging>
+  <packaging>bundle</packaging>
   <name>Apache Whirr Chef</name>
+  <properties>
+    <osgi.import>
+      !org.apache.whirr.service.chef*,
+      org.apache.commons.configuration*;version="[1.6,2)",
+      *
+    </osgi.import>
+    <osgi.export>
+      org.apache.whirr.service.chef*;version="${project.version}"
+    </osgi.export>
+    <osgi.fragment.host>jclouds-scriptbuilder</osgi.fragment.host>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>

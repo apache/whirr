@@ -18,19 +18,18 @@
 
 package org.apache.whirr.cli.command;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PrintStream;
-import java.util.List;
-
 import joptsimple.OptionSet;
-
 import org.apache.whirr.Cluster;
 import org.apache.whirr.ClusterController;
 import org.apache.whirr.ClusterControllerFactory;
 import org.apache.whirr.ClusterSpec;
 import org.apache.whirr.command.AbstractClusterCommand;
 import org.apache.whirr.util.Utils;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintStream;
+import java.util.List;
 
 /**
  * A command to launch a new cluster.
@@ -47,31 +46,34 @@ public class LaunchClusterCommand extends AbstractClusterCommand {
 
   @Override
   public int run(InputStream in, PrintStream out, PrintStream err,
-      List<String> args) throws Exception {
-    
+                 List<String> args) throws Exception {
+
     OptionSet optionSet = parser.parse(args.toArray(new String[args.size()]));
 
     if (!optionSet.nonOptionArguments().isEmpty()) {
       printUsage(err);
       return -1;
     }
-    
+
     try {
       ClusterSpec clusterSpec = getClusterSpec(optionSet);
-      ClusterController controller = createClusterController(clusterSpec.getServiceName());
-      Cluster cluster = controller.launchCluster(clusterSpec);
-      out.printf("Started cluster of %s instances\n",
-          cluster.getInstances().size());
-      out.println(cluster);
-      
-      // print ssh command. do it for the first 20 instances so that the console
-      // won't be overflooded when launching a 1000 node cluster
-      Utils.printAccess(out, clusterSpec, cluster, 20);
-      
-      return 0;
+      return run(in, out, err, clusterSpec);
+
     } catch (IllegalArgumentException e) {
       printErrorAndHelpHint(err, e);
       return -1;
     }
+  }
+
+  public int run(InputStream in, PrintStream out, PrintStream err, ClusterSpec clusterSpec) throws Exception {
+    ClusterController controller = createClusterController(clusterSpec.getServiceName());
+    Cluster cluster = controller.launchCluster(clusterSpec);
+    out.printf("Started cluster of %s instances\n",
+      cluster.getInstances().size());
+    out.println(cluster);
+
+    Utils.printSSHConnectionDetails(out, clusterSpec, cluster, 20);
+
+    return 0;
   }
 }

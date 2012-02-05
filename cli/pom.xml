@@ -25,9 +25,20 @@
   </parent>
   <groupId>org.apache.whirr</groupId>
   <artifactId>whirr-cli</artifactId>
-  <packaging>jar</packaging>
-  <version>0.8.0-SNAPSHOT</version>
+  <packaging>bundle</packaging>
   <name>Apache Whirr CLI</name>
+  <properties>
+    <osgi.import>
+      !org.apache.whirr.cli*,
+      org.apache.commons.configuration*;version="[1.6,2)",
+      *
+    </osgi.import>
+    <osgi.dynamic.import>javax.*,org.jclouds.*</osgi.dynamic.import>
+    <osgi.export>
+      org.apache.whirr.cli*;version="${project.version}"
+    </osgi.export>
+    <osgi.spi.consumer>*</osgi.spi.consumer>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>

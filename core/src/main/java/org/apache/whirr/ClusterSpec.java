@@ -434,8 +434,7 @@ public class ClusterSpec {
       throws ConfigurationException {
     CompositeConfiguration composed = new CompositeConfiguration();
     composed.addConfiguration(userConfig);
-    composed.addConfiguration(
-      new PropertiesConfiguration(DEFAULT_PROPERTIES));
+    composed.addConfiguration(new PropertiesConfiguration(getClass().getClassLoader().getResource(DEFAULT_PROPERTIES)));
     return composed;
   }
 

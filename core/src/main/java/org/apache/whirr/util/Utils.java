@@ -18,27 +18,27 @@
 
 package org.apache.whirr.util;
 
-import java.io.PrintStream;
-
 import org.apache.whirr.Cluster;
 import org.apache.whirr.Cluster.Instance;
 import org.apache.whirr.ClusterSpec;
+
+import java.io.PrintStream;
 
 public class Utils {
 
   /**
    * Prints ssh commands that can be used to login into the nodes
-   * 
+   *
    * @param out
    * @param clusterSpec
    * @param cluster
    */
-  public static void printAccess(PrintStream out, ClusterSpec clusterSpec,
+  public static void printSSHConnectionDetails(PrintStream out, ClusterSpec clusterSpec,
       Cluster cluster, int maxPrint) {
-    out.println("You can log into instances using the following ssh commands:");
+    out.println("\nYou can log into instances using the following ssh commands:");
 
     String user = clusterSpec.getBootstrapUser() != null ? clusterSpec
-        .getBootstrapUser() : clusterSpec.getClusterUser();
+      .getBootstrapUser() : clusterSpec.getClusterUser();
 
     String pkFile = clusterSpec.getPrivateKeyFile().getAbsolutePath();
 
@@ -46,8 +46,8 @@ public class Utils {
     for (Instance instance : cluster.getInstances()) {
 
       out.printf(
-          "'ssh -i %s -o \"UserKnownHostsFile /dev/null\" -o StrictHostKeyChecking=no %s@%s'\n",
-          pkFile, user, instance.getPublicIp());
+        "'ssh -i %s -o \"UserKnownHostsFile /dev/null\" -o StrictHostKeyChecking=no %s@%s'\n",
+        pkFile, user, instance.getPublicIp());
 
       if (counter > maxPrint) {
         out.println("... Too many instances, truncating.");

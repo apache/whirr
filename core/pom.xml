@@ -25,8 +25,19 @@
   </parent>
   <groupId>org.apache.whirr</groupId>
   <artifactId>whirr-core</artifactId>
-  <packaging>jar</packaging>
+  <packaging>bundle</packaging>
   <version>0.8.0-SNAPSHOT</version>
+  <properties>
+    <osgi.import>
+      !org.apache.whirr*,
+      org.apache.commons.configuration*;version="[1.6,2)",
+      *
+    </osgi.import>
+    <osgi.fragment.host>jclouds-scriptbuilder;bundle-version="${jclouds.version}"</osgi.fragment.host>
+    <osgi.export>
+      org.apache.whirr*;version="${project.version}"
+    </osgi.export>
+  </properties>
   <name>Apache Whirr Core</name>
   <dependencies>
     <dependency>
@@ -52,6 +63,11 @@
     <dependency>
       <groupId>org.jclouds.driver</groupId>
       <artifactId>jclouds-sshj</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.jclouds.driver</groupId>
+      <artifactId>jclouds-jsch</artifactId>
+      <version>${jclouds.version}</version>
     </dependency>
     <dependency>
       <groupId>org.jclouds.driver</groupId>
@@ -132,7 +148,7 @@
     <dependency>
       <groupId>net.sf.jopt-simple</groupId>
       <artifactId>jopt-simple</artifactId>
-      <version>3.2</version>
+      <version>${jopt.simple.version}</version>
     </dependency>
   </dependencies>
   <build>

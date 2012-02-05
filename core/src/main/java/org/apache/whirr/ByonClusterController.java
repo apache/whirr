@@ -62,7 +62,7 @@ public class ByonClusterController extends ClusterController {
   public Cluster launchCluster(ClusterSpec clusterSpec) throws IOException,
       InterruptedException {
 
-    Map<String, ClusterActionHandler> handlerMap = new HandlerMapFactory()
+    Map<String, ClusterActionHandler> handlerMap = handlerMapFactory
         .create();
 
     ClusterAction bootstrapper = new ByonClusterAction(BOOTSTRAP_ACTION, getCompute(), handlerMap);
@@ -78,7 +78,7 @@ public class ByonClusterController extends ClusterController {
 
   public void destroyCluster(ClusterSpec clusterSpec) throws IOException,
       InterruptedException {
-    Map<String, ClusterActionHandler> handlerMap = new HandlerMapFactory()
+    Map<String, ClusterActionHandler> handlerMap = handlerMapFactory
         .create();
 
     ClusterAction destroyer = new ByonClusterAction(DESTROY_ACTION, getCompute(), handlerMap);

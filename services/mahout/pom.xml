@@ -25,11 +25,18 @@
   </parent>
   <groupId>org.apache.whirr</groupId>
   <artifactId>whirr-mahout</artifactId>
-  <packaging>jar</packaging>
-  <version>0.8.0-SNAPSHOT</version>
+  <packaging>bundle</packaging>
   <name>Apache Whirr Mahout</name>
   <properties>
-    <hadoop.version>0.20.2</hadoop.version>
+    <osgi.import>
+      !org.apache.whirr.service.mahout*,
+      org.apache.commons.configuration*;version="[1.6,2)",
+      *
+    </osgi.import>
+    <osgi.export>
+      org.apache.whirr.service.mahout*;version="${project.version}"
+    </osgi.export>
+    <osgi.fragment.host>jclouds-scriptbuilder;bundle-version="${jclouds.version}"</osgi.fragment.host>
   </properties>
   <dependencies>
     <dependency>

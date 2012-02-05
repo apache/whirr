@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+   Licensed to the Apache Software Foundation (ASF) under one or more
+   contributor license agreements.  See the NOTICE file distributed with
+   this work for additional information regarding copyright ownership.
+   The ASF licenses this file to You under the Apache License, Version 2.0
+   (the "License"); you may not use this file except in compliance with
+   the License.  You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+-->
+<features xmlns="http://karaf.apache.org/xmlns/features/v1.0.0">
+
+ <repository>mvn:org.jclouds.karaf/jclouds-karaf/${jclouds.karaf.version}/xml/features</repository>
+
+  <feature name="whirr" version="${project.version}" description="Apache Whirr Core" resolver="(obr)">
+    <feature version="${jclouds.karaf.version}">jclouds-aws-ec2</feature>
+    <feature version="${jclouds.karaf.version}">jclouds-aws-s3</feature>
+    <bundle dependency='true'>mvn:org.apache.geronimo.specs/geronimo-activation_1.1_spec/${activation.spec.version}</bundle>
+    <bundle dependency='true'>mvn:org.apache.geronimo.specs/geronimo-servlet_2.5_spec/${servlet.spec.version}</bundle>
+    <bundle dependency='true'>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.jsch/${jsch.bundle.version}</bundle>
+    <bundle dependency='true'>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.javax.mail/${javax.mail.bundle.version}</bundle>
+    <bundle dependency='true'>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.jopt-simple/${jopt.simple.bundle.version}</bundle>
+    <bundle dependency='true'>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.not-yet-commons-ssl/${not-yet-commons-ssl.bundle.version}</bundle>
+    <bundle dependency='true'>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.junit/${junit.bundle.version}</bundle>
+    <!--bundle dependency='true'>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.commons-jexl/${commons.jexl.bundle.version}</bundle-->
+    <bundle dependency='true'>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.commons-jxpath/${commons.jxpath.bundle.version}</bundle>
+    <bundle dependency='true'>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.ant/${ant.bundle.version}</bundle>
+    <!--bundle dependency='true'>mvn:org.apache.commons/commons-vfs2/${commons.vfs2.version}</bundle-->
+    <bundle dependency='true'>mvn:commons-digester/commons-digester/${commons.digester.version}</bundle>
+    <bundle dependency='true'>mvn:commons-beanutils/commons-beanutils/${commons.beanutils.version}</bundle>
+    <bundle dependency='true'>mvn:commons-collections/commons-collections/${commons.collections.version}</bundle>
+    <bundle dependency='true'>mvn:commons-configuration/commons-configuration/${commons.configuration.version}</bundle>
+    <bundle dependency='true'>mvn:commons-codec/commons-codec/${commons.codec.version}</bundle>
+    <bundle dependency='true'>mvn:commons-lang/commons-lang/${commons.lang.version}</bundle>
+    <bundle dependency="true">wrap:mvn:dnsjava/dnsjava/${dnsjava.version}</bundle>
+    <bundle>mvn:org.apache.whirr/whirr-core/${project.version}</bundle>
+    <bundle>mvn:org.apache.whirr/whirr-cli/${project.version}</bundle>
+    <bundle>mvn:org.apache.whirr.karaf/org.apache.whirr.karaf.commands/${project.version}</bundle>
+  </feature>
+
+  <feature name="whirr-cassandra" version="${project.version}" description="Apache Whirr Cassandra Service" resolver="(obr)">
+    <feature version="${project.version}">whirr</feature>
+    <bundle>mvn:org.apache.whirr/whirr-cassandra/${project.version}</bundle>
+  </feature>
+
+  <feature name="whirr-chef" version="${project.version}" description="Apache Whirr Chef Service" resolver="(obr)">
+    <feature version="${project.version}">whirr</feature>
+    <bundle>mvn:org.apache.whirr/whirr-chef/${project.version}</bundle>
+  </feature>
+
+  <feature name="whirr-elasticsearch" version="${project.version}" description="Apache Whirr ElasticSearch Service" resolver="(obr)">
+    <feature version="${project.version}">whirr</feature>
+    <bundle>mvn:org.apache.whirr/whirr-elasticsearch/${project.version}</bundle>
+  </feature>
+
+  <feature name="whirr-ganglia" version="${project.version}" description="Apache Whirr Ganglia Service"
+           resolver="(obr)">
+    <feature version="${project.version}">whirr</feature>
+    <bundle>mvn:org.apache.whirr/whirr-ganglia/${project.version}</bundle>
+  </feature>
+
+  <feature name="whirr-hadoop" version="${project.version}" description="Apache Whirr Hadoop Service" resolver="(obr)">
+    <feature version="${project.version}">whirr</feature>
+    <bundle>mvn:org.apache.whirr/whirr-hadoop/${project.version}</bundle>
+  </feature>
+
+  <feature name="whirr-hbase" version="${project.version}" description="Apache Whirr Hbase Service" resolver="(obr)">
+     <feature version="${project.version}">whirr-hadoop</feature>
+     <feature version="${project.version}">whirr-zookeeper</feature>
+    <bundle>mvn:org.apache.whirr/whirr-hbase/${project.version}</bundle>
+  </feature>
+
+  <feature name="whirr-hama" version="${project.version}" description="Apache Whirr Hama Service" resolver="(obr)">
+    <feature version="${project.version}">whirr-hadoop</feature>
+    <feature version="${project.version}">whirr-zookeeper</feature>
+    <bundle>mvn:org.apache.whirr/whirr-hama/${project.version}</bundle>
+  </feature>
+  <feature name="whirr-mahout" version="${project.version}" description="Apache Whirr Mahout Service" resolver="(obr)">
+    <feature version="${project.version}">whirr</feature>
+    <bundle>mvn:org.apache.whirr/whirr-mahout/${project.version}</bundle>
+  </feature>
+  <feature name="whirr-puppet" version="${project.version}" description="Apache Whirr Puppet Service" resolver="(obr)">
+    <feature version="${project.version}">whirr</feature>
+    <bundle>mvn:org.apache.whirr/whirr-puppet/${project.version}</bundle>
+  </feature>
+
+  <feature name="whirr-voldemort" version="${project.version}" description="Apache Whirr Voldermort Service" resolver="(obr)">
+    <feature version="${project.version}">whirr</feature>
+    <bundle>mvn:org.apache.whirr/whirr-voldemort/${project.version}</bundle>
+  </feature>
+
+  <feature name="whirr-zookeeper" version="${project.version}" description="Apache Whirr Zookeeper Service" resolver="(obr)">
+    <feature version="${project.version}">whirr</feature>
+    <bundle>mvn:org.apache.whirr/whirr-zookeeper/${project.version}</bundle>
+  </feature>
+
+</features>

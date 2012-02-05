@@ -87,7 +87,8 @@ public abstract class ScriptBasedClusterActionTest<T extends ScriptBasedClusterA
     }
   }
 
-  private final static Map<String, ClusterActionHandler> HANDLERMAP = HandlerMapFactory.create();
+  private final static HandlerMapFactory HANDLER_MAP_FACTORY = new HandlerMapFactory();
+  private final static Map<String, ClusterActionHandler> HANDLERMAP = HANDLER_MAP_FACTORY.create();
   private final static Set<String> EMPTYSET = ImmutableSet.of();
 
   private ClusterSpec clusterSpec;

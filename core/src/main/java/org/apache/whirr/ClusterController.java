@@ -30,7 +30,6 @@ import org.apache.whirr.actions.ConfigureServicesAction;
 import org.apache.whirr.actions.DestroyClusterAction;
 import org.apache.whirr.actions.StartServicesAction;
 import org.apache.whirr.actions.StopServicesAction;
-import org.apache.whirr.service.ClusterActionHandler;
 import org.apache.whirr.state.ClusterStateStore;
 import org.apache.whirr.state.ClusterStateStoreFactory;
 import org.apache.whirr.service.ComputeCache;
@@ -62,11 +61,12 @@ public class ClusterController {
 
   private static final Logger LOG = LoggerFactory.getLogger(ClusterController.class);
 
-  private static final Map<String, ClusterActionHandler> HANDLERS = HandlerMapFactory.create();
   private static final ImmutableSet<String> EMPTYSET = ImmutableSet.of();
 
   private final Function<ClusterSpec, ComputeServiceContext> getCompute;
   private final ClusterStateStoreFactory stateStoreFactory;
+
+  protected HandlerMapFactory handlerMapFactory = new HandlerMapFactory();
 
 
   public ClusterController() {
@@ -131,7 +131,7 @@ public class ClusterController {
    * Provision the hardware resources needed for running services
    */
   public Cluster bootstrapCluster(ClusterSpec clusterSpec) throws IOException, InterruptedException {
-    BootstrapClusterAction bootstrapper = new BootstrapClusterAction(getCompute(), HANDLERS);
+    BootstrapClusterAction bootstrapper = new BootstrapClusterAction(getCompute(), handlerMapFactory.create());
     Cluster cluster = bootstrapper.execute(clusterSpec, null);
     getClusterStateStore(clusterSpec).save(cluster);
     return cluster;
@@ -151,7 +151,7 @@ public class ClusterController {
   
   public Cluster configureServices(ClusterSpec clusterSpec, Cluster cluster, Set<String> targetRoles,
         Set<String> targetInstanceIds) throws IOException, InterruptedException {
-    ConfigureServicesAction configurer = new ConfigureServicesAction(getCompute(), HANDLERS,
+    ConfigureServicesAction configurer = new ConfigureServicesAction(getCompute(), handlerMapFactory.create(),
         targetRoles, targetInstanceIds);
     return configurer.execute(clusterSpec, cluster);
   }
@@ -170,7 +170,7 @@ public class ClusterController {
   
   public Cluster startServices(ClusterSpec clusterSpec, Cluster cluster,
       Set<String> targetRoles, Set<String> targetInstanceIds) throws IOException, InterruptedException {
-    StartServicesAction starter = new StartServicesAction(getCompute(), HANDLERS, targetRoles, targetInstanceIds);
+    StartServicesAction starter = new StartServicesAction(getCompute(), handlerMapFactory.create(), targetRoles, targetInstanceIds);
     return starter.execute(clusterSpec, cluster);
   }
 
@@ -189,7 +189,7 @@ public class ClusterController {
   
   public Cluster stopServices(ClusterSpec clusterSpec, Cluster cluster, Set<String> targetRoles,
     Set<String> targetInstanceIds) throws IOException, InterruptedException {
-    StopServicesAction stopper = new StopServicesAction(getCompute(), HANDLERS, targetRoles, targetInstanceIds);
+    StopServicesAction stopper = new StopServicesAction(getCompute(), handlerMapFactory.create(), targetRoles, targetInstanceIds);
     return stopper.execute(clusterSpec, cluster);
   }
 
@@ -202,7 +202,7 @@ public class ClusterController {
 
   public Cluster cleanupCluster(ClusterSpec clusterSpec, Cluster cluster)
     throws IOException, InterruptedException {
-    CleanupClusterAction cleanner = new CleanupClusterAction(getCompute(), HANDLERS);
+    CleanupClusterAction cleanner = new CleanupClusterAction(getCompute(), handlerMapFactory.create());
     return cleanner.execute(clusterSpec, cluster);
   }
   
@@ -222,7 +222,7 @@ public class ClusterController {
 
   public void destroyCluster(ClusterSpec clusterSpec, Cluster cluster)
     throws IOException, InterruptedException {
-    DestroyClusterAction destroyer = new DestroyClusterAction(getCompute(), HANDLERS);
+    DestroyClusterAction destroyer = new DestroyClusterAction(getCompute(), handlerMapFactory.create());
     destroyer.execute(clusterSpec, cluster);
   }
 
@@ -302,6 +302,14 @@ public class ClusterController {
     }
 
     return instances;
+  }
+
+  public HandlerMapFactory getHandlerMapFactory() {
+    return handlerMapFactory;
+  }
+
+  public void setHandlerMapFactory(HandlerMapFactory handlerMapFactory) {
+    this.handlerMapFactory = handlerMapFactory;
   }
 
   private Cluster.Instance toInstance(NodeMetadata metadata, Cluster cluster, ClusterSpec spec) {

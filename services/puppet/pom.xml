@@ -24,8 +24,19 @@
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <artifactId>whirr-puppet</artifactId>
-  <packaging>jar</packaging>
+  <packaging>bundle</packaging>
   <name>Apache Whirr Puppet</name>
+    <properties>
+    <osgi.import>
+      !org.apache.whirr.service.puppet*,
+      org.apache.commons.configuration*;version="[1.6,2)",
+      *
+    </osgi.import>
+    <osgi.export>
+      org.apache.whirr.service.puppet*;version="${project.version}"
+    </osgi.export>
+    <osgi.fragment.host>jclouds-scriptbuilder;bundle-version="${jclouds.version}"</osgi.fragment.host>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>

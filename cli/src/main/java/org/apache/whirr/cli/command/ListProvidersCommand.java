@@ -39,6 +39,10 @@ public class ListProvidersCommand extends AbstractClusterCommand {
         new ClusterControllerFactory());
   }
 
+  public ListProvidersCommand(ClusterControllerFactory factory) {
+    super("list-providers", "Show a list of the supported providers", factory);
+  }
+
   @Override
   public int run(InputStream in, PrintStream out,
                  PrintStream err, List<String> args) throws Exception {
@@ -64,8 +68,8 @@ public class ListProvidersCommand extends AbstractClusterCommand {
     out.println("Usage: whirr list-providers <compute OR blobstore>");
   }
 
-  private void listBlobstoreProviders(PrintStream out) {
-    for(ProviderMetadata blobstore : Providers.allBlobStore()) {
+  public void listBlobstoreProviders(Iterable<ProviderMetadata> blobstoreProviders, PrintStream out) {
+    for(ProviderMetadata blobstore : blobstoreProviders) {
       out.println("* " + blobstore.getName());
 
       out.println("\tHomepage: " + blobstore.getHomepage());
@@ -80,8 +84,12 @@ public class ListProvidersCommand extends AbstractClusterCommand {
     }
   }
 
-  private void listComputeProviders(PrintStream out) {
-    for(ProviderMetadata provider : Providers.allCompute()) {
+  private void listBlobstoreProviders(PrintStream out) {
+    listBlobstoreProviders(Providers.allBlobStore(),out);
+  }
+
+  public void listComputeProviders(Iterable<ProviderMetadata> computeProviders,PrintStream out) {
+    for(ProviderMetadata provider : computeProviders) {
       if (testedComputeProviders.contains(provider.getId())) {
         out.println("* " + provider.getName() + " - tested");
       } else {
@@ -98,5 +106,9 @@ public class ListProvidersCommand extends AbstractClusterCommand {
       out.println("\t\twhirr.identity =  <" + provider.getIdentityName() + ">");
       out.println("\t\twhirr.credential = <" + provider.getCredentialName() + ">\n");
     }
+  }
+
+  private void listComputeProviders(PrintStream out) {
+    listComputeProviders(Providers.allCompute(),out);
   }
 }

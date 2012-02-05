@@ -25,8 +25,19 @@
   </parent>
   <groupId>org.apache.whirr</groupId>
   <artifactId>whirr-ganglia</artifactId>
-  <packaging>jar</packaging>
+  <packaging>bundle</packaging>
   <name>Apache Whirr Ganglia</name>
+  <properties>
+    <osgi.import>
+      !org.apache.whirr.service.ganglia*,
+      org.apache.commons.configuration*;version="[1.6,2)",
+      *
+    </osgi.import>
+    <osgi.export>
+      org.apache.whirr.service.ganglia*;version="${project.version}"
+    </osgi.export>
+    <osgi.fragment.host>jclouds-scriptbuilder;bundle-version="${jclouds.version}"</osgi.fragment.host>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>

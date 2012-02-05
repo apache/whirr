@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import com.google.common.base.Objects;
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
@@ -39,12 +40,11 @@ import org.slf4j.LoggerFactory;
  * {@link ClusterActionHandler}. For each 'before' and 'after' action type there
  * is a corresponding method that implementations may override.
  */
-public abstract class ClusterActionHandlerSupport extends ClusterActionHandler {
+public abstract class ClusterActionHandlerSupport implements ClusterActionHandler {
 
   private static final Logger LOG =
     LoggerFactory.getLogger(ClusterActionHandler.class);
 
-  @Override
   public void beforeAction(ClusterActionEvent event)
       throws IOException, InterruptedException{
     if (event.getAction().equals(BOOTSTRAP_ACTION)) {
@@ -64,7 +64,6 @@ public abstract class ClusterActionHandlerSupport extends ClusterActionHandler {
     }
   }
 
-  @Override
   public void afterAction(ClusterActionEvent event)
       throws IOException, InterruptedException {
     if (event.getAction().equals(BOOTSTRAP_ACTION)) {
@@ -146,7 +145,7 @@ public abstract class ClusterActionHandlerSupport extends ClusterActionHandler {
       String defaultsPropertiesFile) throws IOException {
     try {
       return getConfiguration(clusterSpec,
-          new PropertiesConfiguration(defaultsPropertiesFile));
+          new PropertiesConfiguration(getClass().getClassLoader().getResource(defaultsPropertiesFile)));
     } catch(ConfigurationException e) {
       throw new IOException("Error loading " + defaultsPropertiesFile, e);
     }
@@ -247,5 +246,26 @@ public abstract class ClusterActionHandlerSupport extends ClusterActionHandler {
 
     return config.getString(key, defaultFunction);
   }
+  /**
+    * this uses the inefficient {@link com.google.common.base.Objects} implementation as the object count will be
+    * relatively small and therefore efficiency is not a concern.
+    */
+   @Override
+   public int hashCode() {
+      return Objects.hashCode(getRole());
+   }
+
+   @Override
+   public boolean equals(Object that) {
+      if (that == null)
+         return false;
+      return Objects.equal(this.toString(), that.toString());
+   }
+
+   @Override
+   public String toString() {
+      return Objects.toStringHelper(this).add("role", getRole()).toString();
+   }
+
 
 }

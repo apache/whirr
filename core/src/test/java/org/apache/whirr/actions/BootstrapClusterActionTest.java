@@ -350,7 +350,7 @@ public class BootstrapClusterActionTest {
     when(puppetHandlerFactory.create("module::manifest")).thenReturn(handler);
     when(handler.getRole()).thenReturn("something-else");
 
-    Map<String, ClusterActionHandler> handlerMap = HandlerMapFactory.create(ImmutableSet.of(puppetHandlerFactory),
+    Map<String, ClusterActionHandler> handlerMap = new HandlerMapFactory().create(ImmutableSet.of(puppetHandlerFactory),
           ImmutableSet.of(handler));
 
     Function<ClusterSpec, ComputeServiceContext> getCompute = mock(Function.class);
@@ -410,7 +410,7 @@ public class BootstrapClusterActionTest {
     when(puppetHandlerFactory.getRolePrefix()).thenReturn("puppet");
     when(handler.getRole()).thenReturn("something-else");
 
-    Map<String, ClusterActionHandler> handlerMap = HandlerMapFactory.create(
+    Map<String, ClusterActionHandler> handlerMap = new HandlerMapFactory().create(
       ImmutableSet.of(puppetHandlerFactory), ImmutableSet.of(handler));
 
     Function<ClusterSpec, ComputeServiceContext> getCompute = mock(Function.class);

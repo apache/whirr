@@ -67,12 +67,12 @@ public class HandlerMapFactory {
       }
    }
 
-   public static Map<String, ClusterActionHandler> create() {
+   public Map<String, ClusterActionHandler> create() {
       return create(ServiceLoader.load(ClusterActionHandlerFactory.class),
         ServiceLoader.load(ClusterActionHandler.class));
    }
 
-   public static Map<String, ClusterActionHandler> create(
+   public Map<String, ClusterActionHandler> create(
       Iterable<ClusterActionHandlerFactory> factories,
       Iterable<ClusterActionHandler> handlers
    ) {

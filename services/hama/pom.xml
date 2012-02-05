@@ -25,12 +25,19 @@
   </parent>
   <groupId>org.apache.whirr</groupId>
   <artifactId>whirr-hama</artifactId>
-  <packaging>jar</packaging>
+  <packaging>bundle</packaging>
   <version>0.8.0-SNAPSHOT</version>
   <name>Apache Whirr Hama</name>
   <properties>
-    <hadoop.version>0.20.2</hadoop.version>
-    <hama.version>0.3.0-incubating</hama.version>
+    <osgi.import>
+      !org.apache.whirr.service.hama*,
+      org.apache.commons.configuration*;version="[1.6,2)",
+      *
+    </osgi.import>
+    <osgi.export>
+      org.apache.whirr.service.hama*;version="${project.version}"
+    </osgi.export>
+    <osgi.fragment.host>jclouds-scriptbuilder;bundle-version="${jclouds.version}"</osgi.fragment.host>
   </properties>
   <dependencies>
     <dependency>
@@ -116,7 +123,7 @@
     <dependency>
       <groupId>org.apache.zookeeper</groupId>
       <artifactId>zookeeper</artifactId>
-      <version>3.3.1</version>
+      <version>${zookeeper.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

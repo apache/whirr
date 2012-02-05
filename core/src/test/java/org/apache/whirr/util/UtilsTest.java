@@ -18,23 +18,23 @@
 
 package org.apache.whirr.util;
 
-import static junit.framework.Assert.assertEquals;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import org.apache.whirr.Cluster;
+import org.apache.whirr.Cluster.Instance;
+import org.apache.whirr.ClusterSpec;
+import org.junit.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.PrintStream;
 import java.util.HashSet;
 
-import org.apache.whirr.Cluster;
-import org.apache.whirr.Cluster.Instance;
-import org.apache.whirr.ClusterSpec;
-import org.junit.Test;
+import static junit.framework.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class UtilsTest {
 
-  public static final String EXPECTED_SSH_COMMAND = "You can log into instances using the following ssh commands:\n"
+  public static final String EXPECTED_SSH_COMMAND = "\nYou can log into instances using the following ssh commands:\n"
       + "'ssh -i /test/key/path -o \"UserKnownHostsFile /dev/null\" -o StrictHostKeyChecking=no test-identity@test-public-ip'\n";
 
   @Test
@@ -57,7 +57,7 @@ public class UtilsTest {
 
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
     PrintStream ps = new PrintStream(baos);
-    Utils.printAccess(ps, spec, cluster, 20);
+    Utils.printSSHConnectionDetails(ps, spec, cluster, 20);
 
     assertEquals("The ssh command did not match", EXPECTED_SSH_COMMAND,
         new String(baos.toByteArray()));

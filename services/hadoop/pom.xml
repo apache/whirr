@@ -25,11 +25,19 @@
   </parent>
   <groupId>org.apache.whirr</groupId>
   <artifactId>whirr-hadoop</artifactId>
-  <packaging>jar</packaging>
+  <packaging>bundle</packaging>
   <version>0.8.0-SNAPSHOT</version>
   <name>Apache Whirr Hadoop</name>
   <properties>
-    <hadoop.version>0.20.205.0</hadoop.version>
+    <osgi.import>
+      !org.apache.whirr.service.hadoop*,
+      org.apache.commons.configuration*;version="[1.6,2)",
+      *
+    </osgi.import>
+    <osgi.export>
+      org.apache.whirr.service.hadoop*;version="${project.version}"
+    </osgi.export>
+    <osgi.fragment.host>jclouds-scriptbuilder;bundle-version="${jclouds.version}"</osgi.fragment.host>
   </properties>
   <dependencies>
     <dependency>

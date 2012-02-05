@@ -43,6 +43,8 @@ Trunk (unreleased changes)
 
     WHIRR-498. Update the list of known limitations (asavu)
 
+    WHIRR-436. Allow Whirr to run from inside OSGi (Ioannis Canellos via asavu)
+
   BUG FIXES
 
     WHIRR-367. Wrong groupId for zookeeper (Joe Crobak via asavu)
