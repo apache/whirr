@@ -18,22 +18,22 @@
 
 package org.apache.whirr.service.hbase.integration;
 
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-
 import com.google.common.collect.Lists;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.hadoop.hbase.thrift.generated.ColumnDescriptor;
 import org.apache.hadoop.hbase.thrift.generated.Hbase;
 import org.apache.hadoop.hbase.thrift.generated.Mutation;
 import org.apache.hadoop.hbase.thrift.generated.TRowResult;
 import org.apache.hadoop.hbase.util.Bytes;
+import org.apache.whirr.TestConstants;
 import org.junit.AfterClass;
 import org.junit.Test;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 public abstract class HBaseServiceTest {
 
@@ -52,7 +52,7 @@ public abstract class HBaseServiceTest {
     controller.shutdown();
   }
 
-  @Test
+  @Test(timeout = TestConstants.ITEST_TIMEOUT)
   public void test() throws Exception {
     ArrayList<ColumnDescriptor> columns = new ArrayList<ColumnDescriptor>();
     ColumnDescriptor cd = new ColumnDescriptor();

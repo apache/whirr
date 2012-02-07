@@ -18,17 +18,6 @@
 
 package org.apache.whirr.service.hadoop.integration;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertNull;
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
-
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
-
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileSystem;
@@ -41,8 +30,20 @@ import org.apache.hadoop.mapred.JobClient;
 import org.apache.hadoop.mapred.JobConf;
 import org.apache.hadoop.mapred.lib.LongSumReducer;
 import org.apache.hadoop.mapred.lib.TokenCountMapper;
+import org.apache.whirr.TestConstants;
 import org.junit.AfterClass;
 import org.junit.Test;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertNull;
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThat;
 
 /**
  * Subclasses should implement @BeforeClass static void setUp()
@@ -61,7 +62,7 @@ public abstract class AbstractHadoopServiceTest {
     super();
   }
 
-  @Test
+  @Test(timeout = TestConstants.ITEST_TIMEOUT)
   public void test() throws Exception {
     Configuration conf = controller.getConfiguration();
     JobConf job = new JobConf(conf, HadoopServiceTest.class);
@@ -91,7 +92,7 @@ public abstract class AbstractHadoopServiceTest {
     
   }
 
-  @Test
+  @Test(timeout = TestConstants.ITEST_TIMEOUT)
   public void testExistsTemporaryFolderAndHiveWarehouse() throws Exception {
     Configuration conf = controller.getConfiguration();
     FileSystem fs = FileSystem.get(conf);

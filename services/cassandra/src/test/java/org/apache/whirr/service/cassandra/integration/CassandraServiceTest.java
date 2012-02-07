@@ -18,15 +18,7 @@
 
 package org.apache.whirr.service.cassandra.integration;
 
-import static org.junit.Assert.assertTrue;
-
 import com.google.common.collect.Sets;
-
-import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.cassandra.thrift.Cassandra;
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.PropertiesConfiguration;
@@ -39,12 +31,20 @@ import org.apache.whirr.Cluster;
 import org.apache.whirr.Cluster.Instance;
 import org.apache.whirr.ClusterController;
 import org.apache.whirr.ClusterSpec;
+import org.apache.whirr.TestConstants;
 import org.apache.whirr.service.cassandra.CassandraClusterActionHandler;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import static org.junit.Assert.assertTrue;
 
 public class CassandraServiceTest {
 
@@ -106,7 +106,7 @@ public class CassandraServiceTest {
     }
   }
 
-  @Test
+  @Test(timeout = TestConstants.ITEST_TIMEOUT)
   public void testInstances() throws Exception {
     Set<String> endPoints = Sets.newLinkedHashSet();
     for (Instance instance : cluster.getInstances()) {

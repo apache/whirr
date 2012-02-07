@@ -50,6 +50,9 @@ Trunk (unreleased changes)
 
     WHIRR-436. Allow Whirr to run from inside OSGi (Ioannis Canellos via asavu)
 
+    WHIRR-422. Integration tests should fail or succeed in a limited 
+    amount of time (asavu)
+
   BUG FIXES
 
     WHIRR-367. Wrong groupId for zookeeper (Joe Crobak via asavu)

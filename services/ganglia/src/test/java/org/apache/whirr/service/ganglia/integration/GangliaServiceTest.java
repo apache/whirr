@@ -18,15 +18,8 @@
 
 package org.apache.whirr.service.ganglia.integration;
 
-import static org.apache.whirr.RolePredicates.anyRoleIn;
-import static org.apache.whirr.service.ganglia.GangliaMetadClusterActionHandler.GANGLIA_METAD_ROLE;
-import static org.apache.whirr.service.ganglia.GangliaMonitorClusterActionHandler.GANGLIA_MONITOR_ROLE;
-
-import java.io.IOException;
-import java.net.Socket;
-
+import com.google.common.collect.Sets;
 import junit.framework.TestCase;
-
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.httpclient.HttpClient;
@@ -39,13 +32,19 @@ import org.apache.whirr.ClusterController;
 import org.apache.whirr.ClusterControllerFactory;
 import org.apache.whirr.ClusterSpec;
 import org.apache.whirr.RolePredicates;
+import org.apache.whirr.TestConstants;
 import org.apache.whirr.service.ganglia.GangliaMetadClusterActionHandler;
 import org.apache.whirr.service.ganglia.GangliaMonitorClusterActionHandler;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.google.common.collect.Sets;
+import java.io.IOException;
+import java.net.Socket;
+
+import static org.apache.whirr.RolePredicates.anyRoleIn;
+import static org.apache.whirr.service.ganglia.GangliaMetadClusterActionHandler.GANGLIA_METAD_ROLE;
+import static org.apache.whirr.service.ganglia.GangliaMonitorClusterActionHandler.GANGLIA_MONITOR_ROLE;
 
 public class GangliaServiceTest extends TestCase {
   
@@ -66,7 +65,7 @@ public class GangliaServiceTest extends TestCase {
     cluster = controller.launchCluster(clusterSpec);
   }
   
-  @Test
+  @Test(timeout = TestConstants.ITEST_TIMEOUT)
   public void test() throws Exception {
     Instance metad = cluster.getInstanceMatching(RolePredicates.role(GangliaMetadClusterActionHandler.GANGLIA_METAD_ROLE));
     String metadHostname = metad.getPublicHostName();

@@ -18,7 +18,20 @@
 
 package org.apache.whirr.service.voldemort.integration;
 
-import static org.apache.whirr.service.voldemort.VoldemortConstants.ADMIN_PORT;
+import org.apache.commons.configuration.CompositeConfiguration;
+import org.apache.commons.configuration.PropertiesConfiguration;
+import org.apache.whirr.Cluster;
+import org.apache.whirr.Cluster.Instance;
+import org.apache.whirr.ClusterController;
+import org.apache.whirr.ClusterSpec;
+import org.apache.whirr.TestConstants;
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import voldemort.client.protocol.admin.AdminClient;
+import voldemort.client.protocol.admin.AdminClientConfig;
+import voldemort.cluster.Node;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -26,20 +39,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.configuration.CompositeConfiguration;
-import org.apache.commons.configuration.PropertiesConfiguration;
-import org.apache.whirr.Cluster;
-import org.apache.whirr.Cluster.Instance;
-import org.apache.whirr.ClusterController;
-import org.apache.whirr.ClusterSpec;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-
-import voldemort.client.protocol.admin.AdminClient;
-import voldemort.client.protocol.admin.AdminClientConfig;
-import voldemort.cluster.Node;
+import static org.apache.whirr.service.voldemort.VoldemortConstants.ADMIN_PORT;
 
 public class VoldemortServiceTest {
 
@@ -84,7 +84,7 @@ public class VoldemortServiceTest {
     }
   }
 
-  @Test
+  @Test(timeout = TestConstants.ITEST_TIMEOUT)
   public void testInstances() throws Exception {
     Set<Instance> instances = cluster.getInstances();
     String url = "tcp://" + instances.iterator().next().getPublicAddress().getHostAddress() + ":" + ADMIN_PORT;

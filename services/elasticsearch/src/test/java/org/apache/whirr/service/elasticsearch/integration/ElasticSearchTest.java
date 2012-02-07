@@ -17,9 +17,19 @@
  */
 package org.apache.whirr.service.elasticsearch.integration;
 
-import static org.apache.whirr.RolePredicates.role;
-
 import com.google.common.collect.Iterables;
+import org.apache.commons.configuration.CompositeConfiguration;
+import org.apache.commons.configuration.PropertiesConfiguration;
+import org.apache.whirr.Cluster;
+import org.apache.whirr.ClusterController;
+import org.apache.whirr.ClusterSpec;
+import org.apache.whirr.TestConstants;
+import org.apache.whirr.service.elasticsearch.ElasticSearchHandler;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -28,17 +38,7 @@ import java.net.URL;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.configuration.CompositeConfiguration;
-import org.apache.commons.configuration.PropertiesConfiguration;
-import org.apache.whirr.Cluster;
-import org.apache.whirr.ClusterController;
-import org.apache.whirr.ClusterSpec;
-import org.apache.whirr.service.elasticsearch.ElasticSearchHandler;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static org.apache.whirr.RolePredicates.role;
 
 public class ElasticSearchTest {
 
@@ -61,7 +61,7 @@ public class ElasticSearchTest {
     cluster = controller.launchCluster(clusterSpec);
   }
 
-  @Test
+  @Test(timeout = TestConstants.ITEST_TIMEOUT)
   public void testCheckNumberOfNodes() throws Exception {
     for(int i = 0; i<20; i++) {
       int nodes = getNumberOfNodes();

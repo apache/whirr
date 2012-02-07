@@ -28,6 +28,7 @@ import org.apache.commons.ssl.asn1.Strings;
 import org.apache.whirr.ClusterController;
 import org.apache.whirr.ClusterControllerFactory;
 import org.apache.whirr.ClusterSpec;
+import org.apache.whirr.TestConstants;
 import org.apache.whirr.service.ClusterActionEvent;
 import org.apache.whirr.service.ClusterActionHandlerSupport;
 import org.jclouds.compute.domain.ExecResponse;
@@ -128,7 +129,7 @@ public class PhaseExecutionBarrierTest {
     return ClusterSpec.withTemporaryKeys(getTestConfiguration());
   }
 
-  @Test
+  @Test(timeout = TestConstants.ITEST_TIMEOUT)
   public void testNoRemoteExecutionOverlap() throws Exception {
     ClusterSpec spec = getTestClusterSpec();
     ClusterController controller =

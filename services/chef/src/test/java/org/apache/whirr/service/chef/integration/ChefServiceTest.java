@@ -18,14 +18,8 @@
 
 package org.apache.whirr.service.chef.integration;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertTrue;
-import static junit.framework.Assert.failNotEquals;
-
-import java.io.IOException;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
-
+import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.httpclient.HttpClient;
@@ -33,6 +27,7 @@ import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.whirr.ClusterController;
 import org.apache.whirr.ClusterSpec;
+import org.apache.whirr.TestConstants;
 import org.apache.whirr.service.chef.Recipe;
 import org.jclouds.compute.RunScriptOnNodesException;
 import org.jclouds.compute.domain.ExecResponse;
@@ -46,8 +41,13 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Predicate;
-import com.google.common.base.Predicates;
+import java.io.IOException;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertTrue;
+import static junit.framework.Assert.failNotEquals;
 
 /**
  * Integration test for chef.
@@ -78,7 +78,7 @@ public class ChefServiceTest {
     controller.launchCluster(clusterSpec);
   }
 
-  @Test
+  @Test(timeout = TestConstants.ITEST_TIMEOUT)
   public void testRecipesWereRanInServiceBootstrap() throws Exception {
 
     // and shoudl be installed by the main handlers
@@ -101,7 +101,7 @@ public class ChefServiceTest {
     assertResponsesContain(responses, testMaven, "Apache Maven");
   }
 
-  @Test
+  @Test(timeout = TestConstants.ITEST_TIMEOUT)
   public void testChefRunRecipeFromURL() throws Exception {
     // As chef will be mostly used indirectly in other services
     // this test tests chef's ability to run a recipe, specifically to
@@ -148,7 +148,7 @@ public class ChefServiceTest {
    * 
    * @throws Exception
    */
-  @Test
+  @Test(timeout = TestConstants.ITEST_TIMEOUT)
   public void testChefRunRecipesFromProvidedCookbooks() throws Exception {
     Recipe java = new Recipe("java");
     java.attribs.put("install_flavor", "sun");

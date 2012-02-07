@@ -18,16 +18,12 @@
 
 package org.apache.whirr.service.cdh.integration;
 
-import static junit.framework.Assert.assertEquals;
-
-import java.io.IOException;
-import java.util.concurrent.CountDownLatch;
-
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.whirr.Cluster;
 import org.apache.whirr.ClusterController;
 import org.apache.whirr.ClusterSpec;
+import org.apache.whirr.TestConstants;
 import org.apache.whirr.service.zookeeper.ZooKeeperCluster;
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.WatchedEvent;
@@ -38,6 +34,11 @@ import org.apache.zookeeper.ZooKeeper;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.io.IOException;
+import java.util.concurrent.CountDownLatch;
+
+import static junit.framework.Assert.assertEquals;
 
 public class CdhZooKeeperServiceTest {
   
@@ -60,7 +61,7 @@ public class CdhZooKeeperServiceTest {
     hosts = ZooKeeperCluster.getHosts(cluster);
   }
 
-  @Test
+  @Test (timeout = TestConstants.ITEST_TIMEOUT)
   public void test() throws Exception {
     class ConnectionWatcher implements Watcher {
 

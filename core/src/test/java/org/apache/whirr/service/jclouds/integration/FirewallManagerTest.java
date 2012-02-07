@@ -22,6 +22,7 @@ import com.google.common.collect.Sets;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.whirr.Cluster;
 import org.apache.whirr.ClusterSpec;
+import org.apache.whirr.TestConstants;
 import org.apache.whirr.service.ComputeCache;
 import org.apache.whirr.service.FirewallManager;
 import org.jclouds.compute.ComputeServiceContext;
@@ -68,7 +69,7 @@ public class FirewallManagerTest {
     manager = new FirewallManager(context, clusterSpec, new Cluster(instances));
   }
 
-  @Test
+  @Test(timeout = TestConstants.ITEST_TIMEOUT)
   public void testFirewallAuthorizationIsIdempotent() throws IOException {
     if (context.getProviderSpecificContext().getApi() instanceof EC2Client) {
       EC2Client ec2Client = EC2Client.class.cast(

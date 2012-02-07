@@ -17,16 +17,13 @@
  */
 package org.apache.whirr.service.puppet.integration;
 
-import java.io.IOException;
-import java.net.URI;
-import java.util.concurrent.TimeUnit;
-
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.whirr.Cluster;
+import org.apache.whirr.Cluster.Instance;
 import org.apache.whirr.ClusterController;
 import org.apache.whirr.ClusterSpec;
-import org.apache.whirr.Cluster.Instance;
+import org.apache.whirr.TestConstants;
 import org.jclouds.net.IPSocket;
 import org.jclouds.predicates.InetSocketAddressConnect;
 import org.jclouds.predicates.RetryablePredicate;
@@ -34,6 +31,10 @@ import org.jclouds.util.Strings2;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.io.IOException;
+import java.net.URI;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Install an http service on the remote machine with puppet!
@@ -60,7 +61,7 @@ public class PuppetServiceTest {
 
   }
 
-  @Test
+  @Test(timeout = TestConstants.ITEST_TIMEOUT)
   public void testHttpAvailable() throws Exception {
 
     // check that the http server started

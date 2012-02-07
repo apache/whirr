@@ -18,19 +18,6 @@
 
 package org.apache.whirr.service.cdh.integration;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertNull;
-import static junit.framework.Assert.failNotEquals;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
-import java.util.Map;
-import java.util.Map.Entry;
-
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import org.apache.commons.configuration.CompositeConfiguration;
@@ -51,6 +38,7 @@ import org.apache.hadoop.mapred.lib.TokenCountMapper;
 import org.apache.whirr.Cluster;
 import org.apache.whirr.ClusterController;
 import org.apache.whirr.ClusterSpec;
+import org.apache.whirr.TestConstants;
 import org.apache.whirr.service.hadoop.HadoopProxy;
 import org.jclouds.compute.domain.ExecResponse;
 import org.jclouds.compute.domain.NodeMetadata;
@@ -61,6 +49,19 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+import java.util.Map;
+import java.util.Map.Entry;
+
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertNull;
+import static junit.framework.Assert.failNotEquals;
 
 public class CdhHadoopServiceTest {
 
@@ -101,7 +102,7 @@ public class CdhHadoopServiceTest {
     controller.destroyCluster(clusterSpec);
   }
 
-  @Test
+  @Test(timeout = TestConstants.ITEST_TIMEOUT)
   public void testVersion() throws Exception {
     Statement checkVersion = Statements.exec("ls /etc/alternatives/hadoop-lib");
     Map<? extends NodeMetadata, ExecResponse> responses =
@@ -111,7 +112,7 @@ public class CdhHadoopServiceTest {
     assertResponsesContain(responses, checkVersion, "cdh3u2");
   }
 
-  @Test
+  @Test(timeout = TestConstants.ITEST_TIMEOUT)
   public void testJobExecution() throws Exception {
     Configuration conf = getConfiguration();
     

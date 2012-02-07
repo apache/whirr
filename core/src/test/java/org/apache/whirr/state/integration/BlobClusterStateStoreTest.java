@@ -26,6 +26,7 @@ import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.whirr.Cluster;
 import org.apache.whirr.ClusterSpec;
+import org.apache.whirr.TestConstants;
 import org.apache.whirr.state.BlobClusterStateStore;
 import org.apache.whirr.service.BlobStoreContextBuilder;
 import org.jclouds.blobstore.BlobStoreContext;
@@ -55,7 +56,7 @@ public class BlobClusterStateStoreTest {
     return ClusterSpec.withTemporaryKeys(getTestConfiguration());
   }
 
-  @Test
+  @Test(timeout = TestConstants.ITEST_TIMEOUT)
   public void testStoreAndLoadState() throws Exception {
     ClusterSpec spec = getTestClusterSpec();
 
@@ -91,7 +92,7 @@ public class BlobClusterStateStoreTest {
     }
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test(expected = IllegalArgumentException.class, timeout = TestConstants.ITEST_TIMEOUT)
   public void testInvalidContainerName() throws Exception {
     ClusterSpec spec = getTestClusterSpec();
 

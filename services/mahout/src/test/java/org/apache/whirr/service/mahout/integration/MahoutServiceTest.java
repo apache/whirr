@@ -23,6 +23,7 @@ import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.whirr.Cluster;
 import org.apache.whirr.ClusterController;
 import org.apache.whirr.ClusterSpec;
+import org.apache.whirr.TestConstants;
 import org.apache.whirr.state.ClusterStateStoreFactory;
 import org.jclouds.compute.domain.ExecResponse;
 import org.jclouds.compute.domain.NodeMetadata;
@@ -74,7 +75,7 @@ public class MahoutServiceTest {
     }
   }
 
-  @Test
+  @Test(timeout = TestConstants.ITEST_TIMEOUT)
   public void testBinMahout() throws Exception {
     Statement binMahout = Statements.exec("source /etc/profile; $MAHOUT_HOME/bin/mahout");
 
