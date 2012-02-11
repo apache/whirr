@@ -74,6 +74,9 @@ Trunk (unreleased changes)
     WHIRR-502. configure_cdh_hadoop.sh: syntax error trying to modify 
     permissions on $HADOOP_LOG_DIR (asavu)
 
+    WHIRR-510. Get ZooKeeper ensemble with internal addresses 
+    (David Arthur via asavu)
+
 Release 0.7.0 - 2011-12-11
 
   NEW FEATURES

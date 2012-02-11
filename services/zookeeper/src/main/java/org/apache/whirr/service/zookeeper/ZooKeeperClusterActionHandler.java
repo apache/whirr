@@ -158,13 +158,22 @@ public class ZooKeeperClusterActionHandler extends ClusterActionHandlerSupport {
   }
 
   static List<String> getHosts(Set<Instance> instances) {
+    return getHosts(instances, false);
+  }
+
+  static List<String> getHosts(Set<Instance> instances, final boolean internalHost) {
     return Lists.transform(Lists.newArrayList(instances),
       new Function<Instance, String>() {
         @Override
         public String apply(Instance instance) {
           try {
-            String publicIp = instance.getPublicHostName();
-            return String.format("%s:%d", publicIp, CLIENT_PORT);
+            String host;
+            if(internalHost) {
+              host = instance.getPrivateHostName();
+            } else {
+              host = instance.getPublicHostName();
+            }
+            return String.format("%s:%d", host, CLIENT_PORT);
           } catch (IOException e) {
             throw new IllegalArgumentException(e);
           }

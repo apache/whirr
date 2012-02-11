@@ -24,9 +24,15 @@ import org.apache.whirr.Cluster;
 import org.apache.whirr.RolePredicates;
 
 public class ZooKeeperCluster {
-  public static String getHosts(Cluster cluster) {
+  public static String getHosts(Cluster cluster, boolean internalHosts) {
     return Joiner.on(',').join(
       ZooKeeperClusterActionHandler.getHosts(cluster.getInstancesMatching(
-      RolePredicates.role(ZooKeeperClusterActionHandler.ZOOKEEPER_ROLE))));
+        RolePredicates.role(ZooKeeperClusterActionHandler.ZOOKEEPER_ROLE)
+      ), internalHosts)
+    );
+  }
+
+  public static String getHosts(Cluster cluster) {
+    return getHosts(cluster, false);
   }
 }
