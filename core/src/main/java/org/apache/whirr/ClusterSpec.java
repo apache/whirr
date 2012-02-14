@@ -33,7 +33,6 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.google.common.annotations.VisibleForTesting;
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
@@ -44,6 +43,7 @@ import org.jclouds.predicates.validators.DnsNameValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Objects;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
@@ -205,7 +205,7 @@ public class ClusterSpec {
     return withTemporaryKeys(new PropertiesConfiguration());
   }
   @VisibleForTesting
-  public static ClusterSpec withTemporaryKeys(Configuration conf) 
+  public static ClusterSpec withTemporaryKeys(Configuration conf)
   throws ConfigurationException, JSchException, IOException {
     if (!conf.containsKey(Property.PRIVATE_KEY_FILE.getConfigName())) {
       Map<String, File> keys = org.apache.whirr.util.KeyPair.generateTemporaryFiles();
@@ -766,8 +766,7 @@ public class ClusterSpec {
     /*
      * http://stackoverflow.com/questions/2494645#2494645
      */
-    checkArgument(checkNotNull(publicKey, "publicKey")
-            .startsWith("ssh-rsa AAAAB3NzaC1yc2EA"),
+    checkArgument(checkNotNull(publicKey, "publicKey").startsWith("ssh-rsa AAAAB3NzaC1yc2EA"),
         "key should start with ssh-rsa AAAAB3NzaC1yc2EA");
   }
   
@@ -834,6 +833,7 @@ public class ClusterSpec {
   }
 
   public void setClusterUser(String user) {
+    checkArgument(user == null || !user.equals("root"), "cluster-user != root or do not run as root");
     this.clusterUser = user;
   }
 

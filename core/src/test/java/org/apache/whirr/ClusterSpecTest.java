@@ -376,4 +376,12 @@ public class ClusterSpecTest {
 
     ClusterSpec.withTemporaryKeys(conf);
   }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void testFailIfRunningAsRootOrClusterUserIsRoot() throws ConfigurationException {
+    PropertiesConfiguration conf = new PropertiesConfiguration("whirr-core-test.properties");
+    conf.setProperty("whirr.cluster-user", "root");
+
+    ClusterSpec.withNoDefaults(conf);
+  }
 }
