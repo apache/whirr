@@ -26,8 +26,10 @@ xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 http://maven.apache.org/xsd
     your AWS credentials can be found in the 
     <a href="http://whirr.apache.org/faq.html#how-do-i-find-my-cloud-credentials">FAQ</a>.</p>
     <source>
-export AWS_ACCESS_KEY_ID=... 
-export AWS_SECRET_ACCESS_KEY=... 
+export WHIRR_PROVIDER=aws-ec2
+export WHIRR_IDENTITY=$AWS_ACCESS_KEY_ID
+export WHIRR_CREDENTIAL=$AWS_SECRET_ACCESS_KEY
+# or create ~/.whirr/credentials similar to conf/credentials.sample
 
 curl -O http://www.apache.org/dist/whirr/whirr-0.8.0/whirr-0.8.0.tar.gz
 tar zxf whirr-0.8.0.tar.gz; cd whirr-0.8.0 

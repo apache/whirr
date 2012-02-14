@@ -24,6 +24,23 @@ case "`uname`" in
 	CYGWIN*) cygwin=true;
 esac
 
+if [ -e ~/.whirr/credentials ]; then
+    . ~/.whirr/credentials
+elif [ -e $BIN/../conf/credentials ]; then
+    . $BIN/../conf/credentials
+fi
+
+# Override cloud provider credentials as needed
+export WHIRR_PROVIDER=${WHIRR_PROVIDER:-$PROVIDER}
+export WHIRR_IDENTITY=${WHIRR_IDENTITY:-$IDENTITY}
+export WHIRR_CREDENTIAL=${WHIRR_CREDENTIAL:-$CREDENTIAL}
+
+# Override blob store credentials as needed
+export WHIRR_BLOBSTORE_PROVIDER=${WHIRR_BLOBSTORE_PROVIDER:-$BLOBSTORE_PROVIDER}
+export WHIRR_BLOBSTORE_IDENTITY=${WHIRR_BLOBSTORE_IDENTITY:-$BLOBSTORE_IDENTITY}
+export WHIRR_BLOBSTORE_CREDENTIAL=${WHIRR_BLOBSTORE_CREDENTIAL:-$BLOBSTORE_CREDENTIAL}
+
+# Build the classpath
 if [ -d "$BIN/../cli/target/lib" ]; then
   CLASSPATH="$BIN/../conf/:$BIN/..:$BIN/../cli/target/lib/*:$BIN/../cli/target/*"
 else
@@ -36,5 +53,8 @@ if $cygwin; then
   CLASSPATH=`cygpath -wp $CLASSPATH`;
 fi
 
+echo Starting cluster on "$WHIRR_PROVIDER" using identity "$WHIRR_IDENTITY"
+
+# Start the application
 java $LOGGING_OPTS $WHIRR_CLI_OPTS -cp "$CLASSPATH" org.apache.whirr.cli.Main "$@"
  

@@ -53,6 +53,9 @@ Trunk (unreleased changes)
     WHIRR-422. Integration tests should fail or succeed in a limited 
     amount of time (asavu)
 
+    WHIRR-347. Support provider-independent environment variables for 
+    cloud credentials (asavu)
+
   BUG FIXES
 
     WHIRR-367. Wrong groupId for zookeeper (Joe Crobak via asavu)

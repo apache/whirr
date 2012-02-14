@@ -18,22 +18,15 @@
 
 package org.apache.whirr.command;
 
-import static org.apache.whirr.ClusterSpec.Property.CLUSTER_NAME;
-import static org.apache.whirr.ClusterSpec.Property.IDENTITY;
-import static org.apache.whirr.ClusterSpec.Property.INSTANCE_TEMPLATES;
-
 import com.google.common.collect.Maps;
-
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.EnumSet;
 import java.util.Map;
-
 import joptsimple.ArgumentAcceptingOptionSpec;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import joptsimple.OptionSpec;
-
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
@@ -43,6 +36,12 @@ import org.apache.whirr.ClusterController;
 import org.apache.whirr.ClusterControllerFactory;
 import org.apache.whirr.ClusterSpec;
 import org.apache.whirr.ClusterSpec.Property;
+import static org.apache.whirr.ClusterSpec.Property.CLUSTER_NAME;
+import static org.apache.whirr.ClusterSpec.Property.CREDENTIAL;
+import static org.apache.whirr.ClusterSpec.Property.IDENTITY;
+import static org.apache.whirr.ClusterSpec.Property.INSTANCE_TEMPLATES;
+import static org.apache.whirr.ClusterSpec.Property.PRIVATE_KEY_FILE;
+import static org.apache.whirr.ClusterSpec.Property.PROVIDER;
 import org.apache.whirr.state.ClusterStateStore;
 import org.apache.whirr.state.ClusterStateStoreFactory;
 import org.slf4j.Logger;
@@ -100,12 +99,14 @@ public abstract class AbstractClusterCommand extends Command {
     for (Map.Entry<Property, OptionSpec<?>> entry : optionSpecs.entrySet()) {
       Property property = entry.getKey();
       OptionSpec<?> option = entry.getValue();
+      Object value;
       if (property.hasMultipleArguments()) {
-        optionsConfig.setProperty(property.getConfigName(),
-            optionSet.valuesOf(option));
+        value = optionSet.valuesOf(option);
       } else {
-        optionsConfig.setProperty(property.getConfigName(),
-            optionSet.valueOf(option));
+        value = optionSet.valueOf(option);
+      }
+      if (value != null) {
+        optionsConfig.setProperty(property.getConfigName(), value);
       }
     }
     CompositeConfiguration config = new CompositeConfiguration();
@@ -114,14 +115,17 @@ public abstract class AbstractClusterCommand extends Command {
       Configuration defaults = new PropertiesConfiguration(optionSet.valueOf(configOption));
       config.addConfiguration(defaults);
     }
+    ClusterSpec clusterSpec = new ClusterSpec(config);
 
-    for (Property required : EnumSet.of(CLUSTER_NAME, IDENTITY, INSTANCE_TEMPLATES)) {
-      if (config.getString(required.getConfigName()) == null) {
+    for (Property required : EnumSet.of(CLUSTER_NAME, PROVIDER, IDENTITY, CREDENTIAL,
+        INSTANCE_TEMPLATES, PRIVATE_KEY_FILE)) {
+      if (clusterSpec.getConfiguration().getString(required.getConfigName()) == null) {
         throw new IllegalArgumentException(String.format("Option '%s' not set.",
             required.getSimpleName()));
       }
     }
-    return new ClusterSpec(config);
+
+    return clusterSpec;
   }
 
   /**

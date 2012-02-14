@@ -46,7 +46,7 @@ public class DestroyClusterCommand extends AbstractClusterCommand {
   public int run(InputStream in, PrintStream out, PrintStream err,
                  List<String> args) throws Exception {
 
-    OptionSet optionSet = parser.parse(args.toArray(new String[0]));
+    OptionSet optionSet = parser.parse(args.toArray(new String[args.size()]));
 
     if (!optionSet.nonOptionArguments().isEmpty()) {
       printUsage(err);

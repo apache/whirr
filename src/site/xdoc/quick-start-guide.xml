@@ -50,6 +50,15 @@ xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 http://maven.apache.org/xsd
     <p>Which will display the version of Whirr that is installed.</p>
     <p>To get usage instructions type:</p>
     <source>% bin/whirr</source>
+
+    <h4>Setup your Credentials</h4>
+
+    <source>% mkdir -p ~/.whirr
+    % cp conf/credentials.sample ~/.whirr/credentials
+    </source>
+
+    <p>Edit ~/.whirr/credentials using your editor of choice and add the API
+    connection credentials as required.</p>
     
     <h4>Configure a Hadoop cluster</h4>
 
@@ -64,8 +73,6 @@ xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 http://maven.apache.org/xsd
 whirr.cluster-name=myhadoopcluster 
 whirr.instance-templates=1 hadoop-jobtracker+hadoop-namenode,1 hadoop-datanode+hadoop-tasktracker 
 whirr.provider=aws-ec2
-whirr.identity=${env:AWS_ACCESS_KEY_ID} 
-whirr.credential=${env:AWS_SECRET_ACCESS_KEY}
 whirr.private-key-file=${sys:user.home}/.ssh/id_rsa
 whirr.public-key-file=${sys:user.home}/.ssh/id_rsa.pub
 </source>

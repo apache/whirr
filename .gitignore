@@ -8,3 +8,4 @@ target
 **/*.log
 services/voldemort/lib/
 whirr.log
+conf/credentials
