@@ -58,6 +58,9 @@ Trunk (unreleased changes)
 
     WHIRR-463. Fail fast when running as root (asavu)
 
+    WHIRR-35. Include .pac file for browsing to Hadoop clusters 
+    started on EC2 (asavu)
+
   BUG FIXES
 
     WHIRR-367. Wrong groupId for zookeeper (Joe Crobak via asavu)
