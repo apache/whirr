@@ -58,8 +58,13 @@ end
 def process_module(mod_name)
 
   edit_pom("#{mod_name}/pom.xml") do |pom|
-    pom.at("/project/parent/version").inner_html = $version
+    update_element(pom.at("/project/version"))
+    update_element(pom.at("/project/parent/version"))
   end
+end
+
+def update_element(el)
+    el.inner_html = $version if el
 end
 
 puts "Updating to version #{$version} ..."
