@@ -61,6 +61,8 @@ Trunk (unreleased changes)
     WHIRR-35. Include .pac file for browsing to Hadoop clusters 
     started on EC2 (asavu)
 
+    WHIRR-507. Make whirr script executable from any path (Marco Didonna via asavu)
+
   BUG FIXES
 
     WHIRR-367. Wrong groupId for zookeeper (Joe Crobak via asavu)
