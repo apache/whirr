@@ -55,9 +55,20 @@ def edit_pom(file)
   write(file, pom)
 end
 
-def process_module(mod_name)
+def edit_pom_tree(file)
+  edit_pom(file) do |pom|
+    puts File.dirname(file)
+    modules = []
+    # Add submodules
+    (pom/"project/modules/module").each { |elem| modules << elem.inner_html }
+    # Add submodules which are activated via a profile
+    (pom/"project/profiles/profile/modules/module").each { |elem| modules << elem.inner_html }
 
-  edit_pom("#{mod_name}/pom.xml") do |pom|
+    modules.sort.each do |mod_name|
+      pom_file = "#{File.dirname(file)}/#{mod_name}/pom.xml"
+      edit_pom_tree(pom_file)
+    end
+
     update_element(pom.at("/project/version"))
     update_element(pom.at("/project/parent/version"))
   end
@@ -68,15 +79,5 @@ def update_element(el)
 end
 
 puts "Updating to version #{$version} ..."
-
-edit_pom("pom.xml") do |pom|
-  
-  modules = []
-
-  (pom/"project/modules/module").each { |elem| modules << elem.inner_html }
-
-  modules.sort.each { |mod_name| process_module(mod_name) }
-
-  pom.at("/project/version").inner_html = $version
-end
+edit_pom_tree("pom.xml")
 
