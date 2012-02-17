@@ -53,31 +53,35 @@ def edit_pom(file)
   pom = read_pom(file)
   yield pom
   write(file, pom)
+  find_modules(pom).sort.each do |mod_name|
+    child_file = "#{File.dirname(file)}/#{mod_name}/pom.xml"
+    edit_pom(child_file) do |pom|
+      update_element(pom.at("/project/version"))
+      update_element(pom.at("/project/parent/version"))
+    end
+  end
 end
 
-def edit_pom_tree(file)
-  edit_pom(file) do |pom|
-    puts File.dirname(file)
-    modules = []
-    # Add submodules
-    (pom/"project/modules/module").each { |elem| modules << elem.inner_html }
-    # Add submodules which are activated via a profile
-    (pom/"project/profiles/profile/modules/module").each { |elem| modules << elem.inner_html }
+def find_modules(pom)
+  modules = []
+  # Add submodules
+  (pom/"project/modules/module").each { |elem| modules << elem.inner_html }
+  # Add submodules which are activated via a profile
+  (pom/"project/profiles/profile/modules/module").each { |elem| modules << elem.inner_html }
 
-    modules.sort.each do |mod_name|
-      pom_file = "#{File.dirname(file)}/#{mod_name}/pom.xml"
-      edit_pom_tree(pom_file)
-    end
-
-    update_element(pom.at("/project/version"))
-    update_element(pom.at("/project/parent/version"))
-  end
+  modules
 end
 
 def update_element(el)
     el.inner_html = $version if el
 end
 
+def update_poms()
+  edit_pom("pom.xml") do |pom|
+    update_element(pom.at("/project/version"))
+  end
+end
+
 puts "Updating to version #{$version} ..."
-edit_pom_tree("pom.xml")
+update_poms()
 
