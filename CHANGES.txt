@@ -12,6 +12,9 @@ Release 0.7.1
     WHIRR-498. Update the list of known limitations (asavu)
 
     WHIRR-463. Fail fast when running as root (asavu)
+
+    WHIRR-454. Allow openjdk to be installed as an alternative 
+    to sun-java-6 (Karel Vervaeke via asavu)
     
   BUG FIXES
 
