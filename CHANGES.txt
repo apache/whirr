@@ -11,6 +11,8 @@ Release 0.7.1
 
     WHIRR-498. Update the list of known limitations (asavu)
 
+    WHIRR-463. Fail fast when running as root (asavu)
+    
   BUG FIXES
 
     WHIRR-502. configure_cdh_hadoop.sh: syntax error trying to 

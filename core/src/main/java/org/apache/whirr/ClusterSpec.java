@@ -820,6 +820,7 @@ public class ClusterSpec {
   }
 
   public void setClusterUser(String user) {
+    checkArgument(user == null || !user.equals("root"), "cluster-user != root or do not run as root");
     this.clusterUser = user;
   }
 
