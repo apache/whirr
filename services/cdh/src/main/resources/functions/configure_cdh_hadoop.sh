@@ -77,7 +77,7 @@ EOF
   mkdir -p $(dirname $HADOOP_LOG_DIR)
   ln -s /data/hadoop/logs $HADOOP_LOG_DIR
   chgrp -R hadoop $HADOOP_LOG_DIR
-  chmod -R $HADOOP_LOG_DIR
+  chmod -R g+w $HADOOP_LOG_DIR
 
   for role in $(echo "$ROLES" | tr "," "\n"); do
     case $role in
