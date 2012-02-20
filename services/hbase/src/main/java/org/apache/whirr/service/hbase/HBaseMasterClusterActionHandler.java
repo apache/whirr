@@ -188,6 +188,7 @@ public class HBaseMasterClusterActionHandler extends HBaseClusterActionHandler {
         "Use Ctrl-c to quit.'\n", master.getHostName())
         + Joiner.on(" ").join(proxy.getProxyCommand());
       Files.write(script, hbaseProxyFile, Charsets.UTF_8);
+      hbaseProxyFile.setExecutable(true);
       LOG.info("Wrote HBase proxy script {}", hbaseProxyFile);
     } catch (IOException e) {
       LOG.error("Problem writing HBase proxy script {}", hbaseProxyFile, e);

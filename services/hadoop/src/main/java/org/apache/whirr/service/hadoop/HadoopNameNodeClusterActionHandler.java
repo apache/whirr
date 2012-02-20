@@ -149,6 +149,7 @@ public class HadoopNameNodeClusterActionHandler extends HadoopClusterActionHandl
           "Use Ctrl-c to quit.'\n", namenode.getHostName())
           + Joiner.on(" ").join(proxy.getProxyCommand());
       Files.write(script, hadoopProxyFile, Charsets.UTF_8);
+      hadoopProxyFile.setExecutable(true);
       LOG.info("Wrote Hadoop proxy script {}", hadoopProxyFile);
     } catch (IOException e) {
       LOG.error("Problem writing Hadoop proxy script {}", hadoopProxyFile, e);

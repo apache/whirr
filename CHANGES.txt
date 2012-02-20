@@ -7,6 +7,8 @@ Release 0.7.1
     WHIRR-507. Make whirr script executable from any path 
     (Marco Didonna via asavu)
 
+    WHIRR-439. Make proxy files executable (Marco Didonna via asavu)
+
   BUG FIXES
 
     WHIRR-502. configure_cdh_hadoop.sh: syntax error trying to 
