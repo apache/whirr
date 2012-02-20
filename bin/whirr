@@ -15,7 +15,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-BIN=$(cd $(dirname "$0"); pwd)
+SOURCE=$0;
+SCRIPT=`basename "$SOURCE"`;
+while [ -h "$SOURCE" ]; do
+    SCRIPT=`basename "$SOURCE"`;
+    LOOKUP=`ls -ld "$SOURCE"`;
+    TARGET=`expr "$LOOKUP" : '.*-> \(.*\)$'`;
+    if expr "${TARGET:-.}/" : '/.*/$' > /dev/null; then
+        SOURCE=${TARGET:-.};
+    else
+        SOURCE=`dirname "$SOURCE"`/${TARGET:-.};
+    fi;
+done;
+
+BIN=$(cd $(dirname "$SOURCE"); pwd)
 LOGGING_OPTS="-Dlog4j.configuration=log4j-cli.xml"
 
 if [ -d "$BIN/../cli/target/lib" ]; then
