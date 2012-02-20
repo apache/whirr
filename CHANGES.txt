@@ -14,6 +14,9 @@ Release 0.7.1
     WHIRR-502. configure_cdh_hadoop.sh: syntax error trying to 
     modify permissions on $HADOOP_LOG_DIR (asavu)
 
+    WHIRR-490. hadoop-mapreduce.mapred.child.ulimit should be 
+    unlimited by default (asavu)
+
 Release 0.7.0 - 2011-12-11
 
   NEW FEATURES
