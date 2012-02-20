@@ -46,7 +46,7 @@ public class ElasticSearchHandler extends ClusterActionHandlerSupport {
     ClusterSpec spec = event.getClusterSpec();
     Configuration config = spec.getConfiguration();
 
-    addStatement(event, call(getInstallFunction(config, "java", "install_java")));
+    addStatement(event, call(getInstallFunction(config, "java", "install_openjdk")));
     addStatement(event, call("install_tarball"));
 
     String tarurl = prepareRemoteFileUrl(event,

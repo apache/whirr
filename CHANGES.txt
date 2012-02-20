@@ -63,6 +63,8 @@ Trunk (unreleased changes)
 
     WHIRR-507. Make whirr script executable from any path (Marco Didonna via asavu)
 
+    WHIRR-518. Change to OpenJDK (Frank Scholten via asavu)
+
   BUG FIXES
 
     WHIRR-367. Wrong groupId for zookeeper (Joe Crobak via asavu)

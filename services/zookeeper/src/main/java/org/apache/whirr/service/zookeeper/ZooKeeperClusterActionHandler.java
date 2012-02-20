@@ -61,7 +61,7 @@ public class ZooKeeperClusterActionHandler extends ClusterActionHandlerSupport {
     ClusterSpec clusterSpec = event.getClusterSpec();
     Configuration config = getConfiguration(clusterSpec);
 
-    addStatement(event, call(getInstallFunction(config, "java", "install_java")));
+    addStatement(event, call(getInstallFunction(config, "java", "install_openjdk")));
     addStatement(event, call("install_tarball"));
     addStatement(event, call("install_service"));
 

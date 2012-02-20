@@ -79,7 +79,7 @@ public class VoldemortClusterActionHandler extends ClusterActionHandlerSupport {
       optArgs.add(prepareRemoteFileUrl(event, confUrl));
     }
 
-    addStatement(event, call(getInstallFunction(config, "java", "install_java")));
+    addStatement(event, call(getInstallFunction(config, "java", "install_openjdk")));
     addStatement(event, call("install_service"));
 
     addStatement(event, call(FUNCTION_INSTALL, optArgs.toArray(new String[optArgs.size()])));

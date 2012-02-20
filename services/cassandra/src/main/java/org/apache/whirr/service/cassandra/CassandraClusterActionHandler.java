@@ -60,7 +60,7 @@ public class CassandraClusterActionHandler extends ClusterActionHandlerSupport {
     ClusterSpec clusterSpec = event.getClusterSpec();
     Configuration conf = clusterSpec.getConfiguration();
     
-    addStatement(event, call(getInstallFunction(conf, "java", "install_java")));
+    addStatement(event, call(getInstallFunction(conf, "java", "install_openjdk")));
     addStatement(event, call("install_tarball"));
 
     addStatement(event, call("install_service"));
