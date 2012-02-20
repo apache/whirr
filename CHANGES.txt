@@ -9,6 +9,9 @@ Trunk (unreleased changes)
 
   IMPROVEMENTS
 
+    WHIRR-514. Avoid hardcoded Whirr version number in karaf tests (kve)
+    (orig: Update release instructions or fix update-version script?)
+
     WHIRR-421. Handle more role / service lifecycle events as part 
     of the core functionality (asavu)
 

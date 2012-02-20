@@ -18,6 +18,10 @@
 
 package org.apache.whirr.karaf.itest;
 
+import java.io.IOException;
+
+import java.util.Properties;
+
 import org.apache.felix.service.command.CommandProcessor;
 import org.apache.felix.service.command.CommandSession;
 import org.ops4j.pax.exam.MavenUtils;
@@ -63,7 +67,7 @@ public class WhirrKarafTestSupport {
   static final String GROUP_ID = "org.apache.karaf";
   static final String ARTIFACT_ID = "apache-karaf";
 
-  static final String WHIRR_VERSION = "0.8.0-SNAPSHOT";
+  static final String WHIRR_VERSION = getWhirrVersion();
 
   static final String WHIRR_FEATURE_URL = String.format("mvn:org.apache.whirr.karaf/apache-whirr/%s/xml/features", WHIRR_VERSION);
 
@@ -288,6 +292,16 @@ public class WhirrKarafTestSupport {
   */
   private static Collection<ServiceReference> asCollection(ServiceReference[] references) {
     return references != null ? Arrays.asList(references) : Collections.<ServiceReference>emptyList();
+  }
+
+  private static String getWhirrVersion() {
+    Properties props = new Properties();
+    try {
+      props.load(WhirrKarafTestSupport.class.getResourceAsStream("/whirr-karaf-itests.properties"));
+      return props.getProperty("version");
+    } catch (IOException e) {
+      throw new RuntimeException("Could not load properties containing whirr version number from classpath:/whirr-karaf-itests.properties");
+    }
   }
 
 }
