@@ -34,7 +34,7 @@ import static org.jclouds.scriptbuilder.domain.Statements.createOrOverwriteFile;
  * Helper class to convert between Hadoop configuration representations.
  */
 public class HadoopConfigurationConverter {
-  
+
   private static final String FINAL_SUFFIX = ".final";
 
   @VisibleForTesting
@@ -63,8 +63,8 @@ public class HadoopConfigurationConverter {
     lines.add("</configuration>");
     return lines;
   }
-  
-  public static Statement asCreateXmlConfigurationFileStatement(String path, 
+
+  public static Statement asCreateXmlConfigurationFileStatement(String path,
       Configuration hadoopConfig) {
     return createOrOverwriteFile(path, asXmlConfigurationLines(hadoopConfig));
   }
@@ -72,7 +72,8 @@ public class HadoopConfigurationConverter {
   @VisibleForTesting
   static List<String> asEnvironmentVariablesLines(Configuration hadoopConfig) {
     List<String> lines = Lists.newArrayList();
-    
+    lines.add("source /etc/profile");
+
     for (@SuppressWarnings("unchecked")
         Iterator<String> it = hadoopConfig.getKeys(); it.hasNext(); ) {
       String key = it.next();
@@ -90,10 +91,10 @@ public class HadoopConfigurationConverter {
     }
     return lines;
   }
-  
-  public static Statement asCreateEnvironmentVariablesFileStatement(String path, 
+
+  public static Statement asCreateEnvironmentVariablesFileStatement(String path,
       Configuration config) {
     return createOrOverwriteFile(path, asEnvironmentVariablesLines(config));
   }
-  
+
 }
