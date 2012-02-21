@@ -92,6 +92,8 @@ Trunk (unreleased changes)
     WHIRR-510. Get ZooKeeper ensemble with internal addresses 
     (David Arthur via asavu)
 
+    WHIRR-520. Using OAB script to install sun jdk (Marco Didonna via asavu)
+
 Release 0.7.0 - 2011-12-11
 
   NEW FEATURES
