@@ -31,6 +31,8 @@ Release 0.7.1
 
     WHIRR-460. Error while running whirr on Cygwin (Akash Ashok via asavu)
 
+    WHIRR-520. Using OAB script to install sun jdk (Marco Didonna via asavu)
+
 Release 0.7.0 - 2011-12-11
 
   NEW FEATURES
