@@ -94,6 +94,8 @@ Trunk (unreleased changes)
 
     WHIRR-520. Using OAB script to install sun jdk (Marco Didonna via asavu)
 
+    WHIRR-524. Change confusing 'Starting cluster' message (Frank Scholten via asavu)
+
 Release 0.7.0 - 2011-12-11
 
   NEW FEATURES
