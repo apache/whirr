@@ -20,7 +20,7 @@
   <parent>
     <groupId>org.apache.whirr</groupId>
     <artifactId>whirr</artifactId>
-    <version>0.7.0</version>
+    <version>0.7.1</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <artifactId>whirr-chef</artifactId>

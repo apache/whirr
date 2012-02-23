@@ -25,6 +25,49 @@
     <!-- Paste release notes from https://issues.apache.org/jira/browse/WHIRR here. -->
 
 
+        <h1>Release Notes - Whirr - Version 0.7.1</h1>
+                
+<h2>        Bug
+</h2>
+<ul>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-367'>WHIRR-367</a>] -         Wrong groupId for zookeeper
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-460'>WHIRR-460</a>] -         Error while running whirr on Cygwin 
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-490'>WHIRR-490</a>] -         hadoop-mapreduce.mapred.child.ulimit should be unlimited by default
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-495'>WHIRR-495</a>] -         bin/whirr is does not have executable permissions in the 0.7.0 pre-built download
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-502'>WHIRR-502</a>] -         configure_cdh_hadoop.sh:  syntax error trying to modify permissions on $HADOOP_LOG_DIR
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-518'>WHIRR-518</a>] -         Change to OpenJDK
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-520'>WHIRR-520</a>] -         Using OAB script to install sun jdk
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-521'>WHIRR-521</a>] -         Backport InstallJDK functionality from jclouds 1.4.0
+</li>
+</ul>
+            
+<h2>        Improvement
+</h2>
+<ul>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-439'>WHIRR-439</a>] -         Make proxy files executable
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-454'>WHIRR-454</a>] -         Allow openjdk to be installed as an alternative to sun-java-6
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-463'>WHIRR-463</a>] -         Fail fast when running as root
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-498'>WHIRR-498</a>] -         Update the list of known limitations
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-507'>WHIRR-507</a>] -         Make whirr script executable from any path
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-517'>WHIRR-517</a>] -         Add a retry loop around apt-get and yum commands to overcome transient errors
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-526'>WHIRR-526</a>] -         Don&#39;t log harmless sshj errors to console
+</li>
+</ul>
+                                                
+
        <h1> Release Notes - Whirr - Version 0.7.0 </h1>
     
 <h2>        Sub-task
