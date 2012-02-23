@@ -68,6 +68,8 @@ Trunk (unreleased changes)
 
     WHIRR-518. Change to OpenJDK (Frank Scholten via asavu)
 
+    WHIRR-526. Don't log harmless sshj errors to console (asavu)
+
   BUG FIXES
 
     WHIRR-367. Wrong groupId for zookeeper (Joe Crobak via asavu)

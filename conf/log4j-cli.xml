@@ -41,24 +41,27 @@
     </layout>
   </appender>
 
-  <category name="org.apache.whirr">
-    <priority value="DEBUG" />
-    <appender-ref ref="ROLLINGFILE" />
-  </category>
-  
-  <category name="jclouds.compute">
-    <priority value="DEBUG" />
-    <appender-ref ref="ROLLINGFILE" />
-  </category>
-
-  <category name="net.schmizz.sshj">
-    <priority value="ERROR" />
+  <logger name="org.apache.whirr" additivity="false">
+    <level value="DEBUG" />
     <appender-ref ref="CONSOLE" />
-  </category>
+    <appender-ref ref="ROLLINGFILE" />
+  </logger>
+
+  <logger name="jclouds.compute">
+    <level value="DEBUG" />
+  </logger>
+
+  <logger name="jclouds.ssh">
+    <level value="ERROR" />
+  </logger>
+
+  <logger name="net.schmizz.sshj">
+    <level value="ERROR" />
+  </logger>
 
   <root>
     <priority value="INFO" />
-    <appender-ref ref="CONSOLE" />
+    <appender-ref ref="ROLLINGFILE" />
   </root>
 
 </log4j:configuration>
