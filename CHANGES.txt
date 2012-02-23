@@ -33,6 +33,8 @@ Release 0.7.1
 
     WHIRR-520. Using OAB script to install sun jdk (Marco Didonna via asavu)
 
+    WHIRR-518. Change to OpenJDK (Frank Scholten, Tom White, Andrei Savu)
+
 Release 0.7.0 - 2011-12-11
 
   NEW FEATURES

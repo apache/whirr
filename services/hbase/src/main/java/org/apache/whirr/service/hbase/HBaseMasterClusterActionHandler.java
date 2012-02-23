@@ -66,7 +66,7 @@ public class HBaseMasterClusterActionHandler extends HBaseClusterActionHandler {
 
     addStatement(event, call("configure_hostnames"));
 
-    addStatement(event, call(getInstallFunction(conf, "java", "install_java")));
+    addStatement(event, call(getInstallFunction(conf, "java", "install_openjdk")));
     addStatement(event, call("install_tarball"));
 
     String tarurl = prepareRemoteFileUrl(event,

@@ -72,6 +72,7 @@ public class HadoopConfigurationConverter {
   @VisibleForTesting
   static List<String> asEnvironmentVariablesLines(Configuration hadoopConfig) {
     List<String> lines = Lists.newArrayList();
+    lines.add(". /etc/profile");
     
     for (@SuppressWarnings("unchecked")
         Iterator<String> it = hadoopConfig.getKeys(); it.hasNext(); ) {

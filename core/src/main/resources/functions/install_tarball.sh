@@ -25,10 +25,10 @@ function install_tarball() {
     local target=${2:-/usr/local/}
     mkdir -p $target
 
-    local curl="curl -L --silent --show-error --fail --connect-timeout 10 --max-time 600 --retry 5"
-    # any download should take less than 10 minutes
+    local curl="curl -L --silent --show-error --fail --connect-timeout 20 --max-time 1200 --retry 5"
+    # any download should take less than 20 minutes
 
-    for retry_count in `seq 1 3`;
+    for retry_count in `seq 1 20`;
     do
       $curl -O $tar_url || true
       $curl -O $tar_url.md5 || true
@@ -47,7 +47,7 @@ function install_tarball() {
         rm -f $tar_file $tar_file_md5
       fi
 
-      if [ ! $retry_count -eq "3" ]; then
+      if [ ! $retry_count -eq "20" ]; then
         sleep 10
       fi
     done
