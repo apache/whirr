@@ -56,12 +56,12 @@ public class CassandraClusterActionHandler extends ClusterActionHandlerSupport {
   protected void beforeBootstrap(ClusterActionEvent event) throws IOException {
     ClusterSpec clusterSpec = event.getClusterSpec();
     Configuration conf = clusterSpec.getConfiguration();
-    
-    addStatement(event, call(getInstallFunction(conf, "java", "install_openjdk")));
-    addStatement(event, call("install_tarball"));
 
+    addStatement(event, call("retry_helpers"));
+    addStatement(event, call("install_tarball"));
     addStatement(event, call("install_service"));
-    addStatement(event, call("remove_service"));
+
+    addStatement(event, call(getInstallFunction(conf, "java", "install_openjdk")));
 
     Configuration config = clusterSpec.getConfiguration();
 

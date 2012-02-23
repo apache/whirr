@@ -56,9 +56,9 @@ EOF
   
   # Now that it's configured, install daemon package
   if which dpkg &> /dev/null; then
-    apt-get -y install hadoop-zookeeper-server
+    retry_apt_get -y install hadoop-zookeeper-server
   elif which rpm &> /dev/null; then
-    yum install -y hadoop-zookeeper-server
+    retry_yum install -y hadoop-zookeeper-server
   fi
 
   # Start ZooKeeper

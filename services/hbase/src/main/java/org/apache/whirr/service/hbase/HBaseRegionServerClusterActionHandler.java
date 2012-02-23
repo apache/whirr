@@ -52,10 +52,11 @@ public class HBaseRegionServerClusterActionHandler extends HBaseClusterActionHan
     ClusterSpec clusterSpec = event.getClusterSpec();
     Configuration conf = getConfiguration(clusterSpec);
 
+    addStatement(event, call("retry_helpers"));
     addStatement(event, call("configure_hostnames"));
+    addStatement(event, call("install_tarball"));
 
     addStatement(event, call(getInstallFunction(conf, "java", "install_openjdk")));
-    addStatement(event, call("install_tarball"));
 
     String tarurl = prepareRemoteFileUrl(event,
       getConfiguration(clusterSpec).getString(HBaseConstants.KEY_TARBALL_URL));
@@ -98,6 +99,7 @@ public class HBaseRegionServerClusterActionHandler extends HBaseClusterActionHan
     String tarurl = prepareRemoteFileUrl(event,
       conf.getString(HBaseConstants.KEY_TARBALL_URL));
 
+    addStatement(event, call("retry_helpers"));
     addStatement(event, call(
       getConfigureFunction(conf),
       ROLE,

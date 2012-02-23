@@ -52,7 +52,7 @@ public class ZooKeeperClusterActionHandler extends ClusterActionHandlerSupport {
   }
 
   protected Configuration getConfiguration(ClusterSpec spec)
-    throws IOException {
+      throws IOException {
     return getConfiguration(spec, "whirr-zookeeper-default.properties");
   }
 
@@ -73,9 +73,11 @@ public class ZooKeeperClusterActionHandler extends ClusterActionHandlerSupport {
     ClusterSpec clusterSpec = event.getClusterSpec();
     Configuration config = getConfiguration(clusterSpec);
 
-    addStatement(event, call(getInstallFunction(config, "java", "install_openjdk")));
+    addStatement(event, call("retry_helpers"));
     addStatement(event, call("install_tarball"));
     addStatement(event, call("install_service"));
+
+    addStatement(event, call(getInstallFunction(config, "java", "install_openjdk")));
 
     String tarurl = config.getString("whirr.zookeeper.tarball.url");
     addStatement(event, call(getInstallFunction(config),
@@ -101,6 +103,7 @@ public class ZooKeeperClusterActionHandler extends ClusterActionHandlerSupport {
     Configuration config = getConfiguration(clusterSpec);
     String configureFunction = getConfigureFunction(config);
 
+    addStatement(event, call("retry_helpers"));
     addStatement(event, call(configureFunction, servers));
 
     if (configureFunction.equals("configure_zookeeper")) { //default zookeeper.configure-function
@@ -118,7 +121,7 @@ public class ZooKeeperClusterActionHandler extends ClusterActionHandlerSupport {
 
     LOG.info("Completed configuration of {}", clusterSpec.getClusterName());
     String hosts = Joiner.on(',').join(getHosts(cluster.getInstancesMatching(
-      role(ZOOKEEPER_ROLE))));
+        role(ZOOKEEPER_ROLE))));
     LOG.info("Hosts: {}", hosts);
   }
 

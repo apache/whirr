@@ -15,8 +15,8 @@
 # limitations under the License.
 #
 function install_openjdk_deb() {
-  apt-get update
-  apt-get -y install openjdk-6-jdk
+  retry_apt_get update
+  retry_apt_get -y install openjdk-6-jdk
   
   export JAVA_HOME=/usr/lib/jvm/java-6-openjdk
   echo "export JAVA_HOME=$JAVA_HOME" >> /etc/profile
@@ -27,7 +27,7 @@ function install_openjdk_deb() {
 }
 
 function install_openjdk_rpm() {
-  yum install java-1.6.0-openjdk
+  retry_yum install java-1.6.0-openjdk
   
   export JAVA_HOME=/usr/lib/jvm/java-1.6.0-openjdk
   echo "export JAVA_HOME=$JAVA_HOME" >> /etc/profile

@@ -105,12 +105,12 @@ EOF
 
 function start_namenode() {
   if which dpkg &> /dev/null; then
-    apt-get -y install $HADOOP-namenode
+    retry_apt_get -y install $HADOOP-namenode
     AS_HDFS="su -s /bin/bash - hdfs -c"
     # Format HDFS
     [ ! -e /data/hadoop/hdfs ] && $AS_HDFS "$HADOOP namenode -format"
   elif which rpm &> /dev/null; then
-    yum install -y $HADOOP-namenode
+    retry_yum install -y $HADOOP-namenode
     AS_HDFS="/sbin/runuser -s /bin/bash - hdfs -c"
     # Format HDFS
     [ ! -e /data/hadoop/hdfs ] && $AS_HDFS "$HADOOP namenode -format"
@@ -140,9 +140,9 @@ function start_namenode() {
 function start_hadoop_daemon() {
   daemon=$1
   if which dpkg &> /dev/null; then
-    apt-get -y install $HADOOP-$daemon
+    retry_apt_get -y install $HADOOP-$daemon
   elif which rpm &> /dev/null; then
-    yum install -y $HADOOP-$daemon
+    retry_yum install -y $HADOOP-$daemon
   fi
   service $HADOOP-$daemon start
 }

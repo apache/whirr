@@ -16,9 +16,9 @@
 #
 function update_repo() {
   if which dpkg &> /dev/null; then
-    sudo apt-get update
+    retry_apt_get update
   elif which rpm &> /dev/null; then
-    yum update -y yum
+    retry_yum update -y yum
   fi
 }
 

@@ -53,6 +53,7 @@ public class MahoutClientClusterActionHandler extends ClusterActionHandlerSuppor
 
     String mahoutTarball = prepareRemoteFileUrl(event, conf.getString(MAHOUT_TAR_URL));
 
+    addStatement(event, call("retry_helpers"));
     addStatement(event, call(MAHOUT_CLIENT_SCRIPT, URL_FLAG, mahoutTarball));
   }
 }

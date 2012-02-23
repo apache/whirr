@@ -65,10 +65,11 @@ public abstract class HadoopClusterActionHandler extends ClusterActionHandlerSup
     ClusterSpec clusterSpec = event.getClusterSpec();
     Configuration conf = getConfiguration(clusterSpec);
 
+    addStatement(event, call("retry_helpers"));
     addStatement(event, call("configure_hostnames"));
+    addStatement(event, call("install_tarball"));
 
     addStatement(event, call(getInstallFunction(conf, "java", "install_openjdk")));
-    addStatement(event, call("install_tarball"));
 
     String tarball = prepareRemoteFileUrl(event,
         conf.getString("whirr.hadoop.tarball.url"));
@@ -86,7 +87,8 @@ public abstract class HadoopClusterActionHandler extends ClusterActionHandlerSup
     doBeforeConfigure(event);
 
     createHadoopConfigFiles(event, clusterSpec, cluster);
-    
+
+    addStatement(event, call("retry_helpers"));
     addStatement(event, call(
       getConfigureFunction(getConfiguration(clusterSpec)),
       Joiner.on(",").join(event.getInstanceTemplate().getRoles()),

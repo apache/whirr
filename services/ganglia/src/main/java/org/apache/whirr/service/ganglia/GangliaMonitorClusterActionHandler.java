@@ -70,6 +70,7 @@ public class GangliaMonitorClusterActionHandler extends ClusterActionHandlerSupp
     ClusterSpec clusterSpec = event.getClusterSpec();
     Configuration config = getConfiguration(clusterSpec);
 
+    addStatement(event, call("retry_helpers"));
     addStatement(event, call(getInstallFunction(config),
       "-r", GANGLIA_MONITOR_ROLE)
     );
@@ -89,6 +90,7 @@ public class GangliaMonitorClusterActionHandler extends ClusterActionHandlerSupp
 
     // Call the configure function.
     String metadHost = cluster.getInstanceMatching(role(GANGLIA_METAD_ROLE)).getPrivateIp();
+    addStatement(event, call("retry_helpers"));
     addStatement(event, call(configureFunction, "-m", metadHost));
   }
   

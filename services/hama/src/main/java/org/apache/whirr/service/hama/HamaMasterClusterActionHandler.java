@@ -77,6 +77,8 @@ public class HamaMasterClusterActionHandler extends HamaClusterActionHandler {
     String tarurl = prepareRemoteFileUrl(event, getConfiguration(clusterSpec)
         .getString(HamaConstants.KEY_TARBALL_URL));
 
+    addStatement(event, call("retry_helpers"));
+
     addStatement(event, call(hamaConfigureFunction, ROLE,
         HamaConstants.PARAM_MASTER, master, HamaConstants.PARAM_QUORUM, quorum,
         HamaConstants.PARAM_TARBALL_URL, tarurl));

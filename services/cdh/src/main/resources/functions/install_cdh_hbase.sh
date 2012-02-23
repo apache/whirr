@@ -20,8 +20,8 @@ function register_cloudera_repo() {
 deb http://archive.cloudera.com/debian lucid-$REPO contrib
 deb-src http://archive.cloudera.com/debian lucid-$REPO contrib
 EOF
-    curl -s http://archive.cloudera.com/debian/archive.key | sudo apt-key add -
-    sudo apt-get update
+    curl -s http://archive.cloudera.com/debian/archive.key | apt-key add -
+    retry_apt_get update
   elif which rpm &> /dev/null; then
     rm -f /etc/yum.repos.d/cloudera.repo
     REPO_NUMBER=`echo $REPO | sed -e 's/cdh\([0-9][0-9]*\)/\1/'`
@@ -32,7 +32,7 @@ mirrorlist=http://archive.cloudera.com/redhat/cdh/$REPO_NUMBER/mirrors
 gpgkey = http://archive.cloudera.com/redhat/cdh/RPM-GPG-KEY-cloudera
 gpgcheck = 0
 EOF
-    yum update -y yum
+    retry_yum update -y yum
   fi
 }
 
@@ -77,10 +77,10 @@ function install_cdh_hbase() {
   register_cloudera_repo
   
   if which dpkg &> /dev/null; then
-    apt-get update
-    apt-get -y install hadoop-hbase
+    retry_apt_get update
+    retry_apt_get -y install hadoop-hbase
   elif which rpm &> /dev/null; then
-    yum install -y hadoop-hbase
+    retry_yum install -y hadoop-hbase
   fi
   
   echo "export HBASE_HOME=$HBASE_HOME" >> ~root/.bashrc

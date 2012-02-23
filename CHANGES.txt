@@ -15,6 +15,9 @@ Release 0.7.1
 
     WHIRR-454. Allow openjdk to be installed as an alternative 
     to sun-java-6 (Karel Vervaeke via asavu)
+
+    WHIRR-517. Add a retry loop around apt-get and yum commands 
+    to overcome transient errors (Karel Vervaeke, Andrei Savu)
     
   BUG FIXES
 
