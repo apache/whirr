@@ -21,7 +21,8 @@ function install_openjdk_deb() {
   export JAVA_HOME=/usr/lib/jvm/java-6-openjdk
   echo "export JAVA_HOME=$JAVA_HOME" >> /etc/profile
   echo "export JAVA_HOME=$JAVA_HOME" >> ~root/.bashrc
-  # TODO: update-alternatives?
+  update-alternatives --install /usr/bin/java java $JAVA_HOME/bin/java 17000
+  update-alternatives --set java $JAVA_HOME/bin/java
   java -version
   
 }
