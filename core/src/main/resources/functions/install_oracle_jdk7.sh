@@ -42,8 +42,16 @@ function install_oracle_jdk7() {
   (cd $tmpdir; mv jdk1* $target_dir)
   rm -rf $tmpdir
   
-  # FIXME: detect if there is an alternatives mechanism and use that instead
-  ln -sf "$target_dir/bin/java /usr/bin/java"
+  if which dpkg &> /dev/null; then
+    update-alternatives --install /usr/bin/java java $target_dir/bin/java 17000
+    update-alternatives --set java $target_dir/bin/java
+  elif which rpm &> /dev/null; then
+    alternatives --install /usr/bin/java java $target_dir/bin/java 17000
+    alternatives --set java $target_dir/bin/java
+  else
+    # Assume there is no alternatives mechanism, create our own symlink
+    ln -sf "$target_dir/bin/java" /usr/bin/java
+  fi
 
   # Try to set JAVA_HOME in a number of commonly used locations
   export JAVA_HOME=$target_dir
