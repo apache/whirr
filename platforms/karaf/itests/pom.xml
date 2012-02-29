@@ -71,13 +71,6 @@
     </dependency>
 
     <dependency>
-      <groupId>org.apache.whirr</groupId>
-      <artifactId>whirr-core</artifactId>
-      <version>${project.version}</version>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
       <groupId>org.ops4j.pax.url</groupId>
       <artifactId>pax-url-mvn</artifactId>
     </dependency>

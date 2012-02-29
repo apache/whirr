@@ -68,6 +68,9 @@ Trunk (unreleased changes)
 
     WHIRR-524. Change confusing 'Starting cluster' message (Frank Scholten via asavu)
 
+    WHIRR-536. Using SNAPSHOT versions of jclouds breaks OSGi 
+    support (Ioannis Canellos, Andrei Savu)
+
 Release 0.7.1 - 2012-02-23
 
   IMPROVEMENTS

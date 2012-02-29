@@ -37,7 +37,7 @@
     <osgi.export>
       org.apache.whirr.service.cassandra*;version="${project.version}"
     </osgi.export>
-    <osgi.fragment.host>jclouds-scriptbuilder</osgi.fragment.host>
+    <osgi.fragment.host>jclouds-scriptbuilder;bundle-version="${jclouds.osgi.version.clean}"</osgi.fragment.host>
   </properties>
   <dependencies>
     <dependency>

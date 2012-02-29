@@ -33,7 +33,7 @@
       org.apache.commons.configuration*;version="[1.6,2)",
       *
     </osgi.import>
-    <osgi.fragment.host>jclouds-scriptbuilder;bundle-version="${jclouds.version}"</osgi.fragment.host>
+    <osgi.fragment.host>jclouds-scriptbuilder;bundle-version="${jclouds.osgi.version.clean}"</osgi.fragment.host>
     <osgi.export>
       org.apache.whirr*;version="${project.version}"
     </osgi.export>

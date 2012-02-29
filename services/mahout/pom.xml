@@ -36,7 +36,7 @@
     <osgi.export>
       org.apache.whirr.service.mahout*;version="${project.version}"
     </osgi.export>
-    <osgi.fragment.host>jclouds-scriptbuilder;bundle-version="${jclouds.version}"</osgi.fragment.host>
+    <osgi.fragment.host>jclouds-scriptbuilder;bundle-version="${jclouds.osgi.version.clean}"</osgi.fragment.host>
   </properties>
   <dependencies>
     <dependency>
