@@ -41,13 +41,13 @@ public class ConfigurationReader {
     //Utility Class
   }
 
-
-   /**
+  /**
    * Builds Configuration from a File.
    *
    * @param fileName
    * @return
    * @throws org.apache.commons.configuration.ConfigurationException
+   *
    */
   public static PropertiesConfiguration fromFile(String fileName) {
     PropertiesConfiguration config = null;

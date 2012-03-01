@@ -108,4 +108,5 @@ public abstract class WhirrCommandSupport extends OsgiCommandSupport {
   public void setComputeServices(List<ComputeService> computeServices) {
     this.computeServices = computeServices;
   }
+
 }

@@ -18,12 +18,9 @@
 
 package org.apache.whirr.karaf.itest;
 
-import java.io.IOException;
-
-import java.util.Properties;
-
 import org.apache.felix.service.command.CommandProcessor;
 import org.apache.felix.service.command.CommandSession;
+import static org.openengsb.labs.paxexam.karaf.options.KarafDistributionOption.editConfigurationFileExtend;
 import org.ops4j.pax.exam.MavenUtils;
 import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.TestProbeBuilder;
@@ -57,31 +54,22 @@ import static org.ops4j.pax.exam.CoreOptions.maven;
 
 public class WhirrKarafTestSupport {
 
-  static final Long COMMAND_TIMEOUT = 300000L;
-  static final Long SERVICE_TIMEOUT = 30000L;
-  static final Long DEFAULT_WAIT = 20000L;
+  public static final Long COMMAND_TIMEOUT = 300000L;
+  public static final Long SERVICE_TIMEOUT = 30000L;
 
-  private static final String UNINSTALLED = "[uninstalled]";
-  private static final String INSTALLED = "[installed  ]";
+  public final String GROUP_ID = "org.apache.karaf";
+  public final String ARTIFACT_ID = "apache-karaf";
 
-  static final String GROUP_ID = "org.apache.karaf";
-  static final String ARTIFACT_ID = "apache-karaf";
+  public static final String WHIRR_FEATURE_URL = "mvn:org.apache.whirr.karaf/apache-whirr/%s/xml/features";
 
-  static final String WHIRR_VERSION = getWhirrVersion();
-
-  static final String WHIRR_FEATURE_URL = String.format("mvn:org.apache.whirr.karaf/apache-whirr/%s/xml/features", WHIRR_VERSION);
-
-  static final String DEBUG_OPTS = " --java-opts \"-Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=%s\"";
+  public final String WHIRR_KARAF_GROUP_ID = "org.apache.whirr.karaf";
+  public final String WHIRR_KARAF_ARTIFACT_ID = "apache-whirr";
 
   ExecutorService executor = Executors.newCachedThreadPool();
 
   @Inject
   protected BundleContext bundleContext;
 
-  /**
-   * @param probe
-   * @return
-   */
   @ProbeBuilder
   public TestProbeBuilder probeConfiguration(TestProbeBuilder probe) {
     probe.setHeader(Constants.DYNAMICIMPORT_PACKAGE, "*,org.apache.felix.service.*;status=provisional");
@@ -89,19 +77,6 @@ public class WhirrKarafTestSupport {
     return probe;
   }
 
-  /**
-   * Installs the Whiir feature
-   */
-  protected void installWhirr() {
-    System.err.println(executeCommand("features:addurl " + WHIRR_FEATURE_URL));
-    System.err.println(executeCommand("features:listurl"));
-    System.err.println(executeCommand("features:list"));
-    executeCommand("features:install whirr");
-  }
-
-  protected void unInstallWhirr() {
-    System.err.println(executeCommand("features:uninstall whirr"));
-  }
 
   /**
    * Create an {@link org.ops4j.pax.exam.Option} for using a .
@@ -110,8 +85,9 @@ public class WhirrKarafTestSupport {
    */
   protected Option whirrDistributionConfiguration() {
     return karafDistributionConfiguration().frameworkUrl(
-      maven().groupId(GROUP_ID).artifactId(ARTIFACT_ID).versionAsInProject().type("tar.gz"))
-      .karafVersion(MavenUtils.getArtifactVersion(GROUP_ID, ARTIFACT_ID)).name("Apache Karaf").unpackDirectory(new File("target/paxexam/"));
+        maven().groupId(GROUP_ID).artifactId(ARTIFACT_ID).versionAsInProject().type("tar.gz"))
+        .karafVersion(MavenUtils.getArtifactVersion(GROUP_ID, ARTIFACT_ID))
+        .name("Apache Karaf").unpackDirectory(new File("target/paxexam/"));
   }
 
   /**
@@ -141,20 +117,21 @@ public class WhirrKarafTestSupport {
     final CommandProcessor commandProcessor = getOsgiService(CommandProcessor.class);
     final CommandSession commandSession = commandProcessor.createSession(System.in, printStream, System.err);
     FutureTask<String> commandFuture = new FutureTask<String>(
-      new Callable<String>() {
-        public String call() {
-          try {
-            if (!silent) {
-              System.err.println(command);
+        new Callable<String>() {
+          @Override
+          public String call() {
+            try {
+              if (!silent) {
+                System.err.println(command);
+              }
+              commandSession.execute(command);
+            } catch (Exception e) {
+              e.printStackTrace(System.err);
             }
-            commandSession.execute(command);
-          } catch (Exception e) {
-            e.printStackTrace(System.err);
+            printStream.flush();
+            return byteArrayOutputStream.toString();
           }
-          printStream.flush();
-          return byteArrayOutputStream.toString();
-        }
-      });
+        });
 
     try {
       executor.submit(commandFuture);
@@ -181,19 +158,19 @@ public class WhirrKarafTestSupport {
     final CommandProcessor commandProcessor = getOsgiService(CommandProcessor.class);
     final CommandSession commandSession = commandProcessor.createSession(System.in, printStream, System.err);
     FutureTask<String> commandFuture = new FutureTask<String>(
-      new Callable<String>() {
-        public String call() {
-          try {
-            for (String command : commands) {
-              System.err.println(command);
-              commandSession.execute(command);
+        new Callable<String>() {
+          public String call() {
+            try {
+              for (String command : commands) {
+                System.err.println(command);
+                commandSession.execute(command);
+              }
+            } catch (Exception e) {
+              e.printStackTrace(System.err);
             }
-          } catch (Exception e) {
-            e.printStackTrace(System.err);
+            return byteArrayOutputStream.toString();
           }
-          return byteArrayOutputStream.toString();
-        }
-      });
+        });
 
     try {
       executor.submit(commandFuture);
@@ -234,14 +211,10 @@ public class WhirrKarafTestSupport {
     return result.toString();
   }
 
-  protected <T> T getOsgiService(Class<T> type, long timeout) {
-    return getOsgiService(type, null, timeout);
-  }
-
   protected <T> T getOsgiService(Class<T> type) {
     return getOsgiService(type, null, SERVICE_TIMEOUT);
   }
-  
+
   protected <T> T getOsgiService(Class<T> type, String filter, long timeout) {
     return type.cast(getOsgiService(type.getName(), filter, timeout));
   }
@@ -262,8 +235,10 @@ public class WhirrKarafTestSupport {
       Filter osgiFilter = FrameworkUtil.createFilter(flt);
       tracker = new ServiceTracker(bundleContext, osgiFilter, null);
       tracker.open(true);
+
       // Note that the tracker is not closed to keep the reference
       // This is buggy, as the service reference may change i think
+
       Object svc = tracker.waitForService(timeout);
       if (svc == null) {
         Dictionary dic = bundleContext.getBundle().getHeaders();
@@ -301,14 +276,25 @@ public class WhirrKarafTestSupport {
     return references != null ? Arrays.asList(references) : Collections.<ServiceReference>emptyList();
   }
 
-  private static String getWhirrVersion() {
-    Properties props = new Properties();
-    try {
-      props.load(WhirrKarafTestSupport.class.getResourceAsStream("/whirr-karaf-itests.properties"));
-      return props.getProperty("version");
-    } catch (IOException e) {
-      throw new RuntimeException("Could not load properties containing whirr version number from classpath:/whirr-karaf-itests.properties");
-    }
+  /**
+   * Sets a System property.
+   *
+   * @param propertyName
+   * @return
+   */
+  public static Option systemProperty(String propertyName, String propertyValue) {
+    return editConfigurationFileExtend("etc/system.properties", propertyName, propertyValue != null ? propertyValue : "");
   }
+
+  /**
+   * Copies the actual System property to the container properties.
+   *
+   * @param propertyName
+   * @return
+   */
+  public static Option systemProperty(String propertyName) {
+    return systemProperty(propertyName, System.getProperty(propertyName));
+  }
+
 
 }

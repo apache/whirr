@@ -22,6 +22,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openengsb.labs.paxexam.karaf.options.LogLevelOption;
+import org.ops4j.pax.exam.MavenUtils;
 import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.junit.Configuration;
 import org.ops4j.pax.exam.junit.ExamReactorStrategy;
@@ -29,9 +30,9 @@ import org.ops4j.pax.exam.junit.JUnit4TestRunner;
 import org.ops4j.pax.exam.spi.reactors.AllConfinedStagedReactorFactory;
 import org.osgi.framework.Bundle;
 
-
 import static org.openengsb.labs.paxexam.karaf.options.KarafDistributionOption.keepRuntimeFolder;
 import static org.openengsb.labs.paxexam.karaf.options.KarafDistributionOption.logLevel;
+import static org.ops4j.pax.exam.CoreOptions.scanFeatures;
 
 @RunWith(JUnit4TestRunner.class)
 @ExamReactorStrategy(AllConfinedStagedReactorFactory.class)
@@ -39,18 +40,18 @@ public class WhirrInstallationTest extends WhirrKarafTestSupport {
 
   @Test
   public void testInstallation() throws InterruptedException {
-    //Install Whirr and check if it has been properly installed.
-    installWhirr();
     System.err.println(executeCommand("osgi:list"));
-
     Bundle commandsBundle = getInstalledBundle("org.apache.whirr.karaf.commands");
-    Assert.assertEquals("Expected bundle to be started",Bundle.ACTIVE,commandsBundle.getState());
+    Assert.assertEquals("Expected bundle to be started", Bundle.ACTIVE, commandsBundle.getState());
   }
 
 
   @Configuration
   public Option[] config() {
     return new Option[]{
-            whirrDistributionConfiguration(), keepRuntimeFolder(),logLevel(LogLevelOption.LogLevel.ERROR)};
+        whirrDistributionConfiguration(), keepRuntimeFolder(), logLevel(LogLevelOption.LogLevel.ERROR),
+        scanFeatures(String.format(WHIRR_FEATURE_URL,
+            MavenUtils.getArtifactVersion(WHIRR_KARAF_GROUP_ID, WHIRR_KARAF_ARTIFACT_ID)), "whirr").start()
+    };
   }
 }

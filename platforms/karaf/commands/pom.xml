@@ -39,7 +39,8 @@
       *
     </osgi.import>
     <osgi.dynamic.import>javax.*,org.jclouds.*</osgi.dynamic.import>
-    <osgi.export>org.apache.whirr.karaf.command*;version="${project.version}"</osgi.export>
+    <osgi.export>org.apache.whirr.karaf.command*;version="${project.version}"
+    </osgi.export>
   </properties>
   <dependencies>
     <dependency>

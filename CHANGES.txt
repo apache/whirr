@@ -55,6 +55,8 @@ Trunk (unreleased changes)
     WHIRR-35. Include .pac file for browsing to Hadoop clusters 
     started on EC2 (asavu)
 
+    WHIRR-509. Provide live OSGi integration tests (Ioannis Canellos, Andrei Savu)
+
   BUG FIXES
 
     WHIRR-473. HadoopServiceController.getInstance(String config) does 

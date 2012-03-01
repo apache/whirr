@@ -22,6 +22,7 @@ package org.apache.whirr.karaf.itest;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openengsb.labs.paxexam.karaf.options.LogLevelOption;
+import org.ops4j.pax.exam.MavenUtils;
 import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.junit.Configuration;
 import org.ops4j.pax.exam.junit.ExamReactorStrategy;
@@ -30,6 +31,7 @@ import org.ops4j.pax.exam.spi.reactors.AllConfinedStagedReactorFactory;
 
 import static org.openengsb.labs.paxexam.karaf.options.KarafDistributionOption.keepRuntimeFolder;
 import static org.openengsb.labs.paxexam.karaf.options.KarafDistributionOption.logLevel;
+import static org.ops4j.pax.exam.CoreOptions.scanFeatures;
 
 @RunWith(JUnit4TestRunner.class)
 @ExamReactorStrategy(AllConfinedStagedReactorFactory.class)
@@ -37,9 +39,6 @@ public class WhirrServicesTest extends WhirrKarafTestSupport {
 
   @Test
   public void testServices() throws InterruptedException {
-    //Install Whirr
-    installWhirr();
-    System.err.println(executeCommand("osgi:list"));
     //Install all services
     executeCommand("features:install whirr-cassandra");
     executeCommand("features:install whirr-chef");
@@ -50,7 +49,6 @@ public class WhirrServicesTest extends WhirrKarafTestSupport {
     executeCommand("features:install whirr-hbase");
     executeCommand("features:install whirr-puppet");
     executeCommand("features:install whirr-mahout");
-    //executeCommand("features:install whirr-voldemort");
     executeCommand("features:install whirr-zookeeper");
 
     System.err.println(executeCommand("osgi:list"));
@@ -67,7 +65,6 @@ public class WhirrServicesTest extends WhirrKarafTestSupport {
     testService("hbase-master", "hbase-regionserver", "hbase-restserver", "hbase-avroserver", "hbase-thriftserver");
     testService("puppet-install");
     testService("mahout-client");
-    //testService("voldemort");
     testService("zookeeper");
   }
 
@@ -88,6 +85,9 @@ public class WhirrServicesTest extends WhirrKarafTestSupport {
   @Configuration
   public Option[] config() {
     return new Option[]{
-        whirrDistributionConfiguration(), keepRuntimeFolder(), logLevel(LogLevelOption.LogLevel.ERROR)};
+        whirrDistributionConfiguration(), keepRuntimeFolder(), logLevel(LogLevelOption.LogLevel.ERROR),
+        scanFeatures(String.format(WHIRR_FEATURE_URL, MavenUtils
+            .getArtifactVersion(WHIRR_KARAF_GROUP_ID, WHIRR_KARAF_ARTIFACT_ID)), "whirr").start()
+    };
   }
 }

@@ -50,7 +50,8 @@
     <jclouds.karaf.version>1.3.1</jclouds.karaf.version>
     <jopt.simple.bundle.version>4.3_1</jopt.simple.bundle.version>
     <jsch.bundle.version>0.1.44_2</jsch.bundle.version>
-    <not-yet-commons-ssl.bundle.version>0.3.11_1</not-yet-commons-ssl.bundle.version>
+    <not-yet-commons-ssl.bundle.version>0.3.11_1
+    </not-yet-commons-ssl.bundle.version>
     <servlet.spec.version>1.2</servlet.spec.version>
   </properties>
   <build>
@@ -121,7 +122,8 @@
             </goals>
             <configuration>
               <descriptors>
-                <descriptor>file:${basedir}/target/classes/features.xml</descriptor>
+                <descriptor>file:${basedir}/target/classes/features.xml
+                </descriptor>
               </descriptors>
               <features>
                 <feature>whirr</feature>
