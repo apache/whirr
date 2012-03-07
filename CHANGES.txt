@@ -75,6 +75,8 @@ Trunk (unreleased changes)
     WHIRR-536. Using SNAPSHOT versions of jclouds breaks OSGi 
     support (Ioannis Canellos, Andrei Savu)
 
+    WHIRR-549. Remove dependency on system SSH keys in tests (Frank Scholten)
+
 Release 0.7.1 - 2012-02-23
 
   IMPROVEMENTS
