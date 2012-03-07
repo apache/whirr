@@ -18,6 +18,7 @@
 
 package org.apache.whirr;
 
+import com.google.common.annotations.Beta;
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
@@ -140,15 +141,18 @@ public class ClusterController {
   /**
    * Configure cluster services
    */
+  @Beta
   public Cluster configureServices(ClusterSpec spec) throws IOException, InterruptedException {
     return configureServices(spec, new Cluster(getInstances(spec, getClusterStateStore(spec))));
   }
 
+  @Beta
   public Cluster configureServices(ClusterSpec clusterSpec, Cluster cluster)
     throws IOException, InterruptedException {
     return configureServices(clusterSpec, cluster, EMPTYSET, EMPTYSET);
   }
-  
+
+  @Beta
   public Cluster configureServices(ClusterSpec clusterSpec, Cluster cluster, Set<String> targetRoles,
         Set<String> targetInstanceIds) throws IOException, InterruptedException {
     ConfigureServicesAction configurer = new ConfigureServicesAction(getCompute(), handlerMapFactory.create(),
@@ -196,10 +200,12 @@ public class ClusterController {
   /**
    * Remove the cluster services
    */
+  @Beta
   public Cluster cleanupCluster(ClusterSpec spec) throws IOException, InterruptedException {
     return cleanupCluster(spec, new Cluster(getInstances(spec, getClusterStateStore(spec))));
   }
 
+  @Beta
   public Cluster cleanupCluster(ClusterSpec clusterSpec, Cluster cluster)
     throws IOException, InterruptedException {
     CleanupClusterAction cleanner = new CleanupClusterAction(getCompute(), handlerMapFactory.create());

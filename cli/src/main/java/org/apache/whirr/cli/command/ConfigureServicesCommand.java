@@ -18,6 +18,7 @@
 
 package org.apache.whirr.cli.command;
 
+import com.google.common.annotations.Beta;
 import joptsimple.OptionSet;
 import org.apache.whirr.ClusterController;
 import org.apache.whirr.ClusterControllerFactory;
@@ -29,6 +30,7 @@ import java.io.IOException;
 /**
  * A command to configure the cluster services
  */
+@Beta
 public class ConfigureServicesCommand extends RoleLifecycleCommand {
 
   public ConfigureServicesCommand() throws IOException {
