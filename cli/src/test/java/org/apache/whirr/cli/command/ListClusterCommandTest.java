@@ -31,7 +31,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 import java.io.File;
-import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
@@ -56,7 +55,10 @@ public class ListClusterCommandTest extends BaseCommandTest {
   @Test
   public void testInsufficientOptions() throws Exception {
     ListClusterCommand command = new ListClusterCommand();
-    int rc = command.run(null, null, err, Collections.<String>emptyList());
+    Map<String, File> keys = KeyPair.generateTemporaryFiles();
+    int rc = command.run(null, null, err, Lists.<String>newArrayList(
+        "--private-key-file", keys.get("private").getAbsolutePath())
+    );
     assertThat(rc, is(-1));
     assertThat(errBytes.toString(), containsString("Option 'cluster-name' not set."));
   }

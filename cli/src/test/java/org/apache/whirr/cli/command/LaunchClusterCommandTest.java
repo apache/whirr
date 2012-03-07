@@ -18,7 +18,6 @@
 
 package org.apache.whirr.cli.command;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.PropertiesConfiguration;
@@ -33,7 +32,6 @@ import org.hamcrest.MatcherAssert;
 import org.junit.Test;
 
 import java.io.File;
-import java.util.Collections;
 import java.util.Map;
 
 import static org.hamcrest.Matchers.containsString;
@@ -49,7 +47,10 @@ public class LaunchClusterCommandTest extends BaseCommandTest{
   @Test
   public void testInsufficientArgs() throws Exception {
     LaunchClusterCommand command = new LaunchClusterCommand();
-    int rc = command.run(null, null, err, Collections.<String>emptyList());
+    Map<String, File> keys = KeyPair.generateTemporaryFiles();
+    int rc = command.run(null, null, err, Lists.<String>newArrayList(
+        "--private-key-file", keys.get("private").getAbsolutePath())
+    );
     assertThat(rc, is(-1));
     assertThat(errBytes.toString(), containsString("Option 'cluster-name' not set."));
   }
@@ -159,13 +160,15 @@ public class LaunchClusterCommandTest extends BaseCommandTest{
 
     ClusterControllerFactory factory = new ClusterControllerFactory();
     LaunchClusterCommand launchCluster = new LaunchClusterCommand(factory);
+    Map<String, File> keys = KeyPair.generateTemporaryFiles();
 
-    int rc = launchCluster.run(null, out, err, ImmutableList.of(
+    int rc = launchCluster.run(null, out, err, Lists.<String>newArrayList(
         "--cluster-name", "test-cluster-launch",
         "--state-store", "none",
         "--instance-templates", "1 zookeeper+cassandra, 1 zookeeper+elasticsearch",
         "--provider", "stub",
-        "--identity", "dummy"
+        "--identity", "dummy",
+        "--private-key-file", keys.get("private").getAbsolutePath()
     ));
 
     MatcherAssert.assertThat(rc, is(0));

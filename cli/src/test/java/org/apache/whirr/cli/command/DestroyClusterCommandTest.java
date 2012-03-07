@@ -28,7 +28,6 @@ import org.apache.whirr.util.KeyPair;
 import org.junit.Test;
 
 import java.io.File;
-import java.util.Collections;
 import java.util.Map;
 
 import static org.hamcrest.Matchers.containsString;
@@ -44,7 +43,10 @@ public class DestroyClusterCommandTest extends BaseCommandTest {
   @Test
   public void testInsufficientOptions() throws Exception {
     DestroyClusterCommand command = new DestroyClusterCommand();
-    int rc = command.run(null, null, err, Collections.<String>emptyList());
+    Map<String, File> keys = KeyPair.generateTemporaryFiles();
+    int rc = command.run(null, null, err, Lists.<String>newArrayList(
+        "--private-key-file", keys.get("private").getAbsolutePath())
+    );
     assertThat(rc, is(-1));
     assertThat(errBytes.toString(), containsString("Option 'cluster-name' not set"));
   }
