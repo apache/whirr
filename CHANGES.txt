@@ -1,5 +1,15 @@
 Apache Whirr Change Log
 
+Release 0.7.2
+
+  NEW FEATURES
+
+  IMPROVEMENTS
+
+    WHIRR-457. Upgrade to jclouds 1.2.2 (Andrei Savu)
+
+  BUG FIXES
+
 Release 0.7.1 - 2012-02-23
 
   IMPROVEMENTS
