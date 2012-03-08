@@ -61,6 +61,8 @@ Trunk (unreleased changes)
 
     WHIRR-542. Only expose start / stop / restart as new CLI commands (Andrei Savu)
 
+    WHIRR-550. Upgrade Mahout service to 0.6 (Frank Scholten)
+
   BUG FIXES
 
     WHIRR-473. HadoopServiceController.getInstance(String config) does 
