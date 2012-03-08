@@ -49,6 +49,7 @@ public class WhirrServicesTest extends WhirrKarafTestSupport {
     executeCommand("features:install whirr-hbase");
     executeCommand("features:install whirr-puppet");
     executeCommand("features:install whirr-mahout");
+    executeCommand("features:install whirr-pig");
     executeCommand("features:install whirr-zookeeper");
 
     System.err.println(executeCommand("osgi:list"));
@@ -65,6 +66,7 @@ public class WhirrServicesTest extends WhirrKarafTestSupport {
     testService("hbase-master", "hbase-regionserver", "hbase-restserver", "hbase-avroserver", "hbase-thriftserver");
     testService("puppet-install");
     testService("mahout-client");
+    testService("pig-client");
     testService("zookeeper");
   }
 

@@ -138,6 +138,7 @@
                 <feature>whirr-hbase</feature>
                 <feature>whirr-puppet</feature>
                 <feature>whirr-mahout</feature>
+                <feature>whirr-pig</feature>
                 <feature>whirr-zookeeper</feature>
               </features>
               <repository>target/features-repo</repository>

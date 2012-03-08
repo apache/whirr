@@ -86,6 +86,10 @@
     <feature version="${project.version}">whirr</feature>
     <bundle>mvn:org.apache.whirr/whirr-mahout/${project.version}</bundle>
   </feature>
+  <feature name="whirr-pig" version="${project.version}" description="Apache Whirr Pig Service" resolver="(obr)">
+    <feature version="${project.version}">whirr</feature>
+    <bundle>mvn:org.apache.whirr/whirr-pig/${project.version}</bundle>
+  </feature>
   <feature name="whirr-puppet" version="${project.version}" description="Apache Whirr Puppet Service" resolver="(obr)">
     <feature version="${project.version}">whirr</feature>
     <bundle>mvn:org.apache.whirr/whirr-puppet/${project.version}</bundle>

@@ -52,6 +52,7 @@
     <module>services/puppet</module>
     <module>services/chef</module>
     <module>services/mahout</module>
+    <module>services/pig</module>
     <module>platforms/karaf</module>
   </modules>
 

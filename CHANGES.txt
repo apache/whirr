@@ -7,6 +7,8 @@ Trunk (unreleased changes)
     WHIRR-500. Let users control which hardware is used for each 
     instance template (Karel Vervaeke via asavu)
 
+    WHIRR-531. Add Pig as a service (Marco Didonna, Andrei Savu)
+
   IMPROVEMENTS
 
     WHIRR-514. Avoid hardcoded Whirr version number in karaf tests (kve)
