@@ -40,7 +40,7 @@ import java.util.Map;
 import static org.jclouds.scriptbuilder.domain.Statements.exec;
 
 public class StatementBuilder {
-  
+
   private static final Logger LOG =
     LoggerFactory.getLogger(StatementBuilder.class);
   
@@ -48,25 +48,48 @@ public class StatementBuilder {
     
     private ClusterSpec clusterSpec;
     private Instance instance;
-    
+
     public ConsolidatedStatement(ClusterSpec clusterSpec, Instance instance) {
       this.clusterSpec = clusterSpec;
       this.instance = instance;
     }
-    
+
     @Override
     public Iterable<String> functionDependencies(OsFamily family) {
-       List<String> functions = Lists.newArrayList();
-       for (Statement statement : statements) {
-          Iterables.addAll(functions, statement.functionDependencies(family));
-       }
-       return functions;
+      List<String> functions = Lists.newArrayList();
+      for (Statement statement : statements) {
+        Iterables.addAll(functions, statement.functionDependencies(family));
+      }
+      return functions;
     }
 
     @Override
     public String render(OsFamily family) {
       ScriptBuilder scriptBuilder = new ScriptBuilder();
       Map<String, String> metadataMap = Maps.newLinkedHashMap();
+
+      addEnvironmentVariablesFromClusterSpec(metadataMap);
+      addDefaultEnvironmentVariablesForInstance(metadataMap, instance);
+      metadataMap.putAll(exports);
+      addPerInstanceCustomEnvironmentVariables(metadataMap, instance);
+
+      String writeVariableExporters = Utils.writeVariableExporters(metadataMap, family);
+      scriptBuilder.addStatement(exec(writeVariableExporters));
+
+      for (Statement statement : statements) {
+        scriptBuilder.addStatement(statement);
+      }
+
+      return scriptBuilder.render(family);
+    }
+
+    private void addPerInstanceCustomEnvironmentVariables(Map<String, String> metadataMap, Instance instance) {
+      if (instance != null && exportsByInstanceId.containsKey(instance.getId())) {
+        metadataMap.putAll(exportsByInstanceId.get(instance.getId()));
+      }
+    }
+
+    private void addDefaultEnvironmentVariablesForInstance(Map<String, String> metadataMap, Instance instance) {
       metadataMap.putAll(
         ImmutableMap.of(
           "clusterName", clusterSpec.getClusterName(),
@@ -94,42 +117,45 @@ public class StatementBuilder {
           }
         }
       }
+    }
+
+    private void addEnvironmentVariablesFromClusterSpec(Map<String, String> metadataMap) {
       for (Iterator<?> it = clusterSpec.getConfiguration().getKeys("whirr.env"); it.hasNext(); ) {
-        String key = (String)it.next();
+        String key = (String) it.next();
         String value = clusterSpec.getConfiguration().getString(key);
         metadataMap.put(key.substring("whirr.env.".length()), value);
       }
-      metadataMap.putAll(exports);
-      
-      // Write export statements out directly
-      // Using InitBuilder would be a possible improvement
-      String writeVariableExporters = Utils.writeVariableExporters(metadataMap, family);
-      scriptBuilder.addStatement(exec(writeVariableExporters));
-      for (Statement statement : statements) {
-        scriptBuilder.addStatement(statement);
-      }
-
-      return scriptBuilder.render(family);
     }
   }
-  
+
   protected List<Statement> statements = Lists.newArrayList();
-  protected Map<String,String> exports = Maps.newLinkedHashMap();
-  
+  protected Map<String, String> exports = Maps.newLinkedHashMap();
+  protected Map<String, Map<String, String>> exportsByInstanceId = Maps.newHashMap();
+
   public void addStatement(Statement statement) {
     if (!statements.contains(statement)) {
       statements.add(statement);
     }
   }
-  
+
   public void addStatements(Statement... statements) {
     for (Statement statement : statements) {
       addStatement(statement);
     }
   }
-  
+
   public void addExport(String key, String value) {
     exports.put(key, value);
+  }
+  
+  public void addExportPerInstance(String instanceId, String key, String value) {
+    if (exportsByInstanceId.containsKey(instanceId)) {
+      exportsByInstanceId.get(instanceId).put(key, value);
+    } else {
+      Map<String, String> pairs = Maps.newHashMap();
+      pairs.put(key, value);
+      exportsByInstanceId.put(instanceId, pairs);
+    }
   }
 
   public Statement build(ClusterSpec clusterSpec) {

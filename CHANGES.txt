@@ -12,6 +12,8 @@ Release 0.7.2
 
     WHIRR-550. Upgrade Mahout service to 0.6 (Frank Scholten via asavu)
 
+    WHIRR-407. Upgrade Cassandra to 1.0.6 (Nathan Milford via Andrei Savu)
+
   BUG FIXES
 
 Release 0.7.1 - 2012-02-23

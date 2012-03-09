@@ -52,6 +52,8 @@ function configure_cassandra() {
   
     sed -i -e "s|listen_address: localhost|listen_address: $PRIVATE_IP|" $config_file
     sed -i -e "s|rpc_address: localhost|rpc_address: 0.0.0.0|" $config_file
+    sed -i -e "s|cluster_name: 'Test Cluster'|cluster_name: 'Whirr'|" $config_file
+    sed -i -e "s|initial_token:.*|initial_token: $CASSANDRA_INITIAL_TOKEN|" $config_file
   fi
 }
 
