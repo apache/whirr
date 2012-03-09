@@ -8,6 +8,8 @@ Release 0.7.2
 
     WHIRR-457. Upgrade to jclouds 1.2.2 (Andrei Savu)
 
+    WHIRR-550. Upgrade Mahout service to 0.6 (Frank Scholten via asavu)
+
   BUG FIXES
 
 Release 0.7.1 - 2012-02-23
