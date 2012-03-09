@@ -111,7 +111,7 @@ whirr.public-key-file=${sys:user.home}/.ssh/id_rsa.pub
     worker nodes in the cluster. The most convenient way to do this is to use a 
     <a class="externalLink" href="http://en.wikipedia.org/wiki/Proxy_auto-config">proxy auto-config
     (PAC) file</a> file, such as 
-    <a class="externalLink" href="http://apache-hadoop-ec2.s3.amazonaws.com/proxy.pac">this
+    <a class="externalLink" href="https://svn.apache.org/repos/asf/whirr/trunk/resources/hadoop-ec2-proxy.pac">this
     one</a> for Hadoop EC2 clusters.</p>
     <p>If you are using Firefox, then you may find 
     <a class="externalLink" href="http://foxyproxy.mozdev.org/">FoxyProxy</a> useful for managing

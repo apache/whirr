@@ -14,6 +14,9 @@ Release 0.7.2
 
     WHIRR-407. Upgrade Cassandra to 1.0.6 (Nathan Milford via Andrei Savu)
 
+    WHIRR-35. Include .pac file for browsing to Hadoop clusters started 
+    on EC2 (Andrei Savu)
+
   BUG FIXES
 
 Release 0.7.1 - 2012-02-23
