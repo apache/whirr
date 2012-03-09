@@ -61,6 +61,11 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
+      <artifactId>whirr-pig</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
       <artifactId>whirr-zookeeper</artifactId>
       <version>${project.version}</version>
     </dependency>

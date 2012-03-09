@@ -3,6 +3,8 @@ Apache Whirr Change Log
 Release 0.7.2
 
   NEW FEATURES
+    
+    WHIRR-531. Add Pig as a service (Marco Didonna, Andrei Savu)
 
   IMPROVEMENTS
 
