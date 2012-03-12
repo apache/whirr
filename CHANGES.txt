@@ -63,6 +63,8 @@ Trunk (unreleased changes)
 
     WHIRR-550. Upgrade Mahout service to 0.6 (Frank Scholten)
 
+    WHIRR-554. Upgrade elasticsearch to 0.19.0 (Andrei Savu)
+
   BUG FIXES
 
     WHIRR-473. HadoopServiceController.getInstance(String config) does 
