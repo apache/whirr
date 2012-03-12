@@ -65,6 +65,8 @@ Trunk (unreleased changes)
 
     WHIRR-554. Upgrade elasticsearch to 0.19.0 (Andrei Savu)
 
+    WHIRR-553. Upgrade Cassandra to 1.0.8 (Andrei Savu)
+
   BUG FIXES
 
     WHIRR-473. HadoopServiceController.getInstance(String config) does 
