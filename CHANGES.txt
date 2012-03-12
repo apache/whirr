@@ -19,6 +19,8 @@ Release 0.7.2
 
     WHIRR-554. Upgrade elasticsearch to 0.19.0 (Andrei Savu)
 
+    WHIRR-553. Upgrade Cassandra to 1.0.8 (Andrei Savu)
+
   BUG FIXES
 
 Release 0.7.1 - 2012-02-23
