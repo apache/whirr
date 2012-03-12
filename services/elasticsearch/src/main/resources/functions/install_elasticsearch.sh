@@ -16,7 +16,7 @@
 #
 function install_elasticsearch() {
 
-    local ES_URL=${1:-https://github.com/downloads/elasticsearch/elasticsearch/elasticsearch-0.18.2.tar.gz}
+    local ES_URL=${1:-https://github.com/downloads/elasticsearch/elasticsearch/elasticsearch-0.19.0.tar.gz}
     install_tarball $ES_URL
 
     # get the name of the home folder

@@ -17,6 +17,8 @@ Release 0.7.2
     WHIRR-35. Include .pac file for browsing to Hadoop clusters started 
     on EC2 (Andrei Savu)
 
+    WHIRR-554. Upgrade elasticsearch to 0.19.0 (Andrei Savu)
+
   BUG FIXES
 
 Release 0.7.1 - 2012-02-23
