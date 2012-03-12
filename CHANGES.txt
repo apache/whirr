@@ -67,6 +67,8 @@ Trunk (unreleased changes)
 
     WHIRR-553. Upgrade Cassandra to 1.0.8 (Andrei Savu)
 
+    WHIRR-551. Upgrade to jclouds 1.3.2 (Andrei Savu)
+
   BUG FIXES
 
     WHIRR-473. HadoopServiceController.getInstance(String config) does 
