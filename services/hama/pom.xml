@@ -30,7 +30,7 @@
   <name>Apache Whirr Hama</name>
   <properties>
     <hadoop.version>0.20.2</hadoop.version>
-    <hama.version>0.3.0-incubating</hama.version>
+    <hama.version>0.4.0-incubating</hama.version>
   </properties>
   <dependencies>
     <dependency>
@@ -116,7 +116,7 @@
     <dependency>
       <groupId>org.apache.zookeeper</groupId>
       <artifactId>zookeeper</artifactId>
-      <version>3.3.1</version>
+      <version>3.3.3</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

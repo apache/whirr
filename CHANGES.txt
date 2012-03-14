@@ -21,6 +21,8 @@ Release 0.7.2
 
     WHIRR-553. Upgrade Cassandra to 1.0.8 (Andrei Savu)
 
+    WHIRR-335. Update Hama service to Hama 0.4-incubating (Edward J. Yoon via Frank Scholten)
+
   BUG FIXES
 
 Release 0.7.1 - 2012-02-23

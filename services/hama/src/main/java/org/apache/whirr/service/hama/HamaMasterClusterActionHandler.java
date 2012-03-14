@@ -117,6 +117,8 @@ public class HamaMasterClusterActionHandler extends HamaClusterActionHandler {
 
     config.setProperty("bsp.master.address", master.getHostName() + ":"
         + MASTER_PORT);
+    config.setProperty("fs.default.name", "hdfs://" + master.getHostName()
+        + ":8020");
     config.setProperty("hadoop.socks.server", "localhost:6666");
     config.setProperty("hadoop.rpc.socket.factory.class.default",
         "org.apache.hadoop.net.SocksSocketFactory");

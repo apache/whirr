@@ -236,7 +236,7 @@
           <dependency>
             <groupId>org.apache.whirr</groupId>
             <artifactId>whirr-build-tools</artifactId>
-            <version>${version}</version>
+            <version>${project.version}</version>
           </dependency>
         </dependencies>
         <executions>

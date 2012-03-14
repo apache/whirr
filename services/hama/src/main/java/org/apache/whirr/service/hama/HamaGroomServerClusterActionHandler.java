@@ -51,7 +51,7 @@ public class HamaGroomServerClusterActionHandler extends
     InetAddress masterPublicAddress = instance.getPublicAddress();
 
     event.getFirewallManager().addRules(
-        Rule.create().destination(instance).ports(61000, GROOMSERVER_PORT));
+        Rule.create().destination(instance).ports(GROOMSERVER_PORT));
 
     String hamaConfigureFunction = getConfiguration(clusterSpec).getString(
         HamaConstants.KEY_CONFIGURE_FUNCTION,
