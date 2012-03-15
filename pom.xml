@@ -68,7 +68,7 @@
     <guava.version>11.0.1</guava.version>
     <hadoop.version>0.20.205.0</hadoop.version>
     <hamcrest.version>1.1</hamcrest.version>
-    <hama.version>0.3.0-incubating</hama.version>
+    <hama.version>0.4.0-incubating</hama.version>
     <hbase.version>0.89.20100924-28</hbase.version>
     <jackson.version>1.5.2</jackson.version>
     <jclouds.version>1.3.2</jclouds.version>

@@ -9,6 +9,8 @@ Trunk (unreleased changes)
 
     WHIRR-531. Add Pig as a service (Marco Didonna, Andrei Savu)
 
+    WHIRR-335. Update Hama service to Hama 0.4-incubating (Edward J. Yoon via Frank Scholten)
+
   IMPROVEMENTS
 
     WHIRR-514. Avoid hardcoded Whirr version number in karaf tests (kve)

@@ -86,16 +86,18 @@ public class HamaServiceController {
 
   private static void waitForGroomServers(BSPJobClient client) throws IOException {
     while (true) {
-      ClusterStatus clusterStatus = client.getClusterStatus(true);
-      int grooms = clusterStatus.getGroomServers();
-      if (grooms > 0) {
-        LOG.info("{} groomservers reported in. Continuing.", grooms);
-        break;
-      }
       try {
         System.out.print(".");
         Thread.sleep(1000);
       } catch (InterruptedException e) {
+        break;
+      }
+
+      ClusterStatus clusterStatus = client.getClusterStatus(true);
+      int grooms = clusterStatus.getActiveGroomServerStatus().size();
+
+      if (grooms > 0) {
+        LOG.info("{} groomservers reported in. Continuing.", grooms);
         break;
       }
     }

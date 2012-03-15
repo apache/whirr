@@ -97,9 +97,9 @@ public class HamaMasterClusterActionHandler extends HamaClusterActionHandler {
     Instance instance = cluster.getInstanceMatching(role(ROLE));
     InetAddress masterPublicAddress = instance.getPublicAddress();
 
-    LOG.info("BSPMaster web UI available at http://{}:{}",
-        masterPublicAddress.getHostName(), MASTER_WEB_UI_PORT);
-    
+    LOG.info("BSPMaster web UI available at http://{}:{}", masterPublicAddress
+        .getHostName(), MASTER_WEB_UI_PORT);
+
     String quorum = ZooKeeperCluster.getHosts(cluster);
     Properties config = createClientSideProperties(masterPublicAddress, quorum);
     createClientSideHadoopSiteFile(clusterSpec, config);
@@ -115,6 +115,9 @@ public class HamaMasterClusterActionHandler extends HamaClusterActionHandler {
 
     config.setProperty("bsp.master.address", master.getHostName() + ":"
         + MASTER_PORT);
+    config.setProperty("fs.default.name", "hdfs://" + master.getHostName()
+        + ":8020");
+
     config.setProperty("hadoop.socks.server", "localhost:6666");
     config.setProperty("hadoop.rpc.socket.factory.class.default",
         "org.apache.hadoop.net.SocksSocketFactory");

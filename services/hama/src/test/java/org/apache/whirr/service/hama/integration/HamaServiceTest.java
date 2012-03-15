@@ -17,26 +17,39 @@
  */
 package org.apache.whirr.service.hama.integration;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.DoubleWritable;
+import org.apache.hadoop.io.Text;
 import org.apache.hama.HamaConfiguration;
 import org.apache.hama.bsp.BSPJob;
 import org.apache.hama.bsp.BSPJobClient;
+import org.apache.hama.bsp.BSPJobID;
 import org.apache.hama.bsp.ClusterStatus;
-import org.apache.hama.examples.PiEstimator;
+import org.apache.hama.bsp.FileOutputFormat;
+import org.apache.hama.bsp.NullInputFormat;
+import org.apache.hama.bsp.RunningJob;
+import org.apache.hama.bsp.TextOutputFormat;
 import org.apache.hama.examples.PiEstimator.MyEstimator;
 import org.apache.whirr.TestConstants;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class HamaServiceTest {
+  private static final Logger LOG = LoggerFactory
+      .getLogger(HamaServiceTest.class);
+
   private static HamaServiceController controller = HamaServiceController
       .getInstance();
-  private static String masterTask = "master.task.";
-  
+
+  private final static Path TMP_OUTPUT = new Path("/pi-"
+      + System.currentTimeMillis());
+
   @BeforeClass
   public static void setUp() throws Exception {
     controller.ensureClusterRunning();
@@ -49,27 +62,40 @@ public class HamaServiceTest {
 
   @Test(timeout = TestConstants.ITEST_TIMEOUT)
   public void test() throws Exception {
-    HamaConfiguration conf = controller.getConfiguration();
+    HamaConfiguration jobConf = controller.getConfiguration();
+    jobConf.set("hadoop.rpc.socket.factory.class.default",
+        "org.apache.hadoop.net.StandardSocketFactory");
 
-    BSPJobClient jobClient = new BSPJobClient(conf);
+    BSPJob bsp = new BSPJob(jobConf, new BSPJobID());
+    LOG.info("Job conf: "
+        + bsp.getConf().get("hadoop.rpc.socket.factory.class.default") + ", "
+        + bsp.getJobID().toString());
+
+    bsp.setJarByClass(MyEstimator.class);
+    bsp.setBspClass(MyEstimator.class);
+    bsp.setInputFormat(NullInputFormat.class);
+    bsp.setOutputKeyClass(Text.class);
+    bsp.setOutputValueClass(DoubleWritable.class);
+    bsp.setOutputFormat(TextOutputFormat.class);
+    bsp.set("bsp.working.dir", "/tmp");
+    FileOutputFormat.setOutputPath(bsp, TMP_OUTPUT);
+
+    LOG.info("Client configuration start ..");
+
+    HamaConfiguration clientConf = controller.getConfiguration();
+    BSPJobClient jobClient = new BSPJobClient(clientConf);
     ClusterStatus cluster = jobClient.getClusterStatus(true);
     assertNotNull(cluster);
     assertTrue(cluster.getGroomServers() > 0);
+    assertTrue(cluster.getMaxTasks() > 1);
+    bsp.setNumBspTask(cluster.getMaxTasks());
 
-    BSPJob bsp = new BSPJob(conf, PiEstimator.class);
-    // Set the job name
-    bsp.setJobName("Pi Estimation Example");
-    bsp.setBspClass(MyEstimator.class);
-    bsp.setNumBspTask(cluster.getGroomServers());
+    LOG.info("Client conf: "
+        + clientConf.get("hadoop.rpc.socket.factory.class.default"));
 
-    for (String peerName : cluster.getActiveGroomNames().values()) {
-      conf.set(masterTask, peerName);
-      break;
-    }
-
-    if (bsp.waitForCompletion(true)) {
-      assertEquals(jobClient.getAllJobs().length, 1);
-    }
+    RunningJob rJob = jobClient.submitJob(bsp);
+    rJob.waitForCompletion();
+    LOG.info("finished");
   }
 
 }
