@@ -66,6 +66,11 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
+      <artifactId>whirr-yarn</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
       <artifactId>whirr-zookeeper</artifactId>
       <version>${project.version}</version>
     </dependency>
@@ -92,6 +97,11 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>whirr-chef</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>whirr-yarn</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

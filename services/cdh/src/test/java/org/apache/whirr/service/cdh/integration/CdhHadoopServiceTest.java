@@ -75,7 +75,7 @@ public class CdhHadoopServiceTest {
   protected static Cluster cluster;
 
   protected static String getPropertiesFilename() {
-    return "whirr-hadoop-test.properties";
+    return "whirr-hadoop-cdh-test.properties";
   }
   
   @BeforeClass
@@ -108,7 +108,7 @@ public class CdhHadoopServiceTest {
        controller.runScriptOnNodesMatching(clusterSpec, ALL, checkVersion);
 
     printResponses(checkVersion, responses);
-    assertResponsesContain(responses, checkVersion, "cdh3u2");
+    assertResponsesContain(responses, checkVersion, "cdh4");
   }
 
   @Test

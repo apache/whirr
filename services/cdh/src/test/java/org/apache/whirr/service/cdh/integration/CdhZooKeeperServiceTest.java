@@ -52,7 +52,7 @@ public class CdhZooKeeperServiceTest {
     if (System.getProperty("config") != null) {
       config.addConfiguration(new PropertiesConfiguration(System.getProperty("config")));
     }
-    config.addConfiguration(new PropertiesConfiguration("whirr-zookeeper-test.properties"));
+    config.addConfiguration(new PropertiesConfiguration("whirr-zookeeper-cdh-test.properties"));
     clusterSpec = ClusterSpec.withTemporaryKeys(config);
     controller = new ClusterController();
     

@@ -42,8 +42,10 @@
     <module>examples</module>
     <module>services/cassandra</module>
     <module>services/cdh</module>
+    <module>services/cdh-oldtests</module>
     <module>services/ganglia</module>
     <module>services/hadoop</module>
+    <module>services/yarn</module>
     <module>services/zookeeper</module>
     <module>services/hbase</module>
     <module>services/elasticsearch</module>

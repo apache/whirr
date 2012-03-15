@@ -15,6 +15,8 @@
 # limitations under the License.
 #
 function register_cloudera_repo() {
+  CDH_MAJOR_VERSION=$(echo $REPO | sed -e 's/cdh\([0-9]\).*/\1/')
+  CDH_VERSION=$(echo $REPO | sed -e 's/cdh\([0-9][0-9]*\)/\1/')
   if which dpkg &> /dev/null; then
     cat > /etc/apt/sources.list.d/cloudera.list <<EOF
 deb http://archive.cloudera.com/debian lucid-$REPO contrib
@@ -23,15 +25,25 @@ EOF
     curl -s http://archive.cloudera.com/debian/archive.key | apt-key add -
     retry_apt_get -y update
   elif which rpm &> /dev/null; then
-    rm -f /etc/yum.repos.d/cloudera.repo
-    REPO_NUMBER=`echo $REPO | sed -e 's/cdh\([0-9][0-9]*\)/\1/'`
-    cat > /etc/yum.repos.d/cloudera-$REPO.repo <<EOF
+    rm -f /etc/yum.repos.d/cloudera*.repo
+    if [ $CDH_MAJOR_VERSION = "4" ]; then
+      cat > /etc/yum.repos.d/cloudera-cdh4.repo <<EOF
+[cloudera-cdh4]
+name=Cloudera's Distribution for Hadoop, Version 4
+baseurl=http://archive.cloudera.com/cdh4/redhat/5/x86_64/cdh/4/
+http://repos.jenkins.sf.cloudera.com/cdh4-nightly/redhat/5/x86_64/cdh/4/
+gpgkey = http://archive.cloudera.com/cdh4/redhat/5/x86_64/cdh/RPM-GPG-KEY-cloudera 
+gpgcheck = 1
+EOF
+    else
+      cat > /etc/yum.repos.d/cloudera-$REPO.repo <<EOF
 [cloudera-$REPO]
-name=Cloudera's Distribution for Hadoop, Version $REPO_NUMBER
-mirrorlist=http://archive.cloudera.com/redhat/cdh/$REPO_NUMBER/mirrors
+name=Cloudera's Distribution for Hadoop, Version $CDH_VERSION
+mirrorlist=http://archive.cloudera.com/redhat/cdh/$CDH_VERSION/mirrors
 gpgkey = http://archive.cloudera.com/redhat/cdh/RPM-GPG-KEY-cloudera
 gpgcheck = 0
 EOF
+    fi
     retry_yum update -y yum
   fi
 }
@@ -49,19 +61,26 @@ function install_cdh_zookeeper() {
       ;;
   esac
   
-  REPO=${REPO:-cdh3}
+  REPO=${REPO:-cdh4}
   ZOOKEEPER_HOME=/usr/lib/zookeeper
   ZK_CONF_DIR=/etc/zookeeper
   ZK_LOG_DIR=/var/log/zookeeper
   ZK_DATA_DIR=$ZK_LOG_DIR/txlog
+
+  CDH_MAJOR_VERSION=$(echo $REPO | sed -e 's/cdh\([0-9]\).*/\1/')
+  ZOOKEEPER_PACKAGE=hadoop-zookeeper
+  if [ $CDH_MAJOR_VERSION = "4" ]; then
+    ZOOKEEPER_PACKAGE=zookeeper
+    ZK_CONF_DIR=/etc/zookeeper/conf
+  fi
   
   register_cloudera_repo
   
   if which dpkg &> /dev/null; then
     retry_apt_get update
-    retry_apt_get -y install hadoop-zookeeper
+    retry_apt_get -y install $ZOOKEEPER_PACKAGE
   elif which rpm &> /dev/null; then
-    retry_yum install -y hadoop-zookeeper
+    retry_yum install -y $ZOOKEEPER_PACKAGE
   fi
   
   echo "export ZOOKEEPER_HOME=$ZOOKEEPER_HOME" >> /etc/profile

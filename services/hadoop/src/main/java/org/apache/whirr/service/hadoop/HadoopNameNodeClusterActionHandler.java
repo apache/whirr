@@ -27,7 +27,6 @@ import com.google.common.io.Files;
 import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
-import java.util.Map.Entry;
 import java.util.Properties;
 
 import org.apache.whirr.Cluster;
@@ -84,7 +83,10 @@ public class HadoopNameNodeClusterActionHandler extends HadoopClusterActionHandl
     Properties config = createClientSideProperties(clusterSpec, namenodePublicAddress, jobtrackerPublicAddress);
     createClientSideHadoopSiteFile(clusterSpec, config);
     createProxyScript(clusterSpec, cluster);
-    event.setCluster(new Cluster(cluster.getInstances(), config));
+    Properties combined = new Properties();
+    combined.putAll(cluster.getConfiguration());
+    combined.putAll(config);
+    event.setCluster(new Cluster(cluster.getInstances(), combined));
   }
 
   private Properties createClientSideProperties(ClusterSpec clusterSpec,
@@ -92,9 +94,13 @@ public class HadoopNameNodeClusterActionHandler extends HadoopClusterActionHandl
     Properties config = new Properties();
     config.setProperty("hadoop.job.ugi", "root,root");
     config.setProperty("fs.default.name", String.format("hdfs://%s:8020/", namenode.getHostName()));
-    config.setProperty("mapred.job.tracker", String.format("%s:8021", jobtracker.getHostName()));
+    if (jobtracker != null) {
+      config.setProperty("mapred.job.tracker", String.format("%s:8021", jobtracker.getHostName()));
+    }
     config.setProperty("hadoop.socks.server", "localhost:6666");
     config.setProperty("hadoop.rpc.socket.factory.class.default", "org.apache.hadoop.net.SocksSocketFactory");
+    // See https://issues.apache.org/jira/browse/HDFS-3068
+    config.setProperty("dfs.client.use.legacy.blockreader", "true");
     if (clusterSpec.getProvider().endsWith("ec2")) {
       config.setProperty("fs.s3.awsAccessKeyId", clusterSpec.getIdentity());
       config.setProperty("fs.s3.awsSecretAccessKey", clusterSpec.getCredential());
@@ -107,13 +113,7 @@ public class HadoopNameNodeClusterActionHandler extends HadoopClusterActionHandl
   private void createClientSideHadoopSiteFile(ClusterSpec clusterSpec, Properties config) {
     File configDir = getConfigDir(clusterSpec);
     File hadoopSiteFile = new File(configDir, "hadoop-site.xml");
-    try {
-      Files.write(generateHadoopConfigurationFile(config), hadoopSiteFile,
-          Charsets.UTF_8);
-      LOG.info("Wrote Hadoop site file {}", hadoopSiteFile);
-    } catch (IOException e) {
-      LOG.error("Problem writing Hadoop site file {}", hadoopSiteFile, e);
-    }
+    HadoopConfigurationConverter.createClientSideHadoopSiteFile(hadoopSiteFile, config);
   }
   
   private File getConfigDir(ClusterSpec clusterSpec) {
@@ -122,21 +122,6 @@ public class HadoopNameNodeClusterActionHandler extends HadoopClusterActionHandl
     configDir = new File(configDir, clusterSpec.getClusterName());
     configDir.mkdirs();
     return configDir;
-  }
-  
-  private CharSequence generateHadoopConfigurationFile(Properties config) {
-    StringBuilder sb = new StringBuilder();
-    sb.append("<?xml version=\"1.0\"?>\n");
-    sb.append("<?xml-stylesheet type=\"text/xsl\" href=\"configuration.xsl\"?>\n");
-    sb.append("<configuration>\n");
-    for (Entry<Object, Object> entry : config.entrySet()) {
-      sb.append("  <property>\n");
-      sb.append("    <name>").append(entry.getKey()).append("</name>\n");
-      sb.append("    <value>").append(entry.getValue()).append("</value>\n");
-      sb.append("  </property>\n");
-    }
-    sb.append("</configuration>\n");
-    return sb;
   }
   
   private void createProxyScript(ClusterSpec clusterSpec, Cluster cluster) {

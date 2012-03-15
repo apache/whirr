@@ -49,7 +49,7 @@ public class HadoopServiceController {
     new HashMap<String, HadoopServiceController>();
   
   public static HadoopServiceController getInstance(String config) throws ConfigurationException {
-    if (!INSTANCES.containsKey("config")) {
+    if (!INSTANCES.containsKey(config)) {
       PropertiesConfiguration configuration = new PropertiesConfiguration(config);
       INSTANCES.put(config, new HadoopServiceController(configuration));
     }

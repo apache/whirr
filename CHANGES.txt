@@ -6,6 +6,8 @@ Release 0.7.2
     
     WHIRR-531. Add Pig as a service (Marco Didonna, Andrei Savu)
 
+    WHIRR-391. Write a YARN (Hadoop MR2) service for Whirr. (tomwhite)
+
   IMPROVEMENTS
 
     WHIRR-457. Upgrade to jclouds 1.2.2 (Andrei Savu)
