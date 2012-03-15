@@ -21,24 +21,13 @@
     <groupId>org.apache.whirr</groupId>
     <artifactId>whirr</artifactId>
     <version>0.8.0-SNAPSHOT</version>
-    <relativePath>../pom.xml</relativePath>
+    <relativePath>../../pom.xml</relativePath>
   </parent>
   <groupId>org.apache.whirr</groupId>
-  <artifactId>whirr-cli</artifactId>
-  <packaging>bundle</packaging>
-  <name>Apache Whirr CLI</name>
-  <properties>
-    <osgi.import>
-      !org.apache.whirr.cli*,
-      org.apache.commons.configuration*;version="[1.6,2)",
-      *
-    </osgi.import>
-    <osgi.dynamic.import>javax.*,org.jclouds.*</osgi.dynamic.import>
-    <osgi.export>
-      org.apache.whirr.cli*;version="${project.version}"
-    </osgi.export>
-    <osgi.spi.consumer>*</osgi.spi.consumer>
-  </properties>
+  <artifactId>whirr-cdh-oldtests</artifactId>
+  <packaging>jar</packaging>
+  <version>0.8.0-SNAPSHOT</version>
+  <name>Apache Whirr CDH Old Tests</name>
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
@@ -47,17 +36,14 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>whirr-cassandra</artifactId>
+      <artifactId>whirr-core</artifactId>
       <version>${project.version}</version>
+      <type>test-jar</type>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>whirr-cdh</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>whirr-ganglia</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -67,52 +53,19 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>whirr-mahout</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>whirr-pig</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>whirr-yarn</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>whirr-zookeeper</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>whirr-elasticsearch</artifactId>
+      <artifactId>whirr-hbase</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>whirr-hbase</artifactId>
       <version>${project.version}</version>
+      <type>test-jar</type>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>whirr-hama</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>whirr-puppet</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>whirr-chef</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>whirr-yarn</artifactId>
+      <artifactId>whirr-zookeeper</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -124,8 +77,8 @@
       <artifactId>hamcrest-all</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.mockito</groupId>
-      <artifactId>mockito-all</artifactId>
+      <groupId>commons-configuration</groupId>
+      <artifactId>commons-configuration</artifactId>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
@@ -134,6 +87,7 @@
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-log4j12</artifactId>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>com.jcraft</groupId>
@@ -142,40 +96,52 @@
     <dependency>
       <groupId>log4j</groupId>
       <artifactId>log4j</artifactId>
+      <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>commons-configuration</groupId>
-      <artifactId>commons-configuration</artifactId>
+      <groupId>dnsjava</groupId>
+      <artifactId>dnsjava</artifactId>
     </dependency>
     <dependency>
-      <groupId>net.sf.jopt-simple</groupId>
-      <artifactId>jopt-simple</artifactId>
-      <version>3.2</version>
+      <!-- look at https://repository.cloudera.com/artifactory/libs-release-local/org/apache/hadoop/hadoop-core/ 
+           to find version info for other cdh REPO versions, same for hbase and zookeeper -->
+      <groupId>org.apache.hadoop</groupId>
+      <artifactId>hadoop-core</artifactId>
+      <!-- <version>0.20.2-cdh3u0</version> -->
+      <!-- <version>0.20.2-cdh3u1</version> -->
+      <version>0.20.2-cdh3u2</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.hbase</groupId>
+      <artifactId>hbase</artifactId>
+      <!-- <version>0.90.1-cdh3u0</version> -->
+      <!-- <version>0.90.3-cdh3u1</version> -->
+      <version>0.90.4-cdh3u2</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.zookeeper</groupId>
+      <artifactId>zookeeper</artifactId>
+      <!-- <version>3.3.3-cdh3u0</version> -->
+      <!-- <version>3.3.3-cdh3u1</version> -->
+      <version>3.3.3-cdh3u2</version>
+      <scope>test</scope>
+    </dependency>
+    <!-- The following are missing CDH dependencies -->
+    <dependency>
+      <groupId>org.codehaus.jackson</groupId>
+      <artifactId>jackson-core-asl</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.codehaus.jackson</groupId>
+      <artifactId>jackson-mapper-asl</artifactId>
+      <scope>test</scope>
     </dependency>
   </dependencies>
   <build>
-    <resources>
-      <resource>
-        <directory>${project.basedir}/src/main/resources</directory>
-        <filtering>true</filtering>
-      </resource>
-    </resources>
     <plugins>
-      <!-- Copy dependencies to lib directory so that bin/whirr works in place -->
-      <plugin>
-        <artifactId>maven-dependency-plugin</artifactId>
-          <executions>
-            <execution>
-              <phase>install</phase>
-              <goals>
-                <goal>copy-dependencies</goal>
-              </goals>
-              <configuration>
-                <outputDirectory>${project.build.directory}/lib</outputDirectory>
-              </configuration>
-            </execution>
-          </executions>
-        </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-site-plugin</artifactId>
@@ -185,16 +151,4 @@
       </plugin>
     </plugins>
   </build>
-  <profiles>
-    <profile>
-      <id>voldemort</id>
-      <dependencies>
-        <dependency>
-          <groupId>${project.groupId}</groupId>
-          <artifactId>whirr-voldemort</artifactId>
-          <version>${project.version}</version>
-        </dependency>
-      </dependencies>
-    </profile>
-  </profiles>
 </project>

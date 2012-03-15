@@ -18,8 +18,16 @@ function configure_cdh_zookeeper() {
   local OPTIND
   local OPTARG
   
+  REPO=${REPO:-cdh4}
+  CDH_MAJOR_VERSION=$(echo $REPO | sed -e 's/cdh\([0-9]\).*/\1/')
+  ZOOKEEPER_SERVER_PACKAGE=hadoop-zookeeper-server
   myid_file=/var/log/zookeeper/txlog/myid
   config_file=/etc/zookeeper/zoo.cfg
+
+  if [ $CDH_MAJOR_VERSION = "4" ]; then
+    ZOOKEEPER_SERVER_PACKAGE=zookeeper-server
+    config_file=/etc/zookeeper/conf/zoo.cfg
+  fi
   
   cat > $config_file <<EOF
 # The number of milliseconds of each tick
@@ -56,14 +64,14 @@ EOF
   
   # Now that it's configured, install daemon package
   if which dpkg &> /dev/null; then
-    apt-get -y install hadoop-zookeeper-server
+    apt-get -y install $ZOOKEEPER_SERVER_PACKAGE
   elif which rpm &> /dev/null; then
-    yum install -y hadoop-zookeeper-server
+    yum install -y $ZOOKEEPER_SERVER_PACKAGE
   fi
 
   # Start ZooKeeper
   # For DEB, the service is already started as part of the daemon package installation
   if which rpm &> /dev/null; then
-    service hadoop-zookeeper-server start
+    service $ZOOKEEPER_SERVER_PACKAGE start
   fi
 }

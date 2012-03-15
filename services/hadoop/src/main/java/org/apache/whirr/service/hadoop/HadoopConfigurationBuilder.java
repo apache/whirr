@@ -132,10 +132,13 @@ public class HadoopConfigurationBuilder {
       }
     }
 
-    Instance jobtracker = cluster
-        .getInstanceMatching(role(HadoopJobTrackerClusterActionHandler.ROLE));
-    config.setProperty("mapred.job.tracker", String.format("%s:8021",
-        jobtracker.getPublicHostName()));
+    Set<Instance> jobtracker = cluster
+        .getInstancesMatching(role(HadoopJobTrackerClusterActionHandler.ROLE));
+    if (!jobtracker.isEmpty()) {
+      config.setProperty("mapred.job.tracker", String.format("%s:8021",
+          Iterables.getOnlyElement(jobtracker).getPublicHostName()));
+    }
+
     return config;
   }
 

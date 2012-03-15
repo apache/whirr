@@ -69,6 +69,11 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
+      <artifactId>whirr-yarn</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
       <artifactId>whirr-zookeeper</artifactId>
       <version>${project.version}</version>
     </dependency>
@@ -107,40 +112,27 @@
       <artifactId>dnsjava</artifactId>
     </dependency>
     <dependency>
-      <!-- look at https://repository.cloudera.com/artifactory/libs-release-local/org/apache/hadoop/hadoop-core/ 
-           to find version info for other cdh REPO versions, same for hbase and zookeeper -->
       <groupId>org.apache.hadoop</groupId>
-      <artifactId>hadoop-core</artifactId>
-      <!-- <version>0.20.2-cdh3u0</version> -->
-      <!-- <version>0.20.2-cdh3u1</version> -->
-      <version>0.20.2-cdh3u2</version>
+      <artifactId>hadoop-common</artifactId>
+      <version>0.23.0-cdh4b1</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.hadoop</groupId>
+      <artifactId>hadoop-hdfs</artifactId>
+      <version>0.23.0-cdh4b1</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.hbase</groupId>
       <artifactId>hbase</artifactId>
-      <!-- <version>0.90.1-cdh3u0</version> -->
-      <!-- <version>0.90.3-cdh3u1</version> -->
-      <version>0.90.4-cdh3u2</version>
+      <version>0.92.0-cdh4b1</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.zookeeper</groupId>
       <artifactId>zookeeper</artifactId>
-      <!-- <version>3.3.3-cdh3u0</version> -->
-      <!-- <version>3.3.3-cdh3u1</version> -->
-      <version>3.3.3-cdh3u2</version>
-      <scope>test</scope>
-    </dependency>
-    <!-- The following are missing CDH dependencies -->
-    <dependency>
-      <groupId>org.codehaus.jackson</groupId>
-      <artifactId>jackson-core-asl</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.codehaus.jackson</groupId>
-      <artifactId>jackson-mapper-asl</artifactId>
+      <version>3.4.1-cdh4b1</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -155,4 +147,83 @@
       </plugin>
     </plugins>
   </build>
+  <profiles>
+    <profile>
+      <!--  Use with -Dit.test=CdhHadoopServiceTest  -->
+      <id>cdh4-mr1</id>
+      <activation>
+        <property>
+          <name>mr1</name>
+          <value>true</value>
+        </property>
+      </activation>
+      <dependencies>
+        <dependency>
+          <!-- look at https://repository.cloudera.com/artifactory/libs-release-local/org/apache/hadoop/
+               to find version info for other cdh REPO versions, same for hbase and zookeeper -->
+          <groupId>org.apache.hadoop</groupId>
+          <artifactId>hadoop-core</artifactId>
+          <version>0.23.0-mr1-cdh4b1</version>
+          <scope>test</scope>
+        </dependency>
+      </dependencies>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <configuration>
+              <testExcludes>
+                <exclude>**/CdhHBaseServiceTest.java</exclude><!-- TODO: remove when WHIRR-525 is done -->
+                <exclude>**/CdhYarnServiceTest.java</exclude>
+              </testExcludes>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <!--  Use with -Dit.test=CdhYarnServiceTest  -->
+      <id>cdh4-mr2</id>
+      <activation>
+        <property>
+          <name>!mr1</name>
+        </property>
+      </activation>
+      <dependencies>
+        <dependency>
+          <groupId>org.apache.hadoop</groupId>
+          <artifactId>hadoop-mapreduce-client-common</artifactId>
+          <version>0.23.0-cdh4b1</version>
+          <scope>test</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.apache.hadoop</groupId>
+          <artifactId>hadoop-mapreduce-client-core</artifactId>
+          <version>0.23.0-cdh4b1</version>
+          <scope>test</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.apache.hadoop</groupId>
+          <artifactId>hadoop-mapreduce-client-jobclient</artifactId>
+          <version>0.23.0-cdh4b1</version>
+          <scope>test</scope>
+        </dependency>
+      </dependencies>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <configuration>
+              <testExcludes>
+                <exclude>**/CdhHBaseServiceTest.java</exclude><!-- TODO: remove when WHIRR-525 is done -->
+                <exclude>**/CdhHadoopServiceTest.java</exclude>
+              </testExcludes>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 </project>

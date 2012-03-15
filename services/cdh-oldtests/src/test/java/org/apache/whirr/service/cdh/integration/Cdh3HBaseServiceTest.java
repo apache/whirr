@@ -18,26 +18,26 @@
 
 package org.apache.whirr.service.cdh.integration;
 
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+
 import com.google.common.collect.Lists;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.hadoop.hbase.thrift.generated.ColumnDescriptor;
 import org.apache.hadoop.hbase.thrift.generated.Hbase;
 import org.apache.hadoop.hbase.thrift.generated.Mutation;
 import org.apache.hadoop.hbase.thrift.generated.TRowResult;
 import org.apache.hadoop.hbase.util.Bytes;
-import org.apache.whirr.TestConstants;
 import org.apache.whirr.service.hbase.integration.HBaseServiceController;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-
-public class CdhHBaseServiceTest {
+public class Cdh3HBaseServiceTest {
 
   private static final byte[] FIRST = Bytes.toBytes("");
   private static final byte[] TABLE = Bytes.toBytes("testtable");
@@ -48,7 +48,7 @@ public class CdhHBaseServiceTest {
   private static final byte[] VALUE = Bytes.toBytes("testValue");
 
   private static HBaseServiceController controller =
-    HBaseServiceController.getInstance("whirr-hbase-cdh-test.properties");
+    HBaseServiceController.getInstance("whirr-hbase-cdh3-test.properties");
 
   @BeforeClass
   public static void setUp() throws Exception {
@@ -60,7 +60,7 @@ public class CdhHBaseServiceTest {
     controller.shutdown();
   }
 
-  @Test(timeout = TestConstants.ITEST_TIMEOUT)
+  @Test
   public void test() throws Exception {
     ArrayList<ColumnDescriptor> columns = new ArrayList<ColumnDescriptor>();
     ColumnDescriptor cd = new ColumnDescriptor();

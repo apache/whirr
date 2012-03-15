@@ -18,10 +18,14 @@
 
 package org.apache.whirr.service.hadoop;
 
+import com.google.common.collect.Iterables;
+
 import java.io.IOException;
 import java.net.InetAddress;
+import java.util.Set;
 
 import org.apache.whirr.Cluster;
+import org.apache.whirr.Cluster.Instance;
 import org.apache.whirr.RolePredicates;
 
 public class HadoopCluster {
@@ -41,14 +45,20 @@ public class HadoopCluster {
         RolePredicates.role(HadoopNameNodeClusterActionHandler.ROLE))
         .getPrivateAddress();
   }
+  private static Instance getJobTracker(Cluster cluster) {
+    Set<Instance> jobtracker = cluster.getInstancesMatching(
+        RolePredicates.role(HadoopJobTrackerClusterActionHandler.ROLE));
+    if (jobtracker.isEmpty()) {
+      return null;
+    }
+    return Iterables.getOnlyElement(jobtracker);
+  }
   public static InetAddress getJobTrackerPublicAddress(Cluster cluster) throws IOException {
-    return cluster.getInstanceMatching(
-        RolePredicates.role(HadoopJobTrackerClusterActionHandler.ROLE))
-        .getPublicAddress();
+    Instance jt = getJobTracker(cluster);
+    return jt == null ? null : jt.getPublicAddress();
   }
   public static InetAddress getJobTrackerPrivateAddress(Cluster cluster) throws IOException {
-    return cluster.getInstanceMatching(
-        RolePredicates.role(HadoopJobTrackerClusterActionHandler.ROLE))
-        .getPrivateAddress();
+    Instance jt = getJobTracker(cluster);
+    return jt == null ? null : jt.getPrivateAddress();
   }
 }

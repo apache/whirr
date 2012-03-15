@@ -18,6 +18,19 @@
 
 package org.apache.whirr.service.cdh.integration;
 
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertNull;
+import static junit.framework.Assert.failNotEquals;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+import java.util.Map;
+import java.util.Map.Entry;
+
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import org.apache.commons.configuration.CompositeConfiguration;
@@ -38,7 +51,6 @@ import org.apache.hadoop.mapred.lib.TokenCountMapper;
 import org.apache.whirr.Cluster;
 import org.apache.whirr.ClusterController;
 import org.apache.whirr.ClusterSpec;
-import org.apache.whirr.TestConstants;
 import org.apache.whirr.service.hadoop.HadoopProxy;
 import org.jclouds.compute.domain.ExecResponse;
 import org.jclouds.compute.domain.NodeMetadata;
@@ -50,23 +62,10 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
-import java.util.Map;
-import java.util.Map.Entry;
-
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertNull;
-import static junit.framework.Assert.failNotEquals;
-
-public class CdhHadoopServiceTest {
+public class Cdh3HadoopServiceTest {
 
   private static final Logger LOG = LoggerFactory
-      .getLogger(CdhHadoopServiceTest.class);
+      .getLogger(Cdh3HadoopServiceTest.class);
 
   private final static Predicate<NodeMetadata> ALL = Predicates.alwaysTrue();
 
@@ -76,7 +75,7 @@ public class CdhHadoopServiceTest {
   protected static Cluster cluster;
 
   protected static String getPropertiesFilename() {
-    return "whirr-hadoop-cdh-test.properties";
+    return "whirr-hadoop-cdh3-test.properties";
   }
   
   @BeforeClass
@@ -102,21 +101,21 @@ public class CdhHadoopServiceTest {
     controller.destroyCluster(clusterSpec);
   }
 
-  @Test(timeout = TestConstants.ITEST_TIMEOUT)
+  @Test
   public void testVersion() throws Exception {
     Statement checkVersion = Statements.exec("ls /etc/alternatives/hadoop-lib");
     Map<? extends NodeMetadata, ExecResponse> responses =
        controller.runScriptOnNodesMatching(clusterSpec, ALL, checkVersion);
 
     printResponses(checkVersion, responses);
-    assertResponsesContain(responses, checkVersion, "cdh4");
+    assertResponsesContain(responses, checkVersion, "cdh3");
   }
 
-  @Test(timeout = TestConstants.ITEST_TIMEOUT)
+  @Test
   public void testJobExecution() throws Exception {
     Configuration conf = getConfiguration();
     
-    JobConf job = new JobConf(conf, CdhHadoopServiceTest.class);
+    JobConf job = new JobConf(conf, Cdh3HadoopServiceTest.class);
     JobClient client = new JobClient(job);
     waitForTaskTrackers(client);
 

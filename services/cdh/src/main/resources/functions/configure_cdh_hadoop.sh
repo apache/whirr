@@ -35,9 +35,19 @@ function configure_cdh_hadoop() {
       ;;
   esac
   
-  REPO=${REPO:-cdh3}
-  HADOOP=hadoop-${HADOOP_VERSION:-0.20}
-  HADOOP_CONF_DIR=/etc/$HADOOP/conf.dist
+  REPO=${REPO:-cdh4}
+  CDH_MAJOR_VERSION=$(echo $REPO | sed -e 's/cdh\([0-9]\).*/\1/')
+  if [ $CDH_MAJOR_VERSION = "4" ]; then
+    HADOOP=hadoop
+    HADOOP_CONF_DIR=/etc/$HADOOP/conf.dist
+    HDFS_PACKAGE_PREFIX=hadoop-hdfs
+    MAPREDUCE_PACKAGE_PREFIX=hadoop-0.20-mapreduce
+  else
+    HADOOP=hadoop-${HADOOP_VERSION:-0.20}
+    HADOOP_CONF_DIR=/etc/$HADOOP/conf.dist
+    HDFS_PACKAGE_PREFIX=hadoop-${HADOOP_VERSION:-0.20}
+    MAPREDUCE_PACKAGE_PREFIX=hadoop-${HADOOP_VERSION:-0.20}  
+  fi
   
   mkdir -p /data/hadoop
   chgrp hadoop /data/hadoop
@@ -85,16 +95,16 @@ EOF
       start_namenode
       ;;
     hadoop-secondarynamenode)
-      start_hadoop_daemon secondarynamenode
+      start_hadoop_daemon $HDFS_PACKAGE_PREFIX-secondarynamenode
       ;;
     hadoop-jobtracker)
-      start_hadoop_daemon jobtracker
+      start_hadoop_daemon $MAPREDUCE_PACKAGE_PREFIX-jobtracker
       ;;
     hadoop-datanode)
-      start_hadoop_daemon datanode
+      start_hadoop_daemon $HDFS_PACKAGE_PREFIX-datanode
       ;;
     hadoop-tasktracker)
-      start_hadoop_daemon tasktracker
+      start_hadoop_daemon $MAPREDUCE_PACKAGE_PREFIX-tasktracker
       ;;
     esac
   done
@@ -105,18 +115,18 @@ EOF
 
 function start_namenode() {
   if which dpkg &> /dev/null; then
-    apt-get -y install $HADOOP-namenode
+    apt-get -y install $HDFS_PACKAGE_PREFIX-namenode
     AS_HDFS="su -s /bin/bash - hdfs -c"
     # Format HDFS
     [ ! -e /data/hadoop/hdfs ] && $AS_HDFS "$HADOOP namenode -format"
   elif which rpm &> /dev/null; then
-    yum install -y $HADOOP-namenode
+    yum install -y $HDFS_PACKAGE_PREFIX-namenode
     AS_HDFS="/sbin/runuser -s /bin/bash - hdfs -c"
     # Format HDFS
     [ ! -e /data/hadoop/hdfs ] && $AS_HDFS "$HADOOP namenode -format"
   fi
 
-  service $HADOOP-namenode start
+  service $HDFS_PACKAGE_PREFIX-namenode start
 
   $AS_HDFS "$HADOOP dfsadmin -safemode wait"
   $AS_HDFS "/usr/bin/$HADOOP fs -mkdir /user"
@@ -140,10 +150,10 @@ function start_namenode() {
 function start_hadoop_daemon() {
   daemon=$1
   if which dpkg &> /dev/null; then
-    apt-get -y install $HADOOP-$daemon
+    apt-get -y install $daemon
   elif which rpm &> /dev/null; then
-    yum install -y $HADOOP-$daemon
+    yum install -y $daemon
   fi
-  service $HADOOP-$daemon start
+  service $daemon start
 }
 
