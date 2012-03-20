@@ -73,7 +73,7 @@ Trunk (unreleased changes)
 
   BUG FIXES
 
-    WHIRR-555. Fix java install script: use `...` instead of $(...)
+    WHIRR-555. Fix java install script: $(...) -> `...` (kve)
 
     WHIRR-473. HadoopServiceController.getInstance(String config) does 
     not update instances correctly (Frank Scholten via asavu)
