@@ -31,6 +31,8 @@ Release 0.7.1 - 2012-02-23
 
   IMPROVEMENTS
 
+    WHIRR-555. Fix java install scripts: $(...) -> `...` (kve)
+
     WHIRR-507. Make whirr script executable from any path 
     (Marco Didonna via asavu)
 

@@ -26,7 +26,7 @@ function install_oracle_jdk6() {
     re$turn
   fi
 
-  arch=$(uname -m)
+  arch=`uname -m`
 
   # Find out which .bin file to download
   url=http://download.oracle.com/otn-pub/java/jdk/6u31-b04/jdk-6u31-linux-i586.bin
@@ -34,11 +34,11 @@ function install_oracle_jdk6() {
     url=http://download.oracle.com/otn-pub/java/jdk/6u31-b04/jdk-6u31-linux-x64.bin
   fi
   
-  tmpdir=$(mktemp -d)
-  curl $url -L --silent --show-error --fail --connect-timeout 10 --max-time 600 --retry 5 -o $tmpdir/$(basename $url)
+  tmpdir=`mktemp -d`
+  curl $url -L --silent --show-error --fail --connect-timeout 60 --max-time 600 --retry 5 -o $tmpdir/`basename $url`
 
-  (cd $tmpdir; sh $(basename $url) -noregister)
-  mkdir -p $(dirname $target_dir)
+  (cd $tmpdir; sh `basename $url` -noregister)
+  mkdir -p `dirname $target_dir`
   (cd $tmpdir; mv jdk1* $target_dir)
   rm -rf $tmpdir
   
@@ -60,6 +60,9 @@ function install_oracle_jdk6() {
   fi
   if [ -f /etc/bashrc ]; then
     echo export JAVA_HOME=$JAVA_HOME >> /etc/bashrc
+  fi
+  if [ -f ~root/.bashrc ]; then
+    echo export JAVA_HOME=$JAVA_HOME >> ~root/.bashrc
   fi
   if [ -f /etc/skel/.bashrc ]; then
     echo export JAVA_HOME=$JAVA_HOME >> /etc/skel/.bashrc
