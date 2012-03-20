@@ -18,6 +18,10 @@
 
 package org.apache.whirr.cli.command;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintStream;
+import java.util.List;
 import joptsimple.OptionSet;
 import org.apache.whirr.Cluster;
 import org.apache.whirr.ClusterController;
@@ -25,11 +29,6 @@ import org.apache.whirr.ClusterControllerFactory;
 import org.apache.whirr.ClusterSpec;
 import org.apache.whirr.command.AbstractClusterCommand;
 import org.apache.whirr.util.Utils;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PrintStream;
-import java.util.List;
 
 /**
  * A command to launch a new cluster.
@@ -47,7 +46,6 @@ public class LaunchClusterCommand extends AbstractClusterCommand {
   @Override
   public int run(InputStream in, PrintStream out, PrintStream err,
                  List<String> args) throws Exception {
-
     OptionSet optionSet = parser.parse(args.toArray(new String[args.size()]));
 
     if (!optionSet.nonOptionArguments().isEmpty()) {
@@ -57,6 +55,7 @@ public class LaunchClusterCommand extends AbstractClusterCommand {
 
     try {
       ClusterSpec clusterSpec = getClusterSpec(optionSet);
+      printProviderInfo(out, err, clusterSpec, optionSet);
       return run(in, out, err, clusterSpec);
 
     } catch (IllegalArgumentException e) {

@@ -60,12 +60,7 @@ public abstract class AbstractClusterCommand extends Command {
 
   protected OptionParser parser = new OptionParser();
   private Map<Property, OptionSpec<?>> optionSpecs;
-  private OptionSpec<String> configOption = parser
-    .accepts("config", "Note that Whirr properties specified in " + 
-      "this file  should all have a whirr. prefix.")
-    .withRequiredArg()
-    .describedAs("config.properties")
-    .ofType(String.class);
+  private OptionSpec<String> configOption;
 
   public AbstractClusterCommand(String name, String description, ClusterControllerFactory factory) {
     this(name, description, factory, new ClusterStateStoreFactory());
@@ -74,6 +69,14 @@ public abstract class AbstractClusterCommand extends Command {
   public AbstractClusterCommand(String name, String description, ClusterControllerFactory factory,
         ClusterStateStoreFactory stateStoreFactory) {
     super(name, description);
+
+    configOption = parser.accepts("config", "Note that Whirr properties specified in " + 
+        "this file  should all have a whirr. prefix.")
+        .withRequiredArg()
+        .describedAs("config.properties")
+        .ofType(String.class);
+
+    parser.accepts("quiet", "Be less verbose");
 
     this.factory = factory;
     this.stateStoreFactory = stateStoreFactory;
@@ -154,6 +157,13 @@ public abstract class AbstractClusterCommand extends Command {
    */
   protected ClusterStateStore createClusterStateStore(ClusterSpec spec) {
     return stateStoreFactory.create(spec);
+  }
+
+  protected void printProviderInfo(PrintStream out, PrintStream err,
+      ClusterSpec clusterSpec, OptionSet optionSet) {
+    if (!optionSet.has("quiet")) {
+      out.println(String.format("Running on provider %s using identity %s", clusterSpec.getProvider(), clusterSpec.getIdentity()));
+    }
   }
 
   /**

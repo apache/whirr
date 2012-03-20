@@ -54,6 +54,7 @@ public class DestroyClusterCommand extends AbstractClusterCommand {
     }
     try {
       ClusterSpec clusterSpec = getClusterSpec(optionSet);
+      printProviderInfo(out, err, clusterSpec, optionSet);
       return run(in, out, err, clusterSpec);
 
     } catch (IllegalArgumentException e) {

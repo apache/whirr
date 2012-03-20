@@ -69,6 +69,7 @@ public abstract class RoleLifecycleCommand  extends AbstractClusterCommand {
 
     try {
       ClusterSpec clusterSpec = getClusterSpec(optionSet);
+      printProviderInfo(out, err, clusterSpec, optionSet);
       return runLifecycleStep(
           clusterSpec,
           createClusterController(clusterSpec.getServiceName()),

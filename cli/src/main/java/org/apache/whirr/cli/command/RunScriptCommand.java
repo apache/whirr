@@ -107,6 +107,7 @@ public class RunScriptCommand extends AbstractClusterCommand {
       if (optionSet.has(rolesOption)) {
         roles = optionSet.valueOf(rolesOption).split(",");
       }
+      printProviderInfo(out, err, clusterSpec, optionSet);
       return run(in, out, err, clusterSpec, ids, roles, optionSet.valueOf(scriptOption));
 
     } catch (IllegalArgumentException e) {

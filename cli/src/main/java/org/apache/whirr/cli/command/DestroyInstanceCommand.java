@@ -64,6 +64,7 @@ public class DestroyInstanceCommand extends AbstractClusterCommand {
       }
       ClusterSpec clusterSpec = getClusterSpec(optionSet);
       String instanceId = optionSet.valueOf(instanceOption);
+      printProviderInfo(out, err, clusterSpec, optionSet);
       return run(in, out, err, clusterSpec, instanceId);
 
     } catch (IllegalArgumentException e) {

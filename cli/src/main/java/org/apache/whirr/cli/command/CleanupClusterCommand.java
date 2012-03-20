@@ -62,6 +62,7 @@ public class CleanupClusterCommand extends AbstractClusterCommand {
 
     try {
       ClusterSpec clusterSpec = getClusterSpec(optionSet);
+      printProviderInfo(out, err, clusterSpec, optionSet);
       ClusterController controller = createClusterController(clusterSpec.getServiceName());
       controller.cleanupCluster(clusterSpec);
       return 0;

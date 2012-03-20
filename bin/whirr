@@ -66,8 +66,6 @@ if $cygwin; then
   CLASSPATH=`cygpath -wp $CLASSPATH`;
 fi
 
-echo Running on "$WHIRR_PROVIDER" using identity "$WHIRR_IDENTITY"
-
 # Start the application
 java $LOGGING_OPTS $WHIRR_CLI_OPTS -cp "$CLASSPATH" org.apache.whirr.cli.Main "$@"
  
