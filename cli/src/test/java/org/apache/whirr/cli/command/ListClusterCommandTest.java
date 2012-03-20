@@ -104,6 +104,7 @@ public class ListClusterCommandTest extends BaseCommandTest {
         "--service-name", "test-service",
         "--cluster-name", "test-cluster",
         "--identity", "myusername",
+        "--quiet",
         "--private-key-file", keys.get("private").getAbsolutePath())
     );
     
