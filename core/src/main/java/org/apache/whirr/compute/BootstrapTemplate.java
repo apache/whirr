@@ -42,6 +42,7 @@ import java.net.MalformedURLException;
 
 import static org.jclouds.compute.options.TemplateOptions.Builder.runScript;
 import static org.jclouds.scriptbuilder.domain.Statements.appendFile;
+import static org.jclouds.scriptbuilder.domain.Statements.createOrOverwriteFile;
 import static org.jclouds.scriptbuilder.domain.Statements.interpret;
 import static org.jclouds.scriptbuilder.domain.Statements.newStatementList;
 
@@ -88,7 +89,7 @@ public class BootstrapTemplate {
       "/tmp/logs",// location of stdout.log and stderr.log
       ImmutableMap.of("newUser", user, "defaultHome", "/home/users"), // variables
       ImmutableList.<Statement> of(
-        createUserWithPublicAndPrivateKey(user, publicKey, privateKey),
+        ensureUserExistsWithPublicAndPrivateKey(user, publicKey, privateKey),
         makeSudoersOnlyPermitting(user),
         statement)
     );
@@ -123,22 +124,27 @@ public class BootstrapTemplate {
   }
 
   // must be used inside InitBuilder, as this sets the shell variables used in this statement
-  private static Statement createUserWithPublicAndPrivateKey(String username,
+  private static Statement ensureUserExistsWithPublicAndPrivateKey(String username,
      String publicKey, String privateKey) {
     // note directory must be created first
     return newStatementList(
       interpret(
-        "mkdir -p $DEFAULT_HOME/$NEW_USER/.ssh",
-        "useradd --shell /bin/bash -d $DEFAULT_HOME/$NEW_USER $NEW_USER\n"),
+        "USER_HOME=$DEFAULT_HOME/$NEW_USER",
+        "mkdir -p $USER_HOME/.ssh",
+        "useradd --shell /bin/bash -d $USER_HOME $NEW_USER",
+        "[ $? -ne 0 ] && USER_HOME=$(grep $NEW_USER /etc/passwd | cut -d \":\" -f6)\n"),
       appendFile(
-        "$DEFAULT_HOME/$NEW_USER/.ssh/authorized_keys",
+        "$USER_HOME/.ssh/authorized_keys",
         Splitter.on('\n').split(publicKey)),
-      appendFile(
-        "$DEFAULT_HOME/$NEW_USER/.ssh/id_rsa",
+      createOrOverwriteFile(
+        "$USER_HOME/.ssh/id_rsa.pub",
+        Splitter.on('\n').split(publicKey)),      
+      createOrOverwriteFile(
+        "$USER_HOME/.ssh/id_rsa",
         Splitter.on('\n').split(privateKey)),
       interpret(
-        "chmod 400 $DEFAULT_HOME/$NEW_USER/.ssh/*",
-        "chown -R $NEW_USER $DEFAULT_HOME/$NEW_USER\n"));
+        "chmod 400 $USER_HOME/.ssh/*",
+        "chown -R $NEW_USER $USER_HOME\n"));
   }
 
   // must be used inside InitBuilder, as this sets the shell variables used in this statement
