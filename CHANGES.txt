@@ -27,6 +27,8 @@ Release 0.7.2
 
     WHIRR-464. Do not fail if whirr.cluster-user already exists on the 
     remote machine (Rodrigo Duarte Sousa via Andrei Savu)
+
+    WHIRR-374. Enforce Maven 3 (Tom White via Andrei Savu)
  
   BUG FIXES
 
