@@ -78,6 +78,8 @@ Trunk (unreleased changes)
 
     WHIRR-374. Enforce Maven 3 (Tom White via Andrei Savu)
 
+    WHIRR-565. Add .checktyle files created by eclipse-checkstyle-plugin to rat excludes (David Alves)
+
   BUG FIXES
 
     WHIRR-555. Fix java install script: $(...) -> `...` (kve)

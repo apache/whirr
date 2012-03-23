@@ -432,6 +432,7 @@
             <exclude>**/.project</exclude>
             <exclude>**/.classpath</exclude>
             <exclude>**/.settings/**</exclude>
+            <exclude>**/.checkstyle</exclude>
             <exclude>**/target/**</exclude>
             <exclude>src/site/resources/images/whirr-logo.ai</exclude>
             <!-- binary -->
