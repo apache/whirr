@@ -80,6 +80,8 @@ Trunk (unreleased changes)
 
     WHIRR-565. Add .checktyle files created by eclipse-checkstyle-plugin to rat excludes (David Alves)
 
+    WHIRR-563. Disable password based authentication (Rodrigo Duarte Sousa via Andrei Savu)
+
   BUG FIXES
 
     WHIRR-555. Fix java install script: $(...) -> `...` (kve)
