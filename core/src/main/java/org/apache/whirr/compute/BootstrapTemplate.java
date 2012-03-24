@@ -44,6 +44,7 @@ import static org.jclouds.scriptbuilder.domain.Statements.appendFile;
 import static org.jclouds.scriptbuilder.domain.Statements.createOrOverwriteFile;
 import static org.jclouds.scriptbuilder.domain.Statements.interpret;
 import static org.jclouds.scriptbuilder.domain.Statements.newStatementList;
+import static org.jclouds.scriptbuilder.statements.ssh.SshStatements.sshdConfig;
 
 public class BootstrapTemplate {
 
@@ -89,6 +90,7 @@ public class BootstrapTemplate {
       ImmutableList.<Statement> of(
         ensureUserExistsWithPublicAndPrivateKey(user, publicKey, privateKey),
         makeSudoersOnlyPermitting(user),
+        disablePasswordBasedAuth(),
         statement)
     );
   }
@@ -111,7 +113,7 @@ public class BootstrapTemplate {
 
   // must be used inside InitBuilder, as this sets the shell variables used in this statement
   private static Statement ensureUserExistsWithPublicAndPrivateKey(String username,
-     String publicKey, String privateKey) {
+    String publicKey, String privateKey) {
     // note directory must be created first
     return newStatementList(
       interpret(
@@ -151,4 +153,7 @@ public class BootstrapTemplate {
     );
   }
 
+  private static Statement disablePasswordBasedAuth() {
+    return sshdConfig(ImmutableMap.of("PasswordAuthentication","no"));
+  }
 }

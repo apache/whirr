@@ -23,12 +23,16 @@ Release 0.7.2
 
     WHIRR-553. Upgrade Cassandra to 1.0.8 (Andrei Savu)
   
-    WHIRR-335. Update Hama service to Hama 0.4-incubating (Edward J. Yoon via Frank Scholten)
+    WHIRR-335. Update Hama service to Hama 0.4-incubating 
+    (Edward J. Yoon via Frank Scholten)
 
     WHIRR-464. Do not fail if whirr.cluster-user already exists on the 
     remote machine (Rodrigo Duarte Sousa via Andrei Savu)
 
     WHIRR-374. Enforce Maven 3 (Tom White via Andrei Savu)
+
+    WHIRR-563. Disable password based authentication 
+    (Rodrigo Duarte Sousa via Andrei Savu)
  
   BUG FIXES
 
