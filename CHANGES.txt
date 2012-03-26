@@ -36,6 +36,8 @@ Release 0.7.2
  
   BUG FIXES
 
+    WHIRR-570. Site generation fails for YARN. (tomwhite)
+
 Release 0.7.1 - 2012-02-23
 
   IMPROVEMENTS
