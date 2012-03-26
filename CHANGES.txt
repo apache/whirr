@@ -102,6 +102,8 @@ Trunk (unreleased changes)
 
     WHIRR-549. Remove dependency on system SSH keys in tests (Frank Scholten)
 
+    WHIRR-570. Site generation fails for YARN. (tomwhite)
+
 Release 0.7.1 - 2012-02-23
 
   IMPROVEMENTS
