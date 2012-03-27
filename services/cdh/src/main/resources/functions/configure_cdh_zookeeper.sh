@@ -44,6 +44,15 @@ dataDir=/var/log/zookeeper/txlog
 clientPort=2181
 # The servers in the ensemble
 EOF
+
+  if [ $CDH_MAJOR_VERSION = "4" ]; then
+    if which dpkg &> /dev/null; then
+      AS_ZK="su -s /bin/bash - zookeeper -c"
+    elif which rpm &> /dev/null; then
+      AS_ZK="/sbin/runuser -s /bin/bash - zookeeper -c"
+    fi
+    $AS_ZK "/usr/bin/zookeeper-server-initialize"
+  fi
   
   if [[ $# -gt 1 ]]; then
     id=1
