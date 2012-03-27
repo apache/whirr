@@ -18,33 +18,30 @@
 
 package org.apache.whirr.actions;
 
-import com.google.common.base.Function;
+import java.util.Set;
+
 import org.apache.whirr.ClusterSpec;
 import org.apache.whirr.service.ClusterActionHandler;
 import org.jclouds.compute.ComputeServiceContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.util.Map;
-import java.util.Set;
+import com.google.common.base.Function;
+import com.google.common.cache.LoadingCache;
 
 /**
  * A {@link ClusterAction} for stopping the cluster services
  */
 public class StopServicesAction extends ScriptBasedClusterAction {
 
-  private static final Logger LOG = LoggerFactory.getLogger(StopServicesAction.class);
-
   public StopServicesAction(
       Function<ClusterSpec, ComputeServiceContext> getCompute,
-      Map<String, ClusterActionHandler> handlerMap
+      LoadingCache<String, ClusterActionHandler> handlerMap
   ) {
     super(getCompute, handlerMap);
   }
 
   public StopServicesAction(
       Function<ClusterSpec, ComputeServiceContext> getCompute,
-      Map<String, ClusterActionHandler> handlerMap,
+      LoadingCache<String, ClusterActionHandler> handlerMap,
       Set<String> targetRoles,
       Set<String> targetInstanceIds
   ) {

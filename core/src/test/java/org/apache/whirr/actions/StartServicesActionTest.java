@@ -18,13 +18,14 @@
 
 package org.apache.whirr.actions;
 
-import com.google.common.base.Function;
+import java.util.Set;
+
 import org.apache.whirr.ClusterSpec;
 import org.apache.whirr.service.ClusterActionHandler;
 import org.jclouds.compute.ComputeServiceContext;
 
-import java.util.Map;
-import java.util.Set;
+import com.google.common.base.Function;
+import com.google.common.cache.LoadingCache;
 
 public class StartServicesActionTest extends ScriptBasedClusterActionTest<StartServicesAction> {
 
@@ -35,7 +36,7 @@ public class StartServicesActionTest extends ScriptBasedClusterActionTest<StartS
   
   @Override
   public StartServicesAction newClusterActionInstance(
-      Function<ClusterSpec, ComputeServiceContext> getCompute, Map<String, ClusterActionHandler> handlerMap,
+      Function<ClusterSpec, ComputeServiceContext> getCompute, LoadingCache<String, ClusterActionHandler> handlerMap,
       Set<String> targetRoles, Set<String> targetInstanceIds
   ) {
     return new StartServicesAction(getCompute, handlerMap, targetRoles, targetInstanceIds);

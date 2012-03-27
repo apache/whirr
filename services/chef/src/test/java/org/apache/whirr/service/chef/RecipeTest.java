@@ -28,9 +28,9 @@ public class RecipeTest {
   private static final String NGINX_JSON = "{\"run_list\":[\"recipe[nginx]\"]}";
   private static final String POSTGRES_JSON = "{\"run_list\":[\"recipe[postgresql::server]\"]}";
   private static final String RESOLVER_JSON = "{\"resolver\":{\"nameservers\":[\"10.0.0.1\"],\"search\":\"int.example.com\"},\"run_list\":[\"recipe[resolver]\"]}";
-  private static final String CHEF_COMMAND = "cat > /tmp/test.json <<'END_OF_FILE'\n"
-      + "{\"nginx\":{\"webport\":\"90\"},\"run_list\":[\"recipe[nginx]\"]}\n"
-      + "END_OF_FILE\n" + "sudo -i chef-solo -j /tmp/test.json -r http://myurl\n";
+  private static final String CHEF_COMMAND = "cat > /tmp/test.json <<-'END_OF_JCLOUDS_FILE'\n"
+      + "\t{\"nginx\":{\"webport\":\"90\"},\"run_list\":[\"recipe[nginx]\"]}\n"
+      + "END_OF_JCLOUDS_FILE\n" + "sudo -i chef-solo -j /tmp/test.json -r http://myurl\n";
 
   @Test
   public void testJSONConversion() {

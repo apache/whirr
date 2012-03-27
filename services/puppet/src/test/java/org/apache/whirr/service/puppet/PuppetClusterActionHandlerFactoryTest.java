@@ -27,12 +27,12 @@ public class PuppetClusterActionHandlerFactoryTest {
 
   @Test
   public void testPuppetFactoryIsRegisteredAndWorksWithModules() {
-    assertEquals(new HandlerMapFactory().create().get("puppet:nginx"), new PuppetClusterActionHandler("nginx"));
+    assertEquals(new HandlerMapFactory().create().getUnchecked("puppet:nginx"), new PuppetClusterActionHandler("nginx"));
   }
 
   @Test
   public void testPuppetFactoryIsRegisteredAndWorksWithManifests() {
-    assertEquals(new HandlerMapFactory().create().get("puppet:postgresql::server"), new PuppetClusterActionHandler(
+    assertEquals(new HandlerMapFactory().create().getUnchecked("puppet:postgresql::server"), new PuppetClusterActionHandler(
           "postgresql::server"));
   }
 

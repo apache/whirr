@@ -22,8 +22,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.jcraft.jsch.JSchException;
-
 import java.io.IOException;
 
 import org.apache.commons.configuration.ConfigurationException;
@@ -34,6 +32,8 @@ import org.jclouds.compute.domain.OsFamily;
 import org.jclouds.compute.domain.TemplateBuilder;
 import org.junit.Before;
 import org.junit.Test;
+
+import com.jcraft.jsch.JSchException;
 
 public class TemplateBuilderStrategyTest {
 

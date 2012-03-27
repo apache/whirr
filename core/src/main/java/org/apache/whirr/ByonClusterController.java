@@ -38,12 +38,11 @@ import org.jclouds.compute.domain.NodeMetadata;
 import org.jclouds.compute.domain.NodeState;
 import org.jclouds.compute.options.RunScriptOptions;
 import org.jclouds.scriptbuilder.domain.Statement;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
+import com.google.common.cache.LoadingCache;
 import com.google.common.collect.Collections2;
 
 /**
@@ -51,8 +50,6 @@ import com.google.common.collect.Collections2;
  * ("bring your own nodes").
  */
 public class ByonClusterController extends ClusterController {
-
-  private static final Logger LOG = LoggerFactory.getLogger(ClusterController.class);
 
   @Override
   public String getName() {
@@ -62,7 +59,7 @@ public class ByonClusterController extends ClusterController {
   public Cluster launchCluster(ClusterSpec clusterSpec) throws IOException,
       InterruptedException {
 
-    Map<String, ClusterActionHandler> handlerMap = handlerMapFactory
+    LoadingCache<String, ClusterActionHandler> handlerMap = handlerMapFactory
         .create();
 
     ClusterAction bootstrapper = new ByonClusterAction(BOOTSTRAP_ACTION, getCompute(), handlerMap);
@@ -78,7 +75,7 @@ public class ByonClusterController extends ClusterController {
 
   public void destroyCluster(ClusterSpec clusterSpec) throws IOException,
       InterruptedException {
-    Map<String, ClusterActionHandler> handlerMap = handlerMapFactory
+    LoadingCache<String, ClusterActionHandler> handlerMap = handlerMapFactory
         .create();
 
     ClusterAction destroyer = new ByonClusterAction(DESTROY_ACTION, getCompute(), handlerMap);

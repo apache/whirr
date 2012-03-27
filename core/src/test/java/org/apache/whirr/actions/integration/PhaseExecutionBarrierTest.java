@@ -18,9 +18,14 @@
 
 package org.apache.whirr.actions.integration;
 
-import com.google.common.base.Predicates;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Maps;
+import static java.lang.Integer.parseInt;
+import static org.apache.commons.lang.StringUtils.deleteWhitespace;
+import static org.jclouds.scriptbuilder.domain.Statements.exec;
+import static org.junit.Assert.assertTrue;
+
+import java.util.Map;
+import java.util.concurrent.ConcurrentMap;
+
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
@@ -38,13 +43,9 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentMap;
-
-import static java.lang.Integer.parseInt;
-import static org.apache.commons.lang.StringUtils.deleteWhitespace;
-import static org.jclouds.scriptbuilder.domain.Statements.exec;
-import static org.junit.Assert.assertTrue;
+import com.google.common.base.Predicates;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Maps;
 
 public class PhaseExecutionBarrierTest {
 

@@ -18,36 +18,12 @@
 
 package org.apache.whirr.service;
 
-import com.google.common.base.Function;
-import com.google.common.base.Objects;
-import com.google.common.base.Predicate;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableListMultimap;
-import com.google.common.collect.LinkedListMultimap;
-import com.google.common.collect.ListMultimap;
-import com.google.common.collect.MapMaker;
-import com.google.common.collect.Maps;
-import com.google.common.io.InputSupplier;
-import com.google.inject.AbstractModule;
-import org.aopalliance.intercept.MethodInterceptor;
-import org.aopalliance.intercept.MethodInvocation;
-import org.jclouds.compute.callables.RunScriptOnNode;
-import org.jclouds.compute.domain.ExecResponse;
-import org.jclouds.compute.domain.NodeMetadata;
-import org.jclouds.compute.domain.internal.NodeMetadataImpl;
-import org.jclouds.crypto.CryptoStreams;
-import org.jclouds.domain.Credentials;
-import org.jclouds.domain.LoginCredentials;
-import org.jclouds.io.Payload;
-import org.jclouds.io.payloads.StringPayload;
-import org.jclouds.net.IPSocket;
-import org.jclouds.ssh.SshClient;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static com.google.common.collect.Iterables.concat;
+import static com.google.common.collect.Iterables.contains;
+import static com.google.common.collect.Iterables.find;
+import static com.google.common.collect.Multimaps.synchronizedListMultimap;
+import static com.google.common.io.ByteStreams.newInputStreamSupplier;
 
-import javax.annotation.Nullable;
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -57,14 +33,40 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static com.google.common.collect.Iterables.concat;
-import static com.google.common.collect.Iterables.contains;
-import static com.google.common.collect.Iterables.find;
-import static com.google.common.collect.Multimaps.synchronizedListMultimap;
-import static com.google.common.io.ByteStreams.newInputStreamSupplier;
-import static com.google.inject.matcher.Matchers.identicalTo;
-import static com.google.inject.matcher.Matchers.returns;
-import static com.google.inject.matcher.Matchers.subclassesOf;
+import javax.annotation.Nullable;
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+import org.jclouds.compute.domain.ExecResponse;
+import org.jclouds.compute.domain.NodeMetadata;
+import org.jclouds.compute.events.StatementOnNode;
+import org.jclouds.compute.events.StatementOnNodeSubmission;
+import org.jclouds.crypto.CryptoStreams;
+import org.jclouds.domain.Credentials;
+import org.jclouds.domain.LoginCredentials;
+import org.jclouds.io.Payload;
+import org.jclouds.io.payloads.StringPayload;
+import org.jclouds.net.IPSocket;
+import org.jclouds.scriptbuilder.domain.Statement;
+import org.jclouds.ssh.SshClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.base.Objects;
+import com.google.common.base.Predicate;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableListMultimap;
+import com.google.common.collect.LinkedListMultimap;
+import com.google.common.collect.ListMultimap;
+import com.google.common.collect.Maps;
+import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
+import com.google.common.io.InputSupplier;
+import com.google.inject.AbstractModule;
+import com.google.inject.Provides;
 
 /**
  * Outputs orchestration jclouds does to INFO logging and saves an ordered list
@@ -78,109 +80,51 @@ import static com.google.inject.matcher.Matchers.subclassesOf;
 public class DryRunModule extends AbstractModule {
   private static final Logger LOG = LoggerFactory.getLogger(DryRunModule.class);
 
-  // an example showing how to intercept any internal method for logging
-  // purposes
-  public class LogCallToRunScriptOnNode implements MethodInterceptor {
-
-    public Object invoke(MethodInvocation i) throws Throwable {
-      if (i.getMethod().getName().equals("call")) {
-        RunScriptOnNode runScriptOnNode = RunScriptOnNode.class.cast(i
-            .getThis());
-        String nodeName = runScriptOnNode.getNode().getName();
-        LOG.info(nodeName + " >> running script");
-        Object returnVal = i.proceed();
-        LOG.info(nodeName + " << " + returnVal);
-        return returnVal;
-      } else {
-        return i.proceed();
-      }
+  public static class DryRun {
+    public DryRun reset() {
+      executedScripts.clear();
+      totallyOrderedScripts.clear();
+      return this;
     }
-  }
 
-  public static synchronized DryRun getDryRun() {
-    return DryRun.INSTANCE;
-  }
-
-  public static void resetDryRun() {
-    DryRun.INSTANCE.executedScripts.clear();
-    DryRun.INSTANCE.totallyOrderedScripts.clear();
-  }
-
-  // enum singleton pattern
-  public static enum DryRun {
-    INSTANCE;
-    
     // stores the scripts executed, per node, in the order they were executed
-    private final ListMultimap<NodeMetadata, RunScriptOnNode> executedScripts = synchronizedListMultimap(LinkedListMultimap
-        .<NodeMetadata, RunScriptOnNode> create());
+    private final ListMultimap<NodeMetadata, Statement> executedScripts = synchronizedListMultimap(LinkedListMultimap
+        .<NodeMetadata, Statement> create());
     
-    private final List<RunScriptOnNode> totallyOrderedScripts = Collections.synchronizedList(new ArrayList<RunScriptOnNode>());
+    private final List<StatementOnNode> totallyOrderedScripts = Collections.synchronizedList(new ArrayList<StatementOnNode>());
 
     DryRun() {
     }
-
-    void newExecution(RunScriptOnNode runScript) {
-      NodeMetadata original = runScript.getNode();
-      //duplicate the NodeMetadata instance without credentials because
-      //NodeMetadata equals() contract uses credentials.
-      NodeMetadataImpl stored = new NodeMetadataImpl(
-          original.getProviderId(),
-          original.getName(),
-          original.getId(),
-          original.getLocation(),
-          original.getUri(),
-          original.getUserMetadata(),
-          original.getTags(),
-          original.getGroup(),
-          original.getHardware(),
-          original.getImageId(),
-          original.getOperatingSystem(),
-          original.getState(),
-          original.getLoginPort(),
-          original.getPrivateAddresses(),
-          original.getPublicAddresses(),
-          null,
-          null,
-          original.getHostname());
-      executedScripts.put(stored, runScript);
-      totallyOrderedScripts.add(runScript);
+       
+    @Subscribe
+    public void newExecution(StatementOnNodeSubmission info) {
+      executedScripts.put(info.getNode(), info.getStatement());
+      totallyOrderedScripts.add(info);
     }
 
-    public synchronized ListMultimap<NodeMetadata, RunScriptOnNode> getExecutions() {
+    public synchronized ListMultimap<NodeMetadata, Statement> getExecutions() {
       return ImmutableListMultimap.copyOf(executedScripts);
     }
     
-    public synchronized List<RunScriptOnNode> getTotallyOrderedExecutions() {
+    public synchronized List<StatementOnNode> getTotallyOrderedExecutions() {
       return ImmutableList.copyOf(totallyOrderedScripts);
     }
 
   }
 
-  public class SaveDryRunsByInterceptingRunScriptOnNodeCreation implements
-      MethodInterceptor {
-
-    public Object invoke(MethodInvocation i) throws Throwable {
-      if (i.getMethod().getName().equals("create")) {
-        Object returnVal = i.proceed();
-        getDryRun().newExecution(RunScriptOnNode.class.cast(returnVal));
-        return returnVal;
-      } else {
-        return i.proceed();
-      }
-    }
-  }
-
   @Override
   protected void configure() {
     bind(SshClient.Factory.class).to(LogSshClient.Factory.class);
-    bindInterceptor(subclassesOf(RunScriptOnNode.class),
-        returns(identicalTo(ExecResponse.class)),
-        new LogCallToRunScriptOnNode());
-    bindInterceptor(subclassesOf(RunScriptOnNode.Factory.class),
-        returns(identicalTo(RunScriptOnNode.class)),
-        new SaveDryRunsByInterceptingRunScriptOnNodeCreation());
   }
-
+  
+  @Singleton
+  @Provides
+  DryRun provideDryRun(EventBus in){
+     DryRun dryRun = new DryRun();
+     in.register(dryRun);
+     return dryRun;
+  }
+  
   private static class Key {
     private final IPSocket socket;
     private final Credentials creds;
@@ -240,18 +184,17 @@ public class DryRunModule extends AbstractModule {
     public static class Factory implements SshClient.Factory {
 
       // this will ensure only one state per ip socket/user
-      private final Map<Key, SshClient> clientMap;
+      private final LoadingCache<Key, SshClient> clientMap;
       // easy access to node metadata
       private final ConcurrentMap<String, NodeMetadata> nodes;
 
       @SuppressWarnings("unused")
       @Inject
       public Factory(final ConcurrentMap<String, NodeMetadata> nodes) {
-        this.clientMap = new MapMaker()
-            .makeComputingMap(new Function<Key, SshClient>() {
-
+         this.clientMap = CacheBuilder.newBuilder().build(
+               new CacheLoader<Key, SshClient>(){
               @Override
-              public SshClient apply(Key key) {
+              public SshClient load(Key key) {
                 return new LogSshClient(key);
               }
 
@@ -261,13 +204,13 @@ public class DryRunModule extends AbstractModule {
 
       @Override
       public SshClient create(final IPSocket socket, Credentials loginCreds) {
-        return clientMap.get(new Key(socket, loginCreds, find(nodes.values(),
+        return clientMap.getUnchecked(new Key(socket, loginCreds, find(nodes.values(),
             new NodeHasAddress(socket.getAddress()))));
       }
 
       @Override
       public SshClient create(IPSocket socket, LoginCredentials credentials) {
-        return clientMap.get(new Key(socket, credentials, find(nodes.values(),
+        return clientMap.getUnchecked(new Key(socket, credentials, find(nodes.values(),
             new NodeHasAddress(socket.getAddress()))));
       }
     }
@@ -305,6 +248,9 @@ public class DryRunModule extends AbstractModule {
         } else {
           exec = new ExecResponse("", "", 0);
         }
+      } else if (script.endsWith(" exitstatus")) {
+        // show return code is 0
+        exec = new ExecResponse("0", "", 0);
       } else {
         exec = new ExecResponse("", "", 0);
       }

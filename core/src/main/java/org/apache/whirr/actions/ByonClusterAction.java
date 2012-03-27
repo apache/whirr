@@ -18,27 +18,24 @@
 
 package org.apache.whirr.actions;
 
-import com.google.common.base.Function;
-import com.google.common.base.Predicate;
-import com.google.common.base.Predicates;
-import com.google.common.collect.Collections2;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
+import static com.google.common.base.Predicates.and;
+import static com.google.common.base.Predicates.in;
+import static com.google.common.base.Predicates.not;
+import static com.google.common.collect.Iterables.filter;
+import static com.google.common.collect.Iterables.get;
+import static com.google.common.collect.Iterables.transform;
+import static org.jclouds.compute.options.RunScriptOptions.Builder.overrideLoginCredentials;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.whirr.Cluster;
 import org.apache.whirr.Cluster.Instance;
@@ -50,12 +47,20 @@ import org.apache.whirr.service.jclouds.StatementBuilder;
 import org.jclouds.compute.ComputeService;
 import org.jclouds.compute.ComputeServiceContext;
 import org.jclouds.compute.domain.ComputeMetadata;
+import org.jclouds.compute.domain.ExecResponse;
 import org.jclouds.compute.domain.NodeMetadata;
+import org.jclouds.compute.options.RunScriptOptions;
 import org.jclouds.domain.Credentials;
-import org.jclouds.scriptbuilder.domain.OsFamily;
-import org.jclouds.scriptbuilder.domain.Statement;
+import org.jclouds.domain.LoginCredentials;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.base.Function;
+import com.google.common.base.Predicate;
+import com.google.common.cache.LoadingCache;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 public class ByonClusterAction extends ScriptBasedClusterAction {
 
@@ -65,7 +70,7 @@ public class ByonClusterAction extends ScriptBasedClusterAction {
   private final String action;
   
   public ByonClusterAction(String action, Function<ClusterSpec, ComputeServiceContext> getCompute,
-      Map<String, ClusterActionHandler> handlerMap) {
+      LoadingCache<String, ClusterActionHandler> handlerMap) {
     super(getCompute, handlerMap);
     this.action = action;
   }
@@ -78,10 +83,8 @@ public class ByonClusterAction extends ScriptBasedClusterAction {
   @Override
   protected void doAction(Map<InstanceTemplate, ClusterActionEvent> eventMap)
       throws IOException, InterruptedException {
-    
-    ExecutorService executorService = Executors.newCachedThreadPool();
-    
-    Set<Future<Void>> futures = Sets.newHashSet();
+        
+    final Collection<Future<ExecResponse>> futures = Sets.newHashSet();
 
     List<NodeMetadata> nodes = Lists.newArrayList();
     List<NodeMetadata> usedNodes = Lists.newArrayList();
@@ -99,8 +102,11 @@ public class ByonClusterAction extends ScriptBasedClusterAction {
       final ComputeServiceContext computeServiceContext = getCompute().apply(clusterSpec);
       final ComputeService computeService = computeServiceContext.getComputeService();
 
-      Credentials credentials = new Credentials(clusterSpec.getIdentity(), clusterSpec.getCredential());
+      LoginCredentials credentials = LoginCredentials.builder().user(clusterSpec.getClusterUser())
+            .privateKey(clusterSpec.getPrivateKey()).build();
       
+      final RunScriptOptions options = overrideLoginCredentials(credentials);
+
       if (numberAllocated == 0) {
         for (ComputeMetadata compute : computeService.listNodes()) {
           if (!(compute instanceof NodeMetadata)) {
@@ -111,10 +117,10 @@ public class ByonClusterAction extends ScriptBasedClusterAction {
       }
 
       int num = entry.getKey().getNumberOfInstances();
-      Predicate<NodeMetadata> unused = Predicates.not(Predicates.in(usedNodes));
+      Predicate<NodeMetadata> unused = not(in(usedNodes));
       Predicate<NodeMetadata> instancePredicate = new TagsPredicate(StringUtils.split(entry.getKey().getHardwareId()));      
 
-      List<NodeMetadata> templateNodes = new ArrayList(Collections2.filter(nodes, Predicates.and(unused, instancePredicate)));
+      List<NodeMetadata> templateNodes = Lists.newArrayList(filter(nodes, and(unused, instancePredicate)));
       if (templateNodes.size() < num) {
         LOG.warn("Not enough nodes available for template " + StringUtils.join(entry.getKey().getRoles(), "+"));
       }
@@ -122,33 +128,15 @@ public class ByonClusterAction extends ScriptBasedClusterAction {
       usedNodes.addAll(templateNodes);
       numberAllocated = usedNodes.size() ;
       
-      final Set<Instance> templateInstances = getInstances(
-          credentials, entry.getKey().getRoles(), templateNodes
-      );
+      Set<Instance> templateInstances = getInstances(credentials, entry.getKey().getRoles(), templateNodes);
       allInstances.addAll(templateInstances);
       
       for (final Instance instance : templateInstances) {
-        final Statement statement = statementBuilder.build(clusterSpec, instance);
-
-        futures.add(executorService.submit(new Callable<Void>() {
-          @Override
-          public Void call() throws Exception {
-            LOG.info("Running script on: {}", instance.getId());
-
-            if (LOG.isDebugEnabled()) {
-              LOG.debug("Running script:\n{}", statement.render(OsFamily.UNIX));
-            }
-
-            computeService.runScriptOnNode(instance.getId(), statement);
-            LOG.info("Script run completed on: {}", instance.getId());
-
-            return null;
-          }
-        }));
+         futures.add(runStatementOnInstanceInCluster(statementBuilder, instance, clusterSpec, options));
       }
     }
     
-    for (Future<Void> future : futures) {
+    for (Future<ExecResponse> future : futures) {
       try {
         future.get();
       } catch (ExecutionException e) {
@@ -165,12 +153,12 @@ public class ByonClusterAction extends ScriptBasedClusterAction {
   }
   
   private Set<Instance> getInstances(final Credentials credentials, final Set<String> roles,
-      Collection<NodeMetadata> nodes) {
-    return Sets.newLinkedHashSet(Collections2.transform(Sets.newLinkedHashSet(nodes),
+      Iterable<NodeMetadata> nodes) {
+    return ImmutableSet.copyOf(transform(nodes,
         new Function<NodeMetadata, Instance>() {
           @Override
           public Instance apply(NodeMetadata node) {
-            String publicIp = Iterables.get(node.getPublicAddresses(), 0);
+            String publicIp = get(node.getPublicAddresses(), 0);
             return new Instance(
                 credentials, roles, publicIp, publicIp, node.getId(), node
             );

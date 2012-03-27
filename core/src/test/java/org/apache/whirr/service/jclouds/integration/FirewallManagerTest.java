@@ -18,23 +18,23 @@
 
 package org.apache.whirr.service.jclouds.integration;
 
-import com.google.common.collect.Sets;
+import java.io.IOException;
+import java.util.Set;
+
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.whirr.Cluster;
 import org.apache.whirr.ClusterSpec;
 import org.apache.whirr.TestConstants;
 import org.apache.whirr.service.ComputeCache;
 import org.apache.whirr.service.FirewallManager;
+import org.apache.whirr.service.FirewallManager.Rule;
 import org.jclouds.compute.ComputeServiceContext;
 import org.jclouds.domain.Credentials;
 import org.jclouds.ec2.EC2Client;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.IOException;
-import java.util.Set;
-
-import static org.apache.whirr.service.FirewallManager.Rule;
+import com.google.common.collect.Sets;
 
 public class FirewallManagerTest {
 

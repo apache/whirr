@@ -48,7 +48,7 @@ public class StatementBuilderTest {
     builder.addStatement(
         new RunUrlStatement(false, "http://example.org/", "a/b", "c"));
 
-    String script = builder.build(clusterSpec).render(OsFamily.UNIX);
+    String script = builder.name("foo").build(clusterSpec).render(OsFamily.UNIX);
     int first = script.indexOf("runurl http://example.org/a/b c");
     assertThat(first, greaterThan(-1));
 
@@ -69,7 +69,7 @@ public class StatementBuilderTest {
     builder.addExport("fooBar", "my_value");
     builder.addStatement(Statements.exec("echo $FOO_BAR"));
 
-    String script = builder.build(clusterSpec).render(OsFamily.UNIX);
+    String script = builder.name("foo").build(clusterSpec).render(OsFamily.UNIX);
     
     assertThat(script, containsString("export FOO_BAR="));
     assertThat(script, containsString("my_value"));
@@ -90,7 +90,7 @@ public class StatementBuilderTest {
 
     builder.addStatement(Statements.exec("echo $FOO_BAR"));
     
-    String script = builder.build(clusterSpec).render(OsFamily.UNIX);
+    String script = builder.name("foo").build(clusterSpec).render(OsFamily.UNIX);
     
     assertThat(script, containsString("export FOO_BAR="));
     assertThat(script, containsString("my_value"));

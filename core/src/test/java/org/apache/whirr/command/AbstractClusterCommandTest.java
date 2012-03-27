@@ -18,11 +18,8 @@
 
 package org.apache.whirr.command;
 
-import joptsimple.OptionSet;
-import org.apache.whirr.ClusterControllerFactory;
-import org.apache.whirr.ClusterSpec;
-import org.apache.whirr.util.KeyPair;
-import org.junit.Test;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
 
 import java.io.File;
 import java.io.InputStream;
@@ -30,8 +27,12 @@ import java.io.PrintStream;
 import java.util.List;
 import java.util.Map;
 
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
+import joptsimple.OptionSet;
+
+import org.apache.whirr.ClusterControllerFactory;
+import org.apache.whirr.ClusterSpec;
+import org.apache.whirr.util.KeyPair;
+import org.junit.Test;
 
 public class AbstractClusterCommandTest {
 

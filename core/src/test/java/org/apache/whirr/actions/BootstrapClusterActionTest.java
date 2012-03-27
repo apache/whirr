@@ -18,10 +18,22 @@
 
 package org.apache.whirr.actions;
 
-import com.google.common.base.Function;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
+import static org.apache.whirr.util.Utils.convertMapToLoadingCache;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import java.io.IOException;
+import java.net.URI;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.Stack;
+import java.util.concurrent.atomic.AtomicInteger;
+
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.PropertiesConfiguration;
@@ -35,42 +47,31 @@ import org.jclouds.compute.ComputeService;
 import org.jclouds.compute.ComputeServiceContext;
 import org.jclouds.compute.RunNodesException;
 import org.jclouds.compute.domain.Hardware;
+import org.jclouds.compute.domain.HardwareBuilder;
 import org.jclouds.compute.domain.Image;
+import org.jclouds.compute.domain.ImageBuilder;
 import org.jclouds.compute.domain.NodeMetadata;
+import org.jclouds.compute.domain.NodeMetadataBuilder;
 import org.jclouds.compute.domain.NodeState;
 import org.jclouds.compute.domain.OperatingSystem;
-import org.jclouds.compute.domain.Processor;
 import org.jclouds.compute.domain.Template;
 import org.jclouds.compute.domain.TemplateBuilder;
-import org.jclouds.compute.domain.Volume;
-import org.jclouds.compute.domain.internal.HardwareImpl;
-import org.jclouds.compute.domain.internal.ImageImpl;
-import org.jclouds.compute.domain.internal.NodeMetadataImpl;
 import org.jclouds.compute.domain.internal.TemplateImpl;
 import org.jclouds.compute.options.TemplateOptions;
-import org.jclouds.domain.Credentials;
 import org.jclouds.domain.Location;
+import org.jclouds.domain.LocationBuilder;
 import org.jclouds.domain.LocationScope;
-import org.jclouds.domain.internal.LocationImpl;
+import org.jclouds.domain.LoginCredentials;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.Stack;
-import java.util.concurrent.atomic.AtomicInteger;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import com.google.common.base.Function;
+import com.google.common.cache.LoadingCache;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 public class BootstrapClusterActionTest {
 
@@ -102,13 +103,14 @@ public class BootstrapClusterActionTest {
     dntt.add("hadoop-tasktracker");
 
     TestNodeStarterFactory nodeStarterFactory = null;
-    
+
     ClusterActionHandler handler = mock(ClusterActionHandler.class);     
-    Map<String, ClusterActionHandler> handlerMap = Maps.newHashMap();
-    handlerMap.put("hadoop-jobtracker", handler);
-    handlerMap.put("hadoop-namenode", handler);
-    handlerMap.put("hadoop-datanode", handler);
-    handlerMap.put("hadoop-tasktracker", handler);
+    LoadingCache<String, ClusterActionHandler> handlerMap = convertMapToLoadingCache(
+      ImmutableMap.<String, ClusterActionHandler>builder()
+        .put("hadoop-jobtracker", handler)
+        .put("hadoop-namenode", handler)
+        .put("hadoop-datanode", handler)
+        .put("hadoop-tasktracker", handler).build());
 
     Function<ClusterSpec, ComputeServiceContext> getCompute = mock(Function.class);
     ComputeServiceContext serviceContext = mock(ComputeServiceContext.class);
@@ -169,12 +171,13 @@ public class BootstrapClusterActionTest {
 
     TestNodeStarterFactory nodeStarterFactory = null;
     
-    ClusterActionHandler handler = mock(ClusterActionHandler.class);     
-    Map<String, ClusterActionHandler> handlerMap = Maps.newHashMap();
-    handlerMap.put("hadoop-jobtracker", handler);
-    handlerMap.put("hadoop-namenode", handler);
-    handlerMap.put("hadoop-datanode", handler);
-    handlerMap.put("hadoop-tasktracker", handler);
+    ClusterActionHandler handler = mock(ClusterActionHandler.class);   
+    LoadingCache<String, ClusterActionHandler> handlerMap = convertMapToLoadingCache(
+      ImmutableMap.<String, ClusterActionHandler>builder()
+        .put("hadoop-jobtracker", handler)
+        .put("hadoop-namenode", handler)
+        .put("hadoop-datanode", handler)
+        .put("hadoop-tasktracker", handler).build());
 
     Function<ClusterSpec, ComputeServiceContext> getCompute = mock(Function.class);
     ComputeServiceContext serviceContext = mock(ComputeServiceContext.class);
@@ -284,23 +287,22 @@ public class BootstrapClusterActionTest {
     
     @Override
     public Set<NodeMetadata> call() throws Exception {
-      Map<String, String> userMetadata = Maps.newHashMap();
-      Map<String, Object> locationMetadata = Maps.newHashMap();
-      Location location = new LocationImpl(LocationScope.ZONE, "loc", "test location", 
-        null, new ArrayList<String>(), locationMetadata);
+      Location location = new LocationBuilder().scope(LocationScope.ZONE)
+            .id("loc").description("test location").build();
       Set<String> addresses = Sets.newHashSet();
       addresses.add("10.0.0.1");
-      Credentials loginCredentials = new Credentials("id", "cred");
+      LoginCredentials loginCredentials = LoginCredentials.builder().user("id").privateKey("cred").build();
 
       Set<NodeMetadata> nodes = Sets.newHashSet();
       Map<?, Exception> executionExceptions = Maps.newHashMap();
       Map<NodeMetadata, Throwable> failedNodes = Maps.newHashMap();
       for (int i = 0; i < num; i++) {
-        NodeMetadata nodeMeta = new NodeMetadataImpl(
-            "ec2", "" + roles + id, "nodeId" + id + i, 
-            location, new URI("http://node" + i),
-            userMetadata, ImmutableSet.<String>of(), null, null, null, null, NodeState.RUNNING, 22,
-            addresses, addresses, null, loginCredentials, "hostname");
+        NodeMetadata nodeMeta = new NodeMetadataBuilder()
+            .providerId("ec2").name("" + roles + id).id("nodeId" + id + i)
+            .location(location).uri(URI.create("http://node" + i))
+            .state(NodeState.RUNNING).privateAddresses(addresses)
+            .publicAddresses(addresses)
+            .credentials(loginCredentials).hostname("hostname").build();
         if (i < only) {
           nodes.add(nodeMeta);
           LOG.info("{} - Node successfully started: {}", roles, nodeMeta.getId());
@@ -310,12 +312,11 @@ public class BootstrapClusterActionTest {
         }
       }
       if (failedNodes.size() > 0) {
-        Image image = new ImageImpl("ec2", "test", "testId", location, new URI("http://node"),
-            userMetadata, ImmutableSet.<String>of(), new OperatingSystem(null, null, null, null, "op", true), 
-            "description", null, null, loginCredentials);
-        Hardware hardware = new HardwareImpl("ec2", "test", "testId", location, new URI("http://node"),
-                userMetadata, ImmutableSet.<String>of(), new ArrayList<Processor>(), 1,
-                new ArrayList<Volume>(), null);
+        Image image = new ImageBuilder().providerId("ec2").name("test").id("testId").location(location)
+              .uri(URI.create("http://node")).operatingSystem(OperatingSystem.builder().description("op").build())
+              .description("description").defaultCredentials(loginCredentials).build();
+        Hardware hardware = new HardwareBuilder().providerId("ec2").name("test").id("testId").location(location)
+              .uri(URI.create("http://node")).ram(1).hypervisor("xen").build();
         Template template = new TemplateImpl(image, hardware, location, TemplateOptions.NONE);
         throw new RunNodesException("tag" + id, num, template, nodes, executionExceptions, failedNodes);
       }
@@ -350,7 +351,7 @@ public class BootstrapClusterActionTest {
     when(puppetHandlerFactory.create("module::manifest")).thenReturn(handler);
     when(handler.getRole()).thenReturn("something-else");
 
-    Map<String, ClusterActionHandler> handlerMap = new HandlerMapFactory().create(ImmutableSet.of(puppetHandlerFactory),
+    LoadingCache<String, ClusterActionHandler> handlerMap = new HandlerMapFactory().create(ImmutableSet.of(puppetHandlerFactory),
           ImmutableSet.of(handler));
 
     Function<ClusterSpec, ComputeServiceContext> getCompute = mock(Function.class);
@@ -410,7 +411,7 @@ public class BootstrapClusterActionTest {
     when(puppetHandlerFactory.getRolePrefix()).thenReturn("puppet");
     when(handler.getRole()).thenReturn("something-else");
 
-    Map<String, ClusterActionHandler> handlerMap = new HandlerMapFactory().create(
+    LoadingCache<String, ClusterActionHandler> handlerMap = new HandlerMapFactory().create(
       ImmutableSet.of(puppetHandlerFactory), ImmutableSet.of(handler));
 
     Function<ClusterSpec, ComputeServiceContext> getCompute = mock(Function.class);

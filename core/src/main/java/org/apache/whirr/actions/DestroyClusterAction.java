@@ -33,6 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Function;
+import com.google.common.cache.LoadingCache;
 
 /**
  * A {@link ClusterAction} for tearing down a running cluster and freeing up all
@@ -45,7 +46,7 @@ public class DestroyClusterAction extends ScriptBasedClusterAction {
 
   public DestroyClusterAction(
       final Function<ClusterSpec, ComputeServiceContext> getCompute,
-      final Map<String, ClusterActionHandler> handlerMap) {
+      final LoadingCache<String, ClusterActionHandler> handlerMap) {
     super(getCompute, handlerMap);
   }
 

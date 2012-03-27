@@ -18,7 +18,6 @@
 
 package org.apache.whirr.service;
 
-import java.util.Map;
 import java.util.Properties;
 
 import org.apache.commons.configuration.Configuration;
@@ -43,10 +42,12 @@ import org.slf4j.LoggerFactory;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Function;
 import com.google.common.base.Objects;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import com.google.common.collect.ForwardingObject;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
-import com.google.common.collect.MapMaker;
 import com.google.inject.Module;
 
 public class BlobStoreContextBuilder {
@@ -59,17 +60,17 @@ public class BlobStoreContextBuilder {
 
     @Override
     public BlobStoreContext apply(ClusterSpec arg0) {
-      return cache.get(new Key(arg0));
+      return cache.getUnchecked(new Key(arg0));
     }
 
     // this should prevent recreating the same compute context twice
     @VisibleForTesting
-    final Map<Key, BlobStoreContext> cache = new MapMaker().makeComputingMap(
-       new Function<Key, BlobStoreContext>(){
+    final LoadingCache<Key, BlobStoreContext> cache = CacheBuilder.newBuilder().build(
+       new CacheLoader<Key, BlobStoreContext>(){
         private final BlobStoreContextFactory factory =  new BlobStoreContextFactory();
         
         @Override
-        public BlobStoreContext apply(Key arg0) {
+        public BlobStoreContext load(Key arg0) {
           LOG.debug("creating new BlobStoreContext {}", arg0);
           BlobStoreContext context = new IgnoreCloseBlobStoreContext(
               factory.createContext(arg0.provider, arg0.identity, arg0.credential,

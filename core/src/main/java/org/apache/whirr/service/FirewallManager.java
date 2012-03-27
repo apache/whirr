@@ -27,8 +27,8 @@ import java.util.Set;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.whirr.Cluster;
-import org.apache.whirr.ClusterSpec;
 import org.apache.whirr.Cluster.Instance;
+import org.apache.whirr.ClusterSpec;
 import org.jclouds.aws.util.AWSUtils;
 import org.jclouds.compute.ComputeServiceContext;
 import org.jclouds.ec2.EC2Client;

@@ -18,10 +18,10 @@
 
 package org.apache.whirr.compute;
 
+import java.util.Set;
+
 import org.jclouds.compute.ComputeService;
 import org.jclouds.compute.domain.Template;
-
-import java.util.Set;
 
 public class NodeStarterFactory {
   public NodeStarter create(final ComputeService computeService, final String clusterName,

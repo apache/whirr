@@ -23,13 +23,6 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Iterators;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
-import com.google.common.io.Files;
-import com.jcraft.jsch.JSchException;
-
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
@@ -47,6 +40,13 @@ import org.apache.commons.io.IOUtils;
 import org.apache.whirr.util.KeyPair;
 import org.junit.Assert;
 import org.junit.Test;
+
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Iterators;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
+import com.google.common.io.Files;
+import com.jcraft.jsch.JSchException;
 
 public class ClusterSpecTest {
 

@@ -18,10 +18,9 @@
 
 package org.apache.whirr.util;
 
-import static org.apache.whirr.util.KeyPair.sameKeyPair;
 import static org.apache.whirr.util.KeyPair.generate;
 import static org.apache.whirr.util.KeyPair.generateTemporaryFiles;
-
+import static org.apache.whirr.util.KeyPair.sameKeyPair;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;

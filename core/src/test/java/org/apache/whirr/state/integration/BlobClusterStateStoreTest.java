@@ -18,8 +18,14 @@
 
 package org.apache.whirr.state.integration;
 
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Sets;
+import static com.google.common.base.Preconditions.checkArgument;
+import static junit.framework.Assert.assertNotNull;
+import static junit.framework.Assert.assertNull;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+
+import java.util.Set;
+
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
@@ -27,21 +33,16 @@ import org.apache.commons.lang.RandomStringUtils;
 import org.apache.whirr.Cluster;
 import org.apache.whirr.ClusterSpec;
 import org.apache.whirr.TestConstants;
-import org.apache.whirr.state.BlobClusterStateStore;
 import org.apache.whirr.service.BlobStoreContextBuilder;
+import org.apache.whirr.state.BlobClusterStateStore;
 import org.jclouds.blobstore.BlobStoreContext;
 import org.jclouds.domain.Credentials;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Set;
-
-import static com.google.common.base.Preconditions.checkArgument;
-import static junit.framework.Assert.assertNotNull;
-import static junit.framework.Assert.assertNull;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Sets;
 
 public class BlobClusterStateStoreTest {
 

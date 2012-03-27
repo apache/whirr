@@ -1,9 +1,9 @@
 rm /etc/puppet/manifests/site.pp
-cat >> /etc/puppet/manifests/site.pp <<'END_OF_FILE'
-node default {
-class { 'nginx::server':
+cat >> /etc/puppet/manifests/site.pp <<-'END_OF_JCLOUDS_FILE'
+	node default {
+	class { 'nginx::server':
   hostname => foohost,
 }
-}
-END_OF_FILE
+	}
+END_OF_JCLOUDS_FILE
 puppet apply /etc/puppet/manifests/site.pp

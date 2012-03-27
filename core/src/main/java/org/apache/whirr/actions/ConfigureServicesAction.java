@@ -18,9 +18,12 @@
 
 package org.apache.whirr.actions;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Collections2;
-import com.google.common.primitives.Ints;
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+
 import org.apache.whirr.ClusterSpec;
 import org.apache.whirr.InstanceTemplate;
 import org.apache.whirr.RolePredicates;
@@ -29,11 +32,10 @@ import org.apache.whirr.service.ClusterActionHandler;
 import org.apache.whirr.service.FirewallManager.Rule;
 import org.jclouds.compute.ComputeServiceContext;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
+import com.google.common.base.Function;
+import com.google.common.cache.LoadingCache;
+import com.google.common.collect.Collections2;
+import com.google.common.primitives.Ints;
 
 
 /**
@@ -44,14 +46,14 @@ public class ConfigureServicesAction extends ScriptBasedClusterAction {
 
   public ConfigureServicesAction(
       Function<ClusterSpec, ComputeServiceContext> getCompute,
-      Map<String, ClusterActionHandler> handlerMap
+      LoadingCache<String, ClusterActionHandler> handlerMap
   ) {
     super(getCompute, handlerMap);
   }
 
   public ConfigureServicesAction(
       Function<ClusterSpec, ComputeServiceContext> getCompute,
-      Map<String, ClusterActionHandler> handlerMap,
+      LoadingCache<String, ClusterActionHandler> handlerMap,
       Set<String> targetRoles,
       Set<String> targetInstanceIds
   ) {

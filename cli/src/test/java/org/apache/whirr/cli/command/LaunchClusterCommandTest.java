@@ -20,19 +20,22 @@ package org.apache.whirr.cli.command;
 
 import com.google.common.collect.Lists;
 import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.whirr.Cluster;
 import org.apache.whirr.ClusterController;
 import org.apache.whirr.ClusterControllerFactory;
 import org.apache.whirr.ClusterSpec;
 import org.apache.whirr.InstanceTemplate;
-import org.apache.whirr.service.DryRunModule;
+import org.apache.whirr.service.DryRunModule.DryRun;
 import org.apache.whirr.util.KeyPair;
 import org.hamcrest.MatcherAssert;
 import org.junit.Test;
 
 import java.io.File;
 import java.util.Map;
+
+import joptsimple.OptionSet;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
@@ -154,12 +157,34 @@ public class LaunchClusterCommandTest extends BaseCommandTest{
     assertThat(outBytes.toString(), containsString("Started cluster of 0 instances")); 
   }
 
+  static class TestLaunchClusterCommand extends LaunchClusterCommand {
+    private ClusterSpec clusterSpec;
+    private DryRun dryRun;
+
+    public TestLaunchClusterCommand(ClusterControllerFactory factory) {
+      super(factory);
+    }
+
+    @Override
+    protected ClusterSpec getClusterSpec(OptionSet optionSet) throws ConfigurationException {
+      return this.clusterSpec = super.getClusterSpec(optionSet);
+    }
+
+    @Override
+    protected ClusterController createClusterController(String serviceName) {
+      ClusterController controller = super.createClusterController(serviceName);
+      this.dryRun = controller.getCompute().apply(clusterSpec).utils().injector().getInstance(DryRun.class).reset();
+      return controller;
+    }
+
+  };
+
   @Test
   public void testLaunchClusterUsingDryRun() throws Exception {
-    DryRunModule.resetDryRun();
 
     ClusterControllerFactory factory = new ClusterControllerFactory();
-    LaunchClusterCommand launchCluster = new LaunchClusterCommand(factory);
+    TestLaunchClusterCommand launchCluster = new TestLaunchClusterCommand(factory);
+
     Map<String, File> keys = KeyPair.generateTemporaryFiles();
 
     int rc = launchCluster.run(null, out, err, Lists.<String>newArrayList(
@@ -172,6 +197,6 @@ public class LaunchClusterCommandTest extends BaseCommandTest{
     ));
 
     MatcherAssert.assertThat(rc, is(0));
-    assertExecutedPhases(DryRunModule.DryRun.INSTANCE, "setup", "configure", "start");
+    assertExecutedPhases(launchCluster.dryRun, "bootstrap", "configure", "start");
   }
 }

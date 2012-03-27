@@ -94,7 +94,7 @@ public class HadoopConfigurationBuilderTest {
     List<Processor> processors = ImmutableList.of(new Processor(4, 1.0));
     Hardware hardware = new HardwareImpl(null, null, "id", null, null,
         ImmutableMap.<String,String>of(), ImmutableSet.<String>of(), processors, 
-        1024, ImmutableList.<Volume>of(), null);
+        1024, ImmutableList.<Volume>of(), null, "xen");
     when(node.getHardware()).thenReturn(hardware);
     
     Builder<Instance> instances = ImmutableSet.<Instance>builder();

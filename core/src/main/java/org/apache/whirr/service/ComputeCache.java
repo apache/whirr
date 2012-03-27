@@ -18,14 +18,10 @@
 
 package org.apache.whirr.service;
 
-import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Function;
-import com.google.common.base.Objects;
-import com.google.common.collect.ForwardingObject;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.MapMaker;
-import com.google.inject.Module;
+import static com.google.common.base.Preconditions.checkArgument;
+import static org.jclouds.aws.ec2.reference.AWSEC2Constants.PROPERTY_EC2_AMI_QUERY;
+import static org.jclouds.aws.ec2.reference.AWSEC2Constants.PROPERTY_EC2_CC_AMI_QUERY;
+import static org.jclouds.location.reference.LocationConstants.PROPERTY_REGION;
 
 import java.util.Map;
 import java.util.Properties;
@@ -38,18 +34,31 @@ import org.jclouds.compute.ComputeService;
 import org.jclouds.compute.ComputeServiceContext;
 import org.jclouds.compute.ComputeServiceContextFactory;
 import org.jclouds.compute.Utils;
+import org.jclouds.compute.domain.ExecResponse;
+import org.jclouds.compute.events.StatementOnNodeCompletion;
+import org.jclouds.compute.events.StatementOnNodeFailure;
+import org.jclouds.compute.events.StatementOnNodeSubmission;
 import org.jclouds.domain.Credentials;
 import org.jclouds.logging.slf4j.config.SLF4JLoggingModule;
 import org.jclouds.providers.ProviderMetadata;
 import org.jclouds.providers.Providers;
 import org.jclouds.rest.RestContext;
+import org.jclouds.scriptbuilder.domain.OsFamily;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static org.jclouds.aws.ec2.reference.AWSEC2Constants.PROPERTY_EC2_AMI_QUERY;
-import static org.jclouds.aws.ec2.reference.AWSEC2Constants.PROPERTY_EC2_CC_AMI_QUERY;
-import static org.jclouds.location.reference.LocationConstants.PROPERTY_REGION;
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Function;
+import com.google.common.base.Objects;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
+import com.google.common.collect.ForwardingObject;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
+import com.google.common.eventbus.AllowConcurrentEvents;
+import com.google.common.eventbus.Subscribe;
+import com.google.inject.Module;
 
 /**
  * A convenience class for building jclouds {@link ComputeServiceContext} objects.
@@ -63,28 +72,60 @@ public enum ComputeCache implements Function<ClusterSpec, ComputeServiceContext>
 
   @Override
   public ComputeServiceContext apply(ClusterSpec arg0) {
-    return cache.get(new Key(arg0));
+    return cache.getUnchecked(new Key(arg0));
   }
   
   // this should prevent recreating the same compute context twice
   @VisibleForTesting
-  final Map<Key, ComputeServiceContext> cache = new MapMaker().makeComputingMap(
-      new Function<Key, ComputeServiceContext>(){
+  final LoadingCache<Key, ComputeServiceContext> cache = CacheBuilder.newBuilder().build(
+        new CacheLoader<Key, ComputeServiceContext>(){
         private final ComputeServiceContextFactory factory =  new ComputeServiceContextFactory();
                
         @Override
-        public ComputeServiceContext apply(Key arg0) {
+        public ComputeServiceContext load(Key arg0) {
           LOG.debug("creating new ComputeServiceContext {}", arg0);
           ComputeServiceContext context = new IgnoreCloseComputeServiceContext(factory.createContext(
             arg0.provider, arg0.identity, arg0.credential,
             ImmutableSet.<Module>of(), arg0.overrides));
           LOG.debug("created new ComputeServiceContext {}", context);
+          context.utils().eventBus().register(ComputeCache.this);
           return context;
         }
     
     }
   );
-   
+
+  @Subscribe
+  @AllowConcurrentEvents
+  public void onStart(StatementOnNodeSubmission event) {
+    LOG.info(">> running {} on node({})", event.getStatement(), event.getNode().getId());
+    if (LOG.isDebugEnabled()) {
+      LOG.debug(">> script for {} on node({})\n{}", new Object[] { event.getStatement(), event.getNode().getId(),
+          event.getStatement().render(OsFamily.UNIX) });
+    }
+  }
+
+  @Subscribe
+  @AllowConcurrentEvents
+  public void onFailure(StatementOnNodeFailure event) {
+    LOG.error("<< error running {} on node({}): {}", new Object[] { event.getStatement(), event.getNode().getId(),
+        event.getCause().getMessage() }, event.getCause());
+  }
+
+  @Subscribe
+  @AllowConcurrentEvents
+  public void onSuccess(StatementOnNodeCompletion event) {
+    ExecResponse arg0 = event.getResponse();
+    if (arg0.getExitStatus() != 0) {
+      LOG.error("<< error running {} on node({}): {}", new Object[] { event.getStatement(), event.getNode().getId(),
+          arg0 });
+    } else {
+      LOG.info("<< success executing {} on node({}): {}", new Object[] { event.getStatement(),
+          event.getNode().getId(), arg0 });
+    }
+
+  }
+  
   private static class IgnoreCloseComputeServiceContext
     extends ForwardingObject implements ComputeServiceContext {
 

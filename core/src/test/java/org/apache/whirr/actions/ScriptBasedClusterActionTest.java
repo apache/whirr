@@ -18,11 +18,16 @@
 
 package org.apache.whirr.actions;
 
-import com.google.common.base.Function;
-import com.google.common.base.Predicate;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Iterables;
+import static com.google.common.collect.Sets.newHashSet;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.jclouds.scriptbuilder.domain.Statements.exec;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+import java.util.List;
+import java.util.Set;
+
 import org.apache.whirr.Cluster;
 import org.apache.whirr.ClusterController;
 import org.apache.whirr.ClusterSpec;
@@ -32,24 +37,19 @@ import org.apache.whirr.service.ClusterActionEvent;
 import org.apache.whirr.service.ClusterActionHandler;
 import org.apache.whirr.service.ClusterActionHandlerSupport;
 import org.apache.whirr.service.ComputeCache;
-import org.apache.whirr.service.DryRunModule;
+import org.apache.whirr.service.DryRunModule.DryRun;
 import org.jclouds.compute.ComputeServiceContext;
-import org.jclouds.compute.callables.RunScriptOnNode;
+import org.jclouds.compute.events.StatementOnNode;
 import org.jclouds.scriptbuilder.domain.OsFamily;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import static com.google.common.collect.Sets.newHashSet;
-import static org.apache.whirr.service.DryRunModule.DryRun;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.jclouds.scriptbuilder.domain.Statements.exec;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import com.google.common.base.Function;
+import com.google.common.base.Predicate;
+import com.google.common.cache.LoadingCache;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
 
 public abstract class ScriptBasedClusterActionTest<T extends ScriptBasedClusterAction> {
 
@@ -88,7 +88,7 @@ public abstract class ScriptBasedClusterActionTest<T extends ScriptBasedClusterA
   }
 
   private final static HandlerMapFactory HANDLER_MAP_FACTORY = new HandlerMapFactory();
-  private final static Map<String, ClusterActionHandler> HANDLERMAP = HANDLER_MAP_FACTORY.create();
+  private final static LoadingCache<String, ClusterActionHandler> HANDLERMAP = HANDLER_MAP_FACTORY.create();
   private final static Set<String> EMPTYSET = ImmutableSet.of();
 
   private ClusterSpec clusterSpec;
@@ -111,8 +111,6 @@ public abstract class ScriptBasedClusterActionTest<T extends ScriptBasedClusterA
 
     ClusterController controller = new ClusterController();
     cluster = controller.launchCluster(clusterSpec);
-
-    DryRunModule.resetDryRun();
   }
 
   private InstanceTemplate newInstanceTemplate(String... roles) {
@@ -122,78 +120,87 @@ public abstract class ScriptBasedClusterActionTest<T extends ScriptBasedClusterA
   @Test
   public void testActionIsExecutedOnAllRelevantNodes() throws Exception {
     T action = newClusterActionInstance(EMPTYSET, EMPTYSET);
+    DryRun dryRun = getDryRunForAction(action).reset();
+    
     action.execute(clusterSpec, cluster);
-
-    List<RunScriptOnNode> executions = DryRunModule.getDryRun()
-        .getTotallyOrderedExecutions();
+    
+    List<StatementOnNode> executions = dryRun.getTotallyOrderedExecutions();
 
     // only 2 out of 3 because one instance has only noop
     assertThat(executions.size(), is(2));
+  }
+
+  public DryRun getDryRunForAction(T action) {
+    return action.getCompute().apply(clusterSpec).utils().injector().getInstance(DryRun.class);
   }
 
   @Test
   public void testFilterScriptExecutionByRole() throws Exception {
     String instanceId = getInstaceForRole(cluster, "noop2").getId();
     T action = newClusterActionInstance(ImmutableSet.of("noop2"), EMPTYSET);
+    DryRun dryRun = getDryRunForAction(action).reset();
+    
     action.execute(clusterSpec, cluster);
 
-    List<RunScriptOnNode> executions = DryRunModule.getDryRun()
-        .getTotallyOrderedExecutions();
+    List<StatementOnNode> executions = dryRun.getTotallyOrderedExecutions();
 
     assertThat(executions.size(), is(1));
     assertHasRole(executions.get(0), cluster, "noop2");
     assertEquals(executions.get(0).getNode().getId(), instanceId);
 
-    assertAnyStatementContains(DryRun.INSTANCE, "noop2-" + getActionName());
-    assertNoStatementContains(DryRun.INSTANCE, "noop1-" + getActionName(), "noop3-" + getActionName());
+    assertAnyStatementContains(dryRun, "noop2-" + getActionName());
+    assertNoStatementContains(dryRun, "noop1-" + getActionName(), "noop3-" + getActionName());
   }
 
   @Test
   public void testFilterScriptExecutionByInstanceId() throws Exception {
     String instanceId = getInstaceForRole(cluster, "noop3").getId();
     T action = newClusterActionInstance(EMPTYSET, newHashSet(instanceId));
+    DryRun dryRun = getDryRunForAction(action).reset();
+
     action.execute(clusterSpec, cluster);
 
-    List<RunScriptOnNode> executions = DryRunModule.getDryRun()
-        .getTotallyOrderedExecutions();
-
+    List<StatementOnNode> executions = dryRun.getTotallyOrderedExecutions();
+    
     assertThat(executions.size(), is(1));
     assertHasRole(executions.get(0), cluster, "noop3");
     assertEquals(executions.get(0).getNode().getId(), instanceId);
 
-    assertAnyStatementContains(DryRun.INSTANCE, "noop1-" + getActionName(), "noop3-" + getActionName());
+    assertAnyStatementContains(dryRun, "noop1-" + getActionName(), "noop3-" + getActionName());
   }
 
   @Test
   public void testFilterScriptExecutionByRoleAndInstanceId() throws Exception {
     String instanceId = getInstaceForRole(cluster, "noop1").getId();
     T action = newClusterActionInstance(newHashSet("noop1"), newHashSet(instanceId));
+    DryRun dryRun = getDryRunForAction(action).reset();
+
     action.execute(clusterSpec, cluster);
 
-    List<RunScriptOnNode> executions = DryRunModule.getDryRun()
-        .getTotallyOrderedExecutions();
-
+    List<StatementOnNode> executions = dryRun.getTotallyOrderedExecutions();
+    
     assertThat(executions.size(), is(1));
     assertHasRole(executions.get(0), cluster, "noop1");
     assertEquals(executions.get(0).getNode().getId(), instanceId);
 
-    assertAnyStatementContains(DryRun.INSTANCE, "noop1-" + getActionName());
-    assertNoStatementContains(DryRun.INSTANCE, "noop2-" + getActionName(), "noop3-" + getActionName());
+    assertAnyStatementContains(dryRun, "noop1-" + getActionName());
+    assertNoStatementContains(dryRun, "noop2-" + getActionName(), "noop3-" + getActionName());
   }
 
   @Test
   public void testNoScriptExecutionsForNoop() throws Exception {
     T action = newClusterActionInstance(ImmutableSet.of("noop"), EMPTYSET);
+    DryRun dryRun = getDryRunForAction(action).reset();
+    
     action.execute(clusterSpec, cluster);
 
-    List<RunScriptOnNode> executions = DryRunModule.getDryRun()
-        .getTotallyOrderedExecutions();
-
+    List<StatementOnNode> executions = dryRun.getTotallyOrderedExecutions();
+    
     // empty because noop does not emit any statements
     assertThat(executions.size(), is(0));
   }
 
-  private void assertHasRole(final RunScriptOnNode node, Cluster cluster, String... roles) {
+  private void assertHasRole(final StatementOnNode node, Cluster cluster, String... roles) {
     Cluster.Instance instance = getInstanceForNode(node, cluster);
     for (String role : roles) {
       assertTrue(instance.getRoles().contains(role));
@@ -202,7 +209,7 @@ public abstract class ScriptBasedClusterActionTest<T extends ScriptBasedClusterA
 
   private void assertAnyStatementContains(DryRun dryRun, String... values) {
     Set<String> toCheck = newHashSet(values);
-    for (RunScriptOnNode node : dryRun.getTotallyOrderedExecutions()) {
+    for (StatementOnNode node : dryRun.getTotallyOrderedExecutions()) {
       String statement = node.getStatement().render(OsFamily.UNIX);
       for (String term : ImmutableSet.copyOf(toCheck)) {
         if (statement.contains(term)) {
@@ -216,7 +223,7 @@ public abstract class ScriptBasedClusterActionTest<T extends ScriptBasedClusterA
 
   private void assertNoStatementContains(DryRun dryRun, String... values) {
     Set<String> foundTerms = newHashSet();
-    for (RunScriptOnNode node : dryRun.getTotallyOrderedExecutions()) {
+    for (StatementOnNode node : dryRun.getTotallyOrderedExecutions()) {
       String statement = node.getStatement().render(OsFamily.UNIX);
       for (String term : values) {
         if (statement.contains(term)) {
@@ -238,7 +245,7 @@ public abstract class ScriptBasedClusterActionTest<T extends ScriptBasedClusterA
         });
   }
 
-  private Cluster.Instance getInstanceForNode(final RunScriptOnNode node, Cluster cluster) {
+  private Cluster.Instance getInstanceForNode(final StatementOnNode node, Cluster cluster) {
     return Iterables.find(cluster.getInstances(),
         new Predicate<Cluster.Instance>() {
           @Override
@@ -254,7 +261,7 @@ public abstract class ScriptBasedClusterActionTest<T extends ScriptBasedClusterA
 
   public abstract T newClusterActionInstance(
       Function<ClusterSpec, ComputeServiceContext> getCompute,
-      Map<String, ClusterActionHandler> handlerMap,
+      LoadingCache<String, ClusterActionHandler> handlerMap,
       Set<String> targetRoles,
       Set<String> targetInstanceIds
   );

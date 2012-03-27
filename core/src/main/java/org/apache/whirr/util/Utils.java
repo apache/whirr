@@ -18,14 +18,26 @@
 
 package org.apache.whirr.util;
 
+import java.io.PrintStream;
+import java.util.Map;
+
 import org.apache.whirr.Cluster;
 import org.apache.whirr.Cluster.Instance;
 import org.apache.whirr.ClusterSpec;
 
-import java.io.PrintStream;
+import com.google.common.base.Functions;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 
 public class Utils {
-
+  /**
+   * converts a map to a loading cache.
+   */
+  public static <K, V> LoadingCache<K, V> convertMapToLoadingCache(Map<K, V> in) {
+    return CacheBuilder.newBuilder().build(CacheLoader.from(Functions.forMap(in)));
+  }
+ 
   /**
    * Prints ssh commands that can be used to login into the nodes
    *

@@ -82,6 +82,8 @@ Trunk (unreleased changes)
 
     WHIRR-563. Disable password based authentication (Rodrigo Duarte Sousa via Andrei Savu)
 
+    WHIRR-504. Upgrade to jclouds 1.4.0 (Adrian Cole, Andrei Savu)
+
   BUG FIXES
 
     WHIRR-555. Fix java install script: $(...) -> `...` (kve)

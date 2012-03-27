@@ -7,7 +7,7 @@
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *    http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,27 +18,35 @@
 
 package org.apache.whirr;
 
+import static org.apache.whirr.util.Utils.convertMapToLoadingCache;
+
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
 import org.apache.whirr.service.ClusterActionHandler;
+
+import com.google.common.cache.LoadingCache;
 
 public class DynamicHandlerMapFactory extends HandlerMapFactory {
 
   protected final Map<String, ClusterActionHandler> clusterActionHandlerMap = new ConcurrentHashMap<String, ClusterActionHandler>();
+  protected final LoadingCache<String, ClusterActionHandler> cache = convertMapToLoadingCache(clusterActionHandlerMap);
 
   @Override
-  public Map<String, ClusterActionHandler> create() {
-    return clusterActionHandlerMap;
+  public LoadingCache<String, ClusterActionHandler> create() {
+    return cache;
   }
 
   public void bind(ClusterActionHandler clusterActionHandler) {
-     if (clusterActionHandler != null && clusterActionHandler.getRole() != null) {
+    if (clusterActionHandler != null && clusterActionHandler.getRole() != null) {
       clusterActionHandlerMap.put(clusterActionHandler.getRole(), clusterActionHandler);
+      cache.invalidate(clusterActionHandler.getRole());
     }
   }
 
   public void unbind(ClusterActionHandler clusterActionHandler) {
     if (clusterActionHandler != null && clusterActionHandler.getRole() != null) {
+      cache.invalidate(clusterActionHandler.getRole());
       clusterActionHandlerMap.remove(clusterActionHandler.getRole());
     }
   }

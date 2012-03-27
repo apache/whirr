@@ -37,7 +37,7 @@ public abstract class ClusterAction {
     this.getCompute = getCompute;
   }
   
-  protected Function<ClusterSpec, ComputeServiceContext> getCompute() {
+  public Function<ClusterSpec, ComputeServiceContext> getCompute() {
     return getCompute;
   }
   

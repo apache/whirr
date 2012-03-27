@@ -18,11 +18,6 @@
 
 package org.apache.whirr.util;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.io.Files;
-import com.jcraft.jsch.JSch;
-import com.jcraft.jsch.JSchException;
-
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -39,6 +34,11 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.ssl.PKCS8Key;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.collect.ImmutableMap;
+import com.google.common.io.Files;
+import com.jcraft.jsch.JSch;
+import com.jcraft.jsch.JSchException;
 
 
 /**

@@ -18,6 +18,8 @@
 
 package org.apache.whirr.net;
 
+import static org.xbill.DNS.Message.newQuery;
+
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.SocketTimeoutException;
@@ -31,8 +33,6 @@ import org.xbill.DNS.Resolver;
 import org.xbill.DNS.ReverseMap;
 import org.xbill.DNS.Section;
 import org.xbill.DNS.Type;
-
-import static org.xbill.DNS.Message.newQuery;
 
 /**
  * Fast DNS resolver

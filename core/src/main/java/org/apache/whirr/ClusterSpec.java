@@ -439,7 +439,7 @@ public class ClusterSpec {
     return composed;
   }
 
-  private void checkAndSetKeyPair() throws ConfigurationException {
+  protected void checkAndSetKeyPair() throws ConfigurationException {
     String pairRepresentation = "";
     try {
       String privateKeyPath = getString(Property.PRIVATE_KEY_FILE);

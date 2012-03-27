@@ -18,16 +18,6 @@
 
 package org.apache.whirr.compute;
 
-import com.google.common.base.Predicates;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
-import org.jclouds.compute.ComputeService;
-import org.jclouds.compute.RunNodesException;
-import org.jclouds.compute.domain.NodeMetadata;
-import org.jclouds.compute.domain.Template;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.IOException;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -36,6 +26,17 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
+
+import org.jclouds.compute.ComputeService;
+import org.jclouds.compute.RunNodesException;
+import org.jclouds.compute.domain.NodeMetadata;
+import org.jclouds.compute.domain.Template;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.base.Predicates;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 public class StartupProcess implements Callable<Set<? extends NodeMetadata>> {
 

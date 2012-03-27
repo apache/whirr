@@ -18,14 +18,21 @@
 
 package org.apache.whirr.actions;
 
-import com.google.common.base.Function;
-import com.google.common.base.Joiner;
-import com.google.common.base.Predicate;
-import com.google.common.collect.ComputationException;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Predicates.not;
+import static org.apache.whirr.RolePredicates.onlyRolesIn;
+import static org.jclouds.compute.options.RunScriptOptions.Builder.overrideLoginCredentials;
+
+import java.io.IOException;
+import java.util.Collection;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+
+import javax.annotation.Nullable;
+
 import org.apache.whirr.Cluster;
 import org.apache.whirr.Cluster.Instance;
 import org.apache.whirr.ClusterAction;
@@ -38,27 +45,24 @@ import org.apache.whirr.service.jclouds.StatementBuilder;
 import org.jclouds.compute.ComputeService;
 import org.jclouds.compute.ComputeServiceContext;
 import org.jclouds.compute.domain.ExecResponse;
-import org.jclouds.domain.Credentials;
-import org.jclouds.scriptbuilder.domain.OsFamily;
+import org.jclouds.compute.options.RunScriptOptions;
+import org.jclouds.domain.LoginCredentials;
 import org.jclouds.scriptbuilder.domain.Statement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nullable;
-import java.io.IOException;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-
-import static com.google.common.base.Preconditions.checkNotNull;
-import static org.apache.whirr.RolePredicates.onlyRolesIn;
-import static org.jclouds.compute.options.RunScriptOptions.Builder.overrideCredentialsWith;
+import com.google.common.base.Function;
+import com.google.common.base.Joiner;
+import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
+import com.google.common.base.Throwables;
+import com.google.common.cache.LoadingCache;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
+import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.UncheckedExecutionException;
 
 /**
  * A {@link ClusterAction} that provides the base functionality for running
@@ -69,20 +73,20 @@ public abstract class ScriptBasedClusterAction extends ClusterAction {
   private static final Logger LOG = LoggerFactory
       .getLogger(ScriptBasedClusterAction.class);
 
-  private final Map<String, ClusterActionHandler> handlerMap;
+  private final LoadingCache<String, ClusterActionHandler> handlerMap;
   private final ImmutableSet<String> targetRoles;
   private final ImmutableSet<String> targetInstanceIds;
 
   protected ScriptBasedClusterAction(
       Function<ClusterSpec, ComputeServiceContext> getCompute,
-      Map<String, ClusterActionHandler> handlerMap
+      LoadingCache<String, ClusterActionHandler> handlerMap
   ) {
     this(getCompute, handlerMap, ImmutableSet.<String>of(), ImmutableSet.<String>of());
   }
 
   protected ScriptBasedClusterAction(
       Function<ClusterSpec, ComputeServiceContext> getCompute,
-      Map<String, ClusterActionHandler> handlerMap,
+      LoadingCache<String, ClusterActionHandler> handlerMap,
       Set<String> targetRoles,
       Set<String> targetInstanceIds
   ) {
@@ -155,16 +159,12 @@ public abstract class ScriptBasedClusterAction extends ClusterAction {
       throws InterruptedException, IOException {
 
     final String phaseName = getAction();
-    final ExecutorService executorService = Executors.newCachedThreadPool();
     final Collection<Future<ExecResponse>> futures = Sets.newHashSet();
 
     final ClusterSpec clusterSpec = eventMap.values().iterator().next().getClusterSpec();
-    final ComputeServiceContext computeServiceContext = getCompute().apply(clusterSpec);
-    final ComputeService computeService = computeServiceContext.getComputeService();
 
-    final Credentials credentials = new Credentials(
-        clusterSpec.getClusterUser(), clusterSpec.getPrivateKey());
-
+    final RunScriptOptions options = overrideLoginCredentials(LoginCredentials.builder().user(clusterSpec.getClusterUser())
+          .privateKey(clusterSpec.getPrivateKey()).build());
     for (Entry<InstanceTemplate, ClusterActionEvent> entry : eventMap.entrySet()) {
       if (shouldIgnoreInstanceTemplate(entry.getKey())) {
         continue; // skip if not in the target
@@ -178,61 +178,36 @@ public abstract class ScriptBasedClusterAction extends ClusterAction {
         continue; // skip execution if we have an empty list
       }
 
-      Set<Instance> instances = cluster.getInstancesMatching(onlyRolesIn(entry.getKey().getRoles()));
-      LOG.info("Starting to run scripts on cluster for phase {} "
-          + "on instances: {}", phaseName, asString(instances));
+      Set<Instance> instances = cluster.getInstancesMatching(Predicates.<Instance> and(onlyRolesIn(entry.getKey()
+          .getRoles()), not(instanceIsNotInTarget())));
+      LOG.info("Starting to run scripts on cluster for phase {} " + "on instances: {}", phaseName,
+          asString(instances));
 
-      for (final Instance instance : instances) {
-        if (instanceIsNotInTarget(instance)) {
-          continue; // skip the script execution
-        }
-        final Statement statement = statementBuilder.build(clusterSpec, instance);
-
-        futures.add(executorService.submit(new Callable<ExecResponse>() {
-          @Override
-          public ExecResponse call() {
-
-            LOG.info("Running {} phase script on: {}", phaseName, instance.getId());
-            if (LOG.isDebugEnabled()) {
-              LOG.debug("{} phase script on: {}\n{}", new Object[]{phaseName,
-                  instance.getId(), statement.render(OsFamily.UNIX)});
-            }
-
-            try {
-              return computeService.runScriptOnNode(
-                  instance.getId(),
-                  statement,
-                  overrideCredentialsWith(credentials).runAsRoot(true)
-                      .nameTask(
-                          phaseName + "-"
-                              + Joiner.on('_').join(instance.getRoles())));
-            } finally {
-              LOG.info("{} phase script run completed on: {}", phaseName,
-                  instance.getId());
-            }
-          }
-        }));
+      for (Instance instance : instances) {
+        futures.add(runStatementOnInstanceInCluster(statementBuilder, instance, clusterSpec, options));
       }
     }
-
     for (Future<ExecResponse> future : futures) {
       try {
-        ExecResponse execResponse = future.get();
-        if (execResponse.getExitCode() != 0) {
-          LOG.error("Error running " + phaseName + " script: {}", execResponse);
-        } else {
-          LOG.info("Successfully executed {} script: {}", phaseName, execResponse);
-        }
+        future.get();
       } catch (ExecutionException e) {
         throw new IOException(e.getCause());
       }
     }
-
-    executorService.shutdown();
-    LOG.info("Finished running {} phase scripts on all cluster instances",
-        phaseName);
+    LOG.info("Finished running {} phase scripts on all cluster instances", phaseName);
   }
-
+  
+  public ListenableFuture<ExecResponse> runStatementOnInstanceInCluster(StatementBuilder statementBuilder,
+      Instance instance, ClusterSpec clusterSpec, RunScriptOptions options) {
+    Statement statement = statementBuilder.name(getAction() + "-"
+          + Joiner.on('_').join(instance.getRoles())).build(clusterSpec, instance);
+    ComputeService compute = getCompute().apply(clusterSpec).getComputeService();
+    return compute.submitScriptOnNode(
+              instance.getId(),
+              statement,
+              options);
+  }
+  
   private String asString(Set<Instance> instances) {
     return Joiner.on(", ").join(
         Iterables.transform(instances, new Function<Instance, String>() {
@@ -251,14 +226,26 @@ public abstract class ScriptBasedClusterAction extends ClusterAction {
     return targetRoles.size() == 0 || targetRoles.contains(role);
   }
 
-  protected boolean instanceIsNotInTarget(Instance instance) {
-    if (targetInstanceIds.size() != 0) {
-      return ! targetInstanceIds.contains(instance.getId());
-    }
-    if (targetRoles.size() != 0) {
-      return containsNoneOf(instance.getRoles(), targetRoles);
-    }
-    return false;
+  protected Predicate<Instance> instanceIsNotInTarget() {
+    return new Predicate<Instance>() {
+
+      @Override
+      public boolean apply(Instance arg0) {
+        if (targetInstanceIds.size() != 0) {
+          return !targetInstanceIds.contains(arg0.getId());
+        }
+        if (targetRoles.size() != 0) {
+          return containsNoneOf(arg0.getRoles(), targetRoles);
+        }
+        return false;
+      }
+
+      @Override
+      public String toString() {
+        return "instanceIsNotInTarget()";
+      }
+    };
+
   }
 
   private boolean containsNoneOf(Set<String> querySet, final Set<String> target) {
@@ -289,9 +276,10 @@ public abstract class ScriptBasedClusterAction extends ClusterAction {
         throw new IllegalArgumentException("No handler for role " + role);
       }
       return handler;
-
-    } catch (ComputationException e) {
-      throw new IllegalArgumentException(e.getCause());
+    } catch (UncheckedExecutionException e) {
+       throw Throwables.propagate(e.getCause());
+    } catch (ExecutionException e) {
+       throw new IllegalArgumentException(e.getCause());
     }
   }
 

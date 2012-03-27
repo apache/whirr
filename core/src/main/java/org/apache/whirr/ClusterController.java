@@ -18,6 +18,9 @@
 
 package org.apache.whirr;
 
+import static org.apache.whirr.RolePredicates.withIds;
+import static org.jclouds.compute.options.RunScriptOptions.Builder.overrideLoginCredentials;
+
 import com.google.common.annotations.Beta;
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
@@ -43,6 +46,7 @@ import org.jclouds.compute.domain.NodeMetadata;
 import org.jclouds.compute.domain.NodeState;
 import org.jclouds.compute.options.RunScriptOptions;
 import org.jclouds.domain.Credentials;
+import org.jclouds.domain.LoginCredentials;
 import org.jclouds.scriptbuilder.domain.Statement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,8 +56,6 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
-import static org.apache.whirr.RolePredicates.withIds;
-import static org.jclouds.compute.options.RunScriptOptions.Builder.overrideCredentialsWith;
 
 /**
  * This class is used to start and stop clusters.
@@ -90,7 +92,7 @@ public class ClusterController {
   /**
    * @return compute service contexts for use in managing the service
    */
-  protected Function<ClusterSpec, ComputeServiceContext> getCompute() {
+  public Function<ClusterSpec, ComputeServiceContext> getCompute() {
     return getCompute;
   }
 
@@ -261,13 +263,13 @@ public class ClusterController {
     ClusterSpec spec, Predicate<NodeMetadata> condition, Statement statement,
     RunScriptOptions options) throws IOException, RunScriptOnNodesException {
 
-    Credentials credentials = new Credentials(spec.getClusterUser(),
-      spec.getPrivateKey());
+    LoginCredentials credentials = LoginCredentials.builder()
+      .user(spec.getClusterUser()).privateKey(spec.getPrivateKey()).build();
 
     if (options == null) {
       options = defaultRunScriptOptionsForSpec(spec);
-    } else if (options.getOverridingCredentials() == null) {
-      options = options.overrideCredentialsWith(credentials);
+    } else if (options.getLoginUser() == null) {
+      options = options.overrideLoginCredentials(credentials);
     }
     condition = Predicates
       .and(runningInGroup(spec.getClusterName()), condition);
@@ -278,9 +280,9 @@ public class ClusterController {
   }
 
   public RunScriptOptions defaultRunScriptOptionsForSpec(ClusterSpec spec) {
-    Credentials credentials = new Credentials(spec.getClusterUser(),
-      spec.getPrivateKey());
-    return overrideCredentialsWith(credentials).wrapInInitScript(false)
+    LoginCredentials credentials = LoginCredentials.builder()
+      .user(spec.getClusterUser()).privateKey(spec.getPrivateKey()).build();
+    return overrideLoginCredentials(credentials).wrapInInitScript(false)
       .runAsRoot(false);
   }
 

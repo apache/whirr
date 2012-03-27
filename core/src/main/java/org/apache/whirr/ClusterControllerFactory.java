@@ -18,10 +18,10 @@
 
 package org.apache.whirr;
 
-import com.google.common.collect.Sets;
-
 import java.util.ServiceLoader;
 import java.util.Set;
+
+import com.google.common.collect.Sets;
 
 /**
  * This class is used to create {@link ClusterController} instances.

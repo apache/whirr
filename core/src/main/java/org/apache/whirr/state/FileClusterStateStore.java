@@ -17,6 +17,8 @@
  */
 package org.apache.whirr.state;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.io.File;
 import java.io.IOException;
 
@@ -29,8 +31,6 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
 import com.google.common.io.Files;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Stores/Reads cluster state from a local file (located at:

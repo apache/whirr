@@ -18,14 +18,14 @@
 
 package org.apache.whirr.compute;
 
+import java.util.Set;
+import java.util.concurrent.Callable;
+
 import org.jclouds.compute.ComputeService;
 import org.jclouds.compute.domain.NodeMetadata;
 import org.jclouds.compute.domain.Template;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Set;
-import java.util.concurrent.Callable;
 
 public class NodeStarter implements Callable<Set<NodeMetadata>> {
 

@@ -18,16 +18,25 @@
 
 package org.apache.whirr;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.ServiceLoader;
+import java.util.Set;
 
 import org.apache.whirr.service.ClusterActionHandler;
 import org.apache.whirr.service.ClusterActionHandlerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Function;
-import com.google.common.collect.MapMaker;
+import com.google.common.base.Predicate;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 
 /**
@@ -41,70 +50,87 @@ import com.google.common.collect.Maps;
  * JUnit testable.
  */
 public class HandlerMapFactory {
+  private static final Logger LOG =
+    LoggerFactory.getLogger(HandlerMapFactory.class);
 
-   protected static final class ReturnHandlerByRoleOrPrefix implements Function<String, ClusterActionHandler> {
-      private final Map<String, ClusterActionHandlerFactory> factoryMap;
-      private final Map<String, ClusterActionHandler> handlerMap;
+  protected static final class ReturnHandlerByRoleOrPrefix extends CacheLoader<String, ClusterActionHandler> {
+    private final Map<String, ClusterActionHandlerFactory> factoryMap;
+    private final Map<String, ClusterActionHandler> handlerMap;
 
-      protected ReturnHandlerByRoleOrPrefix(Map<String, ClusterActionHandlerFactory> factoryMap,
-               Map<String, ClusterActionHandler> handlerMap) {
-         this.factoryMap = checkNotNull(factoryMap, "factoryMap");
-         this.handlerMap = checkNotNull(handlerMap, "handlerMap");
+    protected ReturnHandlerByRoleOrPrefix(Map<String, ClusterActionHandlerFactory> factoryMap,
+        Map<String, ClusterActionHandler> handlerMap) {
+      this.factoryMap = checkNotNull(factoryMap, "factoryMap");
+      this.handlerMap = checkNotNull(handlerMap, "handlerMap");
+    }
+
+    @Override
+    public ClusterActionHandler load(final String role) {
+      checkNotNull(role, "role");
+      Set<String> prefixes = factoryMap.keySet();
+      try {
+        String prefix = Iterables.find(prefixes, new Predicate<String>() {
+
+          @Override
+          public boolean apply(String prefix) {
+            return role.startsWith(prefix);
+          }
+
+        });
+        LOG.debug("role {} starts with a configured prefix {}", role, prefix);
+        ClusterActionHandlerFactory factory = factoryMap.get(prefix);
+        checkArgument(factory != null, "could not create action handler factory %s", prefix);
+        String subrole = role.substring(prefix.length());
+        ClusterActionHandler returnVal = factory.create(subrole);
+        checkArgument(returnVal != null, "action handler factory %s could not create action handler for role %s",
+            prefix, subrole);
+        return returnVal;
+      } catch (NoSuchElementException e) {
+        LOG.debug("role {} didn't start with any of the configured prefixes {}", role, prefixes);
+        ClusterActionHandler returnVal = handlerMap.get(role);
+        checkArgument(returnVal != null, "Action handler not found for role: %s; configured roles %s", role,
+            handlerMap.keySet());
+        return returnVal;
       }
+
+    }
+  }
+
+  public LoadingCache<String, ClusterActionHandler> create() {
+    return create(ServiceLoader.load(ClusterActionHandlerFactory.class),
+      ServiceLoader.load(ClusterActionHandler.class));
+  }
+
+  public LoadingCache<String, ClusterActionHandler> create(
+    Iterable<ClusterActionHandlerFactory> factories,
+    Iterable<ClusterActionHandler> handlers
+  ) {
+    Map<String, ClusterActionHandlerFactory> factoryMap =
+       indexFactoriesByRolePrefix(checkNotNull(factories, "factories"));
+    Map<String, ClusterActionHandler> handlerMap =
+       indexHandlersByRole(checkNotNull(handlers, "handlers"));
+    return CacheBuilder.newBuilder().build(new ReturnHandlerByRoleOrPrefix(factoryMap, handlerMap));
+  }
+
+  static Map<String, ClusterActionHandlerFactory> indexFactoriesByRolePrefix(
+        Iterable<ClusterActionHandlerFactory> handlers) {
+    return Maps.uniqueIndex(handlers, new Function<ClusterActionHandlerFactory, String>() {
 
       @Override
-      public ClusterActionHandler apply(String arg0) {
-         checkNotNull(arg0, "role");
-         for (String prefix : factoryMap.keySet()) {
-            if (arg0.startsWith(prefix)) {
-               return checkNotNull(
-                 factoryMap.get(prefix).create(arg0.substring(prefix.length())),
-                 "Unable to create the action handler"
-               );
-            }
-         }
-         return checkNotNull(handlerMap.get(arg0), "Action handler not found");
+      public String apply(ClusterActionHandlerFactory arg0) {
+        return arg0.getRolePrefix();
       }
-   }
 
-   public Map<String, ClusterActionHandler> create() {
-      return create(ServiceLoader.load(ClusterActionHandlerFactory.class),
-        ServiceLoader.load(ClusterActionHandler.class));
-   }
+    });
+  }
 
-   public Map<String, ClusterActionHandler> create(
-      Iterable<ClusterActionHandlerFactory> factories,
-      Iterable<ClusterActionHandler> handlers
-   ) {
-      Map<String, ClusterActionHandlerFactory> factoryMap =
-          indexFactoriesByRolePrefix(checkNotNull(factories, "factories"));
-      Map<String, ClusterActionHandler> handlerMap =
-          indexHandlersByRole(checkNotNull(handlers, "handlers"));
+  static Map<String, ClusterActionHandler> indexHandlersByRole(Iterable<ClusterActionHandler> handlers) {
+    return Maps.uniqueIndex(handlers, new Function<ClusterActionHandler, String>() {
 
-      return new MapMaker().makeComputingMap(
-        new ReturnHandlerByRoleOrPrefix(factoryMap, handlerMap));
-   }
+      @Override
+      public String apply(ClusterActionHandler arg0) {
+        return arg0.getRole();
+      }
 
-   static Map<String, ClusterActionHandlerFactory> indexFactoriesByRolePrefix(
-            Iterable<ClusterActionHandlerFactory> handlers) {
-      return Maps.uniqueIndex(handlers, new Function<ClusterActionHandlerFactory, String>() {
-
-         @Override
-         public String apply(ClusterActionHandlerFactory arg0) {
-            return arg0.getRolePrefix();
-         }
-
-      });
-   }
-
-   static Map<String, ClusterActionHandler> indexHandlersByRole(Iterable<ClusterActionHandler> handlers) {
-      return Maps.uniqueIndex(handlers, new Function<ClusterActionHandler, String>() {
-
-         @Override
-         public String apply(ClusterActionHandler arg0) {
-            return arg0.getRole();
-         }
-
-      });
-   }
+    });
+  }
 }

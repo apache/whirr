@@ -18,19 +18,20 @@
 
 package org.apache.whirr.util;
 
+import static junit.framework.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.PrintStream;
+
 import org.apache.whirr.Cluster;
 import org.apache.whirr.Cluster.Instance;
 import org.apache.whirr.ClusterSpec;
 import org.junit.Test;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.PrintStream;
-import java.util.HashSet;
-
-import static junit.framework.Assert.assertEquals;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import com.google.common.collect.ImmutableSet;
 
 public class UtilsTest {
 
@@ -45,11 +46,7 @@ public class UtilsTest {
 
     Cluster cluster = mock(Cluster.class);
 
-    when(cluster.getInstances()).thenReturn(new HashSet<Cluster.Instance>() {
-      {
-        add(instance);
-      }
-    });
+    when(cluster.getInstances()).thenReturn(ImmutableSet.<Cluster.Instance>of(instance));
 
     ClusterSpec spec = mock(ClusterSpec.class);
     when(spec.getClusterUser()).thenReturn("test-identity");

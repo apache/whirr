@@ -18,15 +18,16 @@
 
 package org.apache.whirr.state;
 
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
+import java.io.IOException;
+
 import org.apache.whirr.Cluster;
 import org.apache.whirr.ClusterSpec;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 
 /**
  * A factory for ClusterStateStores.
@@ -56,7 +57,7 @@ public class ClusterStateStoreFactory {
     }
   }
 
-  private Cache<ClusterSpec, ClusterStateStore> storeCache = CacheBuilder.newBuilder().build(
+  private LoadingCache<ClusterSpec, ClusterStateStore> storeCache = CacheBuilder.newBuilder().build(
     new CacheLoader<ClusterSpec, ClusterStateStore>() {
       @Override
       public ClusterStateStore load(ClusterSpec spec) throws Exception {

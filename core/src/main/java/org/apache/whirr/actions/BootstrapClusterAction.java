@@ -18,12 +18,15 @@
 
 package org.apache.whirr.actions;
 
-import com.google.common.base.Function;
-import com.google.common.base.Joiner;
-import com.google.common.collect.Collections2;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
+import java.io.IOException;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+
 import org.apache.whirr.Cluster;
 import org.apache.whirr.Cluster.Instance;
 import org.apache.whirr.ClusterSpec;
@@ -41,14 +44,12 @@ import org.jclouds.compute.domain.Template;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import com.google.common.base.Function;
+import com.google.common.cache.LoadingCache;
+import com.google.common.collect.Collections2;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 /**
  * A {@link org.apache.whirr.ClusterAction} that starts instances in a cluster in parallel and
@@ -62,12 +63,12 @@ public class BootstrapClusterAction extends ScriptBasedClusterAction {
   private final NodeStarterFactory nodeStarterFactory;
   
   public BootstrapClusterAction(final Function<ClusterSpec, ComputeServiceContext> getCompute,
-      final Map<String, ClusterActionHandler> handlerMap) {
+      final LoadingCache<String, ClusterActionHandler> handlerMap) {
     this(getCompute, handlerMap, new NodeStarterFactory());
   }
   
   BootstrapClusterAction(final Function<ClusterSpec, ComputeServiceContext> getCompute,
-      final Map<String, ClusterActionHandler> handlerMap, final NodeStarterFactory nodeStarterFactory) {
+      final LoadingCache<String, ClusterActionHandler> handlerMap, final NodeStarterFactory nodeStarterFactory) {
     super(getCompute, handlerMap);
     this.nodeStarterFactory = nodeStarterFactory;
   }
@@ -99,11 +100,6 @@ public class BootstrapClusterAction extends ScriptBasedClusterAction {
 
       final Template template = BootstrapTemplate.build(clusterSpec, computeService,
         statementBuilder, entry.getValue().getTemplateBuilderStrategy(), entry.getKey());
-
-      if (template.getOptions() != null) {
-        template.getOptions()
-          .nameTask("bootstrap-" + Joiner.on('_').join(entry.getKey().getRoles()));
-      }
 
       Future<Set<? extends NodeMetadata>> nodesFuture = executorService.submit(
           new StartupProcess(

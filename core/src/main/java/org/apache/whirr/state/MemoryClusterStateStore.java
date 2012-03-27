@@ -18,9 +18,9 @@
 
 package org.apache.whirr.state;
 
-import org.apache.whirr.Cluster;
-
 import java.io.IOException;
+
+import org.apache.whirr.Cluster;
 
 /**
  * Memory only cluster state storage useful for testing

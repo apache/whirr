@@ -18,21 +18,19 @@
 
 package org.apache.whirr.cli.command;
 
-import com.google.common.collect.ListMultimap;
-import org.apache.whirr.service.DryRunModule;
-import org.jclouds.compute.callables.RunScriptOnNode;
-import org.jclouds.compute.callables.RunScriptOnNodeAsInitScriptUsingSsh;
-import org.jclouds.compute.callables.SudoAwareInitManager;
-import org.jclouds.compute.domain.NodeMetadata;
-import org.jclouds.scriptbuilder.InitBuilder;
-import org.junit.Before;
+import static junit.framework.Assert.fail;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
-import java.lang.reflect.Field;
 import java.util.Map;
 
-import static junit.framework.Assert.fail;
+import org.apache.whirr.service.DryRunModule;
+import org.jclouds.compute.domain.NodeMetadata;
+import org.jclouds.scriptbuilder.InitScript;
+import org.jclouds.scriptbuilder.domain.Statement;
+import org.junit.Before;
+
+import com.google.common.collect.ListMultimap;
 
 public class BaseCommandTest {
 
@@ -71,10 +69,10 @@ public class BaseCommandTest {
     }
   }
 
-  private Map.Entry<NodeMetadata, RunScriptOnNode> getEntryForPhase(
-      ListMultimap<NodeMetadata, RunScriptOnNode> executions, String phaseName)
+  private Map.Entry<NodeMetadata, Statement> getEntryForPhase(
+      ListMultimap<NodeMetadata, Statement> executions, String phaseName)
       throws Exception {
-    for (Map.Entry<NodeMetadata, RunScriptOnNode> entry : executions.entries()) {
+    for (Map.Entry<NodeMetadata, Statement> entry : executions.entries()) {
       if (getScriptName(entry.getValue()).startsWith(phaseName)) {
         return entry;
       }
@@ -82,15 +80,7 @@ public class BaseCommandTest {
     throw new IllegalStateException("phase not found: " + phaseName);
   }
 
-  private String getScriptName(RunScriptOnNode script) throws Exception {
-    if (script instanceof RunScriptOnNodeAsInitScriptUsingSsh) {
-      Field initField = SudoAwareInitManager.class
-          .getDeclaredField("init");
-      initField.setAccessible(true);
-      return ((InitBuilder) initField
-          .get(script))
-          .getInstanceName();
-    }
-    throw new IllegalArgumentException();
+  private String getScriptName(Statement script) throws Exception {
+    return InitScript.class.cast(script).getInstanceName();
   }
 }

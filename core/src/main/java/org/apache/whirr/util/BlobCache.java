@@ -18,8 +18,16 @@
 
 package org.apache.whirr.util;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Maps;
+import static org.jclouds.blobstore.options.PutOptions.Builder.multipart;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.whirr.ClusterSpec;
@@ -35,15 +43,8 @@ import org.jclouds.scriptbuilder.domain.Statement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.Map;
-import java.util.Set;
-
-import static org.jclouds.blobstore.options.PutOptions.Builder.multipart;
+import com.google.common.base.Function;
+import com.google.common.collect.Maps;
 
 public class BlobCache {
 

@@ -18,15 +18,23 @@
 
 package org.apache.whirr.command;
 
-import com.google.common.collect.Maps;
+import static org.apache.whirr.ClusterSpec.Property.CLUSTER_NAME;
+import static org.apache.whirr.ClusterSpec.Property.CREDENTIAL;
+import static org.apache.whirr.ClusterSpec.Property.IDENTITY;
+import static org.apache.whirr.ClusterSpec.Property.INSTANCE_TEMPLATES;
+import static org.apache.whirr.ClusterSpec.Property.PRIVATE_KEY_FILE;
+import static org.apache.whirr.ClusterSpec.Property.PROVIDER;
+
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.EnumSet;
 import java.util.Map;
+
 import joptsimple.ArgumentAcceptingOptionSpec;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import joptsimple.OptionSpec;
+
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
@@ -36,16 +44,12 @@ import org.apache.whirr.ClusterController;
 import org.apache.whirr.ClusterControllerFactory;
 import org.apache.whirr.ClusterSpec;
 import org.apache.whirr.ClusterSpec.Property;
-import static org.apache.whirr.ClusterSpec.Property.CLUSTER_NAME;
-import static org.apache.whirr.ClusterSpec.Property.CREDENTIAL;
-import static org.apache.whirr.ClusterSpec.Property.IDENTITY;
-import static org.apache.whirr.ClusterSpec.Property.INSTANCE_TEMPLATES;
-import static org.apache.whirr.ClusterSpec.Property.PRIVATE_KEY_FILE;
-import static org.apache.whirr.ClusterSpec.Property.PROVIDER;
 import org.apache.whirr.state.ClusterStateStore;
 import org.apache.whirr.state.ClusterStateStoreFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.collect.Maps;
 
 /**
  * An abstract command for interacting with clusters.

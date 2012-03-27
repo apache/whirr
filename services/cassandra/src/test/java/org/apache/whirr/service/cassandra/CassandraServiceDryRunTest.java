@@ -7,7 +7,7 @@
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,16 +16,29 @@
  * limitations under the License.
  */
 
-package org.apache.whirr.net;
+package org.apache.whirr.service.cassandra;
 
-/**
- * Generic dns resolution exception
- */
-public class DnsException extends RuntimeException {
+import static com.google.common.base.Predicates.containsPattern;
 
-  private static final long serialVersionUID = 3615182336811732309L;
+import org.apache.whirr.service.BaseServiceDryRunTest;
 
-  public DnsException(Throwable e) {
-    super(e);
+import com.google.common.base.Predicate;
+
+public class CassandraServiceDryRunTest extends BaseServiceDryRunTest {
+
+  @Override
+  protected String getRole() {
+    return "cassandra";
   }
+
+  @Override
+  protected Predicate<CharSequence> bootstrapPredicate() {
+    return containsPattern("install_service cassandra");
+  }
+
+  @Override
+  protected Predicate<CharSequence> configurePredicate() {
+    return containsPattern("seeds");
+  }
+
 }

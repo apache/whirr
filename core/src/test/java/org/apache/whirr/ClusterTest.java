@@ -18,19 +18,20 @@
 
 package org.apache.whirr;
 
-import com.google.common.collect.Sets;
-import org.jclouds.domain.Credentials;
-import org.junit.Before;
-import org.junit.Test;
-
-import java.util.NoSuchElementException;
-import java.util.Set;
-
 import static org.apache.whirr.RolePredicates.role;
 import static org.apache.whirr.RolePredicates.withIds;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.fail;
+
+import java.util.NoSuchElementException;
+import java.util.Set;
+
+import org.jclouds.domain.Credentials;
+import org.junit.Before;
+import org.junit.Test;
+
+import com.google.common.collect.Sets;
 
 public class ClusterTest {
 

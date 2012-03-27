@@ -18,21 +18,10 @@
 
 package org.apache.whirr.service;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ListMultimap;
-import com.google.common.collect.Lists;
-import com.jcraft.jsch.JSchException;
-import org.apache.commons.configuration.CompositeConfiguration;
-import org.apache.commons.configuration.ConfigurationException;
-import org.apache.whirr.ClusterController;
-import org.apache.whirr.ClusterSpec;
-import org.apache.whirr.service.DryRunModule.DryRun;
-import org.jclouds.compute.callables.RunScriptOnNode;
-import org.jclouds.compute.callables.RunScriptOnNodeAsInitScriptUsingSsh;
-import org.jclouds.compute.domain.NodeMetadata;
-import org.jclouds.scriptbuilder.InitBuilder;
-import org.junit.Before;
-import org.junit.Test;
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertSame;
+import static junit.framework.Assert.assertTrue;
+import static org.jclouds.scriptbuilder.domain.Statements.exec;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -40,10 +29,21 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Stack;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertSame;
-import static junit.framework.Assert.assertTrue;
-import static org.jclouds.scriptbuilder.domain.Statements.exec;
+import org.apache.commons.configuration.CompositeConfiguration;
+import org.apache.commons.configuration.ConfigurationException;
+import org.apache.whirr.ClusterController;
+import org.apache.whirr.ClusterSpec;
+import org.apache.whirr.service.DryRunModule.DryRun;
+import org.jclouds.compute.domain.NodeMetadata;
+import org.jclouds.compute.events.StatementOnNode;
+import org.jclouds.scriptbuilder.InitScript;
+import org.jclouds.scriptbuilder.domain.Statement;
+import org.junit.Test;
+
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ListMultimap;
+import com.google.common.collect.Lists;
+import com.jcraft.jsch.JSchException;
 
 public class DryRunModuleTest {
 
@@ -115,11 +115,6 @@ public class DryRunModuleTest {
     }
   }
 
-  @Before
-  public void setUp() {
-    DryRunModule.resetDryRun();
-  }
-
   @Test
   public void testExecuteOnlyBootstrapForNoop() throws Exception {
     CompositeConfiguration config = new CompositeConfiguration();
@@ -131,15 +126,17 @@ public class DryRunModuleTest {
     ClusterSpec clusterSpec = ClusterSpec.withTemporaryKeys(config);
     ClusterController controller = new ClusterController();
 
+    DryRun dryRun = getDryRunInControllerForCluster(controller, clusterSpec);
+    dryRun.reset();
+    
     controller.launchCluster(clusterSpec);
     controller.destroyCluster(clusterSpec);
 
-    DryRun dryRun = DryRunModule.getDryRun();
-    ListMultimap<NodeMetadata, RunScriptOnNode> perNodeExecutions = dryRun.getExecutions();
+    ListMultimap<NodeMetadata, Statement> perNodeExecutions = dryRun.getExecutions();
 
-    for (Entry<NodeMetadata, Collection<RunScriptOnNode>> entry : perNodeExecutions
+    for (Entry<NodeMetadata, Collection<Statement>> entry : perNodeExecutions
         .asMap().entrySet()) {
-      assertSame("An incorrect number of scripts was executed in the node",
+      assertSame("An incorrect number of scripts was executed in the node " + entry,
           entry.getValue().size(), 1);
     }
   }
@@ -152,7 +149,7 @@ public class DryRunModuleTest {
   public void testNoInitScriptsAfterConfigurationStartedAndNoConfigScriptsAfterDestroy()
       throws ConfigurationException, JSchException, IOException, InterruptedException {
 
-    final List<String> expectedExecutionOrder = ImmutableList.of("setup", "configure", "start", "destroy");
+    final List<String> expectedExecutionOrder = ImmutableList.of("bootstrap", "configure", "start", "destroy");
 
     CompositeConfiguration config = new CompositeConfiguration();
     config.setProperty("whirr.provider", "stub");
@@ -162,26 +159,30 @@ public class DryRunModuleTest {
 
     ClusterSpec clusterSpec = ClusterSpec.withTemporaryKeys(config);
     ClusterController controller = new ClusterController();
-
+    
+    DryRun dryRun = getDryRunInControllerForCluster(controller, clusterSpec);
+    dryRun.reset();
+    
     controller.launchCluster(clusterSpec);
     controller.destroyCluster(clusterSpec);
 
-    DryRun dryRun = DryRunModule.getDryRun();
-    ListMultimap<NodeMetadata, RunScriptOnNode> perNodeExecutions = dryRun.getExecutions();
-    List<RunScriptOnNode> totalExecutions = dryRun.getTotallyOrderedExecutions();
+    
+    ListMultimap<NodeMetadata, Statement> perNodeExecutions = dryRun.getExecutions();
+    List<StatementOnNode> totalExecutions = dryRun.getTotallyOrderedExecutions();
 
     // Assert that all nodes executed all three phases and in the right order
 
-    for (Entry<NodeMetadata, Collection<RunScriptOnNode>> entry : perNodeExecutions
+    for (Entry<NodeMetadata, Collection<Statement>> entry : perNodeExecutions
         .asMap().entrySet()) {
-      assertSame("An incorrect number of scripts was executed in the node",
+      assertSame("An incorrect number of scripts was executed in the node: " + entry.getValue(),
           entry.getValue().size(), expectedExecutionOrder.size());
-      List<RunScriptOnNode> asList = (List<RunScriptOnNode>) entry.getValue();
+      List<Statement> asList = Lists.newArrayList(entry.getValue());
 
       int count = 0;
       for(String phase : expectedExecutionOrder) {
-        assertTrue("The '" + phase + "' script was executed in the wrong order",
-            getScriptName(asList.get(count)).startsWith(phase));
+        String scriptName = getScriptName(asList.get(count));
+        assertTrue("The '" + phase + "' script was executed in the wrong order, found: " + scriptName,
+              scriptName.startsWith(phase));
         count += 1;
       }
     }
@@ -190,8 +191,8 @@ public class DryRunModuleTest {
     // script is executed no more setup scripts are executed
 
     Stack<String> executedPhases = new Stack<String>();
-    for (RunScriptOnNode script : totalExecutions) {
-      String[] parts = getScriptName(script).split("-");
+    for (StatementOnNode script : totalExecutions) {
+      String[] parts = getScriptName(script.getStatement()).split("-");
       if ((!executedPhases.empty() && !executedPhases.peek().equals(parts[0])) || executedPhases.empty()) {
         executedPhases.push(parts[0]);
       }
@@ -205,9 +206,13 @@ public class DryRunModuleTest {
     }
   }
 
-  private String getScriptName(RunScriptOnNode script) {
-    return ((InitBuilder) ((RunScriptOnNodeAsInitScriptUsingSsh) script)
-        .getStatement()).getInstanceName();
+public DryRun getDryRunInControllerForCluster(ClusterController controller, ClusterSpec clusterSpec) {
+   DryRun dryRun = controller.getCompute().apply(clusterSpec).utils().injector().getInstance(DryRun.class);
+   return dryRun;
+}
+  
+  private String getScriptName(Statement script) {
+      return InitScript.class.cast(script).getInstanceName();
   }
 
 }

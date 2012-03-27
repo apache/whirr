@@ -18,9 +18,16 @@
 
 package org.apache.whirr.compute;
 
-import com.google.common.base.Joiner;
-import com.google.common.base.Predicate;
-import com.google.common.collect.ImmutableMap;
+import static com.google.common.collect.Iterables.filter;
+import static com.google.common.collect.Iterables.getOnlyElement;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.net.MalformedURLException;
+import java.util.Map;
+
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.whirr.ClusterSpec;
 import org.apache.whirr.InstanceTemplate;
@@ -38,15 +45,9 @@ import org.jclouds.rest.RestContext;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.net.MalformedURLException;
-import java.util.Map;
-
-import static com.google.common.collect.Iterables.filter;
-import static com.google.common.collect.Iterables.getOnlyElement;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import com.google.common.base.Joiner;
+import com.google.common.base.Predicate;
+import com.google.common.collect.ImmutableMap;
 
 public class BootstrapTemplateTest {
 

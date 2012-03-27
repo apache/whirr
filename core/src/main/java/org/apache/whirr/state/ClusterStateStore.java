@@ -23,14 +23,15 @@ import java.net.UnknownHostException;
 import java.util.Iterator;
 import java.util.Set;
 
-import com.google.common.base.Joiner;
-import com.google.common.base.Splitter;
-import com.google.common.collect.Sets;
 import org.apache.whirr.Cluster;
 import org.apache.whirr.ClusterSpec;
 import org.jclouds.domain.Credentials;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.base.Joiner;
+import com.google.common.base.Splitter;
+import com.google.common.collect.Sets;
 
 /**
  * Interface for cluster state storage facilities.
