@@ -18,6 +18,13 @@
 
 package org.apache.whirr.service.hbase;
 
+import java.util.Set;
+import org.apache.whirr.RolePredicates;
+import org.apache.whirr.Cluster.Instance;
+
+import org.apache.whirr.Cluster;
+import org.apache.whirr.service.ClusterActionEvent;
+
 import java.io.IOException;
 
 import org.apache.commons.configuration.Configuration;
@@ -48,5 +55,21 @@ public abstract class HBaseClusterActionHandler
   protected String getConfigureFunction(Configuration config) {
     return getConfigureFunction(config, "hbase", HBaseConstants.FUNCTION_CONFIGURE);
   }
+
+  protected String getMetricsTemplate(ClusterActionEvent event,
+      ClusterSpec clusterSpec, Cluster cluster) {
+    Configuration conf = clusterSpec.getConfiguration();
+    if (conf.containsKey("hbase-metrics.template")) {
+      return conf.getString("hbase-metrics.template");
+    }
+    
+    Set<Instance> gmetadInstances = cluster.getInstancesMatching(RolePredicates.role("ganglia-metad"));
+    if (!gmetadInstances.isEmpty()) {
+      return "hbase-metrics-ganglia.properties.vm";
+    }
+    
+    return "hbase-metrics-null.properties.vm";
+  }
+
 
 }

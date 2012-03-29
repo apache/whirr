@@ -18,6 +18,8 @@
 
 package org.apache.whirr.service;
 
+import com.google.common.base.Joiner;
+import java.util.Set;
 import static junit.framework.Assert.assertTrue;
 import static junit.framework.Assert.fail;
 
@@ -77,8 +79,8 @@ public abstract class BaseServiceDryRunTest {
    */
   @Test
   public void testBootstrapAndConfigure() throws Exception {
-    ClusterSpec cookbookWithDefaultRecipe = newClusterSpecForProperties(ImmutableMap.of("whirr.instance-templates",
-        "1 " + getRole()));
+    ClusterSpec cookbookWithDefaultRecipe = newClusterSpecForProperties(ImmutableMap.of(
+        "whirr.instance-templates", "1 " + Joiner.on("+").join(getInstanceRoles())));
     DryRun dryRun = launchWithClusterSpec(cookbookWithDefaultRecipe);
 
     assertScriptPredicateOnPhase(dryRun, "bootstrap", bootstrapPredicate());
@@ -89,7 +91,7 @@ public abstract class BaseServiceDryRunTest {
 
   protected abstract Predicate<CharSequence> bootstrapPredicate();
 
-  protected abstract String getRole();
+  protected abstract Set<String> getInstanceRoles();
 
   protected void assertScriptPredicateOnPhase(DryRun dryRun, String phase, Predicate<CharSequence> predicate)
       throws Exception {

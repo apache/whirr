@@ -21,6 +21,8 @@ package org.apache.whirr.service.chef;
 import static com.google.common.base.Predicates.and;
 import static com.google.common.base.Predicates.contains;
 import static com.google.common.base.Predicates.containsPattern;
+import com.google.common.collect.ImmutableSet;
+import java.util.Set;
 import static java.util.regex.Pattern.LITERAL;
 import static java.util.regex.Pattern.compile;
 
@@ -35,8 +37,8 @@ import com.google.common.collect.ImmutableMap;
 public class ChefServiceDryRunTest extends BaseServiceDryRunTest {
 
   @Override
-  protected String getRole() {
-    return "chef:java";
+  protected Set<String> getInstanceRoles() {
+    return ImmutableSet.of("chef:java");
   }
 
   @Override

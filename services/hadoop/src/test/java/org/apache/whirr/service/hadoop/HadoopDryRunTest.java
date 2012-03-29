@@ -7,7 +7,7 @@
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,31 +16,36 @@
  * limitations under the License.
  */
 
-package org.apache.whirr.service.cassandra;
+package org.apache.whirr.service.hadoop;
 
+import com.google.common.base.Predicates;
+import static com.google.common.base.Predicates.and;
 import static com.google.common.base.Predicates.containsPattern;
-
 import com.google.common.collect.ImmutableSet;
 import java.util.Set;
-import org.apache.whirr.service.BaseServiceDryRunTest;
 
 import com.google.common.base.Predicate;
+import org.apache.whirr.service.BaseServiceDryRunTest;
 
-public class CassandraServiceDryRunTest extends BaseServiceDryRunTest {
+public class HadoopDryRunTest extends BaseServiceDryRunTest {
 
   @Override
   protected Set<String> getInstanceRoles() {
-    return ImmutableSet.of("cassandra");
-  }
-
-  @Override
-  protected Predicate<CharSequence> bootstrapPredicate() {
-    return containsPattern("install_service cassandra");
+    return ImmutableSet.of("hadoop-namenode", "hadoop-jobtracker", "hadoop-datanode",
+        "hadoop-tasktracker", "ganglia-metad");
   }
 
   @Override
   protected Predicate<CharSequence> configurePredicate() {
-    return containsPattern("seeds");
+    return and(
+        containsPattern("dfs.class=org.apache.hadoop.metrics.ganglia.GangliaContext31"),
+        containsPattern("dfs.servers=10.1.1.1")
+    );
+  }
+
+  @Override
+  protected Predicate<CharSequence> bootstrapPredicate() {
+    return Predicates.alwaysTrue();
   }
 
 }

@@ -18,6 +18,8 @@
 
 package org.apache.whirr.service;
 
+import org.apache.velocity.app.VelocityEngine;
+
 import org.apache.whirr.Cluster;
 import org.apache.whirr.ClusterSpec;
 import org.apache.whirr.InstanceTemplate;
@@ -41,18 +43,19 @@ public class ClusterActionEvent {
     new TemplateBuilderStrategy();
   private FirewallManager firewallManager;
   private Function<ClusterSpec, ComputeServiceContext> getCompute;
+  private VelocityEngine velocityEngine;
   
   public ClusterActionEvent(String action, ClusterSpec clusterSpec,
       InstanceTemplate instanceTemplate, Cluster cluster, 
       Function<ClusterSpec, ComputeServiceContext> getCompute,
-      FirewallManager firewallManager) {
-    this(action, clusterSpec, instanceTemplate, cluster, null, getCompute, firewallManager);
+      FirewallManager firewallManager, VelocityEngine velocityEngine) {
+    this(action, clusterSpec, instanceTemplate, cluster, null, getCompute, firewallManager, velocityEngine);
   }
   
   public ClusterActionEvent(String action, ClusterSpec clusterSpec,
       InstanceTemplate instanceTemplate, Cluster cluster, StatementBuilder statementBuilder,
       Function<ClusterSpec, ComputeServiceContext> getCompute,
-      FirewallManager firewallManager) {
+      FirewallManager firewallManager, VelocityEngine velocityEngine) {
     this.action = action;
     this.clusterSpec = clusterSpec;
     this.instanceTemplate = instanceTemplate;
@@ -60,6 +63,7 @@ public class ClusterActionEvent {
     this.statementBuilder = statementBuilder;
     this.getCompute = getCompute;
     this.firewallManager = firewallManager;
+    this.velocityEngine = velocityEngine;
   }
   
   public Cluster getCluster() {
@@ -101,6 +105,10 @@ public class ClusterActionEvent {
   
   public FirewallManager getFirewallManager() {
     return firewallManager;
+  }
+  
+  public VelocityEngine getTemplateEngine() {
+    return velocityEngine;
   }
 
 }

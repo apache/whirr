@@ -58,15 +58,7 @@ function configure_cdh_hadoop() {
   # Copy generated configuration files in place
   cp /tmp/{core,hdfs,mapred}-site.xml $HADOOP_CONF_DIR
   cp /tmp/hadoop-env.sh $HADOOP_CONF_DIR
-
-  # Expose /metrics URL endpoint
-  cat > $HADOOP_CONF_DIR/hadoop-metrics.properties <<EOF
-# Exposes /metrics URL endpoint for metrics information.
-dfs.class=org.apache.hadoop.metrics.spi.NoEmitMetricsContext
-mapred.class=org.apache.hadoop.metrics.spi.NoEmitMetricsContext
-jvm.class=org.apache.hadoop.metrics.spi.NoEmitMetricsContext
-rpc.class=org.apache.hadoop.metrics.spi.NoEmitMetricsContext
-EOF
+  cp /tmp/hadoop-metrics.properties $HADOOP_CONF_DIR
 
   # Keep PID files in a non-temporary directory
   HADOOP_PID_DIR=$(. /tmp/hadoop-env.sh; echo $HADOOP_PID_DIR)

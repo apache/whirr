@@ -24,6 +24,8 @@ import static org.apache.whirr.service.hbase.HBaseConfigurationBuilder.buildHBas
 import static org.apache.whirr.service.hbase.HBaseConfigurationBuilder.buildHBaseSite;
 import static org.jclouds.scriptbuilder.domain.Statements.call;
 
+import org.apache.whirr.template.TemplateUtils;
+
 import java.io.IOException;
 import java.net.InetAddress;
 
@@ -86,7 +88,8 @@ public class HBaseRegionServerClusterActionHandler extends HBaseClusterActionHan
     try {
       event.getStatementBuilder().addStatements(
           buildHBaseSite("/tmp/hbase-site.xml", clusterSpec, cluster),
-          buildHBaseEnv("/tmp/hbase-env.sh", clusterSpec, cluster)
+          buildHBaseEnv("/tmp/hbase-env.sh", clusterSpec, cluster),
+          TemplateUtils.createFileFromTemplate("/tmp/hbase-hadoop-metrics.properties", event.getTemplateEngine(), getMetricsTemplate(event, clusterSpec, cluster), clusterSpec, cluster)
       );
     } catch (ConfigurationException e) {
       throw new IOException(e);

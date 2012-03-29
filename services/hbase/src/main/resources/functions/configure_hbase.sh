@@ -79,6 +79,7 @@ function configure_hbase() {
   # Copy generated configuration files in place
   cp /tmp/hbase-site.xml $HBASE_CONF_DIR
   cp /tmp/hbase-env.sh $HBASE_CONF_DIR
+  cp /tmp/hbase-hadoop-metrics.properties $HBASE_CONF_DIR/hadoop-metrics.properties
 
   # HBASE_PID_DIR should exist and be owned by hadoop:hadoop
   mkdir -p /var/run/hbase
@@ -95,19 +96,6 @@ function configure_hbase() {
   mkdir -p $(dirname $HBASE_LOG_DIR)
   ln -s $MOUNT/hbase/logs $HBASE_LOG_DIR
   chown -R hadoop:hadoop $HBASE_LOG_DIR
-
-  # configure hbase for ganglia
-  cat > $HBASE_CONF_DIR/hadoop-metrics.properties <<EOF
-dfs.class=org.apache.hadoop.metrics.ganglia.GangliaContext
-dfs.period=10
-dfs.servers=$MASTER_HOST:8649
-hbase.class=org.apache.hadoop.metrics.ganglia.GangliaContext
-hbase.period=10
-hbase.servers=$MASTER_HOST:8649
-jvm.class=org.apache.hadoop.metrics.ganglia.GangliaContext
-jvm.period=10
-jvm.servers=$MASTER_HOST:8649
-EOF
 
   # update classpath to include hbase jars and config
 #  cat >> $HADOOP_HOME/conf/hadoop-env.sh <<EOF

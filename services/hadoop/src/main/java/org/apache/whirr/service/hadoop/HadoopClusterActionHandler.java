@@ -19,21 +19,23 @@
 package org.apache.whirr.service.hadoop;
 
 import static org.apache.whirr.service.hadoop.HadoopConfigurationBuilder.buildCommon;
+import static org.apache.whirr.service.hadoop.HadoopConfigurationBuilder.buildHadoopEnv;
 import static org.apache.whirr.service.hadoop.HadoopConfigurationBuilder.buildHdfs;
 import static org.apache.whirr.service.hadoop.HadoopConfigurationBuilder.buildMapReduce;
-import static org.apache.whirr.service.hadoop.HadoopConfigurationBuilder.buildHadoopEnv;
 import static org.jclouds.scriptbuilder.domain.Statements.call;
 
 import com.google.common.base.Joiner;
-
 import java.io.IOException;
-
+import java.util.Set;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.whirr.Cluster;
+import org.apache.whirr.Cluster.Instance;
 import org.apache.whirr.ClusterSpec;
+import org.apache.whirr.RolePredicates;
 import org.apache.whirr.service.ClusterActionEvent;
 import org.apache.whirr.service.ClusterActionHandlerSupport;
+import org.apache.whirr.template.TemplateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -103,11 +105,27 @@ public abstract class HadoopClusterActionHandler extends ClusterActionHandlerSup
         buildCommon("/tmp/core-site.xml", clusterSpec, cluster),
         buildHdfs("/tmp/hdfs-site.xml", clusterSpec, cluster),
         buildMapReduce("/tmp/mapred-site.xml", clusterSpec, cluster),
-        buildHadoopEnv("/tmp/hadoop-env.sh", clusterSpec, cluster)
+        buildHadoopEnv("/tmp/hadoop-env.sh", clusterSpec, cluster),
+        TemplateUtils.createFileFromTemplate("/tmp/hadoop-metrics.properties", event.getTemplateEngine(), getMetricsTemplate(event, clusterSpec, cluster), clusterSpec, cluster)
       );
+      
     } catch (ConfigurationException e) {
       throw new IOException(e);
     }
+  }
+
+  private String getMetricsTemplate(ClusterActionEvent event, ClusterSpec clusterSpec, Cluster cluster) {
+    Configuration conf = clusterSpec.getConfiguration();
+    if (conf.containsKey("hadoop-metrics.template")) {
+      return conf.getString("hadoop-metrics.template");
+    }
+    
+    Set<Instance> gmetadInstances = cluster.getInstancesMatching(RolePredicates.role("ganglia-metad"));
+    if (!gmetadInstances.isEmpty()) {
+      return "hadoop-metrics-ganglia.properties.vm";
+    }
+    
+    return "hadoop-metrics-null.properties.vm";
   }
 
 }

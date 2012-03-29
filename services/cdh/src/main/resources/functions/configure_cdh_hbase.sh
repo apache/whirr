@@ -65,6 +65,7 @@ function configure_cdh_hbase() {
   # Copy generated configuration files in place
   cp /tmp/hbase-site.xml $HBASE_CONF_DIR
   cp /tmp/hbase-env.sh $HBASE_CONF_DIR
+  cp /tmp/hbase-hadoop-metrics.properties $HBASE_CONF_DIR/hadoop-metrics.properties
 
   # HBASE_PID_DIR should exist and be owned by hbase:hbase
   HBASE_PID_DIR=$(. $HBASE_CONF_DIR/hbase-env.sh; echo $HBASE_PID_DIR)
@@ -83,19 +84,6 @@ function configure_cdh_hbase() {
   mkdir -p $(dirname $HBASE_LOG_DIR)
   ln -s /data/hbase/logs $HBASE_LOG_DIR
   chown -R hbase:hbase $HBASE_LOG_DIR
-
-  # configure hbase for ganglia
-  cat > $HBASE_CONF_DIR/hadoop-metrics.properties <<EOF
-dfs.class=org.apache.hadoop.metrics.ganglia.GangliaContext
-dfs.period=10
-dfs.servers=$MASTER_HOST:8649
-hbase.class=org.apache.hadoop.metrics.ganglia.GangliaContext
-hbase.period=10
-hbase.servers=$MASTER_HOST:8649
-jvm.class=org.apache.hadoop.metrics.ganglia.GangliaContext
-jvm.period=10
-jvm.servers=$MASTER_HOST:8649
-EOF
 
   # Now that the configuration is done, install the daemon packages
   for role in $(echo "$ROLES" | tr "," "\n"); do

@@ -40,6 +40,7 @@
     <bundle dependency='true'>mvn:commons-codec/commons-codec/${commons.codec.version}</bundle>
     <bundle dependency='true'>mvn:commons-lang/commons-lang/${commons.lang.version}</bundle>
     <bundle dependency="true">wrap:mvn:dnsjava/dnsjava/${dnsjava.version}</bundle>
+    <bundle dependency="true">mvn:org.apache.velocity/velocity/${velocity.version}</bundle>
     <bundle>mvn:org.apache.whirr/whirr-core/${project.version}</bundle>
     <bundle>mvn:org.apache.whirr/whirr-cli/${project.version}</bundle>
     <bundle>mvn:org.apache.whirr.karaf/org.apache.whirr.karaf.commands/${project.version}</bundle>

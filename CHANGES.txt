@@ -13,6 +13,8 @@ Trunk (unreleased changes)
 
   IMPROVEMENTS
 
+    WHIRR-370. Templating for configuration files (kve)
+
     WHIRR-556. Improve the 'Running on $PROVIDER using $IDENTITY' message (kve)
 
     WHIRR-514. Avoid hardcoded Whirr version number in karaf tests (kve)

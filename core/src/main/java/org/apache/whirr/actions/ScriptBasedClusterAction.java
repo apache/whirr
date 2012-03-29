@@ -18,43 +18,12 @@
 
 package org.apache.whirr.actions;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Predicates.not;
-import static org.apache.whirr.RolePredicates.onlyRolesIn;
-import static org.jclouds.compute.options.RunScriptOptions.Builder.overrideLoginCredentials;
-
-import java.io.IOException;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-
-import javax.annotation.Nullable;
-
-import org.apache.whirr.Cluster;
-import org.apache.whirr.Cluster.Instance;
-import org.apache.whirr.ClusterAction;
-import org.apache.whirr.ClusterSpec;
-import org.apache.whirr.InstanceTemplate;
-import org.apache.whirr.service.ClusterActionEvent;
-import org.apache.whirr.service.ClusterActionHandler;
-import org.apache.whirr.service.FirewallManager;
-import org.apache.whirr.service.jclouds.StatementBuilder;
-import org.jclouds.compute.ComputeService;
-import org.jclouds.compute.ComputeServiceContext;
-import org.jclouds.compute.domain.ExecResponse;
-import org.jclouds.compute.options.RunScriptOptions;
-import org.jclouds.domain.LoginCredentials;
-import org.jclouds.scriptbuilder.domain.Statement;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
+import static com.google.common.base.Preconditions.checkNotNull;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
+import static com.google.common.base.Predicates.not;
 import com.google.common.base.Throwables;
 import com.google.common.cache.LoadingCache;
 import com.google.common.collect.ImmutableSet;
@@ -63,6 +32,34 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.UncheckedExecutionException;
+import java.io.IOException;
+import java.util.Collection;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import javax.annotation.Nullable;
+import org.apache.velocity.app.VelocityEngine;
+import org.apache.whirr.Cluster;
+import static org.apache.whirr.Cluster.Instance;
+import org.apache.whirr.ClusterAction;
+import org.apache.whirr.ClusterSpec;
+import org.apache.whirr.InstanceTemplate;
+import static org.apache.whirr.RolePredicates.onlyRolesIn;
+import org.apache.whirr.service.ClusterActionEvent;
+import org.apache.whirr.service.ClusterActionHandler;
+import org.apache.whirr.service.FirewallManager;
+import org.apache.whirr.service.jclouds.StatementBuilder;
+import org.apache.whirr.template.TemplateUtils;
+import org.jclouds.compute.ComputeService;
+import org.jclouds.compute.ComputeServiceContext;
+import org.jclouds.compute.domain.ExecResponse;
+import org.jclouds.compute.options.RunScriptOptions;
+import static org.jclouds.compute.options.RunScriptOptions.Builder.overrideLoginCredentials;
+import org.jclouds.domain.LoginCredentials;
+import org.jclouds.scriptbuilder.domain.Statement;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A {@link ClusterAction} that provides the base functionality for running
@@ -111,8 +108,10 @@ public abstract class ScriptBasedClusterAction extends ClusterAction {
       FirewallManager firewallManager = new FirewallManager(
           computeServiceContext, clusterSpec, newCluster);
 
+      VelocityEngine velocityEngine = TemplateUtils.newVelocityEngine();
+
       ClusterActionEvent event = new ClusterActionEvent(getAction(), clusterSpec,
-          instanceTemplate, newCluster, statementBuilder, getCompute(), firewallManager);
+          instanceTemplate, newCluster, statementBuilder, getCompute(), firewallManager, velocityEngine);
 
       eventMap.put(instanceTemplate, event);
       for (String role : instanceTemplate.getRoles()) {
@@ -165,7 +164,7 @@ public abstract class ScriptBasedClusterAction extends ClusterAction {
 
     final RunScriptOptions options = overrideLoginCredentials(LoginCredentials.builder().user(clusterSpec.getClusterUser())
           .privateKey(clusterSpec.getPrivateKey()).build());
-    for (Entry<InstanceTemplate, ClusterActionEvent> entry : eventMap.entrySet()) {
+    for (Map.Entry<InstanceTemplate, ClusterActionEvent> entry : eventMap.entrySet()) {
       if (shouldIgnoreInstanceTemplate(entry.getKey())) {
         continue; // skip if not in the target
       }
@@ -258,7 +257,7 @@ public abstract class ScriptBasedClusterAction extends ClusterAction {
   }
 
   protected void eventSpecificActions(
-      Entry<InstanceTemplate, ClusterActionEvent> entry) throws IOException {
+      Map.Entry<InstanceTemplate, ClusterActionEvent> entry) throws IOException {
   }
 
   protected void postRunScriptsActions(

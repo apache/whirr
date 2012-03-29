@@ -83,6 +83,7 @@
     <slf4j.version>1.6.3</slf4j.version>
     <voldermort.version>0.90</voldermort.version>
     <zookeeper.version>3.3.1</zookeeper.version>
+    <velocity.version>1.7</velocity.version>
   </properties>
 
   <dependencyManagement>

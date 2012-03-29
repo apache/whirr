@@ -50,6 +50,7 @@ function configure_hadoop() {
   # Copy generated configuration files in place
   cp /tmp/{core,hdfs,mapred}-site.xml $HADOOP_CONF_DIR
   cp /tmp/hadoop-env.sh $HADOOP_CONF_DIR
+  cp /tmp/hadoop-metrics.properties $HADOOP_CONF_DIR
 
   # Keep PID files in a non-temporary directory
   HADOOP_PID_DIR=$(. /tmp/hadoop-env.sh; echo $HADOOP_PID_DIR)
@@ -68,7 +69,7 @@ function configure_hadoop() {
   mkdir -p $(dirname $HADOOP_LOG_DIR)
   ln -s /data/hadoop/logs $HADOOP_LOG_DIR
   chown -R hadoop:hadoop $HADOOP_LOG_DIR
-
+  
   for role in $(echo "$ROLES" | tr "," "\n"); do
     case $role in
     hadoop-namenode)

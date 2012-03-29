@@ -179,6 +179,11 @@
         <appender-ref ref="WHIRRFILE" />
     </category>
 
+    <category name="org.apache.velocity">
+        <priority value="INFO" />
+        <appender-ref ref="WHIRRFILE" />
+    </category>
+
     <category name="jclouds.headers">
         <priority value="DEBUG" />
         <appender-ref ref="ASYNCWIRE" />
