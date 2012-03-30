@@ -20,13 +20,13 @@
   <parent>
     <groupId>org.apache.whirr</groupId>
     <artifactId>whirr</artifactId>
-    <version>0.7.1</version>
+    <version>0.7.2</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <groupId>org.apache.whirr</groupId>
   <artifactId>whirr-examples</artifactId>
   <packaging>jar</packaging>
-  <version>0.7.1</version>
+  <version>0.7.2</version>
   <name>Apache Whirr Examples</name>
   <dependencies>
     <dependency>
