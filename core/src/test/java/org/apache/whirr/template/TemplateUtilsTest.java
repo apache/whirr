@@ -36,7 +36,7 @@ public class TemplateUtilsTest {
     Cluster.Instance instance = new Cluster.Instance(credentials,
         Sets.newHashSet("foo"), "127.0.0.1", "127.0.0.1", "id-0", null);
 
-    ClusterSpec clusterSpec = new ClusterSpec(new PropertiesConfiguration("whirr-core-test.properties"));
+    ClusterSpec clusterSpec = ClusterSpec.withTemporaryKeys(new PropertiesConfiguration("whirr-core-test.properties"));
     Cluster cluster = new Cluster(Sets.newHashSet(instance));
     VelocityEngine ve = TemplateUtils.newVelocityEngine();
 
