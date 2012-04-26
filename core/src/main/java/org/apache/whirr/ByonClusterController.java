@@ -56,30 +56,50 @@ public class ByonClusterController extends ClusterController {
     return "byon";
   }
 
-  public Cluster launchCluster(ClusterSpec clusterSpec) throws IOException,
+  /**
+   * Destroys a whirr BYON cluster.
+   * Because this is a BYON cluster it also stops the services.
+   */
+  @Override
+  public void destroyCluster(ClusterSpec clusterSpec) throws IOException,
       InterruptedException {
-
+    stopServices(clusterSpec); // for BYON only
     LoadingCache<String, ClusterActionHandler> handlerMap = handlerMapFactory
         .create();
-
-    ClusterAction bootstrapper = new ByonClusterAction(BOOTSTRAP_ACTION, getCompute(), handlerMap);
+    ClusterAction destroyer = new ByonClusterAction(DESTROY_ACTION,
+        getCompute(), handlerMap);
+    destroyer.execute(clusterSpec, null);
+  }
+  
+  /**
+   * Provisions the hardware for a BYON cluster.
+   */
+  @Override
+  public Cluster bootstrapCluster(ClusterSpec clusterSpec) throws IOException,
+      InterruptedException {
+    LoadingCache<String, ClusterActionHandler> handlerMap = handlerMapFactory
+        .create();
+    ClusterAction bootstrapper = new ByonClusterAction(BOOTSTRAP_ACTION,
+        getCompute(), handlerMap);
     Cluster cluster = bootstrapper.execute(clusterSpec, null);
-
-    ClusterAction configurer = new ByonClusterAction(CONFIGURE_ACTION, getCompute(), handlerMap);
-    cluster = configurer.execute(clusterSpec, cluster);
-
     getClusterStateStore(clusterSpec).save(cluster);
-    
     return cluster;
   }
 
-  public void destroyCluster(ClusterSpec clusterSpec) throws IOException,
-      InterruptedException {
+  /**
+   * Configures cluster services for a BYON cluster.
+   */
+  @Override
+  public Cluster configureServices(ClusterSpec clusterSpec, Cluster cluster,
+      Set<String> targetRoles, Set<String> targetInstanceIds)
+      throws IOException, InterruptedException {
     LoadingCache<String, ClusterActionHandler> handlerMap = handlerMapFactory
         .create();
-
-    ClusterAction destroyer = new ByonClusterAction(DESTROY_ACTION, getCompute(), handlerMap);
-    destroyer.execute(clusterSpec, null);
+    ClusterAction configurer = new ByonClusterAction(CONFIGURE_ACTION,
+        getCompute(), handlerMap);
+    cluster = configurer.execute(clusterSpec, cluster);
+    getClusterStateStore(clusterSpec).save(cluster);
+    return cluster;
   }
   
   public Map<? extends NodeMetadata, ExecResponse> runScriptOnNodesMatching(final ClusterSpec spec,

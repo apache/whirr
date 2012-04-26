@@ -210,7 +210,7 @@ public enum ComputeCache implements Function<ClusterSpec, ComputeServiceContext>
    * configurable properties, scoped to a provider.
    */
   public static final Iterable<String> PROVIDER_PROPERTIES = ImmutableSet.of(
-    "endpoint", "api", "apiversion", "iso3166-codes");
+    "endpoint", "api", "apiversion", "iso3166-codes","nodes");
 
   /**
    * Key class for the compute context cache

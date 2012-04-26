@@ -110,6 +110,9 @@ Trunk (unreleased changes)
 
     WHIRR-572. Ensure ZooKeeper data directories are created. (tomwhite)
 
+    WHIRR-494. Update the BYON cluster controller to support all the operations the 
+    regular controller supports (Cosmin Dumitrache via asavu)
+
 Release 0.7.1 - 2012-02-23
 
   IMPROVEMENTS
