@@ -48,8 +48,8 @@ public class WhirrServicesTest extends WhirrKarafTestSupport {
     executeCommand("features:install whirr-hama");
     executeCommand("features:install whirr-hbase");
     executeCommand("features:install whirr-puppet");
-    executeCommand("features:install whirr-mahout");
     executeCommand("features:install whirr-pig");
+    executeCommand("features:install whirr-mahout");
     executeCommand("features:install whirr-zookeeper");
 
     System.err.println(executeCommand("osgi:list"));
