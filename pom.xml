@@ -258,7 +258,7 @@
         <version>2.3</version>
         <configuration>
           <appendAssemblyId>false</appendAssemblyId>
-          <tarLongFileFormat>gnu</tarLongFileFormat>
+          <tarLongFileMode>gnu</tarLongFileMode>
           <descriptors>
             <descriptor>build-tools/src/assemble-bin.xml</descriptor>
           </descriptors>
@@ -272,7 +272,7 @@
           <dependency>
             <groupId>org.apache.whirr</groupId>
             <artifactId>whirr-build-tools</artifactId>
-            <version>${version}</version>
+            <version>${project.version}</version>
           </dependency>
         </dependencies>
         <executions>
@@ -772,7 +772,7 @@
                 <configuration>
                   <appendAssemblyId>true</appendAssemblyId>
                   <runOnlyAtExecutionRoot>true</runOnlyAtExecutionRoot>
-                  <tarLongFileFormat>gnu</tarLongFileFormat>
+                  <tarLongFileMode>gnu</tarLongFileMode>
                 </configuration>
               </execution>
             </executions>
