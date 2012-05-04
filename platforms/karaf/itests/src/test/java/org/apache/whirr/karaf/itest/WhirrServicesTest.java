@@ -19,6 +19,7 @@
 package org.apache.whirr.karaf.itest;
 
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openengsb.labs.paxexam.karaf.options.LogLevelOption;
@@ -33,6 +34,7 @@ import static org.openengsb.labs.paxexam.karaf.options.KarafDistributionOption.k
 import static org.openengsb.labs.paxexam.karaf.options.KarafDistributionOption.logLevel;
 import static org.ops4j.pax.exam.CoreOptions.scanFeatures;
 
+@Ignore
 @RunWith(JUnit4TestRunner.class)
 @ExamReactorStrategy(AllConfinedStagedReactorFactory.class)
 public class WhirrServicesTest extends WhirrKarafTestSupport {
