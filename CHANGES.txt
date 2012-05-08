@@ -13,6 +13,8 @@ Trunk (unreleased changes)
 
   IMPROVEMENTS
 
+    WHIRR-585. bin/whirr version command does not work (frankscholten)
+
     WHIRR-370. Templating for configuration files (kve)
 
     WHIRR-556. Improve the 'Running on $PROVIDER using $IDENTITY' message (kve)
