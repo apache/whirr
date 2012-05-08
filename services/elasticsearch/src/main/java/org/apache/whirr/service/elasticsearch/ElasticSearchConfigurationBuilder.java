@@ -94,8 +94,8 @@ public class ElasticSearchConfigurationBuilder {
     if (!config.containsKey("es.cloud.aws.secret_key")) {
       config.addProperty("es.cloud.aws.secret_key", spec.getCredential());
     }
-    if (!config.getList("es.plugins", Lists.newLinkedList()).contains("cloud-aws")) {
-      config.addProperty("es.plugins", "cloud-aws");
+    if (!config.getList("es.plugins", Lists.newLinkedList()).contains("elasticsearch/elasticsearch-cloud-aws/1.5.0")) {
+      config.addProperty("es.plugins", "elasticsearch/elasticsearch-cloud-aws/1.5.0");
     }
   }
 
