@@ -68,7 +68,7 @@ public class ElasticSearchConfigurationBuilderTest {
     Configuration config = ElasticSearchConfigurationBuilder.buildConfig(spec, null);
 
     assertThat(config.getStringArray("es.plugins"),
-      is(new String[]{"lang-javascript", "lang-python", "cloud-aws"}));
+      is(new String[]{"lang-javascript", "lang-python", "elasticsearch/elasticsearch-cloud-aws/1.5.0"}));
     assertThat(config.getString("es.discovery.type"), is("ec2"));
   }
 
