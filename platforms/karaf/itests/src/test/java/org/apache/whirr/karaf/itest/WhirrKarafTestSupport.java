@@ -254,6 +254,9 @@ public class WhirrKarafTestSupport {
 
         throw new RuntimeException("Gave up waiting for service " + flt);
       }
+
+      tracker.close();
+
       return svc;
 
     } catch (InvalidSyntaxException e) {

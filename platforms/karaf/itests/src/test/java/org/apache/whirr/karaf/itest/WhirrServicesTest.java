@@ -65,8 +65,8 @@ public class WhirrServicesTest extends WhirrKarafTestSupport {
     testService("hama-master", "hama-groomserver");
     testService("hbase-master", "hbase-regionserver", "hbase-restserver", "hbase-avroserver", "hbase-thriftserver");
     testService("puppet-install");
-    testService("mahout-client");
     testService("pig-client");
+    testService("mahout-client");
     testService("zookeeper");
   }
 
