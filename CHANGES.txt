@@ -4,6 +4,8 @@ Trunk (unreleased changes)
 
   NEW FEATURES
 
+    WHIRR-465. Add Solr as a service.
+
     WHIRR-500. Let users control which hardware is used for each 
     instance template (Karel Vervaeke via asavu)
 
