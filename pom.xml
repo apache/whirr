@@ -55,12 +55,14 @@
     <module>services/chef</module>
     <module>services/mahout</module>
     <module>services/pig</module>
+    <module>services/solr</module>
     <module>platforms/karaf</module>
   </modules>
 
   <properties>
     <commons.codec.version>1.6</commons.codec.version>
     <commons.configuration.version>1.7</commons.configuration.version>
+    <commons.compress.version>1.4</commons.compress.version>
     <commons.httpclient.version>3.1</commons.httpclient.version>
     <commons.io.version>1.4</commons.io.version>
     <common-ssl.version>0.3.11</common-ssl.version>
@@ -179,6 +181,11 @@
         <version>${commons.configuration.version}</version>
       </dependency>
       <dependency>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>commons-compress</artifactId>
+        <version>${commons.compress.version}</version>
+      </dependency>
+      <dependency>
         <groupId>commons-io</groupId>
         <artifactId>commons-io</artifactId>
         <version>${commons.io.version}</version>
@@ -187,6 +194,11 @@
         <groupId>commons-codec</groupId>
         <artifactId>commons-codec</artifactId>
         <version>${commons.codec.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>commons.compress.version</artifactId>
+        <version>${commons.compress.version}</version>
       </dependency>
       <dependency>
         <groupId>org.slf4j</groupId>
