@@ -92,6 +92,8 @@ Trunk (unreleased changes)
 
   BUG FIXES
 
+    WHIRR-582. Yarn service does not build in IntelliJ because of missing Hadoop test dependencies (Frank Scholten)
+
     WHIRR-555. Fix java install script: $(...) -> `...` (kve)
 
     WHIRR-473. HadoopServiceController.getInstance(String config) does 
