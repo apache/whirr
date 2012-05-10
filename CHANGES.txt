@@ -38,6 +38,8 @@ Release 0.7.2
 
   BUG FIXES
 
+    WHIRR-582. Yarn service does not build in IntelliJ because of missing Hadoop test dependencies (Frank Scholten)
+
     WHIRR-570. Site generation fails for YARN. (tomwhite)
 
     WHIRR-572. Ensure ZooKeeper data directories are created. (tomwhite)

@@ -224,7 +224,7 @@
         <version>2.2.2</version>
         <configuration>
           <appendAssemblyId>false</appendAssemblyId>
-          <tarLongFileFormat>gnu</tarLongFileFormat>
+          <tarLongFileMode>gnu</tarLongFileMode>
           <descriptors>
             <descriptor>build-tools/src/assemble-bin.xml</descriptor>
           </descriptors>
@@ -571,7 +571,7 @@
                 <configuration>
                   <appendAssemblyId>true</appendAssemblyId>
                   <runOnlyAtExecutionRoot>true</runOnlyAtExecutionRoot>
-                  <tarLongFileFormat>gnu</tarLongFileFormat>
+                  <tarLongFileMode>gnu</tarLongFileMode>
                 </configuration>
               </execution>
             </executions>
