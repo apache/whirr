@@ -121,6 +121,8 @@ Trunk (unreleased changes)
 
     WHIRR-590. ssh port timeout fails the whole cluster (Doug Daniels via asavu)
 
+    WHIRR-459. DNS Failure when trying to spawn HBase cluster (Alex Heneveld via asavu)
+
 Release 0.7.1 - 2012-02-23
 
   IMPROVEMENTS

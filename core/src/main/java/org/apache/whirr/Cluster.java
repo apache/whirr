@@ -30,6 +30,8 @@ import org.apache.whirr.net.DnsResolver;
 import org.apache.whirr.net.FastDnsResolver;
 import org.jclouds.compute.domain.NodeMetadata;
 import org.jclouds.domain.Credentials;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Predicate;
@@ -43,6 +45,8 @@ import com.google.common.net.InetAddresses;
  *
  */
 public class Cluster {
+
+  private static final Logger LOG = LoggerFactory.getLogger(Cluster.class);
 
   /**
    * This class represents a real node running in a cluster. An instance has
@@ -81,6 +85,9 @@ public class Cluster {
       this.id = checkNotNull(id, "id");
       this.nodeMetadata = nodeMetadata;
       this.dnsResolver = dnsResolver;
+      
+      LOG.debug("constructed instance {} with IP public {}, private {}, and DNS resolver {}", 
+              new Object[] { this, publicIp, privateIp, dnsResolver });
     }
 
     public Credentials getLoginCredentials() {
@@ -110,7 +117,13 @@ public class Cluster {
 
     public synchronized String getPublicHostName() throws IOException {
       if (publicHostName == null) {
+        LOG.debug("resolving public hostname of {} (public {}, private {})", new Object[] { this, publicIp, privateIp });
         publicHostName = dnsResolver.apply(publicIp);
+        LOG.debug("resolved public hostname of {} as {}", this, publicHostName);
+        if (publicHostName.matches("[0-9\\.]+") && nodeMetadata.getHostname()!=null && !nodeMetadata.getHostname().isEmpty()) {
+            LOG.debug("overriding public hostname of {} from {} (unresolved) to {}", new Object[] { this, publicHostName, nodeMetadata.getHostname() });
+            publicHostName = nodeMetadata.getHostname();
+        }
       }
       return publicHostName;
     }
@@ -121,7 +134,9 @@ public class Cluster {
 
     public synchronized String getPrivateHostName() throws IOException {
       if (privateHostName == null) {
+        LOG.debug("resolving private hostname of {} (public {}, private {})", new Object[] { this, publicIp, privateIp });
         privateHostName = dnsResolver.apply(privateIp);
+        LOG.debug("resolved private hostname of {} as {}", this, privateHostName);
       }
       return privateHostName;
     }

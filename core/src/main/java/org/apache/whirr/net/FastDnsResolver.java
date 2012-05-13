@@ -24,6 +24,8 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.SocketTimeoutException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xbill.DNS.DClass;
 import org.xbill.DNS.ExtendedResolver;
 import org.xbill.DNS.Message;
@@ -38,6 +40,9 @@ import org.xbill.DNS.Type;
  * Fast DNS resolver
  */
 public class FastDnsResolver implements DnsResolver {
+
+  private static final Logger LOG = LoggerFactory
+      .getLogger(FastDnsResolver.class);
 
   private int timeoutInSeconds;
 
@@ -70,8 +75,8 @@ public class FastDnsResolver implements DnsResolver {
 
       Record[] answers = response.getSectionArray(Section.ANSWER);
       if (answers.length == 0) {
+        LOG.warn("no answer to DNS resolution attempt for "+hostIp+"; using fallback");
         return fallback(hostIp);
-
       } else {
         String reverseAddress = answers[0].rdataToString();
         return reverseAddress.endsWith(".") ? reverseAddress.substring(0, reverseAddress.length() - 1) : reverseAddress;
@@ -80,7 +85,9 @@ public class FastDnsResolver implements DnsResolver {
       return hostIp;  /* same response as standard Java on timeout */
 
     } catch(IOException e) {
-      throw new DnsException(e);
+      // suggests eg firewall block DNS lookup or similar
+      LOG.warn("error in DNS resolution attempt for "+hostIp+" ("+e+"); using fallback");
+      return fallback(hostIp);
     }
   }
 

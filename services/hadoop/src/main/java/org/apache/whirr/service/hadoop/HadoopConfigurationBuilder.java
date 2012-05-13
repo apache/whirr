@@ -36,9 +36,13 @@ import org.apache.whirr.ClusterSpec;
 import org.jclouds.compute.domain.Hardware;
 import org.jclouds.compute.domain.Processor;
 import org.jclouds.scriptbuilder.domain.Statement;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class HadoopConfigurationBuilder {
-  
+ 
+  private static final Logger LOG = LoggerFactory.getLogger(HadoopConfigurationBuilder.class);
+ 
   private static final String WHIRR_HADOOP_DEFAULT_PROPERTIES =
     "whirr-hadoop-default.properties";
 
@@ -88,6 +92,7 @@ public class HadoopConfigurationBuilder {
 
     Instance namenode = cluster
         .getInstanceMatching(role(HadoopNameNodeClusterActionHandler.ROLE));
+    LOG.debug("hadoop building common configuration, with hostname "+namenode.getPublicHostName());
     config.setProperty("fs.default.name", String.format("hdfs://%s:8020/",
         namenode.getPublicHostName()));
     return config;
