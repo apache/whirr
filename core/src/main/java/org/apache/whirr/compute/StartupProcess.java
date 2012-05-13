@@ -134,15 +134,30 @@ public class StartupProcess implements Callable<Set<? extends NodeMetadata>> {
       Throwable th = e.getCause();
       if (th instanceof RunNodesException) {
         RunNodesException rnex = (RunNodesException) th;
-        successfulNodes.addAll(rnex.getSuccessfulNodes());
-        lostNodes.putAll(rnex.getNodeErrors());
+        addSuccessAndLostNodes(rnex);
       } else {
         LOG.error("Unexpected error while starting " + numberOfNodes + " nodes, minimum "
             + minNumberOfNodes + " nodes for " + roles + " of cluster " + clusterName, e);
       }
     }
   }
-
+  
+  void addSuccessAndLostNodes(RunNodesException rnex) {
+      // workaround https://code.google.com/p/jclouds/issues/detail?id=923
+      // by ensuring that any nodes in the "NodeErrors" do not get considered
+      // successful
+      Set<? extends NodeMetadata> reportedSuccessfulNodes = rnex.getSuccessfulNodes();
+      Map<? extends NodeMetadata, ? extends Throwable> errorNodesMap = rnex.getNodeErrors();
+      Set<? extends NodeMetadata> errorNodes = errorNodesMap.keySet();
+      
+      // "actual" successful nodes are ones that don't appear in the errorNodes 
+      Set<? extends NodeMetadata> actualSuccessfulNodes = 
+              Sets.difference(reportedSuccessfulNodes, errorNodes);
+      
+      successfulNodes.addAll(actualSuccessfulNodes);
+      lostNodes.putAll(errorNodesMap);
+  }
+  
   void cleanupFailedNodes() throws InterruptedException {
     if (lostNodes.size() > 0) {
       Set<String> lostIds = Sets.newLinkedHashSet();

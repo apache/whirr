@@ -119,6 +119,8 @@ Trunk (unreleased changes)
     WHIRR-494. Update the BYON cluster controller to support all the operations the 
     regular controller supports (Cosmin Dumitrache via asavu)
 
+    WHIRR-590. ssh port timeout fails the whole cluster (Doug Daniels via asavu)
+
 Release 0.7.1 - 2012-02-23
 
   IMPROVEMENTS
