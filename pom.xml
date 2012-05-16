@@ -56,7 +56,6 @@
     <module>services/mahout</module>
     <module>services/pig</module>
     <module>services/solr</module>
-    <module>platforms/karaf</module>
   </modules>
 
   <properties>
@@ -242,14 +241,6 @@
         <groupId>dnsjava</groupId>
         <artifactId>dnsjava</artifactId>
         <version>${dnsjava.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.whirr.karaf</groupId>
-        <artifactId>apache-whirr</artifactId>
-        <version>${project.version}</version>
-        <type>xml</type>
-        <classifier>features</classifier>
-        <scope>test</scope>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -801,6 +792,25 @@
       <modules>
         <module>services/voldemort</module>
       </modules>
+    </profile>
+    <profile>
+      <!-- Activate this profile to build & test OSGi support -->
+      <id>osgi</id>
+      <modules>
+        <module>platforms/karaf</module>
+      </modules>
+      <dependencyManagement>
+        <dependencies>
+          <dependency>
+            <groupId>org.apache.whirr.karaf</groupId>
+            <artifactId>apache-whirr</artifactId>
+            <version>${project.version}</version>
+            <type>xml</type>
+            <classifier>features</classifier>
+            <scope>test</scope>
+          </dependency>
+        </dependencies>
+      </dependencyManagement>
     </profile>
   </profiles>
 </project>

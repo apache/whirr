@@ -90,6 +90,8 @@ Trunk (unreleased changes)
 
     WHIRR-504. Upgrade to jclouds 1.4.0 (Adrian Cole, Andrei Savu)
 
+    WHIRR-591. Maven profile for Karaf itests (inactive by default) (asavu)
+
   BUG FIXES
 
     WHIRR-582. Yarn service does not build in IntelliJ because of missing Hadoop test dependencies (Frank Scholten)
