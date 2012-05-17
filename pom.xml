@@ -74,7 +74,7 @@
     <jackson.version>1.5.2</jackson.version>
     <jclouds.version>1.4.0</jclouds.version>
     <jdom.version>1.1</jdom.version>
-    <jopt.simple.version>3.2</jopt.simple.version>
+    <jopt.simple.version>4.3</jopt.simple.version>
     <jsch.version>0.1.44-1</jsch.version>
     <junit.version>4.8.1</junit.version>
     <log4j.version>1.2.16</log4j.version>

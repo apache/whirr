@@ -92,6 +92,8 @@ Trunk (unreleased changes)
 
     WHIRR-591. Maven profile for Karaf itests (inactive by default) (asavu)
 
+    WHIRR-587. Update version of jopt-simple (from 3.2 to 4.3) (asavu)
+
   BUG FIXES
 
     WHIRR-582. Yarn service does not build in IntelliJ because of missing Hadoop test dependencies (Frank Scholten)
