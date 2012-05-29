@@ -127,6 +127,8 @@ Trunk (unreleased changes)
 
     WHIRR-459. DNS Failure when trying to spawn HBase cluster (Alex Heneveld via asavu)
 
+    WHIRR-511. Instance.getPrivateHostName returns an IP address (asavu)
+
 Release 0.7.1 - 2012-02-23
 
   IMPROVEMENTS

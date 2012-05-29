@@ -85,8 +85,8 @@ public class Cluster {
       this.id = checkNotNull(id, "id");
       this.nodeMetadata = nodeMetadata;
       this.dnsResolver = dnsResolver;
-      
-      LOG.debug("constructed instance {} with IP public {}, private {}, and DNS resolver {}", 
+
+      LOG.debug("constructed instance {} with IP public {}, private {}, and DNS resolver {}",
               new Object[] { this, publicIp, privateIp, dnsResolver });
     }
 
@@ -132,13 +132,12 @@ public class Cluster {
       return privateIp;
     }
 
+    /**
+     * TODO Remove in version 0.9.0
+     */
+    @Deprecated
     public synchronized String getPrivateHostName() throws IOException {
-      if (privateHostName == null) {
-        LOG.debug("resolving private hostname of {} (public {}, private {})", new Object[] { this, publicIp, privateIp });
-        privateHostName = dnsResolver.apply(privateIp);
-        LOG.debug("resolved private hostname of {} as {}", this, privateHostName);
-      }
-      return privateHostName;
+      return privateIp;
     }
 
     public String getId() {

@@ -46,19 +46,19 @@ import com.google.common.collect.Sets;
 public class FirewallManager {
 
   public static class Rule {
-    
+
     public static Rule create() {
       return new Rule();
     }
-    
+
     private String source;
     private Set<Instance> destinations;
     private Predicate<Instance> destinationPredicate;
     private int[] ports;
-    
+
     private Rule() {
     }
-    
+
     /**
      * @param source The allowed source IP for traffic. If not set, this will
      * default to {@link ClusterSpec#getClientCidrs()}, or, if that is not set,
@@ -68,7 +68,7 @@ public class FirewallManager {
       this.source = source;
       return this;
     }
-    
+
     /**
      * @param destination The allowed destination instance.
      */
@@ -76,7 +76,7 @@ public class FirewallManager {
       this.destinations = Collections.singleton(destination);
       return this;
     }
-    
+
     /**
      * @param destinations The allowed destination instances.
      */
@@ -84,7 +84,7 @@ public class FirewallManager {
       this.destinations = destinations;
       return this;
     }
-    
+
     /**
      * @param destinationPredicate A predicate which is used to evaluate the
      * allowed destination instances.
@@ -93,7 +93,7 @@ public class FirewallManager {
       this.destinationPredicate = destinationPredicate;
       return this;
     }
-    
+
     /**
      * @param port The port on the destination which is to be opened. Overrides
      * any previous calls to {@link #port(int)} or {@link #ports(int...)}.
@@ -102,7 +102,7 @@ public class FirewallManager {
       this.ports = new int[] { port };
       return this;
     }
-    
+
     /**
      * @param ports The ports on the destination which are to be opened.
      * Overrides
@@ -139,14 +139,14 @@ public class FirewallManager {
       addRule(rule);
     }
   }
-  
+
   /**
    * Rules are additive. If no source is set then it will default
    * to {@link ClusterSpec#getClientCidrs()}, or, if that is not set,
    * to the client's originating IP. If no destinations or ports
    * are set then the rule has not effect.
    *
-   * @param rule The rule to add to the firewall. 
+   * @param rule The rule to add to the firewall.
    * @throws IOException
    */
   public void addRule(Rule rule) throws IOException {
@@ -187,6 +187,10 @@ public class FirewallManager {
    * @throws IOException
    */
   private String getOriginatingIp() throws IOException {
+    if ("stub".equals(clusterSpec.getProvider())) {
+      return "62.217.232.123";
+    }
+
     URL url = new URL("http://checkip.amazonaws.com/");
     HttpURLConnection connection = (HttpURLConnection) url.openConnection();
     connection.connect();

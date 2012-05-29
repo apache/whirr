@@ -10,7 +10,7 @@
 ##   See the License for the specific language governing permissions and
 ##   limitations under the License.
 ##
-#set( $GMETAD_HOST = $cluster.getInstancesMatching($RolePredicates.role("ganglia-metad")).iterator().next().getPrivateHostName() )
+#set( $GMETAD_HOST = $cluster.getInstancesMatching($RolePredicates.role("ganglia-metad")).iterator().next().getPrivateIp() )
 dfs.class=org.apache.hadoop.metrics.ganglia.GangliaContext31
 dfs.period=10
 dfs.servers=$GMETAD_HOST:8649
