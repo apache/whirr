@@ -16,8 +16,8 @@
 #
 function install_cassandra() {
 
-  C_MAJOR_VERSION=${1:-1.0}
-  C_TAR_URL=${2:-http://apache.osuosl.org/cassandra/1.0.8/apache-cassandra-1.0.8-bin.tar.gz}
+  C_MAJOR_VERSION=${1:-1.1}
+  C_TAR_URL=${2:-http://apache.osuosl.org/cassandra/1.1.2/apache-cassandra-1.1.2-bin.tar.gz}
  
   c_tar_file=`basename $C_TAR_URL`
   c_tar_dir=`echo $c_tar_file | awk -F '-bin' '{print $1}'`
