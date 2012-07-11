@@ -94,6 +94,9 @@ Trunk (unreleased changes)
 
     WHIRR-587. Update version of jopt-simple (from 3.2 to 4.3) (asavu)
 
+    WHIRR-428. Always match a stable Canonical AMI on AWS EC2.
+    (Andrew Bayer via tomwhite)
+
   BUG FIXES
 
     WHIRR-582. Yarn service does not build in IntelliJ because of missing Hadoop test dependencies (Frank Scholten)

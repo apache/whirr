@@ -42,7 +42,7 @@ public class TemplateBuilderStrategy {
 
       // canonical images, but not testing ones
       if ("aws-ec2".equals(clusterSpec.getProvider()))
-        templateBuilder.imageDescriptionMatches("ubuntu-images/");
+          templateBuilder.imageDescriptionMatches("^(?!.*(daily|testing)).*ubuntu-images.*$");
     }
     
     if (clusterSpec.getHardwareId() != null || instanceTemplate.getHardwareId() != null) {
