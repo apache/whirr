@@ -135,6 +135,9 @@ Trunk (unreleased changes)
     WHIRR-568. Use the correct CDH version/repository.
     (Andrew Bayer via tomwhite)
 
+    WHIRR-584. Change confusing ssh login help message at the end of
+    deployment. (Andrew Bayer via tomwhite)
+
 Release 0.7.1 - 2012-02-23
 
   IMPROVEMENTS
