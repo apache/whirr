@@ -54,6 +54,8 @@ Release 0.7.2
     WHIRR-599. Whirr CDH4 CDHHadoopServiceTest.testVersion() is broken.
     (Andrew Bayer via tomwhite)
 
+    WHIRR-600. Bump up CDH4 Maven dependencies. (Andrew Bayer via tomwhite)
+
 Release 0.7.1 - 2012-02-23
 
   IMPROVEMENTS
