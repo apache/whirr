@@ -103,7 +103,7 @@ public class CdhHadoopServiceTest {
 
   @Test
   public void testVersion() throws Exception {
-    Statement checkVersion = Statements.exec("ls /etc/alternatives/hadoop-lib");
+    Statement checkVersion = Statements.exec("cat /usr/lib/hadoop/cloudera/cdh_version.properties");
     Map<? extends NodeMetadata, ExecResponse> responses =
        controller.runScriptOnNodesMatching(clusterSpec, ALL, checkVersion);
 

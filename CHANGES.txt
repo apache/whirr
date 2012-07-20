@@ -51,6 +51,9 @@ Release 0.7.2
     WHIRR-568. Use the correct CDH version/repository.
     (Andrew Bayer via tomwhite)
 
+    WHIRR-599. Whirr CDH4 CDHHadoopServiceTest.testVersion() is broken.
+    (Andrew Bayer via tomwhite)
+
 Release 0.7.1 - 2012-02-23
 
   IMPROVEMENTS
