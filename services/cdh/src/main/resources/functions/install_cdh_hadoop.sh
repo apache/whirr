@@ -19,12 +19,20 @@ function register_cloudera_repo() {
   CDH_MAJOR_VERSION=$(echo $REPO | sed -e 's/cdh\([0-9]\).*/\1/')
   CDH_VERSION=$(echo $REPO | sed -e 's/cdh\([0-9][0-9]*\)/\1/')
   if which dpkg &> /dev/null; then
-    cat > /etc/apt/sources.list.d/cloudera.list <<EOF
+    if [ $CDH_MAJOR_VERSION = "4" ]; then
+      cat > /etc/apt/sources.list.d/cloudera-cdh4.list <<EOF
+deb http://archive.cloudera.com/cdh4/ubuntu/lucid/amd64/cdh lucid-cdh4 contrib
+deb-src http://archive.cloudera.com/cdh4/ubuntu/lucid/amd64/cdh lucid-cdh4 contrib
+EOF
+      curl -s http://archive.cloudera.com/cdh4/ubuntu/lucid/amd64/cdh/archive.key | apt-key add -
+    else
+      cat > /etc/apt/sources.list.d/cloudera-$REPO.list <<EOF
 deb http://archive.cloudera.com/debian lucid-$REPO contrib
 deb-src http://archive.cloudera.com/debian lucid-$REPO contrib
 EOF
-    curl -s http://archive.cloudera.com/debian/archive.key | apt-key add -
-    retry_apt_get -y update
+      curl -s http://archive.cloudera.com/debian/archive.key | sudo apt-key add -
+    fi
+    sudo apt-get -y update
   elif which rpm &> /dev/null; then
     rm -f /etc/yum.repos.d/cloudera*.repo
     if [ $CDH_MAJOR_VERSION = "4" ]; then
@@ -45,7 +53,7 @@ gpgkey = http://archive.cloudera.com/redhat/cdh/RPM-GPG-KEY-cloudera
 gpgcheck = 0
 EOF
     fi
-    retry_yum update -y yum
+    yum update -y yum
   fi
 }
 
