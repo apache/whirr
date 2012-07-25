@@ -143,6 +143,8 @@ Trunk (unreleased changes)
 
     WHIRR-600. Bump up CDH4 Maven dependencies. (Andrew Bayer via tomwhite)
 
+    WHIRR-601. Cassandra 1.0.8 download URL no longer valid (Andrew Bayer via asavu)
+
 Release 0.7.1 - 2012-02-23
 
   IMPROVEMENTS
