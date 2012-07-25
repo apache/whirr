@@ -19,8 +19,13 @@
 package org.apache.whirr.cli.command;
 
 import com.google.common.collect.ImmutableSet;
+
 import org.apache.whirr.ClusterControllerFactory;
 import org.apache.whirr.command.AbstractClusterCommand;
+import org.jclouds.apis.ApiMetadata;
+import org.jclouds.apis.Apis;
+import org.jclouds.blobstore.BlobStoreContext;
+import org.jclouds.compute.ComputeServiceContext;
 import org.jclouds.providers.ProviderMetadata;
 import org.jclouds.providers.Providers;
 
@@ -74,21 +79,37 @@ public class ListProvidersCommand extends AbstractClusterCommand {
 
       out.println("\tHomepage: " + blobstore.getHomepage());
       out.println("\tConsole: " + blobstore.getConsole());
-      out.println("\tAPI: " + blobstore.getApiDocumentation());
+      out.println("\tAPI: " + blobstore.getApiMetadata().getDocumentation());
 
       out.println("\tConfiguration options:");
 
       out.println("\t\twhirr.blobstore-provider = " + blobstore.getId());
-      out.println("\t\twhirr.blobstore-identity = <" + blobstore.getIdentityName() +">");
-      out.println("\t\twhirr.blobstore-credential = <" + blobstore.getCredentialName() + ">\n");
+      out.println("\t\twhirr.blobstore-identity = <" + blobstore.getApiMetadata().getIdentityName() +">");
+      out.println("\t\twhirr.blobstore-credential = <" + blobstore.getApiMetadata().getCredentialName().or("UNUSED") + ">\n");
     }
   }
 
+  public void listBlobstoreApis(Iterable<ApiMetadata> blobstoreApis, PrintStream out) {
+    for(ApiMetadata blobstore : blobstoreApis) {
+      out.println("* " + blobstore.getName());
+
+      out.println("\tAPI: " + blobstore.getDocumentation());
+
+      out.println("\tConfiguration options:");
+
+      out.println("\t\twhirr.blobstore-provider = " + blobstore.getId());
+      out.println("\t\twhirr.blobstore-endpoint = " + blobstore.getEndpointName());
+      out.println("\t\twhirr.blobstore-identity = <" + blobstore.getIdentityName() +">");
+      out.println("\t\twhirr.blobstore-credential = <" + blobstore.getCredentialName().or("UNUSED") + ">\n");
+    }
+  }
+ 
   private void listBlobstoreProviders(PrintStream out) {
-    listBlobstoreProviders(Providers.allBlobStore(),out);
+    listBlobstoreProviders(Providers.viewableAs(BlobStoreContext.class), out);
+    listBlobstoreApis(Apis.viewableAs(BlobStoreContext.class), out);
   }
 
-  public void listComputeProviders(Iterable<ProviderMetadata> computeProviders,PrintStream out) {
+  public void listComputeProviders(Iterable<ProviderMetadata> computeProviders, PrintStream out) {
     for(ProviderMetadata provider : computeProviders) {
       if (testedComputeProviders.contains(provider.getId())) {
         out.println("* " + provider.getName() + " - tested");
@@ -98,17 +119,36 @@ public class ListProvidersCommand extends AbstractClusterCommand {
 
       out.println("\tHomepage: " + provider.getHomepage());
       out.println("\tConsole: " + provider.getConsole());
-      out.println("\tAPI: " + provider.getApiDocumentation());
+      out.println("\tAPI: " + provider.getApiMetadata().getDocumentation());
 
       out.println("\tConfiguration options:");
 
       out.println("\t\twhirr.provider = " + provider.getId());
-      out.println("\t\twhirr.identity =  <" + provider.getIdentityName() + ">");
-      out.println("\t\twhirr.credential = <" + provider.getCredentialName() + ">\n");
+      out.println("\t\twhirr.identity =  <" + provider.getApiMetadata().getIdentityName() +">");
+      out.println("\t\twhirr.credential = <" + provider.getApiMetadata().getCredentialName().or("UNUSED") + ">\n");
+    }
+  }
+  
+  public void listComputeApis(Iterable<ApiMetadata> computeApis, PrintStream out) {
+    for(ApiMetadata api : computeApis) {
+      if (testedComputeProviders.contains(api.getId())) {
+        out.println("* " + api.getName() + " - tested");
+      } else {
+        out.println("* " + api.getName());
+      }
+
+      out.println("\tAPI: " + api.getDocumentation());
+
+      out.println("\tConfiguration options:");
+
+      out.println("\t\twhirr.provider = " + api.getId());
+      out.println("\t\twhirr.endpoint = " + api.getEndpointName());
+      out.println("\t\twhirr.identity =  <" + api.getIdentityName() +">");
+      out.println("\t\twhirr.credential = <" + api.getCredentialName().or("UNUSED") + ">\n");
     }
   }
 
   private void listComputeProviders(PrintStream out) {
-    listComputeProviders(Providers.allCompute(),out);
+    listComputeProviders(Providers.viewableAs(ComputeServiceContext.class), out);
   }
 }

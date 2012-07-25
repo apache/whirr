@@ -43,7 +43,6 @@ import org.jclouds.compute.RunScriptOnNodesException;
 import org.jclouds.compute.domain.ComputeMetadata;
 import org.jclouds.compute.domain.ExecResponse;
 import org.jclouds.compute.domain.NodeMetadata;
-import org.jclouds.compute.domain.NodeState;
 import org.jclouds.compute.options.RunScriptOptions;
 import org.jclouds.domain.Credentials;
 import org.jclouds.domain.LoginCredentials;
@@ -264,7 +263,7 @@ public class ClusterController {
     RunScriptOptions options) throws IOException, RunScriptOnNodesException {
 
     LoginCredentials credentials = LoginCredentials.builder()
-      .user(spec.getClusterUser()).privateKey(spec.getPrivateKey()).build();
+        .user(spec.getClusterUser()).privateKey(spec.getPrivateKey()).build();
 
     if (options == null) {
       options = defaultRunScriptOptionsForSpec(spec);
@@ -281,7 +280,7 @@ public class ClusterController {
 
   public RunScriptOptions defaultRunScriptOptionsForSpec(ClusterSpec spec) {
     LoginCredentials credentials = LoginCredentials.builder()
-      .user(spec.getClusterUser()).privateKey(spec.getPrivateKey()).build();
+        .user(spec.getClusterUser()).privateKey(spec.getPrivateKey()).build();
     return overrideLoginCredentials(credentials).wrapInInitScript(false)
       .runAsRoot(false);
   }
@@ -345,7 +344,7 @@ public class ClusterController {
         if (computeMetadata instanceof NodeMetadata) {
           NodeMetadata nodeMetadata = (NodeMetadata) computeMetadata;
           return group.equals(nodeMetadata.getGroup())
-            && nodeMetadata.getState() == NodeState.RUNNING;
+            && nodeMetadata.getStatus() == NodeMetadata.Status.RUNNING;
         }
         return false;
       }

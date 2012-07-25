@@ -163,7 +163,7 @@ public abstract class ScriptBasedClusterAction extends ClusterAction {
     final ClusterSpec clusterSpec = eventMap.values().iterator().next().getClusterSpec();
 
     final RunScriptOptions options = overrideLoginCredentials(LoginCredentials.builder().user(clusterSpec.getClusterUser())
-          .privateKey(clusterSpec.getPrivateKey()).build());
+                                                              .privateKey(clusterSpec.getPrivateKey()).build());
     for (Map.Entry<InstanceTemplate, ClusterActionEvent> entry : eventMap.entrySet()) {
       if (shouldIgnoreInstanceTemplate(entry.getKey())) {
         continue; // skip if not in the target

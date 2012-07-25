@@ -18,20 +18,27 @@
 
 package org.apache.whirr.service;
 
+import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationConverter;
 import org.apache.whirr.ClusterSpec;
+import org.jclouds.Context;
+import org.jclouds.ContextBuilder;
+import org.jclouds.apis.ApiMetadata;
+import org.jclouds.apis.Apis;
 import org.jclouds.blobstore.AsyncBlobStore;
 import org.jclouds.blobstore.BlobMap;
 import org.jclouds.blobstore.BlobRequestSigner;
 import org.jclouds.blobstore.BlobStore;
 import org.jclouds.blobstore.BlobStoreContext;
-import org.jclouds.blobstore.BlobStoreContextFactory;
 import org.jclouds.blobstore.InputStreamMap;
 import org.jclouds.blobstore.attr.ConsistencyModel;
 import org.jclouds.blobstore.options.ListContainerOptions;
+import org.jclouds.enterprise.config.EnterpriseConfigurationModule;
+import org.jclouds.logging.slf4j.config.SLF4JLoggingModule;
 import org.jclouds.providers.ProviderMetadata;
 import org.jclouds.providers.Providers;
 import org.jclouds.rest.RestContext;
@@ -48,6 +55,8 @@ import com.google.common.cache.LoadingCache;
 import com.google.common.collect.ForwardingObject;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Maps;
+import com.google.common.reflect.TypeToken;
 import com.google.inject.Module;
 
 public class BlobStoreContextBuilder {
@@ -67,14 +76,17 @@ public class BlobStoreContextBuilder {
     @VisibleForTesting
     final LoadingCache<Key, BlobStoreContext> cache = CacheBuilder.newBuilder().build(
        new CacheLoader<Key, BlobStoreContext>(){
-        private final BlobStoreContextFactory factory =  new BlobStoreContextFactory();
         
         @Override
         public BlobStoreContext load(Key arg0) {
           LOG.debug("creating new BlobStoreContext {}", arg0);
           BlobStoreContext context = new IgnoreCloseBlobStoreContext(
-              factory.createContext(arg0.provider, arg0.identity, arg0.credential,
-                                    ImmutableSet.<Module>of(), arg0.overrides));
+              ContextBuilder.newBuilder(arg0.provider)
+                            .credentials(arg0.identity, arg0.credential)
+                            .overrides(arg0.overrides)
+                            .modules(ImmutableSet.<Module>of(new SLF4JLoggingModule(), 
+                                                  new EnterpriseConfigurationModule()))
+                            .buildView(BlobStoreContext.class));
           LOG.info("created new BlobStoreContext {}", context);
           return context;
        }
@@ -149,6 +161,7 @@ public class BlobStoreContextBuilder {
     }
 
     @Override
+    @Deprecated
     public <S, A> RestContext<S, A> getProviderSpecificContext() {
       return delegate().getProviderSpecificContext();
     }
@@ -165,30 +178,30 @@ public class BlobStoreContextBuilder {
 
     @Override
     public void close() {
-      // ignore; closed by shutdown hook
+       /* Do nothing. The instance is closed by the builder */
+    }
+
+    @Override
+    public TypeToken<?> getBackendType() {
+      return delegate().getBackendType();
+    }
+
+    @Override
+    public <C extends Context> C unwrap(TypeToken<C> type) {
+      return delegate().unwrap(type);
+    }
+
+    @Override
+    public <C extends Context> C unwrap(Class<C> clazz) {
+      return delegate().unwrap(clazz);
+    }
+
+    @Override
+    public <C extends Context> C unwrap() {
+      return delegate().unwrap();
     }
 
   }
-
-  /**
-   * All APIs that are independently configurable.
-   * @see <a href="http://code.google.com/p/jclouds/issues/detail?id=657" />
-   */
-  public static final Iterable<String> BLOBSTORE_APIS = ImmutableSet.of("transient", "file", "swift", "walrus",
-      "atmos", "aws-s3", "cloudfiles-us", "cloudfiles-uk");
-
-  /**
-   *  jclouds providers and apis that can be used in BlobStoreContextFactory
-   */
-  public static final Iterable<String> BLOBSTORE_KEYS = Iterables.concat(
-      Iterables.transform(Providers.allCompute(), new Function<ProviderMetadata, String>() {
-
-        @Override
-        public String apply(ProviderMetadata input) {
-          return input.getId();
-        }
-
-      }), BLOBSTORE_APIS);
 
   /**
    * configurable properties, scoped to a provider.
@@ -205,7 +218,15 @@ public class BlobStoreContextBuilder {
     private final String credential;
     private final String key;
     private final Properties overrides;
-
+    
+    public static final Map<String, ApiMetadata> BLOBSTORE_APIS = Maps.uniqueIndex(Apis.viewableAs(BlobStoreContext.class),
+        Apis.idFunction());
+     
+    public static final Map<String, ProviderMetadata> BLOBSTORE_PROVIDERS = Maps.uniqueIndex(Providers.viewableAs(BlobStoreContext.class),
+        Providers.idFunction());
+     
+    public static final Set<String> BLOBSTORE_KEYS = ImmutableSet.copyOf(Iterables.concat(BLOBSTORE_PROVIDERS.keySet(), BLOBSTORE_APIS.keySet()));
+     
     public Key(ClusterSpec spec) {
       provider = spec.getBlobStoreProvider();
       identity = spec.getBlobStoreIdentity();
