@@ -158,7 +158,7 @@ public class ByonClusterAction extends ScriptBasedClusterAction {
         new Function<NodeMetadata, Instance>() {
           @Override
           public Instance apply(NodeMetadata node) {
-            String publicIp = get(node.getPublicAddresses(), 0);
+            String publicIp = get(node.getPublicAddresses().size() > 0 ? node.getPublicAddresses() : node.getPrivateAddresses(), 0);
             return new Instance(
                 credentials, roles, publicIp, publicIp, node.getId(), node
             );

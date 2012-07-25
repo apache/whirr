@@ -331,7 +331,7 @@ public class ClusterController {
     }
 
     return new Cluster.Instance(credentials, roles,
-      Iterables.getFirst(metadata.getPublicAddresses(), null),
+      Iterables.getFirst(metadata.getPublicAddresses().size() > 0 ? metadata.getPublicAddresses() : metadata.getPrivateAddresses(), null),
       Iterables.getFirst(metadata.getPrivateAddresses(), null),
       metadata.getId(), metadata);
   }
