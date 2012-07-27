@@ -94,6 +94,9 @@ Trunk (unreleased changes)
 
     WHIRR-587. Update version of jopt-simple (from 3.2 to 4.3) (asavu)
 
+    WHIRR-428. Always match a stable Canonical AMI on AWS EC2.
+    (Andrew Bayer via tomwhite)
+
   BUG FIXES
 
     WHIRR-582. Yarn service does not build in IntelliJ because of missing Hadoop test dependencies (Frank Scholten)
@@ -128,6 +131,21 @@ Trunk (unreleased changes)
     WHIRR-459. DNS Failure when trying to spawn HBase cluster (Alex Heneveld via asavu)
 
     WHIRR-511. Instance.getPrivateHostName returns an IP address (asavu)
+
+    WHIRR-568. Use the correct CDH version/repository.
+    (Andrew Bayer via tomwhite)
+
+    WHIRR-584. Change confusing ssh login help message at the end of
+    deployment. (Andrew Bayer via tomwhite)
+
+    WHIRR-599. Whirr CDH4 CDHHadoopServiceTest.testVersion() is broken.
+    (Andrew Bayer via tomwhite)
+
+    WHIRR-600. Bump up CDH4 Maven dependencies. (Andrew Bayer via tomwhite)
+
+    WHIRR-601. Cassandra 1.0.8 download URL no longer valid (Andrew Bayer via asavu)
+
+    WHIRR-602. Cloud providers may only return "private" IPs (Andrew Bayer via asavu)
 
 Release 0.7.1 - 2012-02-23
 

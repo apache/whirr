@@ -31,6 +31,7 @@ import org.apache.whirr.Cluster.Instance;
 import org.apache.whirr.ClusterSpec;
 import org.jclouds.aws.util.AWSUtils;
 import org.jclouds.compute.ComputeServiceContext;
+import org.jclouds.ec2.EC2ApiMetadata;
 import org.jclouds.ec2.EC2Client;
 import org.jclouds.ec2.domain.IpProtocol;
 import org.jclouds.javax.annotation.Nullable;
@@ -200,15 +201,13 @@ public class FirewallManager {
   public static void authorizeIngress(ComputeServiceContext computeServiceContext,
       Set<Instance> instances, ClusterSpec clusterSpec, List<String> cidrs, int... ports) {
 
-    if (computeServiceContext.getProviderSpecificContext().getApi() instanceof
-      EC2Client) {
+    if (EC2ApiMetadata.CONTEXT_TOKEN.isAssignableFrom(computeServiceContext.getBackendType())) {
       // This code (or something like it) may be added to jclouds (see
       // http://code.google.com/p/jclouds/issues/detail?id=336).
       // Until then we need this temporary workaround.
       String region = AWSUtils.parseHandle(Iterables.get(instances, 0).getId())[0];
-      EC2Client ec2Client = EC2Client.class.cast(
-          computeServiceContext.getProviderSpecificContext().getApi());
-      String groupName = "jclouds#" + clusterSpec.getClusterName() + "#" + region;
+      EC2Client ec2Client = computeServiceContext.unwrap(EC2ApiMetadata.CONTEXT_TOKEN).getApi();
+      String groupName = "jclouds#" + clusterSpec.getClusterName();
       for (String cidr : cidrs) {
         for (int port : ports) {
           try {

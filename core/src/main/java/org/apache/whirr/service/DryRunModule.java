@@ -37,6 +37,7 @@ import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import org.jclouds.compute.domain.ExecChannel;
 import org.jclouds.compute.domain.ExecResponse;
 import org.jclouds.compute.domain.NodeMetadata;
 import org.jclouds.compute.events.StatementOnNode;
@@ -46,7 +47,6 @@ import org.jclouds.domain.Credentials;
 import org.jclouds.domain.LoginCredentials;
 import org.jclouds.io.Payload;
 import org.jclouds.io.payloads.StringPayload;
-import org.jclouds.net.IPSocket;
 import org.jclouds.scriptbuilder.domain.Statement;
 import org.jclouds.ssh.SshClient;
 import org.slf4j.Logger;
@@ -65,6 +65,7 @@ import com.google.common.collect.Maps;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.common.io.InputSupplier;
+import com.google.common.net.HostAndPort;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 
@@ -126,11 +127,11 @@ public class DryRunModule extends AbstractModule {
   }
   
   private static class Key {
-    private final IPSocket socket;
+    private final HostAndPort socket;
     private final Credentials creds;
     private final NodeMetadata node;
 
-    Key(IPSocket socket, Credentials creds, @Nullable NodeMetadata node) {
+    Key(HostAndPort socket, Credentials creds, @Nullable NodeMetadata node) {
       this.socket = socket;
       this.creds = creds;
       this.node = node;
@@ -153,7 +154,7 @@ public class DryRunModule extends AbstractModule {
     @Override
     public String toString() {
       return String.format("%s#%s@%s:%d", node.getName(), creds.identity,
-          socket.getAddress(), socket.getPort());
+          socket.getHostText(), socket.getPort());
     }
   }
 
@@ -203,15 +204,15 @@ public class DryRunModule extends AbstractModule {
       }
 
       @Override
-      public SshClient create(final IPSocket socket, Credentials loginCreds) {
+      public SshClient create(final HostAndPort socket, Credentials loginCreds) {
         return clientMap.getUnchecked(new Key(socket, loginCreds, find(nodes.values(),
-            new NodeHasAddress(socket.getAddress()))));
+            new NodeHasAddress(socket.getHostText()))));
       }
 
       @Override
-      public SshClient create(IPSocket socket, LoginCredentials credentials) {
+      public SshClient create(HostAndPort socket, LoginCredentials credentials) {
         return clientMap.getUnchecked(new Key(socket, credentials, find(nodes.values(),
-            new NodeHasAddress(socket.getAddress()))));
+            new NodeHasAddress(socket.getHostText()))));
       }
     }
 
@@ -271,7 +272,7 @@ public class DryRunModule extends AbstractModule {
 
     @Override
     public String getHostAddress() {
-      return key.socket.getAddress();
+      return key.socket.getHostText();
     }
 
     @Override
@@ -307,6 +308,11 @@ public class DryRunModule extends AbstractModule {
     public void put(String path, String text) {
       put(path, new StringPayload(text));
     }
+
+   @Override
+   public ExecChannel execChannel(String command) {
+      throw new UnsupportedOperationException();
+   }
   }
 
   public static String md5Hex(String in) {

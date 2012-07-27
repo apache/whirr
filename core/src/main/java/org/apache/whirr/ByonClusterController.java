@@ -35,7 +35,6 @@ import org.jclouds.compute.ComputeServiceContext;
 import org.jclouds.compute.RunScriptOnNodesException;
 import org.jclouds.compute.domain.ExecResponse;
 import org.jclouds.compute.domain.NodeMetadata;
-import org.jclouds.compute.domain.NodeState;
 import org.jclouds.compute.options.RunScriptOptions;
 import org.jclouds.scriptbuilder.domain.Statement;
 
@@ -123,7 +122,7 @@ public class ByonClusterController extends ClusterController {
     return new Predicate<NodeMetadata>() {
       @Override
       public boolean apply(final NodeMetadata nodeMetadata) {
-        return instanceIds.contains(nodeMetadata.getId()) && nodeMetadata.getState().equals(NodeState.RUNNING);
+        return instanceIds.contains(nodeMetadata.getId()) && nodeMetadata.getStatus().equals(NodeMetadata.Status.RUNNING);
       }
     };
   }

@@ -30,6 +30,7 @@ import org.apache.whirr.service.FirewallManager;
 import org.apache.whirr.service.FirewallManager.Rule;
 import org.jclouds.compute.ComputeServiceContext;
 import org.jclouds.domain.Credentials;
+import org.jclouds.ec2.EC2ApiMetadata;
 import org.jclouds.ec2.EC2Client;
 import org.junit.Before;
 import org.junit.Test;
@@ -71,10 +72,10 @@ public class FirewallManagerTest {
 
   @Test(timeout = TestConstants.ITEST_TIMEOUT)
   public void testFirewallAuthorizationIsIdempotent() throws IOException {
-    if (context.getProviderSpecificContext().getApi() instanceof EC2Client) {
-      EC2Client ec2Client = EC2Client.class.cast(
-          context.getProviderSpecificContext().getApi());
-      String groupName = "jclouds#" + clusterSpec.getClusterName() + "#" + region;
+    if (EC2ApiMetadata.CONTEXT_TOKEN.isAssignableFrom(context.getBackendType())) {
+      EC2Client ec2Client = context.unwrap(EC2ApiMetadata.CONTEXT_TOKEN).getApi();
+
+      String groupName = "jclouds#" + clusterSpec.getClusterName();
 
       ec2Client.getSecurityGroupServices()
           .createSecurityGroupInRegion(region, groupName, "group description");

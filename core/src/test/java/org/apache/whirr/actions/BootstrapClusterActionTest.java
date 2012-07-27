@@ -43,6 +43,7 @@ import org.apache.whirr.compute.NodeStarter;
 import org.apache.whirr.compute.NodeStarterFactory;
 import org.apache.whirr.service.ClusterActionHandler;
 import org.apache.whirr.service.ClusterActionHandlerFactory;
+import org.jclouds.Context;
 import org.jclouds.compute.ComputeService;
 import org.jclouds.compute.ComputeServiceContext;
 import org.jclouds.compute.RunNodesException;
@@ -52,7 +53,6 @@ import org.jclouds.compute.domain.Image;
 import org.jclouds.compute.domain.ImageBuilder;
 import org.jclouds.compute.domain.NodeMetadata;
 import org.jclouds.compute.domain.NodeMetadataBuilder;
-import org.jclouds.compute.domain.NodeState;
 import org.jclouds.compute.domain.OperatingSystem;
 import org.jclouds.compute.domain.Template;
 import org.jclouds.compute.domain.TemplateBuilder;
@@ -72,6 +72,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import com.google.common.reflect.TypeToken;
 
 public class BootstrapClusterActionTest {
 
@@ -120,6 +121,8 @@ public class BootstrapClusterActionTest {
 
     when(getCompute.apply(clusterSpec)).thenReturn(serviceContext);
     when(serviceContext.getComputeService()).thenReturn(computeService);
+    when(computeService.getContext()).thenReturn(serviceContext);
+    when(serviceContext.getBackendType()).thenReturn(TypeToken.class.cast(TypeToken.of(Context.class)));
     when(computeService.templateBuilder()).thenReturn(templateBuilder);
     when(templateBuilder.options((TemplateOptions) any())).thenReturn(templateBuilder);
     when(templateBuilder.build()).thenReturn(template);
@@ -187,6 +190,8 @@ public class BootstrapClusterActionTest {
 
     when(getCompute.apply(clusterSpec)).thenReturn(serviceContext);
     when(serviceContext.getComputeService()).thenReturn(computeService);
+    when(computeService.getContext()).thenReturn(serviceContext);
+    when(serviceContext.getBackendType()).thenReturn(TypeToken.class.cast(TypeToken.of(Context.class)));
     when(computeService.templateBuilder()).thenReturn(templateBuilder);
     when(templateBuilder.options((TemplateOptions) any())).thenReturn(templateBuilder);
     when(templateBuilder.build()).thenReturn(template);
@@ -300,7 +305,7 @@ public class BootstrapClusterActionTest {
         NodeMetadata nodeMeta = new NodeMetadataBuilder()
             .providerId("ec2").name("" + roles + id).id("nodeId" + id + i)
             .location(location).uri(URI.create("http://node" + i))
-            .state(NodeState.RUNNING).privateAddresses(addresses)
+            .status(NodeMetadata.Status.RUNNING).privateAddresses(addresses)
             .publicAddresses(addresses)
             .credentials(loginCredentials).hostname("hostname").build();
         if (i < only) {
@@ -314,7 +319,7 @@ public class BootstrapClusterActionTest {
       if (failedNodes.size() > 0) {
         Image image = new ImageBuilder().providerId("ec2").name("test").id("testId").location(location)
               .uri(URI.create("http://node")).operatingSystem(OperatingSystem.builder().description("op").build())
-              .description("description").defaultCredentials(loginCredentials).build();
+              .description("description").status(Image.Status.AVAILABLE).defaultCredentials(loginCredentials).build();
         Hardware hardware = new HardwareBuilder().providerId("ec2").name("test").id("testId").location(location)
               .uri(URI.create("http://node")).ram(1).hypervisor("xen").build();
         Template template = new TemplateImpl(image, hardware, location, TemplateOptions.NONE);
@@ -362,6 +367,8 @@ public class BootstrapClusterActionTest {
 
     when(getCompute.apply(clusterSpec)).thenReturn(serviceContext);
     when(serviceContext.getComputeService()).thenReturn(computeService);
+    when(computeService.getContext()).thenReturn(serviceContext);
+    when(serviceContext.getBackendType()).thenReturn(TypeToken.class.cast(TypeToken.of(Context.class)));
     when(computeService.templateBuilder()).thenReturn(templateBuilder);
     when(templateBuilder.options((TemplateOptions) any())).thenReturn(templateBuilder);
     when(templateBuilder.build()).thenReturn(template);

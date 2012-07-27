@@ -24,13 +24,14 @@ import org.apache.whirr.Cluster.Instance;
 import org.apache.whirr.ClusterController;
 import org.apache.whirr.ClusterSpec;
 import org.apache.whirr.TestConstants;
-import org.jclouds.net.IPSocket;
 import org.jclouds.predicates.InetSocketAddressConnect;
 import org.jclouds.predicates.RetryablePredicate;
 import org.jclouds.util.Strings2;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
+import com.google.common.net.HostAndPort;
 
 import java.io.IOException;
 import java.net.URI;
@@ -44,7 +45,7 @@ public class PuppetServiceTest {
   private ClusterSpec clusterSpec;
   private ClusterController controller;
   private Cluster cluster;
-  private RetryablePredicate<IPSocket> socketTester;
+  private RetryablePredicate<HostAndPort> socketTester;
 
   @Before
   public void setUp() throws Exception {
@@ -57,7 +58,7 @@ public class PuppetServiceTest {
     clusterSpec = ClusterSpec.withTemporaryKeys(config);
     controller = new ClusterController();
     cluster = controller.launchCluster(clusterSpec);
-    socketTester = new RetryablePredicate<IPSocket>(new InetSocketAddressConnect(), 60, 1, TimeUnit.SECONDS);
+    socketTester = new RetryablePredicate<HostAndPort>(new InetSocketAddressConnect(), 60, 1, TimeUnit.SECONDS);
 
   }
 
@@ -67,7 +68,7 @@ public class PuppetServiceTest {
     // check that the http server started
     for (Instance instance : cluster.getInstances()) {
       // first, check the socket
-      IPSocket socket = new IPSocket(instance.getPublicAddress().getHostAddress(), 80);
+      HostAndPort socket = HostAndPort.fromParts(instance.getPublicAddress().getHostAddress(), 80);
       assert socketTester.apply(socket) : instance;
       
       // then, try a GET

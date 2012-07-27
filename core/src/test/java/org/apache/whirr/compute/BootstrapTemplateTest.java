@@ -33,7 +33,7 @@ import org.apache.whirr.ClusterSpec;
 import org.apache.whirr.InstanceTemplate;
 import org.apache.whirr.service.jclouds.StatementBuilder;
 import org.apache.whirr.service.jclouds.TemplateBuilderStrategy;
-import org.jclouds.aws.ec2.AWSEC2Client;
+import org.jclouds.aws.ec2.AWSEC2ApiMetadata;
 import org.jclouds.aws.ec2.compute.AWSEC2ComputeService;
 import org.jclouds.aws.ec2.compute.AWSEC2TemplateOptions;
 import org.jclouds.compute.ComputeService;
@@ -41,13 +41,13 @@ import org.jclouds.compute.ComputeServiceContext;
 import org.jclouds.compute.domain.Template;
 import org.jclouds.compute.domain.TemplateBuilder;
 import org.jclouds.compute.options.TemplateOptions;
-import org.jclouds.rest.RestContext;
 import org.junit.Before;
 import org.junit.Test;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.reflect.TypeToken;
 
 public class BootstrapTemplateTest {
 
@@ -99,7 +99,8 @@ public class BootstrapTemplateTest {
     return ClusterSpec.withTemporaryKeys(config);
   }
 
-  private void assertSpotPriceIs(
+  @SuppressWarnings("unchecked")
+private void assertSpotPriceIs(
     ClusterSpec clusterSpec, final String templateGroup, float spotPrice
   ) throws MalformedURLException {
 
@@ -118,11 +119,7 @@ public class BootstrapTemplateTest {
     ComputeServiceContext context = mock(ComputeServiceContext.class);
     when(computeService.getContext()).thenReturn(context);
 
-    RestContext restContext = mock(RestContext.class);
-    when(context.getProviderSpecificContext()).thenReturn(restContext);
-
-    AWSEC2Client awsEc2Client = mock(AWSEC2Client.class);
-    when(restContext.getApi()).thenReturn(awsEc2Client);
+    when(context.getBackendType()).thenReturn(TypeToken.class.cast(AWSEC2ApiMetadata.CONTEXT_TOKEN));
 
     TemplateBuilder templateBuilder = mock(TemplateBuilder.class);
     when(computeService.templateBuilder()).thenReturn(templateBuilder);

@@ -66,7 +66,7 @@ public class StatementBuilderTest {
 
     StatementBuilder builder = new StatementBuilder();
 
-    builder.addExport("fooBar", "my_value");
+    builder.addExport("FOO_BAR", "my_value");
     builder.addStatement(Statements.exec("echo $FOO_BAR"));
 
     String script = builder.name("foo").build(clusterSpec).render(OsFamily.UNIX);
@@ -80,7 +80,7 @@ public class StatementBuilderTest {
   public void testClusterSpecExports() throws Exception {
     PropertiesConfiguration conf = new PropertiesConfiguration();
     conf.addProperty("ignored", "ignored_value");
-    conf.addProperty("whirr.env.fooBar", "my_value");
+    conf.addProperty("whirr.env.FOO_BAR", "my_value");
     
     ClusterSpec clusterSpec = ClusterSpec.withTemporaryKeys(conf);
     clusterSpec.setClusterName("test-cluster");

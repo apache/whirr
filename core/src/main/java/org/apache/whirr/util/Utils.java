@@ -49,8 +49,8 @@ public class Utils {
       Cluster cluster, int maxPrint) {
     out.println("\nYou can log into instances using the following ssh commands:");
 
-    String user = clusterSpec.getBootstrapUser() != null ? clusterSpec
-      .getBootstrapUser() : clusterSpec.getClusterUser();
+    String user = clusterSpec.getClusterUser() != null ? clusterSpec
+      .getClusterUser() : clusterSpec.getBootstrapUser();
 
     String pkFile = clusterSpec.getPrivateKeyFile().getAbsolutePath();
 

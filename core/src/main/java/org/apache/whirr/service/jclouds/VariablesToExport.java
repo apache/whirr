@@ -70,21 +70,21 @@ class VariablesToExport implements Supplier<Map<String, String>> {
 
   private void addDefaultEnvironmentVariablesForInstance(Map<String, String> metadataMap, Instance instance) {
     if (clusterSpec.getClusterName() != null)
-      metadataMap.put("clusterName", clusterSpec.getClusterName());
+      metadataMap.put("CLUSTER_NAME", clusterSpec.getClusterName());
     if (clusterSpec.getProvider() != null)
-      metadataMap.put("cloudProvider", clusterSpec.getProvider());
+      metadataMap.put("CLOUD_PROVIDER", clusterSpec.getProvider());
     if (instance != null) {
-      metadataMap.put("roles", Joiner.on(",").join(instance.getRoles()));
+      metadataMap.put("ROLES", Joiner.on(",").join(instance.getRoles()));
       if (instance.getPublicIp() != null)
-        metadataMap.put("publicIp", instance.getPublicIp());
+        metadataMap.put("PUBLIC_IP", instance.getPublicIp());
       if (instance.getPrivateIp() != null)
-         metadataMap.put("privateIp", instance.getPrivateIp());
+         metadataMap.put("PRIVATE_IP", instance.getPrivateIp());
       if (!clusterSpec.isStub()) {
         try {
           if (instance.getPublicIp() != null)
-            metadataMap.put("publicHostName", instance.getPublicHostName());
+            metadataMap.put("PUBLIC_HOST_NAME", instance.getPublicHostName());
           if (instance.getPrivateIp() != null)
-            metadataMap.put("privateHostName", instance.getPrivateHostName());
+            metadataMap.put("PRIVATE_HOST_NAME", instance.getPrivateHostName());
         } catch (IOException e) {
           LOG.warn("Could not resolve hostname for " + instance, e);
         }

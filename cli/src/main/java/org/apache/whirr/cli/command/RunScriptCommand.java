@@ -159,8 +159,8 @@ public class RunScriptCommand extends AbstractClusterCommand {
           entry.getKey().getPublicAddresses()));
 
       ExecResponse response = entry.getValue();
-      if (response.getExitCode() != 0) {
-        exitStatus = response.getExitCode();
+      if (response.getExitStatus() != 0) {
+        exitStatus = response.getExitStatus();
       }
       out.printf("%s%n", response.getOutput());
       err.printf("%s%n", response.getError());

@@ -18,20 +18,18 @@
 
 package org.apache.whirr.compute;
 
-import com.google.common.base.Splitter;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
 import static org.jclouds.compute.options.TemplateOptions.Builder.runScript;
 import static org.jclouds.scriptbuilder.domain.Statements.appendFile;
 import static org.jclouds.scriptbuilder.domain.Statements.createOrOverwriteFile;
 import static org.jclouds.scriptbuilder.domain.Statements.interpret;
 import static org.jclouds.scriptbuilder.domain.Statements.newStatementList;
+import static org.jclouds.scriptbuilder.statements.ssh.SshStatements.sshdConfig;
 
 import org.apache.whirr.ClusterSpec;
 import org.apache.whirr.InstanceTemplate;
 import org.apache.whirr.service.jclouds.StatementBuilder;
 import org.apache.whirr.service.jclouds.TemplateBuilderStrategy;
-import org.jclouds.aws.ec2.AWSEC2Client;
+import org.jclouds.aws.ec2.AWSEC2ApiMetadata;
 import org.jclouds.aws.ec2.compute.AWSEC2TemplateOptions;
 import org.jclouds.compute.ComputeService;
 import org.jclouds.compute.ComputeServiceContext;
@@ -41,8 +39,11 @@ import org.jclouds.scriptbuilder.domain.OsFamily;
 import org.jclouds.scriptbuilder.domain.Statement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import com.google.common.base.Joiner;
-import static org.jclouds.scriptbuilder.statements.ssh.SshStatements.sshdConfig;
+import com.google.common.base.Splitter;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 
 public class BootstrapTemplate {
 
@@ -81,8 +82,8 @@ public class BootstrapTemplate {
   private static void ensureUserExistsAndAuthorizeSudo(
       StatementBuilder builder, String user, String publicKey, String privateKey
   ) {
-    builder.addExport("newUser", user);
-    builder.addExport("defaultHome", "/home/users");
+    builder.addExport("NEW_USER", user);
+    builder.addExport("DEFAULT_HOME", "/home/users");
     builder.addStatement(0, newStatementList(
         ensureUserExistsWithPublicAndPrivateKey(user, publicKey, privateKey),
         makeSudoersOnlyPermitting(user),
@@ -97,7 +98,7 @@ public class BootstrapTemplate {
       ComputeServiceContext context, ClusterSpec spec, Template template, InstanceTemplate instanceTemplate
   ) {
 
-    if (context != null && context.getProviderSpecificContext().getApi() instanceof AWSEC2Client) {
+    if (AWSEC2ApiMetadata.CONTEXT_TOKEN.isAssignableFrom(context.getBackendType())) {
       float spotPrice = firstPositiveOrDefault(
         0,  /* by default use regular instances */
         instanceTemplate.getAwsEc2SpotPrice(),
