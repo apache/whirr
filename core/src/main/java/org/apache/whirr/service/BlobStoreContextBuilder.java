@@ -163,7 +163,7 @@ public class BlobStoreContextBuilder {
     @Override
     @Deprecated
     public <S, A> RestContext<S, A> getProviderSpecificContext() {
-      return delegate().getProviderSpecificContext();
+      return delegate().<S, A>getProviderSpecificContext();
     }
 
     @Override
@@ -188,17 +188,17 @@ public class BlobStoreContextBuilder {
 
     @Override
     public <C extends Context> C unwrap(TypeToken<C> type) {
-      return delegate().unwrap(type);
+      return delegate().<C>unwrap(type);
     }
 
     @Override
     public <C extends Context> C unwrap(Class<C> clazz) {
-      return delegate().unwrap(clazz);
+      return delegate().<C>unwrap(clazz);
     }
 
     @Override
     public <C extends Context> C unwrap() {
-      return delegate().unwrap();
+      return delegate().<C>unwrap();
     }
 
   }
