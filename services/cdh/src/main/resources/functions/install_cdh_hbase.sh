@@ -78,7 +78,7 @@ function install_cdh_hbase() {
       ;;
   esac
   
-  REPO=${REPO:-cdh3}
+  REPO=${REPO:-cdh4}
   HBASE_HOME=/usr/lib/hbase
   
   # up file-max
@@ -95,12 +95,18 @@ function install_cdh_hbase() {
   [ ! -f /etc/hosts ] && echo "127.0.0.1 localhost" > /etc/hosts
 
   register_cloudera_repo
+  CDH_MAJOR_VERSION=$(echo $REPO | sed -e 's/cdh\([0-9]\).*/\1/')
+  if [ $CDH_MAJOR_VERSION = "4" ]; then
+    HBASE_PREFIX=
+  else
+    HBASE_PREFIX=hadoop-
+  fi
   
   if which dpkg &> /dev/null; then
     apt-get update
-    apt-get -y install hadoop-hbase
+    apt-get -y install ${HBASE_PREFIX}hbase
   elif which rpm &> /dev/null; then
-    yum install -y hadoop-hbase
+    yum install -y ${HBASE_PREFIX}hbase
   fi
   
   echo "export HBASE_HOME=$HBASE_HOME" >> ~root/.bashrc

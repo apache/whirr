@@ -46,6 +46,14 @@ function configure_cdh_hbase() {
   HBASE_HOME=/usr/lib/$HBASE_VERSION
   HBASE_CONF_DIR=/etc/hbase/conf
 
+  REPO=${REPO:-cdh4}
+  CDH_MAJOR_VERSION=$(echo $REPO | sed -e 's/cdh\([0-9]\).*/\1/')
+  if [ $CDH_MAJOR_VERSION = "4" ]; then
+    HBASE_PREFIX=
+  else
+    HBASE_PREFIX=hadoop-
+  fi
+
   case $CLOUD_PROVIDER in
     ec2 | aws-ec2 )
       # Alias /mnt as /data
@@ -89,10 +97,10 @@ function configure_cdh_hbase() {
   for role in $(echo "$ROLES" | tr "," "\n"); do
     case $role in
     hbase-master)
-      install_hbase_daemon hadoop-hbase-master
+      install_hbase_daemon ${HBASE_PREFIX}hbase-master
       ;;
     hbase-regionserver)
-      install_hbase_daemon hadoop-hbase-regionserver
+      install_hbase_daemon ${HBASE_PREFIX}hbase-regionserver
       ;;
     hbase-restserver)
       # not supported
@@ -101,7 +109,7 @@ function configure_cdh_hbase() {
       # not supported
       ;;
     hbase-thriftserver)
-      install_hbase_daemon hadoop-hbase-thrift
+      install_hbase_daemon ${HBASE_PREFIX}hadoop-hbase-thrift
       ;;
     esac
   done
@@ -112,10 +120,10 @@ function configure_cdh_hbase() {
     for role in $(echo "$ROLES" | tr "," "\n"); do
       case $role in
       hbase-master)
-        service hadoop-hbase-master restart
+        service ${HBASE_PREFIX}hbase-master restart
         ;;
       hbase-regionserver)
-        service hadoop-hbase-regionserver restart
+        service ${HBASE_PREFIX}hbase-regionserver restart
         ;;
       hbase-restserver)
         # not supported
@@ -124,7 +132,7 @@ function configure_cdh_hbase() {
         # not supported
         ;;
       hbase-thriftserver)
-        service hadoop-hbase-thrift restart
+        service ${HBASE_PREFIX}hbase-thrift restart
         ;;
       esac
     done

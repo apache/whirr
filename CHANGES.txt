@@ -99,6 +99,8 @@ Trunk (unreleased changes)
 
     WHIRR-605. Upgrade Cassandra to 1.1.2. (Eldon Stegall via adriancole)
 
+    WHIRR-608. CDH HBase configuration uses CDH3 package and service names only (Bruno Dumon via adriancole)
+
   BUG FIXES
 
     WHIRR-582. Yarn service does not build in IntelliJ because of missing Hadoop test dependencies (Frank Scholten)
