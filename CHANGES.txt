@@ -879,3 +879,4 @@ Release 0.1.0 - 2010-09-02
     WHIRR-86. Update quick start documentation to work with release 0.1.0.
     (tomwhite)
 
+    WHIRR-611. Cloud providers may only return "public" IPs. (adriancole)
