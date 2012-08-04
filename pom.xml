@@ -72,7 +72,7 @@
     <hama.version>0.4.0-incubating</hama.version>
     <hbase.version>0.89.20100924-28</hbase.version>
     <jackson.version>1.5.2</jackson.version>
-    <jclouds.version>1.5.0-beta.8</jclouds.version>
+    <jclouds.version>1.5.0-beta.9</jclouds.version>
     <jdom.version>1.1</jdom.version>
     <jopt.simple.version>4.3</jopt.simple.version>
     <jsch.version>0.1.48</jsch.version>
