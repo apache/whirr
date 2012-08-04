@@ -42,7 +42,7 @@ function install_openjdk_deb() {
 }
 
 function install_openjdk_rpm() {
-  yum install java-1.6.0-openjdk
+  yum -y install java-1.6.0-openjdk
   
   # Try to set JAVA_HOME in a number of commonly used locations
   export JAVA_HOME=/usr/lib/jvm/java-6-openjdk

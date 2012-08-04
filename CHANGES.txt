@@ -882,3 +882,5 @@ Release 0.1.0 - 2010-09-02
     (tomwhite)
 
     WHIRR-611. Cloud providers may only return "public" IPs. (adriancole)
+
+    WHIRR-609. Yum install of openjdk needs -y (Andrew Bayer via adriancole)
