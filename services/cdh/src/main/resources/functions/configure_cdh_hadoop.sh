@@ -107,12 +107,12 @@ function configure_cdh_hadoop() {
 
 function start_namenode() {
   if which dpkg &> /dev/null; then
-    apt-get -y install $HDFS_PACKAGE_PREFIX-namenode
+    retry_apt_get -y install $HDFS_PACKAGE_PREFIX-namenode
     AS_HDFS="su -s /bin/bash - hdfs -c"
     # Format HDFS
     [ ! -e /data/hadoop/hdfs ] && $AS_HDFS "$HADOOP namenode -format"
   elif which rpm &> /dev/null; then
-    yum install -y $HDFS_PACKAGE_PREFIX-namenode
+    retry_yum install -y $HDFS_PACKAGE_PREFIX-namenode
     AS_HDFS="/sbin/runuser -s /bin/bash - hdfs -c"
     # Format HDFS
     [ ! -e /data/hadoop/hdfs ] && $AS_HDFS "$HADOOP namenode -format"
@@ -142,9 +142,9 @@ function start_namenode() {
 function start_hadoop_daemon() {
   daemon=$1
   if which dpkg &> /dev/null; then
-    apt-get -y install $daemon
+    retry_apt_get -y install $daemon
   elif which rpm &> /dev/null; then
-    yum install -y $daemon
+    retry_yum install -y $daemon
   fi
   service $daemon start
 }

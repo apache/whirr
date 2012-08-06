@@ -101,6 +101,8 @@ Trunk (unreleased changes)
 
     WHIRR-608. CDH HBase configuration uses CDH3 package and service names only (Bruno Dumon via adriancole)
 
+    WHIRR-528. Add a retry loop around apt-get and yum commands to overcome transient errors (Andrei Savu via adriancole)
+
   BUG FIXES
 
     WHIRR-582. Yarn service does not build in IntelliJ because of missing Hadoop test dependencies (Frank Scholten)

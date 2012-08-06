@@ -36,12 +36,12 @@ function install_ruby_rpm() {
   else
     rpm -Uvh http://download.fedora.redhat.com/pub/epel/5/i386/epel-release-5-4.noarch.rpm
   fi
-  yum -y install ruby ruby-rdoc rubygems
+  retry_yum -y install ruby ruby-rdoc rubygems
 }
 
 function install_ruby_deb() {
-  apt-get update -qq
-  apt-get install -y ruby ruby-dev rubygems libopenssl-ruby rdoc ri irb build-essential wget ssl-cert
+  retry_apt_get update -qq
+  retry_apt_get install -y ruby ruby-dev rubygems libopenssl-ruby rdoc ri irb build-essential wget ssl-cert
 }
 
 function add_to_path() {

@@ -26,9 +26,9 @@ import org.apache.whirr.service.ClusterActionEvent;
 import org.apache.whirr.service.ClusterActionHandlerSupport;
 
 /**
- * Installs puppet (and ruby). 
+ * Installs puppet (and ruby).
  * After this service is configured other services can use it to setup/start other services.
- * 
+ * <p/>
  * To test manually, run whirr launch-cluster with 1 puppet node, then ssh and confirm puppet exists
  */
 public class PuppetInstallClusterActionHandler extends ClusterActionHandlerSupport {
@@ -37,20 +37,22 @@ public class PuppetInstallClusterActionHandler extends ClusterActionHandlerSuppo
 
   @Override
   public String getRole() {
-   return PUPPET_INSTALL_ROLE;
+    return PUPPET_INSTALL_ROLE;
   }
 
   @Override
   protected void beforeBootstrap(ClusterActionEvent event) throws IOException,
-    InterruptedException {
-   
-   // install ruby and ruby-gems in the nodes
-   addStatement(event, call("install_ruby"));
+      InterruptedException {
 
-   // install git
-   addStatement(event, call("install_git"));
+    addStatement(event, call("retry_helpers"));
 
-   // install puppet
-   addStatement(event, call("install_puppet"));
+    // install ruby and ruby-gems in the nodes
+    addStatement(event, call("install_ruby"));
+
+    // install git
+    addStatement(event, call("install_git"));
+
+    // install puppet
+    addStatement(event, call("install_puppet"));
   }
 }

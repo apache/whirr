@@ -45,9 +45,10 @@ public abstract class HamaClusterActionHandler extends
     ClusterSpec clusterSpec = event.getClusterSpec();
     Configuration conf = getConfiguration(clusterSpec);
 
+    addStatement(event, call("retry_helpers"));
     addStatement(event, call("configure_hostnames"));
-    addStatement(event, call(getInstallFunction(conf, "java", "install_openjdk")));
     addStatement(event, call("install_tarball"));
+    addStatement(event, call(getInstallFunction(conf, "java", "install_openjdk")));
 
     String hamaInstallFunction = conf.getString(
         HamaConstants.KEY_INSTALL_FUNCTION, HamaConstants.FUNCTION_INSTALL);

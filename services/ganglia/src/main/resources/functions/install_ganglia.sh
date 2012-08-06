@@ -17,11 +17,11 @@
 
 function update_repo_ganglia() {
   if which dpkg &> /dev/null; then
-    sudo apt-get update
+    retry_apt_get update
   elif which rpm &> /dev/null; then
     #Registers the EPEL repository (this contains the ganglia rpms) 
     rpm -Uvh http://download.fedora.redhat.com/pub/epel/6/$(uname -i)/epel-release-6-5.noarch.rpm
-    yum update -y yum
+    retry_yum update -y yum
   fi
 }
 

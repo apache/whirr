@@ -79,8 +79,11 @@ public class VoldemortClusterActionHandler extends ClusterActionHandlerSupport {
       optArgs.add(prepareRemoteFileUrl(event, confUrl));
     }
 
-    addStatement(event, call(getInstallFunction(config, "java", "install_openjdk")));
+    addStatement(event, call("retry_helpers"));
+    addStatement(event, call("install_tarball"));
     addStatement(event, call("install_service"));
+
+    addStatement(event, call(getInstallFunction(config, "java", "install_openjdk")));
 
     addStatement(event, call(FUNCTION_INSTALL, optArgs.toArray(new String[optArgs.size()])));
   }
@@ -101,6 +104,7 @@ public class VoldemortClusterActionHandler extends ClusterActionHandlerSupport {
     Configuration config = event.getClusterSpec().getConfiguration();
     int partitionsPerNode = config.getInt(PARAM_PARTITIONS_PER_NODE, 10);
 
+    addStatement(event, call("retry_helpers"));
     addStatement(event, call(FUNCTION_CONFIGURE,
                              PARAM_PARTITIONS_PER_NODE,
                              Integer.toString(partitionsPerNode),

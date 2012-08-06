@@ -142,8 +142,8 @@ function configure_cdh_hbase() {
 function install_hbase_daemon() {
   daemon=$1
   if which dpkg &> /dev/null; then
-    apt-get -y install $daemon
+    retry_apt_get -y install $daemon
   elif which rpm &> /dev/null; then
-    yum install -y $daemon
+    retry_yum install -y $daemon
   fi
 }

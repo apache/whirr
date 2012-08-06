@@ -151,7 +151,7 @@ public class ChefServiceTest {
   @Test(timeout = TestConstants.ITEST_TIMEOUT)
   public void testChefRunRecipesFromProvidedCookbooks() throws Exception {
     Recipe java = new Recipe("java");
-    java.attribs.put("install_flavor", "sun");
+    java.attribs.put("install_flavor", "openjdk");
 
     // Recipes have to run directly against ComputeService as they need to be
     // ran as initscripts, a future version of ClusterController might avoid
@@ -166,7 +166,7 @@ public class ChefServiceTest {
     responses = controller
         .runScriptOnNodesMatching(clusterSpec, allNodes, stmt);
 
-    assertResponsesContain(responses, stmt, "Java(TM) SE Runtime Environment");
+    assertResponsesContain(responses, stmt, "Runtime Environment");
 
     Recipe postgreSql = new Recipe("postgresql", "server");
 

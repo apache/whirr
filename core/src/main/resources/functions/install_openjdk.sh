@@ -15,8 +15,8 @@
 # limitations under the License.
 #
 function install_openjdk_deb() {
-  apt-get update
-  apt-get -y install openjdk-6-jdk
+  retry_apt_get update
+  retry_apt_get -y install openjdk-6-jdk
   
   # Try to set JAVA_HOME in a number of commonly used locations
   # Lifting JAVA_HOME detection from jclouds
@@ -51,7 +51,7 @@ function install_openjdk_deb() {
 }
 
 function install_openjdk_rpm() {
-  yum -y install java-1.6.0-openjdk-devel
+  retry_yum -y install java-1.6.0-openjdk-devel
   
   # Try to set JAVA_HOME in a number of commonly used locations
   # Lifting JAVA_HOME detection from jclouds

@@ -29,9 +29,9 @@ EOF
 deb http://archive.cloudera.com/debian lucid-$REPO contrib
 deb-src http://archive.cloudera.com/debian lucid-$REPO contrib
 EOF
-      curl -s http://archive.cloudera.com/debian/archive.key | sudo apt-key add -
+      curl -s http://archive.cloudera.com/debian/archive.key | apt-key add -
     fi
-    sudo apt-get -y update
+    retry_apt_get -y update
   elif which rpm &> /dev/null; then
     rm -f /etc/yum.repos.d/cloudera*.repo
     if [ $CDH_MAJOR_VERSION = "4" ]; then
@@ -52,7 +52,7 @@ gpgkey = http://archive.cloudera.com/redhat/cdh/RPM-GPG-KEY-cloudera
 gpgcheck = 0
 EOF
     fi
-    yum update -y yum
+    retry_yum update -y retry_yum
   fi
 }
 
@@ -85,10 +85,10 @@ function install_cdh_zookeeper() {
   register_cloudera_repo
   
   if which dpkg &> /dev/null; then
-    apt-get update
-    apt-get -y install $ZOOKEEPER_PACKAGE
+    retry_apt_get update
+    retry_apt_get -y install $ZOOKEEPER_PACKAGE
   elif which rpm &> /dev/null; then
-    yum install -y $ZOOKEEPER_PACKAGE
+    retry_yum install -y $ZOOKEEPER_PACKAGE
   fi
   
   echo "export ZOOKEEPER_HOME=$ZOOKEEPER_HOME" >> /etc/profile

@@ -57,6 +57,7 @@ public class ChefClusterActionHandler extends ClusterActionHandlerSupport {
   @Override
   protected void beforeBootstrap(ClusterActionEvent event) throws IOException,
       InterruptedException {
+    addStatement(event, call("retry_helpers"));
     if (isFirstChefRoleIn(event.getInstanceTemplate().getRoles()).apply(role)) {
       addInstallChefStatements(event);
       // for some reason even non-running recipes like ant are sometimes not
@@ -78,6 +79,7 @@ public class ChefClusterActionHandler extends ClusterActionHandlerSupport {
     if (role.equals("")) {
       return;
     }
+    addStatement(event, call("retry_helpers"));
     addStatement(event, new Recipe(cookbook, recipe, event.getClusterSpec()
         .getConfigurationForKeysWithPrefix(cookbook)));
   }

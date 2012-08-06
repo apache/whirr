@@ -73,9 +73,9 @@ EOF
   
   # Now that it's configured, install daemon package
   if which dpkg &> /dev/null; then
-    apt-get -y install $ZOOKEEPER_SERVER_PACKAGE
+    retry_apt_get -y install $ZOOKEEPER_SERVER_PACKAGE
   elif which rpm &> /dev/null; then
-    yum install -y $ZOOKEEPER_SERVER_PACKAGE
+    retry_yum install -y $ZOOKEEPER_SERVER_PACKAGE
   fi
 
   # Start ZooKeeper
