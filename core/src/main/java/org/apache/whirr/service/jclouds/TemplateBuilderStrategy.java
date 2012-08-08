@@ -44,7 +44,7 @@ public class TemplateBuilderStrategy {
       if ("aws-ec2".equals(clusterSpec.getProvider()))
           templateBuilder.imageDescriptionMatches("^(?!.*(daily|testing)).*ubuntu-images.*$");
     }
-    
+
     if (clusterSpec.getHardwareId() != null || instanceTemplate.getHardwareId() != null) {
       templateBuilder.hardwareId(
         or(instanceTemplate.getHardwareId(), clusterSpec.getHardwareId())

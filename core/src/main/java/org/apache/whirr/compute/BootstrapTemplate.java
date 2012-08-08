@@ -73,7 +73,6 @@ public class BootstrapTemplate {
     TemplateBuilder templateBuilder = computeService.templateBuilder()
       .options(runScript(bootstrap));
     strategy.configureTemplateBuilder(clusterSpec, templateBuilder, instanceTemplate);
-
     return setSpotInstancePriceIfSpecified(
       computeService.getContext(), clusterSpec, templateBuilder.build(), instanceTemplate
     );
@@ -109,9 +108,23 @@ public class BootstrapTemplate {
       }
     }
 
-    return template;
+    return setPlacementGroup(context, spec, template, instanceTemplate);
   }
 
+    /**
+     * Set the placement group, if desired - if it doesn't already exist, create it.
+     */
+    private static Template setPlacementGroup(ComputeServiceContext context, ClusterSpec spec,
+                                              Template template, InstanceTemplate instanceTemplate) {
+        if (AWSEC2ApiMetadata.CONTEXT_TOKEN.isAssignableFrom(context.getBackendType())) {
+            if (spec.getAwsEc2PlacementGroup() != null) {
+                template.getOptions().as(AWSEC2TemplateOptions.class).placementGroup(spec.getAwsEc2PlacementGroup());
+            }
+        }
+
+        return template;
+    }
+                                                                                     
   private static float firstPositiveOrDefault(float defaultValue, float... listOfValues) {
     for(float value : listOfValues) {
       if (value > 0) return value;

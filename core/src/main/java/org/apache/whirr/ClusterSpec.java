@@ -161,7 +161,9 @@ public class ClusterSpec {
       "urls from. Change this to host your own set of launch scripts."),
       
     TERMINATE_ALL_ON_LAUNCH_FAILURE(Boolean.class, false, "Whether or not to " +
-      "automatically terminate all nodes when cluster launch fails for some reason.");
+                                    "automatically terminate all nodes when cluster launch fails for some reason."),
+
+    AWS_EC2_PLACEMENT_GROUP(String.class, false, "If given, use this existing EC2 placement group. (aws-ec2 specific option)");
     
     private Class<?> type;
     private boolean multipleArguments;
@@ -279,6 +281,8 @@ public class ClusterSpec {
   
   private boolean terminateAllOnLaunchFailure;
 
+  private String awsEc2PlacementGroup;
+
   private Configuration config;
   
   public ClusterSpec() throws ConfigurationException {
@@ -338,6 +342,8 @@ public class ClusterSpec {
     setTerminateAllOnLaunchFailure(config.getBoolean(
         Property.TERMINATE_ALL_ON_LAUNCH_FAILURE.getConfigName(), Boolean.TRUE));
     
+    setAwsEc2PlacementGroup(getString(Property.AWS_EC2_PLACEMENT_GROUP));
+
     Map<String, List<String>> fr = new HashMap<String, List<String>>();
     String firewallPrefix = Property.FIREWALL_RULES.getConfigName();
     Pattern firewallRuleKeyPattern = Pattern.compile("^".concat(Pattern.quote(firewallPrefix).concat("(?:\\.(.+))?$")));
@@ -410,6 +416,8 @@ public class ClusterSpec {
     r.setRunUrlBase(getRunUrlBase());
     
     r.setTerminateAllOnLaunchFailure(isTerminateAllOnLaunchFailure());
+
+    r.setAwsEc2PlacementGroup(getAwsEc2PlacementGroup());
 
     return r;
   }
@@ -740,6 +748,13 @@ public class ClusterSpec {
     this.terminateAllOnLaunchFailure = terminateAllOnLaunchFailure;
   }
 
+  public String getAwsEc2PlacementGroup() {
+    return awsEc2PlacementGroup;
+  }
+  public void setAwsEc2PlacementGroup(String awsEc2PlacementGroup) {
+    this.awsEc2PlacementGroup = awsEc2PlacementGroup;
+  }
+
   /**
    * The rsa public key which is authorized to login to your on the cloud nodes.
    * 
@@ -912,6 +927,7 @@ public class ClusterSpec {
         && Objects.equal(getStateStoreContainer(), that.getStateStoreContainer())
         && Objects.equal(getStateStoreBlob(), that.getStateStoreBlob())
         && Objects.equal(getAwsEc2SpotPrice(), that.getAwsEc2SpotPrice())
+        && Objects.equal(getAwsEc2PlacementGroup(), that.getAwsEc2PlacementGroup())
         ;
     }
     return false;
@@ -945,7 +961,8 @@ public class ClusterSpec {
         getStateStore(),
         getStateStoreBlob(),
         getStateStoreContainer(),
-        getAwsEc2SpotPrice()
+        getAwsEc2SpotPrice(),
+        getAwsEc2PlacementGroup()
     );
   }
   
@@ -979,6 +996,7 @@ public class ClusterSpec {
       .add("stateStoreBlob", getStateStoreBlob())
       .add("awsEc2SpotPrice", getAwsEc2SpotPrice())
       .add("terminateAllOnLauchFailure",isTerminateAllOnLaunchFailure())
+      .add("awsEc2PlacementGroup",getAwsEc2PlacementGroup())
       .toString();
   }
 }
