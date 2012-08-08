@@ -21,16 +21,16 @@ function register_cloudera_repo() {
   if which dpkg &> /dev/null; then
     if [ $CDH_MAJOR_VERSION = "4" ]; then
       cat > /etc/apt/sources.list.d/cloudera-cdh4.list <<EOF
-deb http://archive.cloudera.com/cdh4/ubuntu/lucid/amd64/cdh lucid-cdh4 contrib
-deb-src http://archive.cloudera.com/cdh4/ubuntu/lucid/amd64/cdh lucid-cdh4 contrib
+deb http://$REPO_HOST/cdh4/ubuntu/lucid/amd64/cdh lucid-cdh4 contrib
+deb-src http://$REPO_HOST/cdh4/ubuntu/lucid/amd64/cdh lucid-cdh4 contrib
 EOF
-      curl -s http://archive.cloudera.com/cdh4/ubuntu/lucid/amd64/cdh/archive.key | apt-key add -
+      curl -s http://$REPO_HOST/cdh4/ubuntu/lucid/amd64/cdh/archive.key | apt-key add -
     else
       cat > /etc/apt/sources.list.d/cloudera-$REPO.list <<EOF
-deb http://archive.cloudera.com/debian lucid-$REPO contrib
-deb-src http://archive.cloudera.com/debian lucid-$REPO contrib
+deb http://$REPO_HOST/debian lucid-$REPO contrib
+deb-src http://$REPO_HOST/debian lucid-$REPO contrib
 EOF
-      curl -s http://archive.cloudera.com/debian/archive.key | apt-key add -
+      curl -s http://$REPO_HOST/debian/archive.key | apt-key add -
     fi
     retry_apt_get -y update
   elif which rpm &> /dev/null; then
@@ -39,17 +39,17 @@ EOF
       cat > /etc/yum.repos.d/cloudera-cdh4.repo <<EOF
 [cloudera-cdh4]
 name=Cloudera's Distribution for Hadoop, Version 4
-baseurl=http://archive.cloudera.com/cdh4/redhat/5/x86_64/cdh/4/
+baseurl=http://$REPO_HOST/cdh4/redhat/5/x86_64/cdh/4/
 http://repos.jenkins.sf.cloudera.com/cdh4-nightly/redhat/5/x86_64/cdh/4/
-gpgkey = http://archive.cloudera.com/cdh4/redhat/5/x86_64/cdh/RPM-GPG-KEY-cloudera 
+gpgkey = http://$REPO_HOST/cdh4/redhat/5/x86_64/cdh/RPM-GPG-KEY-cloudera 
 gpgcheck = 1
 EOF
     else
       cat > /etc/yum.repos.d/cloudera-$REPO.repo <<EOF
 [cloudera-$REPO]
 name=Cloudera's Distribution for Hadoop, Version $CDH_VERSION
-mirrorlist=http://archive.cloudera.com/redhat/cdh/$CDH_VERSION/mirrors
-gpgkey = http://archive.cloudera.com/redhat/cdh/RPM-GPG-KEY-cloudera
+mirrorlist=http://$REPO_HOST/redhat/cdh/$CDH_VERSION/mirrors
+gpgkey = http://$REPO_HOST/redhat/cdh/RPM-GPG-KEY-cloudera
 gpgcheck = 0
 EOF
     fi
@@ -62,6 +62,7 @@ function install_cdh_hadoop() {
   local OPTARG
 
   REPO=${REPO:-cdh4}
+  REPO_HOST=${REPO_HOST:-archive.cloudera.com}
   MAPREDUCE_VERSION=${MAPREDUCE_VERSION:-1}
   HADOOP=hadoop-${HADOOP_VERSION:-0.20}
   HADOOP_CONF_DIR=/etc/$HADOOP/conf.dist
