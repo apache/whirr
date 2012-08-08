@@ -126,6 +126,7 @@ function configure_hbase() {
     # Hadoop distributon (hadoop-core-version vs hadoop-version-core).
     HADOOP_JAR=`ls /usr/local/hadoop-*/hadoop*core*.jar`
     ln -s $HADOOP_JAR $HBASE_HOME/lib/hadoop-core.jar
+    echo "export HBASE_CLASSPATH=$HADOOP_HOME/lib/*:$HBASE_CLASSPATH" >> /etc/hbase/conf/hbase-env.sh
   else
     echo Copy hadoop jar to HBase error: did not find your Hadoop installation
   fi
