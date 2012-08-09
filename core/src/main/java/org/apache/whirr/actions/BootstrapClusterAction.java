@@ -141,7 +141,7 @@ public class BootstrapClusterAction extends ScriptBasedClusterAction {
       public Instance apply(NodeMetadata node) {
         return new Instance(node.getCredentials(), roles,
                             Iterables.get(node.getPublicAddresses().size() > 0 ? node.getPublicAddresses() : node.getPrivateAddresses(), 0),
-            Iterables.get(node.getPrivateAddresses(), 0),
+                            Iterables.get(node.getPrivateAddresses().size() > 0 ? node.getPrivateAddresses() : node.getPublicAddresses(), 0),
             node.getId(), node);
       }
     }));

@@ -153,6 +153,12 @@ Trunk (unreleased changes)
 
     WHIRR-602. Cloud providers may only return "private" IPs (Andrew Bayer via asavu)
 
+    WHIRR-611. Cloud providers may only return "public" IPs. (adriancole)
+
+    WHIRR-609. Yum install of openjdk needs -y (Andrew Bayer via adriancole)
+
+    WHIRR-613. OpenJDK JAVA_HOME detection needs to be improved (Andrew Bayer via adriancole)
+
 Release 0.7.1 - 2012-02-23
 
   IMPROVEMENTS
@@ -882,9 +888,3 @@ Release 0.1.0 - 2010-09-02
 
     WHIRR-86. Update quick start documentation to work with release 0.1.0.
     (tomwhite)
-
-    WHIRR-611. Cloud providers may only return "public" IPs. (adriancole)
-
-    WHIRR-609. Yum install of openjdk needs -y (Andrew Bayer via adriancole)
-
-    WHIRR-613. OpenJDK JAVA_HOME detection needs to be improved (Andrew Bayer via adriancole)
