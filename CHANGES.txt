@@ -15,6 +15,8 @@ Trunk (unreleased changes)
 
   IMPROVEMENTS
 
+    WHIRR-616. Allow multiple YARN node managers to run on a cluster (Godwin Babu via abayer)
+
     WHIRR-585. bin/whirr version command does not work (frankscholten)
 
     WHIRR-370. Templating for configuration files (kve)
