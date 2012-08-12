@@ -23,6 +23,7 @@ import static org.apache.whirr.service.yarn.YarnConfigurationBuilder.build;
 import static org.jclouds.scriptbuilder.domain.Statements.call;
 
 import java.io.IOException;
+import java.util.Set;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
@@ -50,13 +51,17 @@ public class YarnNodeManagerHandler extends YarnHandler {
     Configuration conf = getConfiguration(clusterSpec);
     Cluster cluster = event.getCluster();
     
-    Instance nodeManager = cluster.getInstanceMatching(role(ROLE));
-    event.getFirewallManager().addRules(
-        Rule.create()
-          .destination(nodeManager)
-          .ports(NODE_MANAGER_WEB_UI_PORT)
-    );
-    
+    Set<Instance> nodeManagers = cluster.getInstancesMatching(role(ROLE));
+    if (!nodeManagers.isEmpty()) {
+        for(Instance nodeManager : nodeManagers) {
+            event.getFirewallManager().addRules(
+                    Rule.create()
+                      .destination(nodeManager)
+                      .ports(NODE_MANAGER_WEB_UI_PORT)
+                );            
+        }
+    }
+        
     try {
       event.getStatementBuilder().addStatements(
         build("/tmp/yarn-site.xml", clusterSpec, cluster, ROLE)

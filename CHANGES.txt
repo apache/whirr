@@ -10,6 +10,10 @@ Release 0.7.2
 
   IMPROVEMENTS
 
+    WHIRR-616. Allow multiple YARN node managers to run on a cluster (Godwin Babu via abayer)
+
+    WHIRR-617. Use permanently valid ZooKeeper download link and bump to 3.3.6. (abayer)
+
     WHIRR-585. bin/whirr version command does not work (frankscholten)
 
     WHIRR-457. Upgrade to jclouds 1.2.2 (Andrei Savu)
