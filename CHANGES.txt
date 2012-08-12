@@ -15,6 +15,10 @@ Trunk (unreleased changes)
 
   IMPROVEMENTS
 
+    WHIRR-63. Support EC2 Cluster Compute groups for Hadoop etc. (abayer)
+
+    WHIRR-573. Allow configuring REPO_HOST for CDH repositories. (abayer)
+    
     WHIRR-616. Allow multiple YARN node managers to run on a cluster (Godwin Babu via abayer)
 
     WHIRR-585. bin/whirr version command does not work (frankscholten)
@@ -107,6 +111,12 @@ Trunk (unreleased changes)
 
   BUG FIXES
 
+    WHIRR-603. HBase 0.89 tests won't work with Hadoop 0.20.205. (abayer)
+
+    WHIRR-614. Add HADOOP_HOME/lib to HBase classpath. (abayer)
+
+    WHIRR-615. Use Hadoop 1.0.3 in HBase 0.90 tests. (abayer)
+    
     WHIRR-582. Yarn service does not build in IntelliJ because of missing Hadoop test dependencies (Frank Scholten)
 
     WHIRR-555. Fix java install script: $(...) -> `...` (kve)
