@@ -15,6 +15,8 @@ Trunk (unreleased changes)
 
   IMPROVEMENTS
 
+    WHIRR-189. Hadoop on EC2 should use all available storage. (abayer)
+
     WHIRR-63. Support EC2 Cluster Compute groups for Hadoop etc. (abayer)
 
     WHIRR-573. Allow configuring REPO_HOST for CDH repositories. (abayer)

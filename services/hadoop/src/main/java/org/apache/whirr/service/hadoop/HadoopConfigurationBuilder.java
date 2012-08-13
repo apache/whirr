@@ -21,7 +21,10 @@ package org.apache.whirr.service.hadoop;
 import static org.apache.whirr.RolePredicates.role;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Function;
+import com.google.common.base.Joiner;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 
 import java.io.IOException;
 import java.util.Set;
@@ -50,6 +53,7 @@ public class HadoopConfigurationBuilder {
       Configuration defaults, String prefix)
       throws ConfigurationException {
     CompositeConfiguration config = new CompositeConfiguration();
+    config.setDelimiterParsingDisabled(true);
     Configuration sub = clusterSpec.getConfigurationForKeysWithPrefix(prefix);
     config.addConfiguration(sub.subset(prefix)); // remove prefix
     config.addConfiguration(defaults.subset(prefix));
@@ -64,16 +68,16 @@ public class HadoopConfigurationBuilder {
   }
   
   public static Statement buildHdfs(String path, ClusterSpec clusterSpec,
-      Cluster cluster) throws ConfigurationException, IOException {
+      Cluster cluster, Set<String> dataDirectories) throws ConfigurationException, IOException {
     Configuration config = buildHdfsConfiguration(clusterSpec, cluster,
-        new PropertiesConfiguration(WHIRR_HADOOP_DEFAULT_PROPERTIES));
+        new PropertiesConfiguration(WHIRR_HADOOP_DEFAULT_PROPERTIES), dataDirectories);
     return HadoopConfigurationConverter.asCreateXmlConfigurationFileStatement(path, config);
   }
   
   public static Statement buildMapReduce(String path, ClusterSpec clusterSpec,
-      Cluster cluster) throws ConfigurationException, IOException {
+      Cluster cluster, Set<String> dataDirectories) throws ConfigurationException, IOException {
     Configuration config = buildMapReduceConfiguration(clusterSpec, cluster,
-        new PropertiesConfiguration(WHIRR_HADOOP_DEFAULT_PROPERTIES));
+        new PropertiesConfiguration(WHIRR_HADOOP_DEFAULT_PROPERTIES), dataDirectories);
     return HadoopConfigurationConverter.asCreateXmlConfigurationFileStatement(path, config);
   }
   
@@ -100,15 +104,26 @@ public class HadoopConfigurationBuilder {
   
   @VisibleForTesting
   static Configuration buildHdfsConfiguration(ClusterSpec clusterSpec,
-      Cluster cluster, Configuration defaults) throws ConfigurationException {
-    return build(clusterSpec, cluster, defaults, "hadoop-hdfs");
+      Cluster cluster, Configuration defaults, Set<String> dataDirectories) throws ConfigurationException {
+    Configuration config = build(clusterSpec, cluster, defaults, "hadoop-hdfs");
+    
+    setIfAbsent(config, "dfs.data.dir",
+        appendToDataDirectories(dataDirectories, "/hadoop/hdfs/data"));
+    setIfAbsent(config, "dfs.name.dir",
+        appendToDataDirectories(dataDirectories, "/hadoop/hdfs/name"));
+    setIfAbsent(config, "fs.checkpoint.dir",
+        appendToDataDirectories(dataDirectories, "/hadoop/hdfs/secondary"));
+    return config;
   }
   
   @VisibleForTesting
   static Configuration buildMapReduceConfiguration(ClusterSpec clusterSpec,
-      Cluster cluster, Configuration defaults) throws ConfigurationException, IOException {
+      Cluster cluster, Configuration defaults, Set<String> dataDirectories) throws ConfigurationException, IOException {
     Configuration config = build(clusterSpec, cluster, defaults,
         "hadoop-mapreduce");
+    
+    setIfAbsent(config, "mapred.local.dir",
+        appendToDataDirectories(dataDirectories, "/hadoop/mapred/local"));
     
     Set<Instance> taskTrackers = cluster
       .getInstancesMatching(role(HadoopTaskTrackerClusterActionHandler.ROLE));
@@ -157,6 +172,16 @@ public class HadoopConfigurationBuilder {
     if (!config.containsKey(property)) {
       config.setProperty(property, value);
     }
+  }
+  
+  private static String appendToDataDirectories(Set<String> dataDirectories, final String suffix) {
+    return Joiner.on(',').join(Lists.transform(Lists.newArrayList(dataDirectories),
+      new Function<String, String>() {
+        @Override public String apply(String input) {
+          return input + suffix;
+        }
+      }
+    ));
   }
 
 }

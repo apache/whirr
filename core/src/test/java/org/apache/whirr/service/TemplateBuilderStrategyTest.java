@@ -44,6 +44,7 @@ public class TemplateBuilderStrategyTest {
   @Before
   public void setUp() throws ConfigurationException, JSchException, IOException {
     spec = ClusterSpec.withTemporaryKeys();
+    spec.setProvider("my-provider");
     instanceTemplate = mock(InstanceTemplate.class);
   }
 

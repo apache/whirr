@@ -19,6 +19,7 @@
 package org.apache.whirr.compute;
 
 import static org.jclouds.compute.options.TemplateOptions.Builder.runScript;
+import static org.jclouds.ec2.domain.RootDeviceType.EBS;
 import static org.jclouds.scriptbuilder.domain.Statements.appendFile;
 import static org.jclouds.scriptbuilder.domain.Statements.createOrOverwriteFile;
 import static org.jclouds.scriptbuilder.domain.Statements.interpret;
@@ -31,6 +32,9 @@ import org.apache.whirr.service.jclouds.StatementBuilder;
 import org.apache.whirr.service.jclouds.TemplateBuilderStrategy;
 import org.jclouds.aws.ec2.AWSEC2ApiMetadata;
 import org.jclouds.aws.ec2.compute.AWSEC2TemplateOptions;
+import org.jclouds.ec2.EC2ApiMetadata;
+import org.jclouds.ec2.compute.options.EC2TemplateOptions;
+import org.jclouds.ec2.compute.predicates.EC2ImagePredicates;
 import org.jclouds.compute.ComputeService;
 import org.jclouds.compute.ComputeServiceContext;
 import org.jclouds.compute.domain.Template;
@@ -108,9 +112,24 @@ public class BootstrapTemplate {
       }
     }
 
-    return setPlacementGroup(context, spec, template, instanceTemplate);
+    return mapEphemeralIfImageIsEBSBacked(context, spec, template, instanceTemplate);
   }
 
+    /**
+     * If this is an EBS-backed volume, map the ephemeral device.
+     */
+    private static Template mapEphemeralIfImageIsEBSBacked(ComputeServiceContext context,
+                                                           ClusterSpec spec,
+                                                           Template template,
+                                                           InstanceTemplate instanceTemplate) {
+        if (EC2ApiMetadata.CONTEXT_TOKEN.isAssignableFrom(context.getBackendType())) {
+            if (EC2ImagePredicates.rootDeviceType(EBS).apply(template.getImage())) {
+                template.getOptions().as(EC2TemplateOptions.class).mapEphemeralDeviceToDeviceName("/dev/sdc", "ephemeral1");
+            }
+        }
+        return setPlacementGroup(context, spec, template, instanceTemplate);
+    }
+    
     /**
      * Set the placement group, if desired - if it doesn't already exist, create it.
      */

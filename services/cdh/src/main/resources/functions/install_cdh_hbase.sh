@@ -69,15 +69,6 @@ function install_cdh_hbase() {
     esac
   done
   
-  case $CLOUD_PROVIDER in
-    ec2 | aws-ec2 )
-      # Alias /mnt as /data
-      if [ ! -e /data ]; then ln -s /mnt /data; fi
-      ;;
-    *)
-      ;;
-  esac
-  
   REPO=${REPO:-cdh4}
   REPO_HOST=${REPO_HOST:-archive.cloudera.com}
   HBASE_HOME=/usr/lib/hbase

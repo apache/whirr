@@ -26,15 +26,6 @@ function configure_cdh_hadoop() {
   ROLES=$1
   shift
   
-  case $CLOUD_PROVIDER in
-    ec2 | aws-ec2 )
-      # Alias /mnt as /data
-      if [ ! -e /data ]; then ln -s /mnt /data; fi
-      ;;
-    *)
-      ;;
-  esac
-  
   REPO=${REPO:-cdh4}
   CDH_MAJOR_VERSION=$(echo $REPO | sed -e 's/cdh\([0-9]\).*/\1/')
   if [ $CDH_MAJOR_VERSION = "4" ]; then
@@ -49,11 +40,7 @@ function configure_cdh_hadoop() {
     MAPREDUCE_PACKAGE_PREFIX=hadoop-${HADOOP_VERSION:-0.20}  
   fi
   
-  mkdir -p /data/hadoop
-  chgrp hadoop /data/hadoop
-  chmod g+w /data/hadoop
-  mkdir /data/tmp
-  chmod a+rwxt /data/tmp
+  make_hadoop_dirs /data*
 
   # Copy generated configuration files in place
   cp /tmp/{core,hdfs,mapred}-site.xml $HADOOP_CONF_DIR
@@ -103,6 +90,19 @@ function configure_cdh_hadoop() {
   
     CONFIGURE_HADOOP_DONE=1
   
+}
+
+function make_hadoop_dirs {
+  for mount in "$@"; do
+    if [ ! -e $mount/hadoop ]; then
+      mkdir -p $mount/hadoop
+      chown hadoop:hadoop $mount/hadoop
+    fi
+    if [ ! -e $mount/tmp ]; then
+      mkdir $mount/tmp
+      chmod a+rwxt $mount/tmp
+    fi
+  done
 }
 
 function start_namenode() {

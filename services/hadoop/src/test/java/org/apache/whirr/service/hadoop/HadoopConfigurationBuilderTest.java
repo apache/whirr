@@ -23,6 +23,8 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSet.Builder;
 import com.google.common.collect.Iterators;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.whirr.Cluster;
@@ -142,21 +144,27 @@ public class HadoopConfigurationBuilderTest {
   @Test
   public void testHdfs() throws Exception {
     Configuration conf = HadoopConfigurationBuilder.buildHdfsConfiguration(
-        clusterSpec, cluster, defaults);
-    assertThat(Iterators.size(conf.getKeys()), is(1));
+        clusterSpec, cluster, defaults,
+        Sets.newLinkedHashSet(Lists.newArrayList("/data0", "/data1")));
+    assertThat(Iterators.size(conf.getKeys()), is(4));
     assertThat(conf.getString("p1"), is("hdfs1"));
+    assertThat(conf.getString("dfs.data.dir"),
+        is("/data0/hadoop/hdfs/data,/data1/hadoop/hdfs/data"));
   }
 
   @Test
   public void testMapReduce() throws Exception {
     Cluster cluster = newCluster(5);
     Configuration conf = HadoopConfigurationBuilder
-      .buildMapReduceConfiguration(clusterSpec, cluster, defaults);
+      .buildMapReduceConfiguration(clusterSpec, cluster, defaults,
+          Sets.newLinkedHashSet(Lists.newArrayList("/data0", "/data1")));
     assertThat(conf.getString("p1"), is("mapred1"));
     assertThat(conf.getString("mapred.job.tracker"), matches(".+:8021"));
     assertThat(conf.getString("mapred.tasktracker.map.tasks.maximum"), is("4"));
     assertThat(conf.getString("mapred.tasktracker.reduce.tasks.maximum"), is("3"));
     assertThat(conf.getString("mapred.reduce.tasks"), is("15"));
+    assertThat(conf.getString("mapred.local.dir"),
+        is("/data0/hadoop/mapred/local,/data1/hadoop/mapred/local"));
   }
 
   @Test
@@ -165,7 +173,8 @@ public class HadoopConfigurationBuilderTest {
     overrides.addProperty("hadoop-mapreduce.mapred.tasktracker.map.tasks.maximum", "70");
     clusterSpec = ClusterSpec.withNoDefaults(overrides);
     Configuration conf = HadoopConfigurationBuilder.buildMapReduceConfiguration(
-        clusterSpec, cluster, defaults);
+        clusterSpec, cluster, defaults,
+        Sets.newLinkedHashSet(Lists.newArrayList("/data0", "/data1")));
     assertThat(conf.getString("mapred.tasktracker.map.tasks.maximum"), is("70"));
   }
   
@@ -175,7 +184,8 @@ public class HadoopConfigurationBuilderTest {
     overrides.addProperty("hadoop-mapreduce.mapred.reduce.tasks", "7");
     clusterSpec = ClusterSpec.withNoDefaults(overrides);
     Configuration conf = HadoopConfigurationBuilder.buildMapReduceConfiguration(
-        clusterSpec, cluster, defaults);
+        clusterSpec, cluster, defaults,
+        Sets.newLinkedHashSet(Lists.newArrayList("/data0", "/data1")));
     assertThat(conf.getString("mapred.reduce.tasks"), is("7"));
   }
 

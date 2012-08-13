@@ -38,6 +38,7 @@ import org.jclouds.aws.ec2.compute.AWSEC2ComputeService;
 import org.jclouds.aws.ec2.compute.AWSEC2TemplateOptions;
 import org.jclouds.compute.ComputeService;
 import org.jclouds.compute.ComputeServiceContext;
+import org.jclouds.compute.domain.Image;
 import org.jclouds.compute.domain.Template;
 import org.jclouds.compute.domain.TemplateBuilder;
 import org.jclouds.compute.options.TemplateOptions;
@@ -127,8 +128,10 @@ private void assertSpotPriceIs(
 
     Template template = mock(Template.class);
     TemplateOptions options = mock(TemplateOptions.class);
+    Image image = mock(Image.class);
     when(templateBuilder.build()).thenReturn(template);
     when(template.getOptions()).thenReturn(options);
+    when(template.getImage()).thenReturn(image);
 
     AWSEC2TemplateOptions awsEec2TemplateOptions = mock(AWSEC2TemplateOptions.class);
     when(options.as((Class<TemplateOptions>) any())).thenReturn(awsEec2TemplateOptions);

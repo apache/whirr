@@ -54,21 +54,7 @@ function configure_cdh_hbase() {
     HBASE_PREFIX=hadoop-
   fi
 
-  case $CLOUD_PROVIDER in
-    ec2 | aws-ec2 )
-      # Alias /mnt as /data
-      if [ ! -e /data ]; then ln -s /mnt /data; fi
-      ;;
-    *)
-      ;;
-  esac
-
-  mkdir -p /data/hbase
-  chown hbase:hbase /data/hbase
-  if [ ! -e /data/tmp ]; then
-    mkdir /data/tmp
-    chmod a+rwxt /data/tmp
-  fi
+  make_hbase_dirs /data*
 
   # Copy generated configuration files in place
   cp /tmp/hbase-site.xml $HBASE_CONF_DIR
@@ -146,4 +132,18 @@ function install_hbase_daemon() {
   elif which rpm &> /dev/null; then
     retry_yum install -y $daemon
   fi
+}
+
+
+function make_hbase_dirs {
+  for mount in "$@"; do
+    if [ ! -e $mount/hbase ]; then
+      mkdir -p $mount/hbase
+      chown hbase:hbase $mount/hbase
+    fi
+    if [ ! -e $mount/tmp ]; then
+      mkdir $mount/tmp
+      chmod a+rwxt $mount/tmp
+    fi
+  done
 }

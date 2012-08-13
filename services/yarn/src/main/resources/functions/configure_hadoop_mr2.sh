@@ -28,26 +28,12 @@ function configure_hadoop_mr2() {
   ROLES=$1
   shift
 
-  case $CLOUD_PROVIDER in
-    ec2 | aws-ec2 )
-      # Alias /mnt as /data
-      ln -s /mnt /data
-      ;;
-    *)
-      ;;
-  esac
-  
   HADOOP_COMMON_HOME=$HADOOP_HOME
   HADOOP_HDFS_HOME=$HADOOP_HOME
   HADOOP_HOME=/usr/local/hadoop
   HADOOP_CONF_DIR=$HADOOP_HOME/etc/hadoop
 
-  mkdir -p /data/hadoop
-  chown hadoop:hadoop /data/hadoop
-  if [ ! -e /data/tmp ]; then
-    mkdir /data/tmp
-    chmod a+rwxt /data/tmp
-  fi
+  make_hadoop_dirs /data*
   mkdir /etc/hadoop
   ln -s $HADOOP_CONF_DIR /etc/hadoop/conf
 
@@ -99,6 +85,19 @@ function configure_hadoop_mr2() {
 
   CONFIGURE_HADOOP_DONE=1
 
+}
+
+function make_hadoop_dirs {
+  for mount in "$@"; do
+    if [ ! -e $mount/hadoop ]; then
+      mkdir -p $mount/hadoop
+      chown hadoop:hadoop $mount/hadoop
+    fi
+    if [ ! -e $mount/tmp ]; then
+      mkdir $mount/tmp
+      chmod a+rwxt $mount/tmp
+    fi
+  done
 }
 
 function start_namenode() {

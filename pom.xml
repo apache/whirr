@@ -348,23 +348,7 @@
           </archive>
         </configuration>
       </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-javadoc-plugin</artifactId>
-        <version>2.8.1</version>
-        <configuration>
-          <excludePackageNames>org.jclouds.*</excludePackageNames>
-        </configuration>
-        <executions>
-          <execution>
-            <id>aggregate</id>
-            <goals>
-              <goal>aggregate</goal>
-            </goals>
-            <phase>site</phase>
-          </execution>
-        </executions>
-      </plugin>
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-remote-resources-plugin</artifactId>
@@ -411,6 +395,7 @@
         <groupId>org.apache.rat</groupId>
         <artifactId>apache-rat-plugin</artifactId>
         <version>0.8</version>
+        <inherited>false</inherited>
         <executions>
           <execution>
             <phase>package</phase>
@@ -604,12 +589,32 @@
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-site-plugin</artifactId>
           <version>3.0</version>
+          <inherited>false</inherited>
           <configuration>
-            <!-- Reports are generated at the site level -->
-            <generateReports>false</generateReports>
             <templateDirectory>${basedir}/src/site/resources</templateDirectory>
             <template>site.vm</template>
             <relativizeDecorationLinks>false</relativizeDecorationLinks>
+            <reportPlugins>
+              <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>2.8.1</version>
+                <configuration>
+                  <encoding>${project.build.sourceEncoding}</encoding>
+                  <quiet>true</quiet>
+                  <maxmemory>256m</maxmemory>
+                </configuration>
+                <reportSets>
+                  <reportSet>
+                    <id>default</id>
+                    <reports>
+                      <report>javadoc</report>
+                      <report>aggregate</report>
+                    </reports>
+                  </reportSet>
+                </reportSets>
+              </plugin>
+            </reportPlugins>
           </configuration>
         </plugin>
       </plugins>
@@ -700,13 +705,6 @@
               <excludePackageNames>org.jclouds.*</excludePackageNames>
             </configuration>
             <executions>
-              <execution>
-                <id>aggregate</id>
-                <goals>
-                  <goal>aggregate</goal>
-                </goals>
-                <phase>site</phase>
-              </execution>
               <execution>
                 <id>attach-javadocs</id>
                 <goals>

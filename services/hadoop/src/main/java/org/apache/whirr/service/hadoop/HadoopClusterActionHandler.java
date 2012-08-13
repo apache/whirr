@@ -25,7 +25,9 @@ import static org.apache.whirr.service.hadoop.HadoopConfigurationBuilder.buildMa
 import static org.jclouds.scriptbuilder.domain.Statements.call;
 
 import com.google.common.base.Joiner;
+import com.google.common.collect.Iterables;
 import java.io.IOException;
+import java.util.Map;
 import java.util.Set;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
@@ -80,6 +82,16 @@ public abstract class HadoopClusterActionHandler extends ClusterActionHandlerSup
         "-u", tarball));
   }
   
+  protected Map<String, String> getDeviceMappings(ClusterActionEvent event) {
+      Set<Instance> instances = event.getCluster().getInstancesMatching(RolePredicates.role(getRole()));
+      Instance prototype = Iterables.getFirst(instances, null);
+      if (prototype == null) {
+          throw new IllegalStateException("No instances found in role " + getRole());
+      }
+      VolumeManager volumeManager = new VolumeManager();
+      return volumeManager.getDeviceMappings(event.getClusterSpec(), prototype);
+  }
+    
   @Override
   protected void beforeConfigure(ClusterActionEvent event)
       throws IOException, InterruptedException {
@@ -102,11 +114,12 @@ public abstract class HadoopClusterActionHandler extends ClusterActionHandlerSup
 
   private void createHadoopConfigFiles(ClusterActionEvent event,
       ClusterSpec clusterSpec, Cluster cluster) throws IOException {
+    Map<String, String> deviceMappings = getDeviceMappings(event);
     try {
       event.getStatementBuilder().addStatements(
         buildCommon("/tmp/core-site.xml", clusterSpec, cluster),
-        buildHdfs("/tmp/hdfs-site.xml", clusterSpec, cluster),
-        buildMapReduce("/tmp/mapred-site.xml", clusterSpec, cluster),
+        buildHdfs("/tmp/hdfs-site.xml", clusterSpec, cluster, deviceMappings.keySet()),
+        buildMapReduce("/tmp/mapred-site.xml", clusterSpec, cluster, deviceMappings.keySet()),
         buildHadoopEnv("/tmp/hadoop-env.sh", clusterSpec, cluster),
         TemplateUtils.createFileFromTemplate("/tmp/hadoop-metrics.properties", event.getTemplateEngine(), getMetricsTemplate(event, clusterSpec, cluster), clusterSpec, cluster)
       );
@@ -114,6 +127,8 @@ public abstract class HadoopClusterActionHandler extends ClusterActionHandlerSup
     } catch (ConfigurationException e) {
       throw new IOException(e);
     }
+    String devMappings = VolumeManager.asString(deviceMappings);
+    addStatement(event, call("prepare_all_disks", "'" + devMappings + "'"));
   }
 
   private String getMetricsTemplate(ClusterActionEvent event, ClusterSpec clusterSpec, Cluster cluster) {
