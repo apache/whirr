@@ -109,13 +109,13 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>com.cloudera.hbase</groupId>
+      <groupId>org.apache.hbase</groupId>
       <artifactId>hbase</artifactId>
       <version>${hbase.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>com.cloudera.hbase</groupId>
+      <groupId>org.apache.hbase</groupId>
       <artifactId>hbase</artifactId>
       <version>${hbase.version}</version>
       <classifier>tests</classifier>

@@ -174,7 +174,6 @@
             <artifactId>maven-compiler-plugin</artifactId>
             <configuration>
               <testExcludes>
-                <exclude>**/CdhHBaseServiceTest.java</exclude><!-- TODO: remove when WHIRR-525 is done -->
                 <exclude>**/CdhYarnServiceTest.java</exclude>
               </testExcludes>
             </configuration>
@@ -217,7 +216,6 @@
             <artifactId>maven-compiler-plugin</artifactId>
             <configuration>
               <testExcludes>
-                <exclude>**/CdhHBaseServiceTest.java</exclude><!-- TODO: remove when WHIRR-525 is done -->
                 <exclude>**/CdhHadoopServiceTest.java</exclude>
               </testExcludes>
             </configuration>

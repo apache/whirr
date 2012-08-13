@@ -20,6 +20,7 @@ package org.apache.whirr.service.hbase.integration;
 
 import java.io.IOException;
 import java.net.InetAddress;
+import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -143,8 +144,8 @@ public class HBaseServiceController {
     LOG.info("Waiting for .META. table...");
     TProtocol protocol = new TBinaryProtocol(transport, true, true);
     Hbase.Client client = new Hbase.Client(protocol);
-    int scannerId = client.scannerOpen(HConstants.META_TABLE_NAME,
-        Bytes.toBytes(""), null);
+    int scannerId = client.scannerOpen(ByteBuffer.wrap(HConstants.META_TABLE_NAME),
+        ByteBuffer.wrap(Bytes.toBytes("")), null);
     client.scannerClose(scannerId);
     thriftClient = client;
   }
