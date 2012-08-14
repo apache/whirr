@@ -20,10 +20,10 @@ package org.apache.whirr.service.hbase.integration;
 
 import org.junit.BeforeClass;
 
-public class HBase090ServiceTest extends HBaseServiceTest {
+public class HBase092ServiceTest extends HBaseServiceTest {
   @BeforeClass
   public static void setUp() throws Exception {
-    controller = HBaseServiceController.getInstance("whirr-hbase-0.90-test.properties");
+    controller = HBaseServiceController.getInstance("whirr-hbase-0.92-test.properties");
     controller.ensureClusterRunning();
   }
 }
