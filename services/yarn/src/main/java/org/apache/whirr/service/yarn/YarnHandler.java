@@ -51,6 +51,7 @@ public abstract class YarnHandler extends ClusterActionHandlerSupport {
     ClusterSpec clusterSpec = event.getClusterSpec();
     Configuration conf = getConfiguration(clusterSpec);
     
+    addStatement(event, call("retry_helpers"));
     addStatement(event, call("configure_hostnames"));
 
     addStatement(event, call(getInstallFunction(conf, "java", "install_openjdk")));

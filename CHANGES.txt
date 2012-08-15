@@ -114,6 +114,9 @@ Trunk (unreleased changes)
     WHIRR-528. Add a retry loop around apt-get and yum commands to overcome transient errors (Andrei Savu via adriancole)
 
   BUG FIXES
+  
+    WHIRR-604. Non-resolvable hostnames should be reset to something
+    resolvable. (abayer)
 
     WHIRR-579. Sun/Oracle JDK install doesn't work - switch to OpenJDK
     by default. (abayer)

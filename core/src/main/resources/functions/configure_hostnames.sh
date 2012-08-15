@@ -17,20 +17,20 @@
 function configure_hostnames() {
   local OPTIND
   local OPTARG
-  
-  case $CLOUD_PROVIDER in
-    cloudservers | cloudservers-uk | cloudservers-us )
-      if which dpkg &> /dev/null; then
-        PRIVATE_IP=`/sbin/ifconfig eth0 | grep 'inet addr:' | cut -d: -f2 | awk '{ print $1}'`
-        HOSTNAME=`echo $PRIVATE_IP | tr . -`.static.cloud-ips.com
-        echo $HOSTNAME > /etc/hostname
-        sed -i -e "s/$PRIVATE_IP.*/$PRIVATE_IP $HOSTNAME/" /etc/hosts
-        set +e
-        /etc/init.d/hostname restart
-        set -e
-        sleep 2
-        hostname
+
+  if [ ! -z $AUTO_HOSTNAME_SUFFIX ]; then
+      PUBLIC_IP=`/sbin/ifconfig eth0 | grep 'inet addr:' | cut -d: -f2 | awk '{ print $1}'`
+      HOSTNAME=${AUTO_HOSTNAME_PREFIX}`echo $PUBLIC_IP | tr . -`${AUTO_HOSTNAME_SUFFIX}
+      echo $HOSTNAME > /etc/hostname
+      sed -i -e "s/$PUBLIC_IP.*/$PUBLIC_IP $HOSTNAME/" /etc/hosts
+      set +e
+      if [ -f /etc/init.d/hostname ]; then
+          /etc/init.d/hostname restart
+      else
+          hostname $HOSTNAME
       fi
-      ;;
-  esac
+      set -e
+      sleep 2
+      hostname
+  fi
 }

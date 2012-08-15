@@ -297,6 +297,31 @@ public class ClusterSpecTest {
   }
 
   @Test
+  public void testAutoHostnameForProvider() throws Exception {
+      Configuration cloudServersConfig = new PropertiesConfiguration();
+      cloudServersConfig.addProperty("whirr.provider", "cloudservers-us");
+
+      ClusterSpec cloudServersSpec = ClusterSpec.withTemporaryKeys(cloudServersConfig);
+      assertEquals(cloudServersSpec.getAutoHostnamePrefix(), null);
+      assertEquals(cloudServersSpec.getAutoHostnameSuffix(), ".static.cloud-ips.com");
+
+      Configuration cloudServersUkConfig = new PropertiesConfiguration();
+      cloudServersUkConfig.addProperty("whirr.provider", "cloudservers-uk");
+
+      ClusterSpec cloudServersUkSpec = ClusterSpec.withTemporaryKeys(cloudServersUkConfig);
+      assertEquals(cloudServersUkSpec.getAutoHostnamePrefix(), null);
+      assertEquals(cloudServersUkSpec.getAutoHostnameSuffix(), ".static.cloud-ips.co.uk");
+
+      Configuration ec2Config = new PropertiesConfiguration();
+      ec2Config.addProperty("whirr.provider", "aws-ec2");
+
+      ClusterSpec ec2Spec = ClusterSpec.withTemporaryKeys(ec2Config);
+      assertEquals(null, ec2Spec.getAutoHostnamePrefix());
+      assertEquals(null, ec2Spec.getAutoHostnameSuffix());
+  }
+      
+
+  @Test
   public void testApplySubroleAliases() throws ConfigurationException {
     CompositeConfiguration c = new CompositeConfiguration();
     Configuration config = new PropertiesConfiguration();

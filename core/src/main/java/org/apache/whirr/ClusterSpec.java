@@ -163,6 +163,12 @@ public class ClusterSpec {
     TERMINATE_ALL_ON_LAUNCH_FAILURE(Boolean.class, false, "Whether or not to " +
                                     "automatically terminate all nodes when cluster launch fails for some reason."),
 
+    AUTO_HOSTNAME_PREFIX(String.class, false, "If given, used a prefix when automatically " +
+                         "generating hostnames. Ignored if AUTO_HOSTNAME_SUFFIX is not also set."),
+
+    AUTO_HOSTNAME_SUFFIX(String.class, false, "If given, use this (along with AUTO_HOSTNAME_PREFIX, if set) to set " +
+                             "the hostname for the instances."),
+
     AWS_EC2_PLACEMENT_GROUP(String.class, false, "If given, use this existing EC2 placement group. (aws-ec2 specific option)");
     
     private Class<?> type;
@@ -283,6 +289,10 @@ public class ClusterSpec {
 
   private String awsEc2PlacementGroup;
 
+  private String autoHostnamePrefix;
+
+  private String autoHostnameSuffix;
+    
   private Configuration config;
   
   public ClusterSpec() throws ConfigurationException {
@@ -313,6 +323,9 @@ public class ClusterSpec {
 
     setInstanceTemplates(InstanceTemplate.parse(config));
     setMaxStartupRetries(getInt(Property.MAX_STARTUP_RETRIES, 1));
+
+    setAutoHostnamePrefix(getString(Property.AUTO_HOSTNAME_PREFIX));
+    setAutoHostnameSuffix(getString(Property.AUTO_HOSTNAME_SUFFIX));
 
     setProvider(getString(Property.PROVIDER));
     setIdentity(getString(Property.IDENTITY));
@@ -418,6 +431,9 @@ public class ClusterSpec {
     r.setTerminateAllOnLaunchFailure(isTerminateAllOnLaunchFailure());
 
     r.setAwsEc2PlacementGroup(getAwsEc2PlacementGroup());
+
+    r.setAutoHostnamePrefix(getAutoHostnamePrefix());
+    r.setAutoHostnameSuffix(getAutoHostnameSuffix());
 
     return r;
   }
@@ -675,9 +691,22 @@ public class ClusterSpec {
       LOG.warn("Please use provider \"cloudservers-us\" instead of \"cloudservers\"");
       provider = "cloudservers-us";
     }
+    if (provider != null) 
+        setAutoHostnameForProvider(provider);
     this.provider = provider;
   }
 
+  private void setAutoHostnameForProvider(String provider) {
+      if (provider.equals("cloudservers")
+          || provider.equals("cloudservers-us")) {
+          setAutoHostnamePrefix(null);
+          setAutoHostnameSuffix(".static.cloud-ips.com");
+      } else if (provider.equals("cloudservers-uk")) {
+          setAutoHostnamePrefix(null);
+          setAutoHostnameSuffix(".static.cloud-ips.co.uk");
+      }
+  }
+      
   public void setIdentity(String identity) {
     this.identity = identity;
   }
@@ -751,8 +780,25 @@ public class ClusterSpec {
   public String getAwsEc2PlacementGroup() {
     return awsEc2PlacementGroup;
   }
+    
   public void setAwsEc2PlacementGroup(String awsEc2PlacementGroup) {
     this.awsEc2PlacementGroup = awsEc2PlacementGroup;
+  }
+
+  public String getAutoHostnameSuffix() {
+    return autoHostnameSuffix;
+  }
+    
+  public void setAutoHostnameSuffix(String autoHostnameSuffix) {
+    this.autoHostnameSuffix = autoHostnameSuffix;
+  }
+
+  public String getAutoHostnamePrefix() {
+    return autoHostnamePrefix;
+  }
+    
+  public void setAutoHostnamePrefix(String autoHostnamePrefix) {
+    this.autoHostnamePrefix = autoHostnamePrefix;
   }
 
   /**
@@ -928,6 +974,8 @@ public class ClusterSpec {
         && Objects.equal(getStateStoreBlob(), that.getStateStoreBlob())
         && Objects.equal(getAwsEc2SpotPrice(), that.getAwsEc2SpotPrice())
         && Objects.equal(getAwsEc2PlacementGroup(), that.getAwsEc2PlacementGroup())
+        && Objects.equal(getAutoHostnamePrefix(), that.getAutoHostnamePrefix())
+        && Objects.equal(getAutoHostnameSuffix(), that.getAutoHostnameSuffix())
         ;
     }
     return false;
@@ -962,7 +1010,9 @@ public class ClusterSpec {
         getStateStoreBlob(),
         getStateStoreContainer(),
         getAwsEc2SpotPrice(),
-        getAwsEc2PlacementGroup()
+        getAwsEc2PlacementGroup(),
+        getAutoHostnamePrefix(),
+        getAutoHostnameSuffix()
     );
   }
   
@@ -997,6 +1047,8 @@ public class ClusterSpec {
       .add("awsEc2SpotPrice", getAwsEc2SpotPrice())
       .add("terminateAllOnLauchFailure",isTerminateAllOnLaunchFailure())
       .add("awsEc2PlacementGroup",getAwsEc2PlacementGroup())
+      .add("autoHostnamePrefix",getAutoHostnamePrefix())
+      .add("autoHostnameSuffix",getAutoHostnameSuffix())
       .toString();
   }
 }
