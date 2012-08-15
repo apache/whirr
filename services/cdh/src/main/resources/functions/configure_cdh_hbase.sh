@@ -95,7 +95,7 @@ function configure_cdh_hbase() {
       # not supported
       ;;
     hbase-thriftserver)
-      install_hbase_daemon ${HBASE_PREFIX}hadoop-hbase-thrift
+      install_hbase_daemon ${HBASE_PREFIX}hbase-thrift
       ;;
     esac
   done
