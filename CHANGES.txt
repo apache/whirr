@@ -185,6 +185,8 @@ Trunk (unreleased changes)
 
     WHIRR-613. OpenJDK JAVA_HOME detection needs to be improved (Andrew Bayer via adriancole)
 
+    WHIRR-629. YARN tests fail on Rackspace. (tomwhite)
+
 Release 0.7.1 - 2012-02-23
 
   IMPROVEMENTS

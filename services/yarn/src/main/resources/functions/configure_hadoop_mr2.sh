@@ -118,6 +118,10 @@ function start_namenode() {
   # It's needed to allow users to create their own user directories
   $AS_HADOOP "$HADOOP_HOME/bin/hadoop fs -chmod +w /user"
   
+  # Create job history directory (see mapreduce.jobhistory.intermediate-done-dir)
+  $AS_HADOOP "$HADOOP_HOME/bin/hadoop fs -mkdir /user/history"
+  $AS_HADOOP "$HADOOP_HOME/bin/hadoop fs -chmod -R 1777 /user/history"
+  
   # Create temporary directory for Pig and Hive in HDFS
   $AS_HADOOP "$HADOOP_HOME/bin/hadoop fs -mkdir /tmp"
   $AS_HADOOP "$HADOOP_HOME/bin/hadoop fs -chmod +w /tmp"

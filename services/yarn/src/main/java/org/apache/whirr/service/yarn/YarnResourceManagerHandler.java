@@ -24,10 +24,13 @@ import static org.jclouds.scriptbuilder.domain.Statements.call;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.Properties;
 
+import org.apache.commons.configuration.AbstractConfiguration;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.lang.StringUtils;
 import org.apache.whirr.Cluster;
 import org.apache.whirr.Cluster.Instance;
 import org.apache.whirr.ClusterSpec;
@@ -112,6 +115,18 @@ public class YarnResourceManagerHandler extends YarnHandler {
   
   private Properties createClientSideYarnProperties(ClusterSpec clusterSpec, Instance resourceManager) throws IOException {
     Properties config = new Properties();
+    String prefix = "hadoop-yarn";
+    Configuration sub = clusterSpec.getConfigurationForKeysWithPrefix(prefix);
+    sub = sub.subset(prefix); // remove prefix
+    for (@SuppressWarnings("unchecked")
+        Iterator<String> it = sub.getKeys(); it.hasNext(); ) {
+      String key = it.next();
+      // rebuild the original value by joining all of them with the default separator
+      String value = StringUtils.join(sub.getStringArray(key),
+          AbstractConfiguration.getDefaultListDelimiter());
+      config.setProperty(key, value);
+      System.out.println("createClientSideYarnProperties " + key + ":" + value);
+    }
     config.setProperty("yarn.resourcemanager.address",
         String.format("%s:8040", resourceManager.getPublicHostName()));
     config.setProperty("yarn.resourcemanager.scheduler.address",
@@ -119,17 +134,6 @@ public class YarnResourceManagerHandler extends YarnHandler {
     config.setProperty("yarn.resourcemanager.resource-tracker.address",
         String.format("%s:8025", resourceManager.getPublicHostName()));
     config.setProperty("yarn.app.mapreduce.am.staging-dir", "/user");
-    config.setProperty("yarn.application.classpath",
-        "/etc/hadoop/conf.dist," +
-        "/usr/lib/hadoop/*," +
-        "/usr/lib/hadoop/lib/*," +
-        "$HADOOP_CONF_DIR," +
-        "$HADOOP_COMMON_HOME/share/hadoop/common/*," +
-        "$HADOOP_COMMON_HOME/share/hadoop/common/lib/*," +
-        "$HADOOP_HDFS_HOME/share/hadoop/hdfs/*," +
-        "$HADOOP_HDFS_HOME/share/hadoop/hdfs/lib/*," +
-        "$YARN_HOME/share/hadoop/mapreduce/*," +
-        "$YARN_HOME/share/hadoop/mapreduce/lib/*");
     return config;
   }
   

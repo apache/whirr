@@ -44,6 +44,7 @@ public class YarnConfigurationBuilder {
       throws ConfigurationException {
     CompositeConfiguration config = new CompositeConfiguration();
     Configuration sub = clusterSpec.getConfigurationForKeysWithPrefix(prefix);
+    config.setDelimiterParsingDisabled(true);
     config.addConfiguration(sub.subset(prefix)); // remove prefix
     config.addConfiguration(defaults.subset(prefix));
     return config;
@@ -63,16 +64,22 @@ public class YarnConfigurationBuilder {
     Configuration config = build(clusterSpec, cluster, defaults,
         "hadoop-yarn");
 
-    Instance resourceManager = cluster
-        .getInstanceMatching(role(YarnResourceManagerHandler.ROLE));
-    String resourceManagerPrivateAddress =
-      resourceManager.getPrivateAddress().getHostName();
-    config.setProperty("yarn.resourcemanager.address",
-        String.format("%s:8040", resourceManagerPrivateAddress));
-    config.setProperty("yarn.resourcemanager.scheduler.address",
-        String.format("%s:8030", resourceManagerPrivateAddress));
-    config.setProperty("yarn.resourcemanager.resource-tracker.address",
-        String.format("%s:8025", resourceManagerPrivateAddress));
+    if (role.equals(YarnResourceManagerHandler.ROLE)) {
+      config.setProperty("yarn.resourcemanager.address", "0.0.0.0:8040");
+      config.setProperty("yarn.resourcemanager.scheduler.address", "0.0.0.0:8030");
+      config.setProperty("yarn.resourcemanager.resource-tracker.address", "0.0.0.0:8025");
+    } else {
+      Instance resourceManager = cluster
+          .getInstanceMatching(role(YarnResourceManagerHandler.ROLE));
+      String resourceManagerPrivateAddress =
+        resourceManager.getPrivateAddress().getHostName();
+      config.setProperty("yarn.resourcemanager.address",
+          String.format("%s:8040", resourceManagerPrivateAddress));
+      config.setProperty("yarn.resourcemanager.scheduler.address",
+          String.format("%s:8030", resourceManagerPrivateAddress));
+      config.setProperty("yarn.resourcemanager.resource-tracker.address",
+          String.format("%s:8025", resourceManagerPrivateAddress));
+    }
     return config;
   }
 }
