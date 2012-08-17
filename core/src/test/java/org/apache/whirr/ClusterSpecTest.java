@@ -38,6 +38,7 @@ import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.io.IOUtils;
 import org.apache.whirr.util.KeyPair;
+import org.jclouds.compute.domain.TemplateBuilderSpec;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -69,7 +70,23 @@ public class ClusterSpecTest {
     assertThat(spec.getRunUrlBase(), is("http://example.org"));
   }
   
-
+  @Test
+  public void testAwsEc2SpotPrice() throws ConfigurationException {
+    assertEquals(ClusterSpec.withNoDefaults(new PropertiesConfiguration()).getAwsEc2SpotPrice(), null);
+    Configuration conf = new PropertiesConfiguration();
+    conf.setProperty(ClusterSpec.Property.AWS_EC2_SPOT_PRICE.getConfigName(), "0.30");
+    ClusterSpec spec = ClusterSpec.withNoDefaults(conf);
+    assertEquals(spec.getAwsEc2SpotPrice(), new Float(0.3));
+  }
+  
+  @Test
+  public void testTemplate() throws ConfigurationException {
+    Configuration conf = new PropertiesConfiguration();
+    conf.setProperty(ClusterSpec.Property.TEMPLATE.getConfigName(), "osFamily=UBUNTU,os64Bit=true,minRam=2048");
+    ClusterSpec spec = ClusterSpec.withNoDefaults(conf);
+    assertEquals(spec.getTemplate(), TemplateBuilderSpec.parse("osFamily=UBUNTU,os64Bit=true,minRam=2048"));
+  }
+  
   @Test
   public void testEndpoint() throws ConfigurationException {
     Configuration conf = new PropertiesConfiguration();
@@ -354,7 +371,7 @@ public class ClusterSpecTest {
   public void testCopySpec() throws Exception {
     ClusterSpec spec = ClusterSpec.withTemporaryKeys(
       new PropertiesConfiguration("whirr-core-test.properties"));
-    spec.setLocationId("random-location");
+    spec.setTemplate(TemplateBuilderSpec.parse("locationId=random-location"));
 
     /* check the copy is the same as the original */
     assertThat(spec.copy(), is(spec));
@@ -376,32 +393,40 @@ public class ClusterSpecTest {
   @Test
   public void testHardwareIdPerInstanceTemplate() throws Exception {
     PropertiesConfiguration conf = new PropertiesConfiguration("whirr-core-test.properties");
-    conf.setProperty("whirr.instance-templates", "2 noop, 1 role1+role2, 1 role1, 3 spots");
+    conf.setProperty("whirr.instance-templates", "2 noop, 1 role1+role2, 1 role1, 3 spots, 1 spec");
     conf.setProperty("whirr.hardware-id", "c1.xlarge");
 
     conf.setProperty("whirr.templates.noop.hardware-id", "m1.large");
     conf.setProperty("whirr.templates.role1+role2.hardware-id", "t1.micro");
     conf.setProperty("whirr.templates.role1+role2.image-id", "us-east-1/ami-123324");
     conf.setProperty("whirr.templates.spots.aws-ec2-spot-price", 0.5f);
+    conf.setProperty("whirr.templates.spec.template", "osFamily=UBUNTU,os64Bit=true,minRam=2048");
 
     ClusterSpec spec = ClusterSpec.withTemporaryKeys(conf);
     List<InstanceTemplate> templates = spec.getInstanceTemplates();
 
     InstanceTemplate noops = get(templates, 0);
     assert noops.getRoles().contains("noop");
-    assertEquals(noops.getHardwareId(), "m1.large");
-    assertEquals(noops.getImageId(), null);
+    assertEquals(noops.getTemplate().getHardwareId(), "m1.large");
+    assertEquals(noops.getTemplate().getImageId(), null);
+    assertEquals(noops.getAwsEc2SpotPrice(), null);
 
     InstanceTemplate second = get(templates, 1);
-    assertEquals(second.getHardwareId(), "t1.micro");
-    assertEquals(second.getImageId(), "us-east-1/ami-123324");
+    assertEquals(second.getTemplate().getHardwareId(), "t1.micro");
+    assertEquals(second.getTemplate().getImageId(), "us-east-1/ami-123324");
+    assertEquals(second.getAwsEc2SpotPrice(), null);
 
     InstanceTemplate third = get(templates, 2);
-    assertEquals(third.getHardwareId(), null);
-    assertEquals(third.getImageId(), null);
+    assertEquals(third.getTemplate(), null);
+    assertEquals(third.getAwsEc2SpotPrice(), null);
 
     InstanceTemplate spots = get(templates, 3);
-    assertEquals(spots.getAwsEc2SpotPrice(), 0.5f, 0.001);
+    assertEquals(spots.getAwsEc2SpotPrice(), new Float(0.5f), 0.001);
+
+    InstanceTemplate template = get(templates, 4);
+    assertEquals(template.getTemplate(), TemplateBuilderSpec.parse("osFamily=UBUNTU,os64Bit=true,minRam=2048"));
+    assertEquals(template.getAwsEc2SpotPrice(), null);
+
   }
 
   @Test(expected = ConfigurationException.class)

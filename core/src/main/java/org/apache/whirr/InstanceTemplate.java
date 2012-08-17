@@ -31,10 +31,14 @@ import java.util.regex.Pattern;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.lang.StringUtils;
+import org.jclouds.compute.domain.TemplateBuilderSpec;
+import org.jclouds.javax.annotation.Nullable;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.base.Objects;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -52,9 +56,8 @@ public class InstanceTemplate {
   public static class Builder {
     private int numberOfInstances = -1;
     private int minNumberOfInstances = -1;
-    private String hardwareId;
-    private String imageId;
-    private float awsEc2SpotPrice = 0;
+    private TemplateBuilderSpec template;
+    private Float awsEc2SpotPrice;
     private Set<String> roles;
 
     public Builder numberOfInstance(int numberOfInstances) {
@@ -67,17 +70,12 @@ public class InstanceTemplate {
       return this;
     }
 
-    public Builder hardwareId(String hardwareId) {
-      this.hardwareId = hardwareId;
+    public Builder template(@Nullable TemplateBuilderSpec template) {
+      this.template = template;
       return this;
     }
-
-    public Builder imageId(String imageId) {
-      this.imageId = imageId;
-      return this;
-    }
-
-    public Builder awsEc2SpotPrice(float awsEc2SpotPrice) {
+    
+    public Builder awsEc2SpotPrice(@Nullable Float awsEc2SpotPrice) {
       this.awsEc2SpotPrice = awsEc2SpotPrice;
       return this;
     }
@@ -97,20 +95,19 @@ public class InstanceTemplate {
         minNumberOfInstances = numberOfInstances;
       }
       return new InstanceTemplate(numberOfInstances, minNumberOfInstances, roles,
-        hardwareId, imageId, awsEc2SpotPrice);
+        template, awsEc2SpotPrice);
     }
   }
 
   private int numberOfInstances;
   private int minNumberOfInstances;  // some instances may fail, at least a minimum number is required
-  private String hardwareId;
-  private String imageId;
-  private float awsEc2SpotPrice;
+  private TemplateBuilderSpec template;
+  private Float awsEc2SpotPrice;
   private Set<String> roles;
 
 
   private InstanceTemplate(int numberOfInstances, int minNumberOfInstances,
-      Set<String> roles, String hardwareId, String imageId, float awsEc2SpotPrice) {
+      Set<String> roles, TemplateBuilderSpec template, Float awsEc2SpotPrice) {
     for (String role : roles) {
       checkArgument(!StringUtils.contains(role, " "),
         "Role '%s' may not contain space characters.", role);
@@ -118,8 +115,7 @@ public class InstanceTemplate {
 
     this.numberOfInstances = numberOfInstances;
     this.minNumberOfInstances = minNumberOfInstances;
-    this.hardwareId = hardwareId;
-    this.imageId = imageId;
+    this.template = template;
     this.awsEc2SpotPrice = awsEc2SpotPrice;
     this.roles = roles;
   }
@@ -136,15 +132,13 @@ public class InstanceTemplate {
     return minNumberOfInstances;
   }
 
-  public String getHardwareId() {
-    return hardwareId;
+  @Nullable
+  public TemplateBuilderSpec getTemplate() {
+    return template;
   }
 
-  public String getImageId() {
-    return imageId;
-  }
-
-  public float getAwsEc2SpotPrice() {
+  @Nullable
+  public Float getAwsEc2SpotPrice() {
     return awsEc2SpotPrice;
   }
 
@@ -153,8 +147,7 @@ public class InstanceTemplate {
       InstanceTemplate that = (InstanceTemplate) o;
       return numberOfInstances == that.numberOfInstances
         && minNumberOfInstances == that.minNumberOfInstances
-        && Objects.equal(hardwareId, that.hardwareId)
-        && Objects.equal(imageId, that.imageId)
+        && Objects.equal(template, that.template)
         && awsEc2SpotPrice == that.awsEc2SpotPrice
         && Objects.equal(roles, that.roles);
     }
@@ -163,15 +156,14 @@ public class InstanceTemplate {
 
   public int hashCode() {
     return Objects.hashCode(numberOfInstances, minNumberOfInstances,
-      hardwareId, imageId, awsEc2SpotPrice, roles);
+             template, awsEc2SpotPrice, roles);
   }
 
   public String toString() {
-    return Objects.toStringHelper(this)
+    return Objects.toStringHelper(this).omitNullValues()
       .add("numberOfInstances", numberOfInstances)
       .add("minNumberOfInstances", minNumberOfInstances)
-      .add("hardwareId", hardwareId)
-      .add("imageId", imageId)
+      .add("template", template)
       .add("awsEc2SpotPrice", awsEc2SpotPrice)
       .add("roles", roles)
       .toString();
@@ -219,19 +211,26 @@ public class InstanceTemplate {
     return templates;
   }
 
-  private static void parseInstanceTemplateGroupOverrides(
-    Configuration configuration, String templateGroup, Builder templateBuilder
-  ) {
-
-    String hardwareId = configuration.getString(
-      "whirr.templates." + templateGroup + ".hardware-id", null);
-    String imageId = configuration.getString(
-      "whirr.templates." + templateGroup + ".image-id", null);
-    float awsEc2SpotPrice = configuration.getFloat(
-      "whirr.templates." + templateGroup + ".aws-ec2-spot-price", 0);
-
-    templateBuilder.hardwareId(hardwareId).imageId(imageId)
-      .awsEc2SpotPrice(awsEc2SpotPrice);
+  private static void parseInstanceTemplateGroupOverrides(Configuration configuration, String templateGroup,
+        Builder templateBuilder) {
+    if (configuration.getList("whirr.templates." + templateGroup + ".template").size() > 0) {
+      String specString = Joiner.on(',').join(configuration.getList("whirr.templates." + templateGroup + ".template"));
+      templateBuilder.template(TemplateBuilderSpec.parse(specString));
+    } else {
+      // until TemplateBuilderSpec has type-safe builder
+      ImmutableMap.Builder<String, String> templateParamsBuilder = ImmutableMap.<String, String> builder();
+      for (String resource : ImmutableSet.of("image", "hardware")) {
+        String key = String.format("whirr.templates.%s.%s-id", templateGroup, resource);
+        if (configuration.getString(key) != null) {
+          templateParamsBuilder.put(resource + "Id", configuration.getString(key));
+        }
+      }
+      Map<String, String> templateParams = templateParamsBuilder.build();
+      if (templateParams.size() > 0)
+        templateBuilder.template(TemplateBuilderSpec.parse(Joiner.on(',').withKeyValueSeparator("=")
+              .join(templateParams)));
+    }
+    templateBuilder.awsEc2SpotPrice(configuration.getFloat("whirr.templates." + templateGroup + ".aws-ec2-spot-price", null));
   }
 
   private static int parseMinNumberOfInstances(

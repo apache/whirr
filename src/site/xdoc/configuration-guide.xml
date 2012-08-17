@@ -518,6 +518,16 @@ xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 http://maven.apache.org/xsd
       </tr>
       <tr valign="top">
         <td>
+          <tt>whirr.template</tt>
+        </td>
+        <td>
+          <tt>--template</tt>
+        </td>
+        <td>osFamily=UBUNTU,osVersionMatches=10.04,minRam=1024</td>
+        <td>The specification of requirements for instances in jclouds <a href="https://github.com/jclouds/jclouds/blob/1.5.x/compute/src/main/java/org/jclouds/compute/domain/TemplateBuilderSpec.java">TemplateBuilderSpec</a> format. For example, this can control the ram, cores, os, and login user details.</td>
+      </tr>
+      <tr valign="top">
+        <td>
           <tt>whirr.image-id</tt>
         </td>
         <td>

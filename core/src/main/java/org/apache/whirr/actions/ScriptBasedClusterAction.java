@@ -38,7 +38,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
-import javax.annotation.Nullable;
 import org.apache.velocity.app.VelocityEngine;
 import org.apache.whirr.Cluster;
 import static org.apache.whirr.Cluster.Instance;
@@ -211,7 +210,7 @@ public abstract class ScriptBasedClusterAction extends ClusterAction {
     return Joiner.on(", ").join(
         Iterables.transform(instances, new Function<Instance, String>() {
           @Override
-          public String apply(@Nullable Instance instance) {
+          public String apply(Instance instance) {
             return instance == null ? "<null>" : instance.getId();
           }
         }));
@@ -250,7 +249,7 @@ public abstract class ScriptBasedClusterAction extends ClusterAction {
   private boolean containsNoneOf(Set<String> querySet, final Set<String> target) {
     return !Iterables.any(querySet, new Predicate<String>() {
       @Override
-      public boolean apply(@Nullable String role) {
+      public boolean apply(String role) {
         return target.contains(role);
       }
     });

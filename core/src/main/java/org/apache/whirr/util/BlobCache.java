@@ -119,20 +119,20 @@ public class BlobCache {
         LOG.warn("No blob store location found with this ID '{}'. " +
           "Using default location.", spec.getBlobStoreLocationId());
       }
-    } else if (spec.getLocationId() != null) {
+    } else if (spec.getTemplate().getLocationId() != null) {
       /* find the closest location to the compute nodes */
       ComputeServiceContext compute = getCompute.apply(spec);
 
       Set<String> computeIsoCodes = null;
       for(Location loc : compute.getComputeService().listAssignableLocations()) {
-        if (loc.getId().equals(spec.getLocationId())) {
+        if (loc.getId().equals(spec.getTemplate().getLocationId())) {
           computeIsoCodes = loc.getIso3166Codes();
           break;
         }
       }
       if (computeIsoCodes == null) {
         LOG.warn("Invalid compute location ID '{}'. " +
-          "Using default blob store location.", spec.getLocationId());
+          "Using default blob store location.", spec.getTemplate().getLocationId());
       } else {
         for (Location loc : context.getBlobStore().listAssignableLocations()) {
           if (containsAny(loc.getIso3166Codes(), computeIsoCodes)) {

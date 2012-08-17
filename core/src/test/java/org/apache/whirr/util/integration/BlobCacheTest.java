@@ -41,6 +41,7 @@ import org.apache.whirr.service.BlobStoreContextBuilder;
 import org.apache.whirr.service.ComputeCache;
 import org.apache.whirr.util.BlobCache;
 import org.jclouds.blobstore.BlobStoreContext;
+import org.jclouds.compute.domain.TemplateBuilderSpec;
 import org.jclouds.http.HttpRequest;
 import org.jclouds.scriptbuilder.domain.OsFamily;
 import org.junit.Test;
@@ -99,7 +100,7 @@ public class BlobCacheTest {
       return; // this test can be executed only on amazon but the internal
       // location selection mechanism should work for any cloud provider
     }
-    spec.setLocationId("eu-west-1");
+    spec.setTemplate(TemplateBuilderSpec.parse("locationId=eu-west-1"));
 
     BlobCache cache = BlobCache.getInstance(ComputeCache.INSTANCE, spec);
     assertThat(cache.getLocation().getId(), is("EU"));

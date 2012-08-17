@@ -39,12 +39,17 @@ import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.ConfigurationUtils;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.io.IOUtils;
+import org.jclouds.compute.domain.TemplateBuilderSpec;
+import org.jclouds.javax.annotation.Nullable;
 import org.jclouds.predicates.validators.DnsNameValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Joiner;
 import com.google.common.base.Objects;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableMap.Builder;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -67,9 +72,6 @@ public class ClusterSpec {
 
     SERVICE_NAME(String.class, false, "(optional) The name of the " +
       "service to use. E.g. hadoop."),
-
-    BOOTSTRAP_USER(String.class, false,  "Override the default login user "+
-      "used to bootstrap whirr. E.g. ubuntu or myuser:mypass."),
 
     CLUSTER_USER(String.class, false, "The name of the user that Whirr " +
             "will create on all the cluster instances. You have to use " +
@@ -137,7 +139,15 @@ public class ClusterSpec {
       "Valid only for the blob state store. Defaults to whirr-<cluster-name>"),
 
     AWS_EC2_SPOT_PRICE(Float.class, false, "Spot instance price (aws-ec2 specific option)"),
-      
+    
+    TEMPLATE(String.class, true, "The specification of requirements for instances in jclouds "+
+       "TemplateBuilderSpec format.  default. \"osFamily=UBUNTU,osVersionMatches=10.04,minRam=1024\". "+
+       "Note that this is a an alternative not compatible with the following properties: "+
+       "image-id, hardware-id, location-id, hardware-min-ram, bootstrap-user."),
+
+    BOOTSTRAP_USER(String.class, false,  "Override the default login user "+
+      "used to bootstrap whirr. E.g. ubuntu or myuser:mypass."),
+       
     IMAGE_ID(String.class, false, "The ID of the image to use for " + 
       "instances. If not specified then a vanilla Linux image is " + 
       "chosen."),
@@ -254,7 +264,6 @@ public class ClusterSpec {
   private String serviceName;
 
   private String clusterUser;
-  private String bootstrapUser;
 
   private List<InstanceTemplate> instanceTemplates;
   private int maxStartupRetries;
@@ -274,19 +283,15 @@ public class ClusterSpec {
   private String stateStoreContainer;
   private String stateStoreBlob;
 
-  private float awsEc2SpotPrice;
+  private Float awsEc2SpotPrice;
 
   private String privateKey;
   private File privateKeyFile;
   private String publicKey;
 
-  private String locationId;
   private String blobStoreLocationId;
 
-  private String imageId;
-
-  private String hardwareId;
-  private int hardwareMinRam;
+  private TemplateBuilderSpec template;
 
   private List<String> clientCidrs;
   private Map<String, List<String>> firewallRules;
@@ -327,7 +332,6 @@ public class ClusterSpec {
     setClusterName(getString(Property.CLUSTER_NAME));
     setServiceName(getString(Property.SERVICE_NAME));
 
-    setBootstrapUser(getBootstrapUserOrDeprecatedLoginUser());
     setClusterUser(getString(Property.CLUSTER_USER));
 
     setInstanceTemplates(InstanceTemplate.parse(config));
@@ -351,15 +355,39 @@ public class ClusterSpec {
     setStateStoreContainer(getString(Property.STATE_STORE_CONTAINER));
     setStateStoreBlob(getString(Property.STATE_STORE_BLOB));
 
-    setAwsEc2SpotPrice(getFloat(Property.AWS_EC2_SPOT_PRICE, -1));
+    setAwsEc2SpotPrice(getFloat(Property.AWS_EC2_SPOT_PRICE, (Float) null));
 
     checkAndSetKeyPair();
-
-    setImageId(getString(Property.IMAGE_ID));
-    setHardwareId(getString(Property.HARDWARE_ID));
-    setHardwareMinRam(getInt(Property.HARDWARE_MIN_RAM, 1024));
-
-    setLocationId(getString(Property.LOCATION_ID));
+    
+    if (getList(Property.TEMPLATE).size() > 0) {
+       this.template = TemplateBuilderSpec.parse(Joiner.on(',').join(getList(Property.TEMPLATE)));
+    } else {
+       // until TemplateBuilderSpec has type-safe builder
+       Builder<String, String> template = ImmutableMap.<String, String>builder();
+       if (getString(Property.IMAGE_ID) != null) {
+          template.put("imageId", getString(Property.IMAGE_ID));
+       } else {
+          template.put("osFamily", "UBUNTU");
+          template.put("osVersionMatches", "10.04");
+          // canonical images, but not testing ones
+          if ("aws-ec2".equals(getProvider()))
+             template.put("osDescriptionMatches", "^(?!.*(daily|testing)).*ubuntu-images.*$");
+       }
+       if (getString(Property.HARDWARE_ID) != null) {
+          template.put("hardwareId", getString(Property.HARDWARE_ID));
+       } else {
+          template.put("minRam", Integer.toString(getInt(Property.HARDWARE_MIN_RAM, 1024)));
+       }
+       if (getString(Property.LOCATION_ID) != null) {
+          template.put("locationId", getString(Property.LOCATION_ID));
+       }
+       String bootstrapUser = getBootstrapUserOrDeprecatedLoginUser();
+       if (bootstrapUser != null) {
+          template.put("loginUser", bootstrapUser);
+       }
+       this.template = TemplateBuilderSpec.parse(Joiner.on(',').withKeyValueSeparator("=").join(template.build()));
+    }
+    
     setBlobStoreLocationId(getString(Property.BLOBSTORE_LOCATION_ID));
     setClientCidrs(getList(Property.CLIENT_CIDRS));
     
@@ -404,7 +432,6 @@ public class ClusterSpec {
     r.setClusterName(getClusterName());
     r.setServiceName(getServiceName());
 
-    r.setBootstrapUser(getBootstrapUser());
     r.setClusterUser(getClusterUser());
 
     r.setInstanceTemplates(Lists.newLinkedList(getInstanceTemplates()));
@@ -428,11 +455,8 @@ public class ClusterSpec {
     r.setPrivateKey(getPrivateKey());
     r.setPublicKey(getPublicKey());
 
-    r.setImageId(getImageId());
-    r.setHardwareId(getHardwareId());
-    r.setHardwareMinRam(getHardwareMinRam());
+    r.setTemplate(getTemplate());
 
-    r.setLocationId(getLocationId());
     r.setBlobStoreLocationId(getBlobStoreLocationId());
     r.setClientCidrs(getClientCidrs());
 
@@ -460,7 +484,11 @@ public class ClusterSpec {
   private float getFloat(Property key, float defaultValue) {
     return config.getFloat(key.getConfigName(), defaultValue);
   }
-
+  
+  private Float getFloat(Property key, Float defaultValue) {
+    return config.getFloat(key.getConfigName(), defaultValue);
+  }
+  
   private List<String> getList(Property key) {
     return config.getList(key.getConfigName());
   }
@@ -638,7 +666,8 @@ public class ClusterSpec {
     return stateStoreBlob;
   }
 
-  public float getAwsEc2SpotPrice() {
+  @Nullable
+  public Float getAwsEc2SpotPrice() {
     return awsEc2SpotPrice;
   }
 
@@ -658,20 +687,12 @@ public class ClusterSpec {
     return publicKey;
   }
 
-  public String getImageId() {
-    return imageId;
-  }
-
-  public String getHardwareId() {
-    return hardwareId;
-  }
-
-  public int getHardwareMinRam() {
-    return hardwareMinRam;
-  }
-
-  public String getLocationId() {
-    return locationId;
+  /**
+   * Parameters that define how an instance is built, including hardware, image, and login information.
+   * 
+   */
+  public TemplateBuilderSpec getTemplate() {
+    return template;
   }
 
   public List<String> getClientCidrs() {
@@ -692,15 +713,6 @@ public class ClusterSpec {
 
   public String getClusterUser() {
     return clusterUser;
-  }
-
-  public String getBootstrapUser() {
-    return bootstrapUser;
-  }
-
-  @Deprecated
-  public String getLoginUser() {
-    return getBootstrapUser();
   }
 
   public void setInstanceTemplates(List<InstanceTemplate> instanceTemplates) {
@@ -795,7 +807,7 @@ public class ClusterSpec {
     this.stateStoreBlob = blob;
   }
 
-  public void setAwsEc2SpotPrice(float value) {
+  public void setAwsEc2SpotPrice(@Nullable Float value) {
     this.awsEc2SpotPrice = value;
   }
 
@@ -897,23 +909,11 @@ public class ClusterSpec {
         .startsWith("-----BEGIN RSA PRIVATE KEY-----"),
         "key should start with -----BEGIN RSA PRIVATE KEY-----");
   }
-
-  public void setImageId(String imageId) {
-    this.imageId = imageId;
-  }
   
-  public void setHardwareId(String hardwareId) {
-    this.hardwareId = hardwareId;
+  public void setTemplate(TemplateBuilderSpec template) {
+     this.template = template;
   }
 
-  public void setHardwareMinRam(int minRam) {
-    this.hardwareMinRam = minRam;
-  }
-  
-  public void setLocationId(String locationId) {
-    this.locationId = locationId;
-  }
-  
   public void setClientCidrs(List<String> clientCidrs) {
     this.clientCidrs = clientCidrs;
   }
@@ -933,15 +933,6 @@ public class ClusterSpec {
   public void setClusterUser(String user) {
     checkArgument(user == null || !user.equals("root"), "cluster-user != root or do not run as root");
     this.clusterUser = user;
-  }
-
-  public void setBootstrapUser(String bootstrapUser) {
-    this.bootstrapUser = bootstrapUser;
-  }
-
-  @Deprecated
-  public void setLoginUser(String user) {
-    setBootstrapUser(user);
   }
 
   public Configuration getConfiguration() {
@@ -997,13 +988,9 @@ public class ClusterSpec {
         && Objects.equal(getClusterName(), that.getClusterName())
         && Objects.equal(getServiceName(), that.getServiceName())
         && Objects.equal(getClusterUser(), that.getClusterUser())
-        && Objects.equal(getBootstrapUser(), that.getBootstrapUser())
         && Objects.equal(getPublicKey(), that.getPublicKey())
         && Objects.equal(getPrivateKey(), that.getPrivateKey())
-        && Objects.equal(getImageId(), that.getImageId())
-        && Objects.equal(getHardwareId(), that.getHardwareId())
-        && Objects.equal(getHardwareMinRam(), that.getHardwareMinRam())
-        && Objects.equal(getLocationId(), that.getLocationId())
+        && Objects.equal(getTemplate(), that.getTemplate())
         && Objects.equal(getBlobStoreLocationId(), that.getBlobStoreLocationId())
         && Objects.equal(getClientCidrs(), that.getClientCidrs())
         && Objects.equal(getVersion(), that.getVersion())
@@ -1036,13 +1023,9 @@ public class ClusterSpec {
         getClusterName(),
         getServiceName(),
         getClusterUser(),
-        getBootstrapUser(),
         getPublicKey(),
         getPrivateKey(),
-        getImageId(),
-        getHardwareId(),
-        getHardwareMinRam(),
-        getLocationId(),
+        getTemplate(),
         getBlobStoreLocationId(),
         getClientCidrs(),
         getVersion(),
@@ -1073,13 +1056,9 @@ public class ClusterSpec {
       .add("clusterName", getClusterName())
       .add("serviceName", getServiceName())
       .add("clusterUser", getClusterUser())
-      .add("bootstrapUser", getBootstrapUser())
       .add("publicKey", getPublicKey())
       .add("privateKey", getPrivateKey())
-      .add("imageId", getImageId())
-      .add("hardwareId", getHardwareId())
-      .add("hardwareMinRam", getHardwareMinRam())
-      .add("locationId", getLocationId())
+      .add("template", getTemplate())
       .add("blobStoreLocationId", getBlobStoreLocationId())
       .add("clientCidrs", getClientCidrs())
       .add("version", getVersion())

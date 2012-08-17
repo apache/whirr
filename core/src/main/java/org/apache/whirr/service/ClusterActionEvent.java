@@ -24,7 +24,6 @@ import org.apache.whirr.Cluster;
 import org.apache.whirr.ClusterSpec;
 import org.apache.whirr.InstanceTemplate;
 import org.apache.whirr.service.jclouds.StatementBuilder;
-import org.apache.whirr.service.jclouds.TemplateBuilderStrategy;
 import org.jclouds.compute.ComputeServiceContext;
 
 import com.google.common.base.Function;
@@ -39,8 +38,6 @@ public class ClusterActionEvent {
   private InstanceTemplate instanceTemplate;
   private Cluster cluster;
   private StatementBuilder statementBuilder;
-  private TemplateBuilderStrategy templateBuilderStrategy =
-    new TemplateBuilderStrategy();
   private FirewallManager firewallManager;
   private Function<ClusterSpec, ComputeServiceContext> getCompute;
   private VelocityEngine velocityEngine;
@@ -94,15 +91,6 @@ public class ClusterActionEvent {
     return statementBuilder;
   }
 
-  public TemplateBuilderStrategy getTemplateBuilderStrategy() {
-    return templateBuilderStrategy;
-  }
-
-  public void setTemplateBuilderStrategy(
-      TemplateBuilderStrategy templateBuilderStrategy) {
-    this.templateBuilderStrategy = templateBuilderStrategy;
-  }
-  
   public FirewallManager getFirewallManager() {
     return firewallManager;
   }

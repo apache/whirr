@@ -56,6 +56,7 @@ import org.jclouds.compute.domain.NodeMetadataBuilder;
 import org.jclouds.compute.domain.OperatingSystem;
 import org.jclouds.compute.domain.Template;
 import org.jclouds.compute.domain.TemplateBuilder;
+import org.jclouds.compute.domain.TemplateBuilderSpec;
 import org.jclouds.compute.domain.internal.TemplateImpl;
 import org.jclouds.compute.options.TemplateOptions;
 import org.jclouds.domain.Location;
@@ -124,6 +125,7 @@ public class BootstrapClusterActionTest {
     when(computeService.getContext()).thenReturn(serviceContext);
     when(serviceContext.getBackendType()).thenReturn(TypeToken.class.cast(TypeToken.of(Context.class)));
     when(computeService.templateBuilder()).thenReturn(templateBuilder);
+    when(templateBuilder.from((TemplateBuilderSpec) any())).thenReturn(templateBuilder);
     when(templateBuilder.options((TemplateOptions) any())).thenReturn(templateBuilder);
     when(templateBuilder.build()).thenReturn(template);
     
@@ -193,6 +195,7 @@ public class BootstrapClusterActionTest {
     when(computeService.getContext()).thenReturn(serviceContext);
     when(serviceContext.getBackendType()).thenReturn(TypeToken.class.cast(TypeToken.of(Context.class)));
     when(computeService.templateBuilder()).thenReturn(templateBuilder);
+    when(templateBuilder.from((TemplateBuilderSpec) any())).thenReturn(templateBuilder);
     when(templateBuilder.options((TemplateOptions) any())).thenReturn(templateBuilder);
     when(templateBuilder.build()).thenReturn(template);
     
@@ -370,6 +373,7 @@ public class BootstrapClusterActionTest {
     when(computeService.getContext()).thenReturn(serviceContext);
     when(serviceContext.getBackendType()).thenReturn(TypeToken.class.cast(TypeToken.of(Context.class)));
     when(computeService.templateBuilder()).thenReturn(templateBuilder);
+    when(templateBuilder.from((TemplateBuilderSpec) any())).thenReturn(templateBuilder);
     when(templateBuilder.options((TemplateOptions) any())).thenReturn(templateBuilder);
     when(templateBuilder.build()).thenReturn(template);
     
@@ -431,6 +435,7 @@ public class BootstrapClusterActionTest {
     when(getCompute.apply(clusterSpec)).thenReturn(serviceContext);
     when(serviceContext.getComputeService()).thenReturn(computeService);
     when(computeService.templateBuilder()).thenReturn(templateBuilder);
+    when(templateBuilder.from((TemplateBuilderSpec) any())).thenReturn(templateBuilder);
     when(templateBuilder.options((TemplateOptions) any())).thenReturn(templateBuilder);
     when(templateBuilder.build()).thenReturn(template);
     

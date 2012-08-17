@@ -33,7 +33,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
@@ -131,7 +130,7 @@ public class DryRunModule extends AbstractModule {
     private final Credentials creds;
     private final NodeMetadata node;
 
-    Key(HostAndPort socket, Credentials creds, @Nullable NodeMetadata node) {
+    Key(HostAndPort socket, Credentials creds, NodeMetadata node) {
       this.socket = socket;
       this.creds = creds;
       this.node = node;

@@ -99,7 +99,7 @@ public class BootstrapClusterAction extends ScriptBasedClusterAction {
         computeServiceContext.getComputeService();
 
       final Template template = BootstrapTemplate.build(clusterSpec, computeService,
-        statementBuilder, entry.getValue().getTemplateBuilderStrategy(), entry.getKey());
+        statementBuilder, entry.getKey());
 
       Future<Set<? extends NodeMetadata>> nodesFuture = executorService.submit(
           new StartupProcess(

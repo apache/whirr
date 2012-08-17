@@ -29,7 +29,6 @@ import static org.jclouds.scriptbuilder.statements.ssh.SshStatements.sshdConfig;
 import org.apache.whirr.ClusterSpec;
 import org.apache.whirr.InstanceTemplate;
 import org.apache.whirr.service.jclouds.StatementBuilder;
-import org.apache.whirr.service.jclouds.TemplateBuilderStrategy;
 import org.jclouds.aws.ec2.AWSEC2ApiMetadata;
 import org.jclouds.aws.ec2.compute.AWSEC2TemplateOptions;
 import org.jclouds.ec2.EC2ApiMetadata;
@@ -58,7 +57,6 @@ public class BootstrapTemplate {
     final ClusterSpec clusterSpec,
     ComputeService computeService,
     StatementBuilder statementBuilder,
-    TemplateBuilderStrategy strategy,
     InstanceTemplate instanceTemplate
   ) {
     String name = "bootstrap-" + Joiner.on('_').join(instanceTemplate.getRoles());
@@ -74,9 +72,10 @@ public class BootstrapTemplate {
       LOG.debug("Running script {}:\n{}", name, bootstrap.render(OsFamily.UNIX));
     }
 
-    TemplateBuilder templateBuilder = computeService.templateBuilder()
-      .options(runScript(bootstrap));
-    strategy.configureTemplateBuilder(clusterSpec, templateBuilder, instanceTemplate);
+    TemplateBuilder templateBuilder = computeService.templateBuilder().from(
+        instanceTemplate.getTemplate() != null ? instanceTemplate.getTemplate() :
+        clusterSpec.getTemplate());
+    templateBuilder.options(runScript(bootstrap));
     return setSpotInstancePriceIfSpecified(
       computeService.getContext(), clusterSpec, templateBuilder.build(), instanceTemplate
     );
@@ -102,14 +101,9 @@ public class BootstrapTemplate {
   ) {
 
     if (AWSEC2ApiMetadata.CONTEXT_TOKEN.isAssignableFrom(context.getBackendType())) {
-      float spotPrice = firstPositiveOrDefault(
-        0,  /* by default use regular instances */
-        instanceTemplate.getAwsEc2SpotPrice(),
-        spec.getAwsEc2SpotPrice()
-      );
-      if (spotPrice > 0) {
-        template.getOptions().as(AWSEC2TemplateOptions.class).spotPrice(spotPrice);
-      }
+      template.getOptions().as(AWSEC2TemplateOptions.class)
+            .spotPrice(instanceTemplate.getAwsEc2SpotPrice() != null ? instanceTemplate.getAwsEc2SpotPrice() :
+                                                                       spec.getAwsEc2SpotPrice());
     }
 
     return mapEphemeralIfImageIsEBSBacked(context, spec, template, instanceTemplate);
@@ -143,13 +137,6 @@ public class BootstrapTemplate {
 
         return template;
     }
-                                                                                     
-  private static float firstPositiveOrDefault(float defaultValue, float... listOfValues) {
-    for(float value : listOfValues) {
-      if (value > 0) return value;
-    }
-    return defaultValue;
-  }
 
   // must be used inside InitBuilder, as this sets the shell variables used in this statement
   private static Statement ensureUserExistsWithPublicAndPrivateKey(String username,

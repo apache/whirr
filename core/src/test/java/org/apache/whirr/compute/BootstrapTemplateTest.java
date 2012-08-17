@@ -32,7 +32,6 @@ import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.whirr.ClusterSpec;
 import org.apache.whirr.InstanceTemplate;
 import org.apache.whirr.service.jclouds.StatementBuilder;
-import org.apache.whirr.service.jclouds.TemplateBuilderStrategy;
 import org.jclouds.aws.ec2.AWSEC2ApiMetadata;
 import org.jclouds.aws.ec2.compute.AWSEC2ComputeService;
 import org.jclouds.aws.ec2.compute.AWSEC2TemplateOptions;
@@ -41,6 +40,7 @@ import org.jclouds.compute.ComputeServiceContext;
 import org.jclouds.compute.domain.Image;
 import org.jclouds.compute.domain.Template;
 import org.jclouds.compute.domain.TemplateBuilder;
+import org.jclouds.compute.domain.TemplateBuilderSpec;
 import org.jclouds.compute.options.TemplateOptions;
 import org.junit.Before;
 import org.junit.Test;
@@ -53,12 +53,10 @@ import com.google.common.reflect.TypeToken;
 public class BootstrapTemplateTest {
 
   private StatementBuilder statementBuilder;
-  private TemplateBuilderStrategy templateBuilderStrategy;
 
   @Before
   public void setUp() throws Exception {
     statementBuilder = new StatementBuilder();
-    templateBuilderStrategy = new TemplateBuilderStrategy();
   }
 
   @Test
@@ -124,6 +122,7 @@ private void assertSpotPriceIs(
 
     TemplateBuilder templateBuilder = mock(TemplateBuilder.class);
     when(computeService.templateBuilder()).thenReturn(templateBuilder);
+    when(templateBuilder.from((TemplateBuilderSpec)any())).thenReturn(templateBuilder);
     when(templateBuilder.options((TemplateOptions)any())).thenReturn(templateBuilder);
 
     Template template = mock(Template.class);
@@ -137,7 +136,7 @@ private void assertSpotPriceIs(
     when(options.as((Class<TemplateOptions>) any())).thenReturn(awsEec2TemplateOptions);
 
     BootstrapTemplate.build(clusterSpec, computeService,
-      statementBuilder, templateBuilderStrategy, instanceTemplate);
+      statementBuilder, instanceTemplate);
 
     verify(awsEec2TemplateOptions).spotPrice(spotPrice);
   }

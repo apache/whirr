@@ -57,6 +57,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
 import com.google.common.cache.LoadingCache;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
@@ -118,7 +119,16 @@ public class ByonClusterAction extends ScriptBasedClusterAction {
 
       int num = entry.getKey().getNumberOfInstances();
       Predicate<NodeMetadata> unused = not(in(usedNodes));
-      Predicate<NodeMetadata> instancePredicate = new TagsPredicate(StringUtils.split(entry.getKey().getHardwareId()));      
+      
+      // TODO: This seems very fragile and a bug.  It is not required that someone passes a hardware id, 
+      // so this is likely to break badly. Even if there was, why do we assume it is splittable?!
+      // this logic should be refactored or removed ASAP
+      Predicate<NodeMetadata> instancePredicate = Predicates.alwaysTrue();
+      if (entry.getKey().getTemplate() != null) {
+        String hardwareId = entry.getKey().getTemplate().getHardwareId();
+        if (hardwareId != null)
+          instancePredicate = new TagsPredicate(StringUtils.split(hardwareId)); 
+      }
 
       List<NodeMetadata> templateNodes = Lists.newArrayList(filter(nodes, and(unused, instancePredicate)));
       if (templateNodes.size() < num) {

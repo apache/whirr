@@ -115,6 +115,8 @@ Trunk (unreleased changes)
 
     WHIRR-630. Add endpoint and blobstore-endpoint configuration for private clouds (adriancole)
 
+    WHIRR-593. Upgrade to jclouds 1.5.0 (adriancole)
+
   BUG FIXES
 
     WHIRR-612. CDH4 can be installed on Ubuntu now as well as CentOS. (abayer)

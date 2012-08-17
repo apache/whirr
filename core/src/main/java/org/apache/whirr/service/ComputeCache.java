@@ -271,11 +271,8 @@ public enum ComputeCache implements Function<ClusterSpec, ComputeServiceContext>
         }
       }
       overrides = ConfigurationConverter.getProperties(jcloudsConfig);
-      if (spec.getBootstrapUser() != null) {
-         overrides.put(provider + ".image.login-user", spec.getBootstrapUser());
-      }
 
-      if ("aws-ec2".equals(spec.getProvider()) && spec.getImageId() != null) {
+      if ("aws-ec2".equals(spec.getProvider()) && spec.getTemplate().getImageId() != null) {
         enableAWSEC2LazyImageFetching(spec);
       }
 
@@ -297,7 +294,7 @@ public enum ComputeCache implements Function<ClusterSpec, ComputeServiceContext>
       overrides.setProperty(PROPERTY_EC2_AMI_QUERY, "");
       overrides.setProperty(PROPERTY_EC2_CC_AMI_QUERY, "");
 
-      String[] parts = StringUtils.split(spec.getImageId(), '/');
+      String[] parts = StringUtils.split(spec.getTemplate().getImageId(), '/');
       checkArgument(parts.length == 2, "Expected to find image-id = region/ami-id");
 
       overrides.setProperty(PROPERTY_REGION, parts[0]);

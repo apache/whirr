@@ -136,6 +136,7 @@ public class LaunchClusterCommandTest extends BaseCommandTest{
     assertThat(rc, is(0));
 
     Configuration conf = new PropertiesConfiguration();
+    conf.addProperty("whirr.provider", "aws-ec2");
     conf.addProperty("whirr.version", "version-string");
     conf.addProperty("whirr.instance-templates-max-percent-failure", "60 hadoop-datanode+hadoop-tasktracker");
 
@@ -147,7 +148,6 @@ public class LaunchClusterCommandTest extends BaseCommandTest{
         .roles("hadoop-datanode", "hadoop-tasktracker").build()
     ));
     expectedClusterSpec.setServiceName("hadoop");
-    expectedClusterSpec.setProvider("aws-ec2");
     expectedClusterSpec.setIdentity("myusername");
     expectedClusterSpec.setCredential("mypassword");
     expectedClusterSpec.setClusterName("test-cluster");
