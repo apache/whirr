@@ -255,6 +255,16 @@ xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 http://maven.apache.org/xsd
       </tr>
       <tr valign="top">
         <td>
+          <tt>whirr.endpoint</tt>
+        </td>
+        <td>
+          <tt>--endpoint</tt>
+        </td>
+        <td>none</td>
+        <td>Specifies the url of the compute provider.  For example, for openstack-nova, it is the keystone url, like: http://localhost:5000/v2.0/.  If not specified, it is the default for the provider</td>
+      </tr>
+      <tr valign="top">
+        <td>
           <tt>whirr.identity</tt>
         </td>
         <td>
@@ -322,6 +332,16 @@ xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 http://maven.apache.org/xsd
         <tt>whirr.provider</tt></td>
         <td>The name of the blobstore provider. All jclouds blobstore providers are
         supported</td>
+      </tr>
+      <tr valign="top">
+        <td>
+          <tt>whirr.blobstore-endpoint</tt>
+        </td>
+        <td>
+          <tt>--blobstore-endpoint</tt>
+        </td>
+        <td>none</td>
+        <td>Specifies the url of the blobstore provider.  For example, for swift-keystone, it is the keystone url, like: http://localhost:5000/v2.0/.  If not specified, it is the default for the provider</td>
       </tr>
       <tr valign="top">
         <td>

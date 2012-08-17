@@ -97,10 +97,14 @@ public class ClusterSpec {
     
     PROVIDER(String.class, false, "The name of the cloud provider. " + 
       "E.g. aws-ec2, cloudservers-uk"),
+
+    ENDPOINT(String.class, false, "optionally specifies the url of the " +
+      "compute provider.  For example, for openstack-nova, it is the " +
+      "keystone url, like: http://localhost:5000/v2.0/."),
+      
+    IDENTITY(String.class, false, "The cloud identity."),
       
     CREDENTIAL(String.class, false, "The cloud credential."),
-    
-    IDENTITY(String.class, false, "The cloud identity."),
 
     PUBLIC_KEY_FILE(String.class, false, "The filename of the public " +
       "key used to connect to instances."),
@@ -110,6 +114,8 @@ public class ClusterSpec {
 
     BLOBSTORE_PROVIDER(String.class, false, "The blob store provider. " +
       "E.g. aws-s3, cloudfiles-us, cloudfiles-uk"),
+
+    BLOBSTORE_ENDPOINT(String.class, false, "The blob store endpoint"),
 
     BLOBSTORE_IDENTITY(String.class, false, "The blob store identity"),
 
@@ -212,6 +218,7 @@ public class ClusterSpec {
   throws ConfigurationException, JSchException, IOException {
     return withTemporaryKeys(new PropertiesConfiguration());
   }
+  
   @VisibleForTesting
   public static ClusterSpec withTemporaryKeys(Configuration conf)
   throws ConfigurationException, JSchException, IOException {
@@ -253,11 +260,13 @@ public class ClusterSpec {
   private int maxStartupRetries;
 
   private String provider;
+  private String endpoint;
   private String identity;
   private String credential;
 
   private String blobStoreProvider;
   private String blobStoreIdentity;
+  private String blobStoreEndpoint;
   private String blobStoreCredential;
   private String blobStoreCacheContainer;
 
@@ -328,10 +337,12 @@ public class ClusterSpec {
     setAutoHostnameSuffix(getString(Property.AUTO_HOSTNAME_SUFFIX));
 
     setProvider(getString(Property.PROVIDER));
+    setEndpoint(getString(Property.ENDPOINT));
     setIdentity(getString(Property.IDENTITY));
     setCredential(getString(Property.CREDENTIAL));
 
     setBlobStoreProvider(getString(Property.BLOBSTORE_PROVIDER));
+    setBlobStoreEndpoint(getString(Property.BLOBSTORE_ENDPOINT));
     setBlobStoreIdentity(getString(Property.BLOBSTORE_IDENTITY));
     setBlobStoreCredential(getString(Property.BLOBSTORE_CREDENTIAL));
     setBlobStoreCacheContainer(getString(Property.BLOBSTORE_CACHE_CONTAINER));
@@ -530,6 +541,15 @@ public class ClusterSpec {
   public boolean isStub() {
     return "stub".equals(getProvider());
   }
+  
+  /**
+   * Optionally specifies the url of the compute provider. For example, for
+   * {@code openstack-nova}, it is the keystone url, like:
+   * {@code http://localhost:5000/v2.0/}.
+   */
+  public String getEndpoint() {
+    return endpoint;
+  }
 
   public String getIdentity() {
     return identity;
@@ -568,7 +588,16 @@ public class ClusterSpec {
     }
     return mappings.get(provider);
   }
-
+  
+  /**
+   * Optionally specifies the url of the blobstore provider. For example, for
+   * {@code swift-keystone}, it is the keystone url, like:
+   * {@code http://localhost:5000/v2.0/}.
+   */
+  public String getBlobStoreEndpoint() {
+    return blobStoreEndpoint;
+  }
+  
   public String getBlobStoreIdentity() {
     if (blobStoreIdentity == null) {
       return identity;
@@ -706,7 +735,11 @@ public class ClusterSpec {
           setAutoHostnameSuffix(".static.cloud-ips.co.uk");
       }
   }
-      
+
+  public void setEndpoint(String endpoint) {
+    this.endpoint = endpoint;
+  }    
+  
   public void setIdentity(String identity) {
     this.identity = identity;
   }
@@ -718,6 +751,10 @@ public class ClusterSpec {
   public void setBlobStoreProvider(String provider) {
     blobStoreProvider = provider;
   }
+
+  public void setBlobStoreEndpoint(String endpoint) {
+    this.blobStoreEndpoint = endpoint;
+  }    
 
   public void setBlobStoreIdentity(String identity) {
     blobStoreIdentity = identity;
@@ -949,9 +986,11 @@ public class ClusterSpec {
       return Objects.equal(getInstanceTemplates(), that.getInstanceTemplates())
         && Objects.equal(getMaxStartupRetries(), that.getMaxStartupRetries())
         && Objects.equal(getProvider(), that.getProvider())
+        && Objects.equal(getEndpoint(), that.getEndpoint())
         && Objects.equal(getIdentity(), that.getIdentity())
         && Objects.equal(getCredential(), that.getCredential())
         && Objects.equal(getBlobStoreProvider(), that.getBlobStoreProvider())
+        && Objects.equal(getBlobStoreEndpoint(), that.getBlobStoreEndpoint())
         && Objects.equal(getBlobStoreIdentity(), that.getBlobStoreIdentity())
         && Objects.equal(getBlobStoreCredential(), that.getBlobStoreCredential())
         && Objects.equal(getBlobStoreCacheContainer(), that.getBlobStoreCacheContainer())
@@ -986,9 +1025,11 @@ public class ClusterSpec {
         getInstanceTemplates(),
         getMaxStartupRetries(),
         getProvider(),
+        getEndpoint(),
         getIdentity(),
         getCredential(),
         getBlobStoreProvider(),
+        getBlobStoreEndpoint(),
         getBlobStoreIdentity(),
         getBlobStoreCredential(),
         getBlobStoreCacheContainer(),
@@ -1017,13 +1058,15 @@ public class ClusterSpec {
   }
   
   public String toString() {
-    return Objects.toStringHelper(this)
+    return Objects.toStringHelper(this).omitNullValues()
       .add("instanceTemplates", getInstanceTemplates())
       .add("maxStartupRetries", getMaxStartupRetries())
       .add("provider", getProvider())
+      .add("endpoint", getEndpoint())
       .add("identity", getIdentity())
       .add("credential", getCredential())
       .add("blobStoreProvider", getBlobStoreProvider())
+      .add("blobStoreEndpoint", getBlobStoreEndpoint())
       .add("blobStoreCredential", getBlobStoreCredential())
       .add("blobStoreIdentity", getBlobStoreIdentity())
       .add("blobStoreCacheContainer", getBlobStoreCacheContainer())

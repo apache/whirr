@@ -75,6 +75,8 @@ public class LaunchClusterCommandTest extends BaseCommandTest{
         "--cluster-name", "test-cluster",
         "--instance-templates", "1 role1+role2,2 role3",
         "--provider", "rackspace",
+        "--endpoint", "http://endpoint",
+        "--blobstore-endpoint", "http://blobstore-endpoint",
         "--identity", "myusername", "--credential", "mypassword",
         "--private-key-file", keys.get("private").getAbsolutePath(),
         "--version", "version-string"
@@ -92,8 +94,10 @@ public class LaunchClusterCommandTest extends BaseCommandTest{
     ));
     expectedClusterSpec.setServiceName("test-service");
     expectedClusterSpec.setProvider("rackspace");
+    expectedClusterSpec.setEndpoint("http://endpoint");
     expectedClusterSpec.setIdentity("myusername");
     expectedClusterSpec.setCredential("mypassword");
+    expectedClusterSpec.setBlobStoreEndpoint("http://blobstore-endpoint");
     expectedClusterSpec.setClusterName("test-cluster");
     expectedClusterSpec.setPrivateKey(keys.get("private"));
     expectedClusterSpec.setPublicKey(keys.get("public"));

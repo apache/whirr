@@ -80,13 +80,15 @@ public class BlobStoreContextBuilder {
         @Override
         public BlobStoreContext load(Key arg0) {
           LOG.debug("creating new BlobStoreContext {}", arg0);
+          ContextBuilder builder = ContextBuilder.newBuilder(arg0.provider)
+                                                 .credentials(arg0.identity, arg0.credential)
+                                                 .overrides(arg0.overrides)
+                                                 .modules(ImmutableSet.<Module>of(new SLF4JLoggingModule(), 
+                                                                       new EnterpriseConfigurationModule()));
+          if (arg0.endpoint != null)
+             builder.endpoint(arg0.endpoint);
           BlobStoreContext context = new IgnoreCloseBlobStoreContext(
-              ContextBuilder.newBuilder(arg0.provider)
-                            .credentials(arg0.identity, arg0.credential)
-                            .overrides(arg0.overrides)
-                            .modules(ImmutableSet.<Module>of(new SLF4JLoggingModule(), 
-                                                  new EnterpriseConfigurationModule()))
-                            .buildView(BlobStoreContext.class));
+              builder.buildView(BlobStoreContext.class));
           LOG.info("created new BlobStoreContext {}", context);
           return context;
        }
@@ -214,6 +216,7 @@ public class BlobStoreContextBuilder {
    */
   private static class Key {
     private final String provider;
+    private final String endpoint;
     private final String identity;
     private final String credential;
     private final String key;
@@ -229,9 +232,13 @@ public class BlobStoreContextBuilder {
      
     public Key(ClusterSpec spec) {
       provider = spec.getBlobStoreProvider();
+      endpoint = spec.getBlobStoreEndpoint();
       identity = spec.getBlobStoreIdentity();
       credential = spec.getBlobStoreCredential();
-      key = String.format("%s-%s-%s", provider, identity, credential);
+      key = Objects.toStringHelper("").omitNullValues()
+                   .add("provider", provider)
+                   .add("endpoint", endpoint)
+                   .add("identity", identity).toString();
       Configuration jcloudsConfig = spec.getConfigurationForKeysWithPrefix("jclouds");
       
       // jclouds configuration for providers are not prefixed with jclouds.

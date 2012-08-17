@@ -68,6 +68,17 @@ public class ClusterSpecTest {
     ClusterSpec spec = ClusterSpec.withNoDefaults(conf);
     assertThat(spec.getRunUrlBase(), is("http://example.org"));
   }
+  
+
+  @Test
+  public void testEndpoint() throws ConfigurationException {
+    Configuration conf = new PropertiesConfiguration();
+    conf.setProperty(ClusterSpec.Property.ENDPOINT.getConfigName(), "http://compute");
+    conf.setProperty(ClusterSpec.Property.BLOBSTORE_ENDPOINT.getConfigName(), "http://blobstore");
+    ClusterSpec spec = ClusterSpec.withNoDefaults(conf);
+    assertThat(spec.getEndpoint(), is("http://compute"));
+    assertThat(spec.getBlobStoreEndpoint(), is("http://blobstore"));
+  }
 
   @Test
   public void testGetConfigurationForKeysWithPrefix()

@@ -113,6 +113,8 @@ Trunk (unreleased changes)
 
     WHIRR-528. Add a retry loop around apt-get and yum commands to overcome transient errors (Andrei Savu via adriancole)
 
+    WHIRR-630. Add endpoint and blobstore-endpoint configuration for private clouds (adriancole)
+
   BUG FIXES
 
     WHIRR-612. CDH4 can be installed on Ubuntu now as well as CentOS. (abayer)

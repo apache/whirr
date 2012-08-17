@@ -91,12 +91,14 @@ public enum ComputeCache implements Function<ClusterSpec, ComputeServiceContext>
         @Override
         public ComputeServiceContext load(Key arg0) {
           LOG.debug("creating new ComputeServiceContext {}", arg0);
+          ContextBuilder builder = ContextBuilder.newBuilder(arg0.provider)
+                                                 .credentials(arg0.identity, arg0.credential)
+                                                 .overrides(arg0.overrides)
+                                                 .modules(arg0.modules);
+          if (arg0.endpoint != null)
+            builder.endpoint(arg0.endpoint);
           ComputeServiceContext context = new IgnoreCloseComputeServiceContext(
-              ContextBuilder.newBuilder(arg0.provider)
-                            .credentials(arg0.identity, arg0.credential)
-                            .overrides(arg0.overrides)
-                            .modules(arg0.modules)
-                            .buildView(ComputeServiceContext.class));
+                builder.buildView(ComputeServiceContext.class));
           LOG.debug("created new ComputeServiceContext {}", context);
           context.utils().eventBus().register(ComputeCache.this);
           return context;
@@ -236,6 +238,7 @@ public enum ComputeCache implements Function<ClusterSpec, ComputeServiceContext>
    */
   private static class Key {
     private String provider;
+    private String endpoint;
     private String identity;
     private String credential;
 
@@ -246,10 +249,14 @@ public enum ComputeCache implements Function<ClusterSpec, ComputeServiceContext>
 
     public Key(ClusterSpec spec) {
       provider = spec.getProvider();
+      endpoint = spec.getEndpoint();
       identity = spec.getIdentity();
       credential = spec.getCredential();
 
-      key = String.format("%s-%s-%s", provider, identity, credential);
+      key = Objects.toStringHelper("").omitNullValues()
+            .add("provider", provider)
+            .add("endpoint", endpoint)
+            .add("identity", identity).toString();
       Configuration jcloudsConfig = spec.getConfigurationForKeysWithPrefix("jclouds");
       
       // jclouds configuration for providers are not prefixed with jclouds.
