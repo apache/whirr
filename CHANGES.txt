@@ -119,6 +119,8 @@ Trunk (unreleased changes)
 
   BUG FIXES
 
+    WHIRR-632. CDH4 only available on 64 bit. (abayer)
+  
     WHIRR-612. CDH4 can be installed on Ubuntu now as well as CentOS. (abayer)
     
     WHIRR-604. Non-resolvable hostnames should be reset to something
