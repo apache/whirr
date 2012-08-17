@@ -24,6 +24,125 @@
     <body>
     <!-- Paste release notes from https://issues.apache.org/jira/browse/WHIRR here. -->
 
+        <h1>Release Notes - Whirr - Version 0.8.0</h1>
+                
+<h2>        Bug
+</h2>
+<ul>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-413'>WHIRR-413</a>] -         jobcache file is stored at /tmp/ folder so that it has out of storage error
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-527'>WHIRR-527</a>] -         Zookeeper server.0 set to localhost for a distributed cluster configuration for recipe hbase-cdh.properties (post setup)
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-540'>WHIRR-540</a>] -         Java Processes Terminate Immediately when starting elasticsearch cluster at EC2
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-552'>WHIRR-552</a>] -         Fix sporadic HBase 0.92 failures
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-558'>WHIRR-558</a>] -         Ensure integration tests report build failure on wrong credentials
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-579'>WHIRR-579</a>] -         sun jdk install fails
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-580'>WHIRR-580</a>] -         install_openjdk_rpm is broken
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-586'>WHIRR-586</a>] -         Whirr-Ubuntu build broken because of failing WhirrServicesTest
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-596'>WHIRR-596</a>] -         Add commons-compres to the feature descriptor.
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-597'>WHIRR-597</a>] -         Add CDH support for Ubuntu 12.04
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-598'>WHIRR-598</a>] -         Add CDH support for CentOS/RHEL 6
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-599'>WHIRR-599</a>] -         Whirr CDH4 CDHHadoopServiceTest.testVersion() is broken
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-600'>WHIRR-600</a>] -         Bump up CDH4 Maven dependencies
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-601'>WHIRR-601</a>] -         Cassandra 1.0.8 download URL no longer valid
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-602'>WHIRR-602</a>] -         Cloud providers may only return &quot;private&quot; IPs
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-603'>WHIRR-603</a>] -         HBase 0.89 tests won&#39;t work with Hadoop 0.20.205
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-604'>WHIRR-604</a>] -         Non-resolvable hostnames should be reset to something resolvable
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-608'>WHIRR-608</a>] -         CDH HBase configuration uses CDH3 package and service names only
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-609'>WHIRR-609</a>] -         Yum install of openjdk needs -y
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-610'>WHIRR-610</a>] -         whirr.env.repo should be whirr.env.REPO (?)
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-611'>WHIRR-611</a>] -         Cloud providers may only return &quot;public&quot; IPs
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-612'>WHIRR-612</a>] -         CDH4 can be installed on Ubuntu now as well as CentOS
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-613'>WHIRR-613</a>] -         OpenJDK JAVA_HOME detection needs to be improved
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-614'>WHIRR-614</a>] -         Add HADOOP_HOME/lib to HBase classpath
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-615'>WHIRR-615</a>] -         Use Hadoop 1.0.3 in HBase 0.90 tests
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-616'>WHIRR-616</a>] -         Starting multiple yarn nodemanagers on EC2
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-618'>WHIRR-618</a>] -         Site generation is unnecessarily recursive
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-629'>WHIRR-629</a>] -         YARN tests fail on Rackspace
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-632'>WHIRR-632</a>] -         CDH4 only available on 64 bit
+</li>
+</ul>
+            
+<h2>        Improvement
+</h2>
+<ul>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-189'>WHIRR-189</a>] -         Hadoop on EC2 should use all available local storage
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-351'>WHIRR-351</a>] -         configure_hadoop should create+chown all data dirs listed in hadoop-hdfs.dfs.data.dir
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-525'>WHIRR-525</a>] -         Upgrade to HBase 0.92.0
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-528'>WHIRR-528</a>] -         Add a retry loop around apt-get and yum commands to overcome transient errors
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-548'>WHIRR-548</a>] -         Allow whirr to reuse existing compute services
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-559'>WHIRR-559</a>] -         Make configuring alternative service implementations less error prone
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-569'>WHIRR-569</a>] -         create a default set of keys for itests so that we can login into instances when itests fail
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-573'>WHIRR-573</a>] -         Allow specification of REPO_HOST for RPMs/debs
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-593'>WHIRR-593</a>] -         Upgrade to jclouds 1.5.0
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-605'>WHIRR-605</a>] -         Upgrade Cassandra to 1.1.2
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-630'>WHIRR-630</a>] -         add property endpoint
+</li>
+</ul>
+    
+<h2>        New Feature
+</h2>
+<ul>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-63'>WHIRR-63</a>] -         Support EC2 Cluster Compute Groups for Hadoop
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-221'>WHIRR-221</a>] -         Optionally control the order of starting services
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-472'>WHIRR-472</a>] -         FactoryBean for Whirr generated Hadoop Configuration
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-594'>WHIRR-594</a>] -         Mahout example - Apache Software Foundation public mail archives
+</li>
+</ul>
+                        
+<h2>        Task
+</h2>
+<ul>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-575'>WHIRR-575</a>] -         LAMP stack recipes &amp; test files
+</li>
+</ul>
+            
+<h2>        Test
+</h2>
+<ul>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-513'>WHIRR-513</a>] -         Add integration test for BYON provider
+</li>
+</ul>
+        
 
         <h1>Release Notes - Whirr - Version 0.7.1</h1>
                 
