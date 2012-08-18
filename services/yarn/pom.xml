@@ -25,12 +25,22 @@
   </parent>
   <groupId>org.apache.whirr</groupId>
   <artifactId>whirr-yarn</artifactId>
-  <packaging>jar</packaging>
+  <packaging>bundle</packaging>
   <version>0.8.0</version>
   <name>Apache Whirr YARN</name>
   <properties>
     <hadoop.version>0.20.2</hadoop.version>
+    <osgi.import>
+      !org.apache.whirr.service.yarn*,
+      org.apache.commons.configuration*;version="[1.6,2)",
+      *
+    </osgi.import>
+    <osgi.export>
+      org.apache.whirr.service.yarn*;version="${project.version}"
+    </osgi.export>
+    <osgi.bundle.activator>org.apache.whirr.service.yarn.osgi.Activator</osgi.bundle.activator>
   </properties>
+  
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
@@ -116,6 +126,11 @@
       <artifactId>hadoop-mapreduce-client-jobclient</artifactId>
       <version>0.23.1</version>
       <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.core</artifactId>
+      <scope>provided</scope>
     </dependency>
   </dependencies>
   <build>

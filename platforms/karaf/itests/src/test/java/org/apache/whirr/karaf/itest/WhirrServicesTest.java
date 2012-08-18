@@ -29,6 +29,7 @@ import org.ops4j.pax.exam.junit.ExamReactorStrategy;
 import org.ops4j.pax.exam.junit.JUnit4TestRunner;
 import org.ops4j.pax.exam.spi.reactors.AllConfinedStagedReactorFactory;
 
+import static org.openengsb.labs.paxexam.karaf.options.KarafDistributionOption.debugConfiguration;
 import static org.openengsb.labs.paxexam.karaf.options.KarafDistributionOption.keepRuntimeFolder;
 import static org.openengsb.labs.paxexam.karaf.options.KarafDistributionOption.logLevel;
 import static org.ops4j.pax.exam.CoreOptions.scanFeatures;
@@ -50,6 +51,7 @@ public class WhirrServicesTest extends WhirrKarafTestSupport {
     executeCommand("features:install whirr-puppet");
     executeCommand("features:install whirr-pig");
     executeCommand("features:install whirr-mahout");
+    executeCommand("features:install whirr-yarn");
     executeCommand("features:install whirr-zookeeper");
 
     System.err.println(executeCommand("osgi:list"));
@@ -67,6 +69,7 @@ public class WhirrServicesTest extends WhirrKarafTestSupport {
     testService("puppet-install");
     testService("pig-client");
     testService("mahout-client");
+    testService("yarn-nodemanager","yarn-resourcemanager");
     testService("zookeeper");
   }
 

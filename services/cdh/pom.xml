@@ -36,6 +36,7 @@
     <osgi.export>
       functions*;version="${project.version}"
     </osgi.export>
+    <osgi.bundle.activator>org.apache.whirr.service.cdh.osgi.Activator</osgi.bundle.activator>
   </properties>
   <dependencies>
     <dependency>
@@ -134,6 +135,11 @@
       <artifactId>zookeeper</artifactId>
       <version>3.4.3-cdh4.0.1</version>
       <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.core</artifactId>
+      <scope>provided</scope>
     </dependency>
   </dependencies>
   <build>

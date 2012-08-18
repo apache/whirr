@@ -95,6 +95,12 @@
       <scope>test</scope>
     </dependency>
     <dependency>
+      <groupId>org.jclouds</groupId>
+      <artifactId>jclouds-scriptbuilder</artifactId>
+      <version>${jclouds.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>org.openengsb.labs.paxexam.karaf</groupId>
       <artifactId>paxexam-karaf-container</artifactId>
       <scope>test</scope>

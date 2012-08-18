@@ -117,6 +117,8 @@ Release 0.8.0 - 2012-08-17
 
     WHIRR-593. Upgrade to jclouds 1.5.0 (adriancole)
 
+    WHIRR-633. Align jclouds 1.5.0 modularity changes with Whirr (iocanel via adriancole)
+
   BUG FIXES
 
     WHIRR-632. CDH4 only available on 64 bit. (abayer)

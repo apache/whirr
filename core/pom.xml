@@ -33,7 +33,7 @@
       org.apache.commons.configuration*;version="[1.6,2)",
       *
     </osgi.import>
-    <osgi.fragment.host>jclouds-scriptbuilder;bundle-version="${jclouds.osgi.version.clean}"</osgi.fragment.host>
+    <osgi.bundle.activator>org.apache.whirr.osgi.Activator</osgi.bundle.activator>
     <osgi.export>
       org.apache.whirr*;version="${project.version}"
     </osgi.export>
@@ -158,6 +158,17 @@
       <groupId>net.sf.jopt-simple</groupId>
       <artifactId>jopt-simple</artifactId>
       <version>${jopt.simple.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.core</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.compendium</artifactId>
+      <scope>provided</scope>
     </dependency>
   </dependencies>
   <build>

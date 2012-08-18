@@ -37,7 +37,7 @@
     <osgi.export>
       org.apache.whirr.service.elasticsearch*;version="${project.version}"
     </osgi.export>
-    <osgi.fragment.host>jclouds-scriptbuilder;bundle-version="${jclouds.osgi.version.clean}"</osgi.fragment.host>
+    <osgi.bundle.activator>org.apache.whirr.service.elasticsearch.osgi.Activator</osgi.bundle.activator>
   </properties>
   <dependencies>
     <dependency>
@@ -85,6 +85,12 @@
       <groupId>log4j</groupId>
       <artifactId>log4j</artifactId>
       <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.core</artifactId>
+      <scope>provided</scope>
     </dependency>
   </dependencies>
   <build>
