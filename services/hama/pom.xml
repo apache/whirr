@@ -39,7 +39,7 @@
     <osgi.export>
       org.apache.whirr.service.hama*;version="${project.version}"
     </osgi.export>
-    <osgi.fragment.host>jclouds-scriptbuilder;bundle-version="${jclouds.osgi.version.clean}"</osgi.fragment.host>
+    <osgi.bundle.activator>org.apache.whirr.service.hama.osgi.Activator</osgi.bundle.activator>
   </properties>
   <dependencies>
     <dependency>
@@ -127,6 +127,12 @@
       <artifactId>zookeeper</artifactId>
       <version>${zookeeper.version}</version>
       <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.core</artifactId>
+      <scope>provided</scope>
     </dependency>
   </dependencies>
   <build>

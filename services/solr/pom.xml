@@ -38,7 +38,7 @@
     <osgi.export>
       org.apache.whirr.service.solr*;version="${project.version}"
     </osgi.export>
-    <osgi.fragment.host>jclouds-scriptbuilder;bundle-version="${jclouds.version}"</osgi.fragment.host>
+    <osgi.bundle.activator>org.apache.whirr.service.solr.osgi.Activator</osgi.bundle.activator>
   </properties>
   <dependencies>
     <dependency>
@@ -74,6 +74,11 @@
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-log4j12</artifactId>
      </dependency>
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.core</artifactId>
+      <scope>provided</scope>
+    </dependency>
   </dependencies>
   <build>
     <plugins>

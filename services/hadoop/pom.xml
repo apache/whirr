@@ -37,7 +37,7 @@
     <osgi.export>
       org.apache.whirr.service.hadoop*;version="${project.version}"
     </osgi.export>
-    <osgi.fragment.host>jclouds-scriptbuilder;bundle-version="${jclouds.osgi.version.clean}"</osgi.fragment.host>
+    <osgi.bundle.activator>org.apache.whirr.service.hadoop.osgi.Activator</osgi.bundle.activator>
   </properties>
   <dependencies>
     <dependency>
@@ -119,6 +119,12 @@
       <artifactId>jackson-mapper-asl</artifactId>
       <version>1.9.3</version>
       <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.core</artifactId>
+      <scope>provided</scope>
     </dependency>
   </dependencies>
   <build>
