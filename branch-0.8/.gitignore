@@ -1,0 +1,11 @@
+.svn
+.classpath
+.project
+.settings
+target
+.idea/
+*.iml
+**/*.log
+services/voldemort/lib/
+whirr.log
+conf/credentials

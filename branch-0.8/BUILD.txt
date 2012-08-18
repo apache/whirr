@@ -1,0 +1,17 @@
+Apache Whirr Build Instructions
+
+REQUIREMENTS
+
+- Java 1.6
+- Apache Maven 2.2.1 or greater
+- Ruby 1.8.7 or greater (to run build-tools/update-versions)
+
+BUILDING
+
+To run unit tests and install artifacts locally:
+
+mvn install
+
+To build a source package:
+
+mvn package -Ppackage

@@ -1,0 +1,151 @@
+#
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+function configure_cdh_hadoop() {
+  local OPTIND
+  local OPTARG
+  
+  if [ "$CONFIGURE_HADOOP_DONE" == "1" ]; then
+    echo "Hadoop is already configured."
+    return;
+  fi
+  
+  ROLES=$1
+  shift
+  
+  REPO=${REPO:-cdh4}
+  CDH_MAJOR_VERSION=$(echo $REPO | sed -e 's/cdh\([0-9]\).*/\1/')
+  if [ $CDH_MAJOR_VERSION = "4" ]; then
+    HADOOP=hadoop
+    HADOOP_CONF_DIR=/etc/$HADOOP/conf.dist
+    HDFS_PACKAGE_PREFIX=hadoop-hdfs
+    MAPREDUCE_PACKAGE_PREFIX=hadoop-0.20-mapreduce
+  else
+    HADOOP=hadoop-${HADOOP_VERSION:-0.20}
+    HADOOP_CONF_DIR=/etc/$HADOOP/conf.dist
+    HDFS_PACKAGE_PREFIX=hadoop-${HADOOP_VERSION:-0.20}
+    MAPREDUCE_PACKAGE_PREFIX=hadoop-${HADOOP_VERSION:-0.20}  
+  fi
+  
+  make_hadoop_dirs /data*
+
+  # Copy generated configuration files in place
+  cp /tmp/{core,hdfs,mapred}-site.xml $HADOOP_CONF_DIR
+  cp /tmp/hadoop-env.sh $HADOOP_CONF_DIR
+  cp /tmp/hadoop-metrics.properties $HADOOP_CONF_DIR
+
+  # Keep PID files in a non-temporary directory
+  HADOOP_PID_DIR=$(. /tmp/hadoop-env.sh; echo $HADOOP_PID_DIR)
+  HADOOP_PID_DIR=${HADOOP_PID_DIR:-/var/run/hadoop}
+  mkdir -p $HADOOP_PID_DIR
+  chgrp -R hadoop $HADOOP_PID_DIR
+  chmod -R g+w $HADOOP_PID_DIR
+
+  # Create the actual log dir
+  mkdir -p /data/hadoop/logs
+  chgrp -R hadoop /data/hadoop/logs
+  chmod -R g+w /data/hadoop/logs
+
+  # Create a symlink at $HADOOP_LOG_DIR
+  HADOOP_LOG_DIR=$(. /tmp/hadoop-env.sh; echo $HADOOP_LOG_DIR)
+  HADOOP_LOG_DIR=${HADOOP_LOG_DIR:-/var/log/hadoop/logs}
+  rm -rf $HADOOP_LOG_DIR
+  mkdir -p $(dirname $HADOOP_LOG_DIR)
+  ln -s /data/hadoop/logs $HADOOP_LOG_DIR
+  chgrp -R hadoop $HADOOP_LOG_DIR
+  chmod -R g+w $HADOOP_LOG_DIR
+
+  for role in $(echo "$ROLES" | tr "," "\n"); do
+    case $role in
+    hadoop-namenode)
+      start_namenode
+      ;;
+    hadoop-secondarynamenode)
+      start_hadoop_daemon $HDFS_PACKAGE_PREFIX-secondarynamenode
+      ;;
+    hadoop-jobtracker)
+      start_hadoop_daemon $MAPREDUCE_PACKAGE_PREFIX-jobtracker
+      ;;
+    hadoop-datanode)
+      start_hadoop_daemon $HDFS_PACKAGE_PREFIX-datanode
+      ;;
+    hadoop-tasktracker)
+      start_hadoop_daemon $MAPREDUCE_PACKAGE_PREFIX-tasktracker
+      ;;
+    esac
+  done
+  
+    CONFIGURE_HADOOP_DONE=1
+  
+}
+
+function make_hadoop_dirs {
+  for mount in "$@"; do
+    if [ ! -e $mount/hadoop ]; then
+      mkdir -p $mount/hadoop
+      chown hadoop:hadoop $mount/hadoop
+    fi
+    if [ ! -e $mount/tmp ]; then
+      mkdir $mount/tmp
+      chmod a+rwxt $mount/tmp
+    fi
+  done
+}
+
+function start_namenode() {
+  if which dpkg &> /dev/null; then
+    retry_apt_get -y install $HDFS_PACKAGE_PREFIX-namenode
+    AS_HDFS="su -s /bin/bash - hdfs -c"
+    # Format HDFS
+    [ ! -e /data/hadoop/hdfs ] && $AS_HDFS "$HADOOP namenode -format"
+  elif which rpm &> /dev/null; then
+    retry_yum install -y $HDFS_PACKAGE_PREFIX-namenode
+    AS_HDFS="/sbin/runuser -s /bin/bash - hdfs -c"
+    # Format HDFS
+    [ ! -e /data/hadoop/hdfs ] && $AS_HDFS "$HADOOP namenode -format"
+  fi
+
+  service $HDFS_PACKAGE_PREFIX-namenode start
+
+  $AS_HDFS "$HADOOP dfsadmin -safemode wait"
+  $AS_HDFS "/usr/bin/$HADOOP fs -mkdir /user"
+  # The following is questionable, as it allows a user to delete another user
+  # It's needed to allow users to create their own user directories
+  $AS_HDFS "/usr/bin/$HADOOP fs -chmod +w /user"
+  $AS_HDFS "/usr/bin/$HADOOP fs -mkdir /hadoop"
+  $AS_HDFS "/usr/bin/$HADOOP fs -chmod +w /hadoop"
+  $AS_HDFS "/usr/bin/$HADOOP fs -mkdir /hbase"
+  $AS_HDFS "/usr/bin/$HADOOP fs -chmod +w /hbase"
+  $AS_HDFS "/usr/bin/$HADOOP fs -mkdir /mnt"
+  $AS_HDFS "/usr/bin/$HADOOP fs -chmod +w /mnt"
+
+  # Create temporary directory for Pig and Hive in HDFS
+  $AS_HDFS "/usr/bin/$HADOOP fs -mkdir /tmp"
+  $AS_HDFS "/usr/bin/$HADOOP fs -chmod +w /tmp"
+  $AS_HDFS "/usr/bin/$HADOOP fs -mkdir /user/hive/warehouse"
+  $AS_HDFS "/usr/bin/$HADOOP fs -chmod +w /user/hive/warehouse"
+}
+
+function start_hadoop_daemon() {
+  daemon=$1
+  if which dpkg &> /dev/null; then
+    retry_apt_get -y install $daemon
+  elif which rpm &> /dev/null; then
+    retry_yum install -y $daemon
+  fi
+  service $daemon start
+}
+
