@@ -1,1 +1,0 @@
-Apache Whirr ${project.version}

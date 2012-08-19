@@ -33,12 +33,14 @@
     <bundle dependency='true'>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.commons-jxpath/${commons.jxpath.bundle.version}</bundle>
     <bundle dependency='true'>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.ant/${ant.bundle.version}</bundle>
     <!--bundle dependency='true'>mvn:org.apache.commons/commons-vfs2/${commons.vfs2.version}</bundle-->
+    <bundle dependency='true'>mvn:org.apache.commons/commons-compress/${commons.compress.version}</bundle>
     <bundle dependency='true'>mvn:commons-digester/commons-digester/${commons.digester.version}</bundle>
     <bundle dependency='true'>mvn:commons-beanutils/commons-beanutils/${commons.beanutils.version}</bundle>
     <bundle dependency='true'>mvn:commons-collections/commons-collections/${commons.collections.version}</bundle>
     <bundle dependency='true'>mvn:commons-configuration/commons-configuration/${commons.configuration.version}</bundle>
     <bundle dependency='true'>mvn:commons-codec/commons-codec/${commons.codec.version}</bundle>
     <bundle dependency='true'>mvn:commons-lang/commons-lang/${commons.lang.version}</bundle>
+    <bundle dependency='true'>wrap:mvn:org.tukaani/xz/${tukaani.xz.version}</bundle>
     <bundle dependency="true">wrap:mvn:dnsjava/dnsjava/${dnsjava.version}</bundle>
     <bundle dependency="true">mvn:org.apache.velocity/velocity/${velocity.version}</bundle>
     <bundle>mvn:org.apache.whirr/whirr-core/${project.version}</bundle>
@@ -49,6 +51,11 @@
   <feature name="whirr-cassandra" version="${project.version}" description="Apache Whirr Cassandra Service" resolver="(obr)">
     <feature version="${project.version}">whirr</feature>
     <bundle>mvn:org.apache.whirr/whirr-cassandra/${project.version}</bundle>
+  </feature>
+
+  <feature name="whirr-cdh" version="${project.version}" description="Apache Whirr CDH Service" resolver="(obr)">
+    <feature version="${project.version}">whirr</feature>
+    <bundle>mvn:org.apache.whirr/whirr-cdh/${project.version}</bundle>
   </feature>
 
   <feature name="whirr-chef" version="${project.version}" description="Apache Whirr Chef Service" resolver="(obr)">
@@ -95,10 +102,19 @@
     <feature version="${project.version}">whirr</feature>
     <bundle>mvn:org.apache.whirr/whirr-puppet/${project.version}</bundle>
   </feature>
+  <feature name="whirr-solr" version="${project.version}" description="Apache Whirr Solr Service" resolver="(obr)">
+    <feature version="${project.version}">whirr</feature>
+    <bundle>mvn:org.apache.whirr/whirr-solr/${project.version}</bundle>
+  </feature>
 
   <feature name="whirr-voldemort" version="${project.version}" description="Apache Whirr Voldermort Service" resolver="(obr)">
     <feature version="${project.version}">whirr</feature>
     <bundle>mvn:org.apache.whirr/whirr-voldemort/${project.version}</bundle>
+  </feature>
+
+  <feature name="whirr-yarn" version="${project.version}" description="Apache Whirr Yarn Service" resolver="(obr)">
+    <feature version="${project.version}">whirr</feature>
+    <bundle>mvn:org.apache.whirr/whirr-yarn/${project.version}</bundle>
   </feature>
 
   <feature name="whirr-zookeeper" version="${project.version}" description="Apache Whirr Zookeeper Service" resolver="(obr)">
