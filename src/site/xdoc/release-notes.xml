@@ -93,6 +93,8 @@
 </li>
 <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-640'>WHIRR-640</a>] -         Recipes and tests using whirr.template should specify minRam there
 </li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-635'>WHIRR-635</a>] -         Ensure hostname update as required by AUTO_HOSTNAME_SUFFIX is consistent for RHEL derivatives
+</li>
 </ul>
             
 <h2>        Improvement

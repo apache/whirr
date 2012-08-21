@@ -21,7 +21,12 @@ function configure_hostnames() {
   if [ ! -z $AUTO_HOSTNAME_SUFFIX ]; then
       PUBLIC_IP=`/sbin/ifconfig eth0 | grep 'inet addr:' | cut -d: -f2 | awk '{ print $1}'`
       HOSTNAME=${AUTO_HOSTNAME_PREFIX}`echo $PUBLIC_IP | tr . -`${AUTO_HOSTNAME_SUFFIX}
-      echo $HOSTNAME > /etc/hostname
+      if [ -f /etc/hostname ]; then
+          echo $HOSTNAME > /etc/hostname
+      fi
+      if [ -f /etc/sysconfig/network ]; then
+          sed -i -e "s/HOSTNAME=.*/HOSTNAME=$HOSTNAME/" /etc/sysconfig/network
+      fi
       sed -i -e "s/$PUBLIC_IP.*/$PUBLIC_IP $HOSTNAME/" /etc/hosts
       set +e
       if [ -f /etc/init.d/hostname ]; then
