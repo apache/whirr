@@ -121,6 +121,15 @@ Release 0.8.0 - 2012-08-17
 
   BUG FIXES
 
+    WHIRR-635. Ensure hostname update as required by
+    AUTO_HOSTNAME_SUFFIX is consistent for RHEL derivatives (Graham
+    Gear via abayer)
+  
+    WHIRR-640. Ensure minRam is set for CDH recipes and test
+    properties. (abayer)
+
+    WHIRR-639. Set ownership of CDH Hadoop data dir to Hadoop group. (abayer)
+
     WHIRR-632. CDH4 only available on 64 bit. (abayer)
   
     WHIRR-612. CDH4 can be installed on Ubuntu now as well as CentOS. (abayer)

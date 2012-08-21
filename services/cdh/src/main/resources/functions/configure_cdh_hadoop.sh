@@ -96,7 +96,8 @@ function make_hadoop_dirs {
   for mount in "$@"; do
     if [ ! -e $mount/hadoop ]; then
       mkdir -p $mount/hadoop
-      chown hadoop:hadoop $mount/hadoop
+      chgrp -R hadoop $mount/hadoop
+      chmod -R g+w $mount/hadoop
     fi
     if [ ! -e $mount/tmp ]; then
       mkdir $mount/tmp
