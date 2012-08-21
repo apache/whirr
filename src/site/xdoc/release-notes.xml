@@ -89,6 +89,10 @@
 </li>
 <li>[<a href='https://issues.apache.org/jira/browse/WHIRR-633'>WHIRR-633</a>] -         Align jclouds 1.5.0 modularity changes with Whirr
 </li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-639'>WHIRR-639</a>] -         /data*/hadoop should be owned and writable by the hadoop group for CDH.
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-640'>WHIRR-640</a>] -         Recipes and tests using whirr.template should specify minRam there
+</li>
 </ul>
             
 <h2>        Improvement
