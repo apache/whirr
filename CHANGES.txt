@@ -123,6 +123,9 @@ Release 0.8.0 - 2012-08-17
 
   BUG FIXES
 
+    WHIRR-640. Ensure minRam is set for CDH recipes and test
+    properties. (abayer)
+
     WHIRR-639. Set ownership of CDH Hadoop data dir to Hadoop group. (abayer)
 
     WHIRR-632. CDH4 only available on 64 bit. (abayer)
