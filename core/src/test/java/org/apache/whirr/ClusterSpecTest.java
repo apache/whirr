@@ -360,7 +360,21 @@ public class ClusterSpecTest {
       assertEquals(null, ec2Spec.getAutoHostnamePrefix());
       assertEquals(null, ec2Spec.getAutoHostnameSuffix());
   }
-      
+
+  @Test
+  public void testJdkInstallUrl() throws Exception {
+      Configuration cloudServersConfig = new PropertiesConfiguration();
+
+      ClusterSpec cloudServersSpec = ClusterSpec.withTemporaryKeys(cloudServersConfig);
+      assertEquals(null, cloudServersSpec.getJdkInstallUrl());
+
+      cloudServersConfig = new PropertiesConfiguration();
+      cloudServersConfig.addProperty("whirr.jdk-install-url", "http://whirr-third-party.s3.amazonaws.com/jdk-6u21-linux-i586-rpm.bin");
+
+      cloudServersSpec = ClusterSpec.withTemporaryKeys(cloudServersConfig);
+      assertEquals("http://whirr-third-party.s3.amazonaws.com/jdk-6u21-linux-i586-rpm.bin", cloudServersSpec.getJdkInstallUrl());
+  }  
+  
 
   @Test
   public void testApplySubroleAliases() throws ConfigurationException {

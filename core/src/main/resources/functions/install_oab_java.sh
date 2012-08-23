@@ -23,9 +23,9 @@ function install_oab_java_deb() {
   
   apt-get update
   
-  wget https://raw.github.com/flexiondotorg/oab-java6/master/oab-java6.sh -O oab-java6.sh
-  chmod +x oab-java6.sh
-  ./oab-java6.sh
+  wget https://raw.github.com/flexiondotorg/oab-java6/master/oab-java.sh -O oab-java.sh
+  chmod +x oab-java.sh
+  ./oab-java.sh
   
   apt-get update
   
@@ -39,17 +39,22 @@ function install_oab_java_deb() {
 }
 
 function install_oab_java_rpm() {
-  MACHINE_TYPE=`uname -m`
-  if [ ${MACHINE_TYPE} == 'x86_64' ]; then
-    JDK_PACKAGE=jdk-6u21-linux-x64-rpm.bin
-  else
-    JDK_PACKAGE=jdk-6u21-linux-i586-rpm.bin
-  fi
   JDK_INSTALL_PATH=/usr/java
   mkdir -p $JDK_INSTALL_PATH
   cd $JDK_INSTALL_PATH
-  wget http://whirr-third-party.s3.amazonaws.com/$JDK_PACKAGE
-  chmod +x $JDK_PACKAGE
+  if [ -z "${JDK_INSTALL_URL+xxx}" ]; then
+	  MACHINE_TYPE=`uname -m`
+	  if [ ${MACHINE_TYPE} == 'x86_64' ]; then
+	    JDK_PACKAGE=jdk-6u21-linux-x64-rpm.bin
+	  else
+	    JDK_PACKAGE=jdk-6u21-linux-i586-rpm.bin
+	  fi
+	  wget http://whirr-third-party.s3.amazonaws.com/$JDK_PACKAGE
+  else
+    JDK_PACKAGE=$(basename $JDK_INSTALL_URL)
+    wget $JDK_INSTALL_URL
+  fi
+  chmod +x $JDK_PACKAGE  
   mv /bin/more /bin/more.no
   yes | ./$JDK_PACKAGE -noregister
   mv /bin/more.no /bin/more

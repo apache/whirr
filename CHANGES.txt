@@ -6,6 +6,8 @@ Release 0.8.1 (unreleased changes)
 
   IMPROVEMENTS
 
+    WHIRR-638. Parameterize OAB Java install. (Graham Gear via abayer)
+  
   BUG FIXES
 
     WHIRR-641. Improved parsing of config ->
