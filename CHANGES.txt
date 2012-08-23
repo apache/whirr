@@ -2,6 +2,15 @@ Apache Whirr Change Log
 
 Trunk (unreleased changes)
 
+  NEW FEATURES
+
+  IMPROVEMENTS
+
+  BUG FIXES
+
+    WHIRR-641. Improved parsing of config ->
+    TemplateBuilderSpec. (Adrian Cole via abayer)
+
 Release 0.8.0 - 2012-08-17
 
   NEW FEATURES
