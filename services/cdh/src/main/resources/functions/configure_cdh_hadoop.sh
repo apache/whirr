@@ -68,11 +68,12 @@ function configure_cdh_hadoop() {
   chgrp -R hadoop $HADOOP_LOG_DIR
   chmod -R g+w $HADOOP_LOG_DIR
 
+  if [ $(echo "$ROLES" | grep "hadoop-namenode" | wc -l) -gt 0 ]; then
+    start_namenode
+  fi
+  
   for role in $(echo "$ROLES" | tr "," "\n"); do
     case $role in
-    hadoop-namenode)
-      start_namenode
-      ;;
     hadoop-secondarynamenode)
       start_hadoop_daemon $HDFS_PACKAGE_PREFIX-secondarynamenode
       ;;

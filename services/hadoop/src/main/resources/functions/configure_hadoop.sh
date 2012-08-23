@@ -55,12 +55,13 @@ function configure_hadoop() {
   mkdir -p $(dirname $HADOOP_LOG_DIR)
   ln -s /data/hadoop/logs $HADOOP_LOG_DIR
   chown -R hadoop:hadoop $HADOOP_LOG_DIR
-  
+
+  if [ $(echo "$ROLES" | grep "hadoop-namenode" | wc -l) -gt 0 ]; then
+    start_namenode
+  fi
+
   for role in $(echo "$ROLES" | tr "," "\n"); do
     case $role in
-    hadoop-namenode)
-      start_namenode
-      ;;
     hadoop-secondarynamenode)
       start_hadoop_daemon secondarynamenode
       ;;
