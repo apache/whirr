@@ -81,6 +81,9 @@ class VariablesToExport implements Supplier<Map<String, String>> {
             metadataMap.put("AUTO_HOSTNAME_PREFIX", clusterSpec.getAutoHostnamePrefix());
         }
     }
+    if(clusterSpec.getJdkInstallUrl() != null) {
+      metadataMap.put("JDK_INSTALL_URL", clusterSpec.getJdkInstallUrl());
+    }
     if (instance != null) {
       metadataMap.put("ROLES", Joiner.on(",").join(instance.getRoles()));
       if (instance.getPublicIp() != null)
