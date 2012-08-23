@@ -39,6 +39,7 @@ import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.ConfigurationUtils;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.io.IOUtils;
+import org.apache.whirr.internal.ConfigToTemplateBuilderSpec;
 import org.jclouds.compute.domain.TemplateBuilderSpec;
 import org.jclouds.javax.annotation.Nullable;
 import org.jclouds.predicates.validators.DnsNameValidator;
@@ -46,10 +47,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Joiner;
 import com.google.common.base.Objects;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableMap.Builder;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -64,7 +62,7 @@ import com.jcraft.jsch.KeyPair;
  */
 public class ClusterSpec {
   
-  private static final Logger LOG = LoggerFactory.getLogger(ClusterSpec.class);
+  static final Logger LOG = LoggerFactory.getLogger(ClusterSpec.class);
 
   public enum Property {
     CLUSTER_NAME(String.class, false,  "The name of the cluster " +
@@ -358,36 +356,9 @@ public class ClusterSpec {
     setAwsEc2SpotPrice(getFloat(Property.AWS_EC2_SPOT_PRICE, (Float) null));
 
     checkAndSetKeyPair();
-    
-    if (getList(Property.TEMPLATE).size() > 0) {
-       this.template = TemplateBuilderSpec.parse(Joiner.on(',').join(getList(Property.TEMPLATE)));
-    } else {
-       // until TemplateBuilderSpec has type-safe builder
-       Builder<String, String> template = ImmutableMap.<String, String>builder();
-       if (getString(Property.IMAGE_ID) != null) {
-          template.put("imageId", getString(Property.IMAGE_ID));
-       } else {
-          template.put("osFamily", "UBUNTU");
-          template.put("osVersionMatches", "10.04");
-          // canonical images, but not testing ones
-          if ("aws-ec2".equals(getProvider()))
-             template.put("osDescriptionMatches", "^(?!.*(daily|testing)).*ubuntu-images.*$");
-       }
-       if (getString(Property.HARDWARE_ID) != null) {
-          template.put("hardwareId", getString(Property.HARDWARE_ID));
-       } else {
-          template.put("minRam", Integer.toString(getInt(Property.HARDWARE_MIN_RAM, 1024)));
-       }
-       if (getString(Property.LOCATION_ID) != null) {
-          template.put("locationId", getString(Property.LOCATION_ID));
-       }
-       String bootstrapUser = getBootstrapUserOrDeprecatedLoginUser();
-       if (bootstrapUser != null) {
-          template.put("loginUser", bootstrapUser);
-       }
-       this.template = TemplateBuilderSpec.parse(Joiner.on(',').withKeyValueSeparator("=").join(template.build()));
-    }
-    
+
+    this.template = ConfigToTemplateBuilderSpec.INSTANCE.apply(config);
+
     setBlobStoreLocationId(getString(Property.BLOBSTORE_LOCATION_ID));
     setClientCidrs(getList(Property.CLIENT_CIDRS));
     
@@ -411,16 +382,7 @@ public class ClusterSpec {
     setVersion(getString(Property.VERSION));
     setRunUrlBase(getString(Property.RUN_URL_BASE));
   }
-
-  private String getBootstrapUserOrDeprecatedLoginUser() {
-    final String loginUserConfig = "whirr.login-user";
-    if (config.containsKey(loginUserConfig)) {
-      LOG.warn("whirr.login-user is deprecated. Please rename to whirr.bootstrap-user.");
-      return config.getString(loginUserConfig, null);
-    }
-    return getString(Property.BOOTSTRAP_USER);
-  }
-
+  
   /**
    * Create a deep object copy. It's not enough to just copy the configuration
    * because the object can also be modified using the setters and the changes
@@ -481,10 +443,6 @@ public class ClusterSpec {
     return config.getInt(key.getConfigName(), defaultValue);
   }
 
-  private float getFloat(Property key, float defaultValue) {
-    return config.getFloat(key.getConfigName(), defaultValue);
-  }
-  
   private Float getFloat(Property key, Float defaultValue) {
     return config.getFloat(key.getConfigName(), defaultValue);
   }
@@ -492,7 +450,7 @@ public class ClusterSpec {
   private List<String> getList(Property key) {
     return config.getList(key.getConfigName());
   }
-
+  
   private Configuration composeWithDefaults(Configuration userConfig)
       throws ConfigurationException {
     CompositeConfiguration composed = new CompositeConfiguration();

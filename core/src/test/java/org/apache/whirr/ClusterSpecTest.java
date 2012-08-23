@@ -79,12 +79,25 @@ public class ClusterSpecTest {
     assertEquals(spec.getAwsEc2SpotPrice(), new Float(0.3));
   }
   
+  /**
+   * @see ConfigToTemplateBuilderSpecTest for more
+   */
   @Test
-  public void testTemplate() throws ConfigurationException {
+  public void testTemplateOverrides() throws ConfigurationException {
     Configuration conf = new PropertiesConfiguration();
     conf.setProperty(ClusterSpec.Property.TEMPLATE.getConfigName(), "osFamily=UBUNTU,os64Bit=true,minRam=2048");
     ClusterSpec spec = ClusterSpec.withNoDefaults(conf);
     assertEquals(spec.getTemplate(), TemplateBuilderSpec.parse("osFamily=UBUNTU,os64Bit=true,minRam=2048"));
+  }
+  
+  /**
+   * @see ConfigToTemplateBuilderSpecTest for more
+   */
+  @Test
+  public void testNoTemplateSetsUbuntu1004With1GB() throws ConfigurationException {
+    Configuration conf = new PropertiesConfiguration();
+    ClusterSpec spec = ClusterSpec.withNoDefaults(conf);
+    assertEquals(spec.getTemplate(), TemplateBuilderSpec.parse("osFamily=UBUNTU,osVersionMatches=10.04,minRam=1024"));
   }
   
   @Test
