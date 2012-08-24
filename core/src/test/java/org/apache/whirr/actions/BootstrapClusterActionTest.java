@@ -119,7 +119,8 @@ public class BootstrapClusterActionTest {
     ComputeService computeService = mock(ComputeService.class);
     TemplateBuilder templateBuilder = mock(TemplateBuilder.class);
     Template template = mock(Template.class);
-
+    TemplateOptions templateOptions = mock(TemplateOptions.class);
+    
     when(getCompute.apply(clusterSpec)).thenReturn(serviceContext);
     when(serviceContext.getComputeService()).thenReturn(computeService);
     when(computeService.getContext()).thenReturn(serviceContext);
@@ -128,6 +129,7 @@ public class BootstrapClusterActionTest {
     when(templateBuilder.from((TemplateBuilderSpec) any())).thenReturn(templateBuilder);
     when(templateBuilder.options((TemplateOptions) any())).thenReturn(templateBuilder);
     when(templateBuilder.build()).thenReturn(template);
+    when(template.getOptions()).thenReturn(templateOptions);
     
     // here is a scenario when jt+nn fails once, then the retry is successful
     // and from the dn+tt one node fails, then the retry is successful
@@ -189,6 +191,7 @@ public class BootstrapClusterActionTest {
     ComputeService computeService = mock(ComputeService.class);
     TemplateBuilder templateBuilder = mock(TemplateBuilder.class);
     Template template = mock(Template.class);
+    TemplateOptions templateOptions = mock(TemplateOptions.class);
 
     when(getCompute.apply(clusterSpec)).thenReturn(serviceContext);
     when(serviceContext.getComputeService()).thenReturn(computeService);
@@ -198,6 +201,7 @@ public class BootstrapClusterActionTest {
     when(templateBuilder.from((TemplateBuilderSpec) any())).thenReturn(templateBuilder);
     when(templateBuilder.options((TemplateOptions) any())).thenReturn(templateBuilder);
     when(templateBuilder.build()).thenReturn(template);
+    when(template.getOptions()).thenReturn(templateOptions);
     
     // here is a scenario when jt+nn does not fail
     // but the dn+tt one node fails 3, then in the retry fails 2
@@ -367,6 +371,7 @@ public class BootstrapClusterActionTest {
     ComputeService computeService = mock(ComputeService.class);
     TemplateBuilder templateBuilder = mock(TemplateBuilder.class);
     Template template = mock(Template.class);
+    TemplateOptions templateOptions = mock(TemplateOptions.class);
 
     when(getCompute.apply(clusterSpec)).thenReturn(serviceContext);
     when(serviceContext.getComputeService()).thenReturn(computeService);
@@ -376,6 +381,7 @@ public class BootstrapClusterActionTest {
     when(templateBuilder.from((TemplateBuilderSpec) any())).thenReturn(templateBuilder);
     when(templateBuilder.options((TemplateOptions) any())).thenReturn(templateBuilder);
     when(templateBuilder.build()).thenReturn(template);
+    when(template.getOptions()).thenReturn(templateOptions);
     
     Map<Set<String>, Stack<Integer>> reaction = Maps.newHashMap();
     Stack<Integer> nnStack = new Stack<Integer>();
