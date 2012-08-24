@@ -18,7 +18,6 @@
 
 package org.apache.whirr.compute;
 
-import static org.jclouds.compute.options.TemplateOptions.Builder.runScript;
 import static org.jclouds.ec2.domain.RootDeviceType.EBS;
 import static org.jclouds.scriptbuilder.domain.Statements.appendFile;
 import static org.jclouds.scriptbuilder.domain.Statements.createOrOverwriteFile;
@@ -75,9 +74,10 @@ public class BootstrapTemplate {
     TemplateBuilder templateBuilder = computeService.templateBuilder().from(
         instanceTemplate.getTemplate() != null ? instanceTemplate.getTemplate() :
         clusterSpec.getTemplate());
-    templateBuilder.options(runScript(bootstrap));
+    Template template = templateBuilder.build();
+    template.getOptions().runScript(bootstrap);
     return setSpotInstancePriceIfSpecified(
-      computeService.getContext(), clusterSpec, templateBuilder.build(), instanceTemplate
+      computeService.getContext(), clusterSpec, template, instanceTemplate
     );
   }
 
