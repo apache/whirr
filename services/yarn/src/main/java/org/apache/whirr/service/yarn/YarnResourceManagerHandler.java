@@ -72,6 +72,8 @@ public class YarnResourceManagerHandler extends YarnHandler {
           .destination(resourceManager)
           .ports(RESOURCE_MANAGER_RPC_PORT)
     );
+
+    handleFirewallRules(event);
     
     try {
       event.getStatementBuilder().addStatements(

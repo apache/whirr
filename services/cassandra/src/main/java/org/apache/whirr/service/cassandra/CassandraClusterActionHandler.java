@@ -90,6 +90,8 @@ public class CassandraClusterActionHandler extends ClusterActionHandlerSupport {
         .ports(CLIENT_PORT, JMX_PORT)
     );
 
+    handleFirewallRules(event);
+    
     setInitialTokensAsEnvironmentVariables(event, instances);
 
     List<Instance> seeds = getSeeds(instances);

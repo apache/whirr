@@ -85,6 +85,8 @@ public class GangliaMonitorClusterActionHandler extends ClusterActionHandlerSupp
         Rule.create().destination(role(GANGLIA_MONITOR_ROLE)).port(GANGLIA_MONITOR_PORT)
     );
 
+    handleFirewallRules(event);
+    
     Configuration config = getConfiguration(clusterSpec);
     String configureFunction = getConfigureFunction(config);
 

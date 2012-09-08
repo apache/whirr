@@ -100,6 +100,8 @@ public abstract class HadoopClusterActionHandler extends ClusterActionHandlerSup
     
     doBeforeConfigure(event);
 
+    handleFirewallRules(event);
+    
     createHadoopConfigFiles(event, clusterSpec, cluster);
 
     addStatement(event, call("retry_helpers"));

@@ -55,4 +55,9 @@ public class PigClientClusterActionHandler extends ClusterActionHandlerSupport {
 
     addStatement(event, call(PIG_CLIENT_SCRIPT, URL_FLAG, pigTarball));
   }
+
+  @Override
+  protected void beforeConfigure(ClusterActionEvent event) throws IOException, InterruptedException {
+      handleFirewallRules(event);
+  }
 }

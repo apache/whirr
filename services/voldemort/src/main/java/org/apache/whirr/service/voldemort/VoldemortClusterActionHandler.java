@@ -99,6 +99,8 @@ public class VoldemortClusterActionHandler extends ClusterActionHandlerSupport {
         .ports(CLIENT_PORT, ADMIN_PORT, HTTP_PORT)
     );
 
+    handleFirewallRules(event);
+
     String servers = Joiner.on(' ').join(getPrivateIps(cluster.getInstances()));
 
     Configuration config = event.getClusterSpec().getConfiguration();

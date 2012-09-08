@@ -60,7 +60,7 @@ public class ChefServiceDryRunTest extends BaseServiceDryRunTest {
     ClusterSpec chefOnly = newClusterSpecForProperties(ImmutableMap.of("whirr.instance-templates", "1 chef"));
     DryRun dryRun = launchWithClusterSpec(chefOnly);
     assertScriptPredicateOnPhase(dryRun, "bootstrap", bootstrapPredicate());
-    assertNoEntryForPhase(dryRun, "configure");
+    // We now have iptables calls by default in the configure phase.
   }
 
   /**

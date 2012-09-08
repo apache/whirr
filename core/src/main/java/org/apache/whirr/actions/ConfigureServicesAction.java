@@ -21,7 +21,6 @@ package org.apache.whirr.actions;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.whirr.ClusterSpec;
@@ -68,9 +67,8 @@ public class ConfigureServicesAction extends ScriptBasedClusterAction {
   /**
    * Apply the firewall rules specified via configuration.
    */
-  protected void eventSpecificActions(Entry<InstanceTemplate, ClusterActionEvent> entry) 
+  protected void eventSpecificActions(InstanceTemplate instanceTemplate, ClusterActionEvent event) 
       throws IOException {
-    ClusterActionEvent event = entry.getValue();
     ClusterSpec clusterSpec = event.getClusterSpec();
     
     Map<String, List<String>> firewallRules = clusterSpec.getFirewallRules();

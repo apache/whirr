@@ -74,6 +74,8 @@ public class ChefClusterActionHandler extends ClusterActionHandlerSupport {
   @Override
   protected void beforeConfigure(ClusterActionEvent event) throws IOException,
       InterruptedException {
+    handleFirewallRules(event);
+    
     // if the role is an exact match to the prefix then there is nothing to
     // do (chef only installation)
     if (role.equals("")) {

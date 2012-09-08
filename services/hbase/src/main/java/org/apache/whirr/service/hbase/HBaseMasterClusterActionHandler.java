@@ -98,6 +98,9 @@ public class HBaseMasterClusterActionHandler extends HBaseClusterActionHandler {
     //Velocity is assuming flat classloaders or TCCL to load templates.
     //This doesn't work in OSGi unless we set the TCCL to the bundle classloader before invocation
     ClassLoader oldTccl = Thread.currentThread().getContextClassLoader();
+
+    handleFirewallRules(event);
+    
     try {
       Thread.currentThread().setContextClassLoader(getClass().getClassLoader());
       event.getStatementBuilder().addStatements(

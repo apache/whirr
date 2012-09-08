@@ -559,7 +559,7 @@ xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 http://maven.apache.org/xsd
         <td>The minimum amount of RAM each instance should have</td>
       </tr>
     </table>
-    <subsection name="Firewall Options"></subsection>
+    <subsection name="Firewall and DNS-Related Options"></subsection>
     <table border="0">
       <tr valign="top">
         <th>
@@ -607,6 +607,16 @@ xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 http://maven.apache.org/xsd
         </td>
         <td>none</td>
         <td>A comma-separated list of port numbers to open on instances with a specific role. Replace {role} the actual role name. E.g. <tt>whirr.firewall-rules.hbase-master=10101</tt>.</td>
+      </tr>
+      <tr valign="top">
+        <td>
+          <tt>whirr.store-cluster-in-etc-hosts</tt>
+        </td>
+        <td>
+          <tt>--store-cluster-in-etc-hosts</tt>
+        </td>
+        <td>false</td>
+        <td>Whether to store all cluster IPs and hostnames in /etc/hosts on each node.</td>
       </tr>
     </table>
     <p>

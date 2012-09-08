@@ -86,6 +86,8 @@ public class GangliaMetadClusterActionHandler extends ClusterActionHandlerSuppor
         Rule.create().destination(role(GANGLIA_METAD_ROLE)).ports(HTTP_PORT, GANGLIA_META_PORT)
     );
 
+    handleFirewallRules(event);
+
     Configuration config = getConfiguration(clusterSpec);
     String configureFunction = getConfigureFunction(config);
 

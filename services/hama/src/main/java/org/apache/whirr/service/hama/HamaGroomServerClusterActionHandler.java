@@ -53,6 +53,8 @@ public class HamaGroomServerClusterActionHandler extends
     event.getFirewallManager().addRules(
         Rule.create().destination(instance).ports(GROOMSERVER_PORT));
 
+    handleFirewallRules(event);
+    
     String hamaConfigureFunction = getConfiguration(clusterSpec).getString(
         HamaConstants.KEY_CONFIGURE_FUNCTION,
         HamaConstants.FUNCTION_POST_CONFIGURE);
