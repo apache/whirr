@@ -61,7 +61,9 @@ public class YarnNodeManagerHandler extends YarnHandler {
                 );            
         }
     }
-        
+
+    handleFirewallRules(event);
+    
     try {
       event.getStatementBuilder().addStatements(
         build("/tmp/yarn-site.xml", clusterSpec, cluster, ROLE)

@@ -84,6 +84,8 @@ public class ZooKeeperClusterActionHandler extends ClusterActionHandlerSupport {
       Rule.create().destination(role(ZOOKEEPER_ROLE)).port(CLIENT_PORT)
     );
 
+    handleFirewallRules(event);
+
     // Pass list of all servers in ensemble to configure script.
     // Position is significant: i-th server has id i.
 

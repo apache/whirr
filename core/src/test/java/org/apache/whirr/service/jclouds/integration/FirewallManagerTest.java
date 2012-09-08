@@ -89,6 +89,7 @@ public class FirewallManagerTest {
           Rule.create().destination(instances).port(23344)
         );
 
+        manager.authorizeAllRules();
       } finally {
         ec2Client.getSecurityGroupServices()
             .deleteSecurityGroupInRegion(region, groupName);

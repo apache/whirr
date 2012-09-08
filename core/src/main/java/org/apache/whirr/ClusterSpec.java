@@ -168,7 +168,7 @@ public class ClusterSpec {
           
     FIREWALL_RULES_ROLE(String.class, true, "A comma-separated list of port" +
       " numbers. E.g. 8080,8181. Replace 'role' with an actual role name"),
-              
+        
     VERSION(String.class, false, ""),
     
     RUN_URL_BASE(String.class, false, "The base URL for forming run " + 
@@ -176,6 +176,9 @@ public class ClusterSpec {
       
     TERMINATE_ALL_ON_LAUNCH_FAILURE(Boolean.class, false, "Whether or not to " +
                                     "automatically terminate all nodes when cluster launch fails for some reason."),
+
+    STORE_CLUSTER_IN_ETC_HOSTS(Boolean.class, false, "Whether or not to " +
+                               "store all cluster IPs and hostnames in /etc/hosts on each node."),
 
     AUTO_HOSTNAME_PREFIX(String.class, false, "If given, used a prefix when automatically " +
                          "generating hostnames. Ignored if AUTO_HOSTNAME_SUFFIX is not also set."),
@@ -300,6 +303,7 @@ public class ClusterSpec {
   private String runUrlBase;
   
   private boolean terminateAllOnLaunchFailure;
+  private boolean storeClusterInEtcHosts;
 
   private String awsEc2PlacementGroup;
 
@@ -370,7 +374,10 @@ public class ClusterSpec {
     
     setTerminateAllOnLaunchFailure(config.getBoolean(
         Property.TERMINATE_ALL_ON_LAUNCH_FAILURE.getConfigName(), Boolean.TRUE));
-    
+
+    setStoreClusterInEtcHosts(config.getBoolean(
+        Property.STORE_CLUSTER_IN_ETC_HOSTS.getConfigName(), Boolean.FALSE));
+
     setAwsEc2PlacementGroup(getString(Property.AWS_EC2_PLACEMENT_GROUP));
 
     Map<String, List<String>> fr = new HashMap<String, List<String>>();
@@ -432,6 +439,7 @@ public class ClusterSpec {
     r.setRunUrlBase(getRunUrlBase());
     
     r.setTerminateAllOnLaunchFailure(isTerminateAllOnLaunchFailure());
+    r.setStoreClusterInEtcHosts(isStoreClusterInEtcHosts());
 
     r.setAwsEc2PlacementGroup(getAwsEc2PlacementGroup());
 
@@ -792,6 +800,13 @@ public class ClusterSpec {
     this.terminateAllOnLaunchFailure = terminateAllOnLaunchFailure;
   }
 
+  public boolean isStoreClusterInEtcHosts() {
+    return storeClusterInEtcHosts;
+  }
+  public void setStoreClusterInEtcHosts(boolean storeClusterInEtcHosts) {
+    this.storeClusterInEtcHosts = storeClusterInEtcHosts;
+  }
+
   public String getAwsEc2PlacementGroup() {
     return awsEc2PlacementGroup;
   }
@@ -1044,6 +1059,7 @@ public class ClusterSpec {
       .add("stateStoreBlob", getStateStoreBlob())
       .add("awsEc2SpotPrice", getAwsEc2SpotPrice())
       .add("terminateAllOnLauchFailure",isTerminateAllOnLaunchFailure())
+      .add("storeClusterInEtcHosts",isStoreClusterInEtcHosts())
       .add("awsEc2PlacementGroup",getAwsEc2PlacementGroup())
       .add("autoHostnamePrefix",getAutoHostnamePrefix())
       .add("autoHostnameSuffix",getAutoHostnameSuffix())

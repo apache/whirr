@@ -18,6 +18,8 @@
 
 package org.apache.whirr.service;
 
+import static org.jclouds.scriptbuilder.domain.Statements.exec;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
@@ -28,6 +30,7 @@ import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.whirr.ClusterSpec;
+import org.apache.whirr.Cluster.Instance;
 import org.apache.whirr.service.jclouds.RunUrlStatement;
 import org.apache.whirr.util.BlobCache;
 import org.jclouds.scriptbuilder.domain.Statement;
@@ -47,10 +50,11 @@ public abstract class ClusterActionHandlerSupport implements ClusterActionHandle
     LoggerFactory.getLogger(ClusterActionHandler.class);
 
   public void beforeAction(ClusterActionEvent event)
-      throws IOException, InterruptedException{
+    throws IOException, InterruptedException{
     if (event.getAction().equals(BOOTSTRAP_ACTION)) {
       beforeBootstrap(event);
     } else if (event.getAction().equals(CONFIGURE_ACTION)) {
+      addClusterToEtcHostsAndFirewall(event);
       beforeConfigure(event);
     } else if (event.getAction().equals(START_ACTION)) {
       beforeStart(event);
@@ -66,7 +70,7 @@ public abstract class ClusterActionHandlerSupport implements ClusterActionHandle
   }
 
   public void afterAction(ClusterActionEvent event)
-      throws IOException, InterruptedException {
+    throws IOException, InterruptedException {
     if (event.getAction().equals(BOOTSTRAP_ACTION)) {
       afterBootstrap(event);
     } else if (event.getAction().equals(CONFIGURE_ACTION)) {
@@ -135,7 +139,7 @@ public abstract class ClusterActionHandlerSupport implements ClusterActionHandle
    * @return The composite configuration.
    */
   protected Configuration getConfiguration(
-      ClusterSpec clusterSpec, Configuration defaults) {
+                                           ClusterSpec clusterSpec, Configuration defaults) {
     CompositeConfiguration cc = new CompositeConfiguration();
     cc.addConfiguration(clusterSpec.getConfiguration());
     cc.addConfiguration(defaults);
@@ -143,24 +147,24 @@ public abstract class ClusterActionHandlerSupport implements ClusterActionHandle
   }
 
   protected Configuration getConfiguration(ClusterSpec clusterSpec,
-      String defaultsPropertiesFile) throws IOException {
+                                           String defaultsPropertiesFile) throws IOException {
     try {
       return getConfiguration(clusterSpec,
-          new PropertiesConfiguration(getClass().getClassLoader().getResource(defaultsPropertiesFile)));
+                              new PropertiesConfiguration(getClass().getClassLoader().getResource(defaultsPropertiesFile)));
     } catch(ConfigurationException e) {
       throw new IOException("Error loading " + defaultsPropertiesFile, e);
     }
- }
+  }
   
   /**
    * A convenience method for adding a {@link RunUrlStatement} to a
    * {@link ClusterActionEvent}.
    */
   public static void addRunUrl(ClusterActionEvent event, String runUrl,
-      String... args)
-      throws IOException {
+                               String... args)
+    throws IOException {
     Statement statement = new RunUrlStatement(
-        event.getClusterSpec().getRunUrlBase(), runUrl, args);
+                                              event.getClusterSpec().getRunUrlBase(), runUrl, args);
     addStatement(event, statement);
   }
 
@@ -168,6 +172,54 @@ public abstract class ClusterActionHandlerSupport implements ClusterActionHandle
     event.getStatementBuilder().addStatement(statement);
   }
 
+  public static void addClusterToEtcHostsAndFirewall(ClusterActionEvent event) throws IOException {
+    if (event.getClusterSpec().isStoreClusterInEtcHosts()) {
+      addStatement(event, exec("echo -e '\\n' >> /etc/hosts"));
+    
+      for (Instance instance : event.getCluster().getInstances()) {
+        
+        // Remove any existing references to this IP from /etc/hosts
+        addStatement(event, exec(String.format("sed -i -e '/%s/d' /etc/hosts",
+                                               instance.getPublicIp())));
+        // Add this IP to /etc/hosts
+        addStatement(event, exec(String.format("echo -e '\\n%s %s' >> /etc/hosts",
+                                               instance.getPublicIp(),
+                                               instance.getPublicHostName())));
+
+        // Allow access to this host on all ports from this public IP
+        addStatement(event, exec(String.format("iptables -I INPUT 1 -p tcp --source %s -j ACCEPT || true",
+                                               instance.getPublicIp())));
+        
+        if (instance.getPrivateIp() != null) {
+          // Allow access to this host on all ports from this private IP
+          addStatement(event, exec(String.format("iptables -I INPUT 1 -p tcp --source %s -j ACCEPT || true",
+                                                 instance.getPrivateIp())));
+        }
+        
+      }
+
+      addStatement(event, exec("test -f /etc/hostname && echo $PUBLIC_HOST_NAME > /etc/hostname || true"));
+      addStatement(event, exec("test -f /etc/sysconfig/network && sed -i -e \"s/HOSTNAME=.*/HOSTNAME=$PUBLIC_HOST_NAME/\" /etc/sysconfig/network || true"));
+      addStatement(event, exec("test -f /etc/init.d/hostname && /etc/init.d/hostname restart || hostname $PUBLIC_HOST_NAME"));
+      addStatement(event, exec("sleep 2"));
+      
+      addStatement(event, exec("iptables-save || true"));
+    }
+  }
+    
+  /**
+   * Handles firewall rules for a given event.
+   */
+  public static void handleFirewallRules(ClusterActionEvent event) {
+    ClusterSpec clusterSpec = event.getClusterSpec();
+    
+    for (Statement statement : event.getFirewallManager().getRulesAsStatements()) {
+      addStatement(event, statement);
+    }
+
+    event.getFirewallManager().authorizeAllRules();
+  }
+      
   /**
    * Prepare the file url for the remote machine.
    *
@@ -178,7 +230,7 @@ public abstract class ClusterActionHandlerSupport implements ClusterActionHandle
    * @return  an URL visible to the install / configure scripts
    */
   public static String prepareRemoteFileUrl(ClusterActionEvent event, String rawUrl)
-      throws IOException {
+    throws IOException {
     if (rawUrl != null && rawUrl.startsWith("file://")) {
       try {
         URI uri = new URI(rawUrl);
@@ -248,25 +300,25 @@ public abstract class ClusterActionHandlerSupport implements ClusterActionHandle
     return config.getString(key, defaultFunction);
   }
   /**
-    * this uses the inefficient {@link com.google.common.base.Objects} implementation as the object count will be
-    * relatively small and therefore efficiency is not a concern.
-    */
-   @Override
-   public int hashCode() {
-      return Objects.hashCode(getRole());
-   }
+   * this uses the inefficient {@link com.google.common.base.Objects} implementation as the object count will be
+   * relatively small and therefore efficiency is not a concern.
+   */
+  @Override
+  public int hashCode() {
+    return Objects.hashCode(getRole());
+  }
 
-   @Override
-   public boolean equals(Object that) {
-      if (that == null)
-         return false;
-      return Objects.equal(this.toString(), that.toString());
-   }
+  @Override
+  public boolean equals(Object that) {
+    if (that == null)
+      return false;
+    return Objects.equal(this.toString(), that.toString());
+  }
 
-   @Override
-   public String toString() {
-      return Objects.toStringHelper(this).add("role", getRole()).toString();
-   }
+  @Override
+  public String toString() {
+    return Objects.toStringHelper(this).add("role", getRole()).toString();
+  }
 
 
 }

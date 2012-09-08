@@ -89,6 +89,8 @@ public class BasicServerClusterActionHandler extends HBaseClusterActionHandler {
       Rule.create().destination(instance).port(port)
     );
 
+    handleFirewallRules(event);
+    
     String master = masterPublicAddress.getHostName();
     String quorum = ZooKeeperCluster.getHosts(cluster);
 

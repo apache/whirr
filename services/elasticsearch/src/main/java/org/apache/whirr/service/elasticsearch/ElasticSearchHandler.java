@@ -67,6 +67,8 @@ public class ElasticSearchHandler extends ClusterActionHandlerSupport {
         .port(HTTP_CLIENT_PORT)
     );
 
+    handleFirewallRules(event);
+
     Configuration config = ElasticSearchConfigurationBuilder.buildConfig(spec, cluster);
     addStatement(event, call("retry_helpers"));
     addStatement(event,

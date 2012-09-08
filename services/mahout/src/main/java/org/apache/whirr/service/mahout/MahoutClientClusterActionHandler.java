@@ -56,4 +56,9 @@ public class MahoutClientClusterActionHandler extends ClusterActionHandlerSuppor
     addStatement(event, call("retry_helpers"));
     addStatement(event, call(MAHOUT_CLIENT_SCRIPT, URL_FLAG, mahoutTarball));
   }
+
+  @Override
+  protected void beforeConfigure(ClusterActionEvent event) throws IOException, InterruptedException {
+      handleFirewallRules(event);
+  }
 }

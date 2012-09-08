@@ -113,6 +113,7 @@ public abstract class ScriptBasedClusterAction extends ClusterAction {
           instanceTemplate, newCluster, statementBuilder, getCompute(), firewallManager, velocityEngine);
 
       eventMap.put(instanceTemplate, event);
+      eventSpecificActions(instanceTemplate, event);
       for (String role : instanceTemplate.getRoles()) {
         if (roleIsInTarget(role)) {
           safeGetActionHandler(role).beforeAction(event);
@@ -168,7 +169,7 @@ public abstract class ScriptBasedClusterAction extends ClusterAction {
         continue; // skip if not in the target
       }
 
-      eventSpecificActions(entry);
+
 
       Cluster cluster = entry.getValue().getCluster();
       StatementBuilder statementBuilder = entry.getValue().getStatementBuilder();
@@ -255,8 +256,7 @@ public abstract class ScriptBasedClusterAction extends ClusterAction {
     });
   }
 
-  protected void eventSpecificActions(
-      Map.Entry<InstanceTemplate, ClusterActionEvent> entry) throws IOException {
+  protected void eventSpecificActions(InstanceTemplate instanceTemplate, ClusterActionEvent event) throws IOException {
   }
 
   protected void postRunScriptsActions(

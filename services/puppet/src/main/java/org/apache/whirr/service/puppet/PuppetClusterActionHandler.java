@@ -98,8 +98,10 @@ public class PuppetClusterActionHandler extends PuppetInstallClusterActionHandle
   }
 
   protected void beforeConfigure(ClusterActionEvent event) throws IOException, InterruptedException {
+    handleFirewallRules(event);
+    
     super.beforeConfigure(event);
-
+    
     if (isLastPuppetRoleIn(event.getInstanceTemplate().getRoles()).apply(getRole())) {
       Configuration config = event.getClusterSpec().getConfiguration();
       Iterable<String> roles = RolesManagedByPuppet.INSTANCE.apply(event.getInstanceTemplate().getRoles());

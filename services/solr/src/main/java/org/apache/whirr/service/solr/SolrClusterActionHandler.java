@@ -115,6 +115,8 @@ public class SolrClusterActionHandler extends ClusterActionHandlerSupport {
 
     // Open up Jetty port
     event.getFirewallManager().addRule(Rule.create().destination(role(SOLR_ROLE)).port(jettyPort));
+
+    handleFirewallRules(event);
   }
 
   @Override

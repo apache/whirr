@@ -18,6 +18,8 @@
 
 package org.apache.whirr.service;
 
+import static org.jclouds.scriptbuilder.domain.Statements.exec;
+
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -35,6 +37,7 @@ import org.jclouds.ec2.EC2ApiMetadata;
 import org.jclouds.ec2.EC2Client;
 import org.jclouds.ec2.domain.IpProtocol;
 import org.jclouds.javax.annotation.Nullable;
+import org.jclouds.scriptbuilder.domain.Statement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,6 +49,39 @@ import com.google.common.collect.Sets;
 
 public class FirewallManager {
 
+  public static class StoredRule {
+    private Rule rule;
+    private List<String> cidrs;
+    private Set<Instance> instances;
+      
+    public StoredRule(Rule rule, List<String> cidrs, Set<Instance> instances) {
+      this.rule = rule;
+      this.cidrs = cidrs;
+      this.instances = instances;
+    }
+
+    /**
+     * Get the Rule object for this stored rule.
+     */
+    public Rule rule() {
+      return rule;
+    }
+
+    /**
+     * Get the CIDRs for this stored rule.
+     */
+    public List<String> cidrs() {
+      return cidrs;
+    }
+
+    /**
+     * Get the set of Instances for this stored rule.
+     */
+    public Set<Instance> instances() {
+      return instances;
+    }
+  }
+    
   public static class Rule {
 
     public static Rule create() {
@@ -116,17 +152,19 @@ public class FirewallManager {
   }
 
   private static final Logger LOG = LoggerFactory
-      .getLogger(FirewallManager.class);
+    .getLogger(FirewallManager.class);
 
   private ComputeServiceContext computeServiceContext;
   private ClusterSpec clusterSpec;
   private Cluster cluster;
-
+  private Set<StoredRule> storedRules;
+    
   public FirewallManager(ComputeServiceContext computeServiceContext,
-      ClusterSpec clusterSpec, Cluster cluster) {
+                         ClusterSpec clusterSpec, Cluster cluster) {
     this.computeServiceContext = computeServiceContext;
     this.clusterSpec = clusterSpec;
     this.cluster = cluster;
+    this.storedRules = Sets.newHashSet();
   }
 
   public void addRules(Rule... rules) throws IOException {
@@ -168,19 +206,59 @@ public class FirewallManager {
       cidrs = Lists.newArrayList(rule.source + "/32");
     }
 
+    storedRules.add(new StoredRule(rule, cidrs, instances));
+  }
+
+  /**
+   * Logs information about the StoredRule we're adding
+   * @param storedRule the StoredRule we're adding
+   */
+  private void logInstanceRules(StoredRule storedRule) {
     Iterable<String> instanceIds =
-      Iterables.transform(instances, new Function<Instance, String>() {
-        @Override
-        public String apply(@Nullable Instance instance) {
-          return instance == null ? "<null>" : instance.getId();
-        }
-      });
-
+      Iterables.transform(storedRule.instances(), new Function<Instance, String>() {
+          @Override
+          public String apply(@Nullable Instance instance) {
+            return instance == null ? "<null>" : instance.getId();
+          }
+        });
+      
+      
+      
     LOG.info("Authorizing firewall ingress to {} on ports {} for {}",
-        new Object[] { instanceIds, rule.ports, cidrs });
+             new Object[] { instanceIds, storedRule.rule().ports, storedRule.cidrs() });
+  }
 
-    authorizeIngress(computeServiceContext, instances,
-        clusterSpec, cidrs, rule.ports);
+  /**
+   * Authorizes all rules via jclouds security groups interface.
+   */
+  public void authorizeAllRules() {
+    for (StoredRule storedRule : storedRules) { 
+      logInstanceRules(storedRule);
+      authorizeIngress(computeServiceContext, storedRule.instances(),
+                       clusterSpec, storedRule.cidrs(), storedRule.rule().ports);
+    }
+  }
+
+  /**
+   * Returns a list of Statements for executing iptables for the stored rules.
+   * @return List of iptables Statements.
+   */
+  public List<Statement> getRulesAsStatements() {
+    List<Statement> ruleStatements = Lists.newArrayList();
+
+    for (StoredRule storedRule : storedRules) {
+      logInstanceRules(storedRule);
+      for (String cidr : storedRule.cidrs()) {
+        for (int port : storedRule.rule().ports) {
+          ruleStatements.add(exec(String.format("iptables -I INPUT 1 -p tcp --dport %d --source %s -j ACCEPT || true",
+                                                port, cidr)));
+        }
+      }
+    }
+
+    ruleStatements.add(exec("iptables-save || true"));
+
+    return ruleStatements;
   }
 
   /**
@@ -199,7 +277,7 @@ public class FirewallManager {
   }
 
   public static void authorizeIngress(ComputeServiceContext computeServiceContext,
-      Set<Instance> instances, ClusterSpec clusterSpec, List<String> cidrs, int... ports) {
+                                      Set<Instance> instances, ClusterSpec clusterSpec, List<String> cidrs, int... ports) {
 
     if (EC2ApiMetadata.CONTEXT_TOKEN.isAssignableFrom(computeServiceContext.getBackendType())) {
       // This code (or something like it) may be added to jclouds (see
@@ -213,7 +291,7 @@ public class FirewallManager {
           try {
             ec2Client.getSecurityGroupServices()
               .authorizeSecurityGroupIngressInRegion(region, groupName,
-                IpProtocol.TCP, port, port, cidr);
+                                                     IpProtocol.TCP, port, port, cidr);
           } catch(IllegalStateException e) {
             LOG.warn(e.getMessage());
             /* ignore, it means that this permission was already granted */

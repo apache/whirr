@@ -67,6 +67,8 @@ public class HamaMasterClusterActionHandler extends HamaClusterActionHandler {
         Rule.create().destination(instance).ports(MASTER_WEB_UI_PORT),
         Rule.create().destination(instance).ports(MASTER_PORT));
 
+    handleFirewallRules(event);
+    
     String hamaConfigureFunction = getConfiguration(clusterSpec).getString(
         HamaConstants.KEY_CONFIGURE_FUNCTION,
         HamaConstants.FUNCTION_POST_CONFIGURE);

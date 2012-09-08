@@ -40,6 +40,7 @@ public class MapReduceJobHistoryServerHandler extends YarnHandler {
       InterruptedException {
     ClusterSpec clusterSpec = event.getClusterSpec();
     Configuration conf = getConfiguration(clusterSpec);
+    handleFirewallRules(event);
     addStatement(event, call(getStartFunction(conf, "mr_jobhistory", "start_mr_jobhistory"), "historyserver"));
   }
 
