@@ -28,7 +28,7 @@ public class LaunchCluster extends WhirrCommandSupport {
 
   @Override
   protected Object doExecute() throws Exception {
-    Thread.currentThread().setContextClassLoader(getClass().getClassLoader());
+    validateInput();
     LaunchClusterCommand command = new LaunchClusterCommand(clusterControllerFactory);
     ClusterSpec clusterSpec = getClusterSpec();
     if (clusterSpec != null) {

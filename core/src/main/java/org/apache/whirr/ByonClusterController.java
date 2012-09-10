@@ -30,6 +30,7 @@ import java.util.Set;
 import org.apache.whirr.Cluster.Instance;
 import org.apache.whirr.actions.ByonClusterAction;
 import org.apache.whirr.service.ClusterActionHandler;
+import org.apache.whirr.state.ClusterStateStoreFactory;
 import org.jclouds.compute.ComputeService;
 import org.jclouds.compute.ComputeServiceContext;
 import org.jclouds.compute.RunScriptOnNodesException;
@@ -49,6 +50,14 @@ import com.google.common.collect.Collections2;
  * ("bring your own nodes").
  */
 public class ByonClusterController extends ClusterController {
+
+  public ByonClusterController() {
+    super();
+  }
+
+  public ByonClusterController(Function<ClusterSpec, ComputeServiceContext> getCompute, ClusterStateStoreFactory stateStoreFactory) {
+    super(getCompute, stateStoreFactory);
+  }
 
   @Override
   public String getName() {

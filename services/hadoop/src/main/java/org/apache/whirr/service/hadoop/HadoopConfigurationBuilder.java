@@ -63,28 +63,28 @@ public class HadoopConfigurationBuilder {
   public static Statement buildCommon(String path, ClusterSpec clusterSpec,
       Cluster cluster) throws ConfigurationException, IOException {
     Configuration config = buildCommonConfiguration(clusterSpec, cluster,
-        new PropertiesConfiguration(WHIRR_HADOOP_DEFAULT_PROPERTIES));
+        new PropertiesConfiguration(HadoopConfigurationBuilder.class.getResource("/" + WHIRR_HADOOP_DEFAULT_PROPERTIES)));
     return HadoopConfigurationConverter.asCreateXmlConfigurationFileStatement(path, config);
   }
   
   public static Statement buildHdfs(String path, ClusterSpec clusterSpec,
       Cluster cluster, Set<String> dataDirectories) throws ConfigurationException, IOException {
     Configuration config = buildHdfsConfiguration(clusterSpec, cluster,
-        new PropertiesConfiguration(WHIRR_HADOOP_DEFAULT_PROPERTIES), dataDirectories);
+        new PropertiesConfiguration(HadoopConfigurationBuilder.class.getResource("/" + WHIRR_HADOOP_DEFAULT_PROPERTIES)), dataDirectories);
     return HadoopConfigurationConverter.asCreateXmlConfigurationFileStatement(path, config);
   }
   
   public static Statement buildMapReduce(String path, ClusterSpec clusterSpec,
       Cluster cluster, Set<String> dataDirectories) throws ConfigurationException, IOException {
     Configuration config = buildMapReduceConfiguration(clusterSpec, cluster,
-        new PropertiesConfiguration(WHIRR_HADOOP_DEFAULT_PROPERTIES), dataDirectories);
+        new PropertiesConfiguration(HadoopConfigurationBuilder.class.getResource("/" + WHIRR_HADOOP_DEFAULT_PROPERTIES)), dataDirectories);
     return HadoopConfigurationConverter.asCreateXmlConfigurationFileStatement(path, config);
   }
   
   public static Statement buildHadoopEnv(String path, ClusterSpec clusterSpec,
       Cluster cluster) throws ConfigurationException, IOException {
     Configuration config = buildHadoopEnvConfiguration(clusterSpec, cluster,
-        new PropertiesConfiguration(WHIRR_HADOOP_DEFAULT_PROPERTIES));
+        new PropertiesConfiguration(HadoopConfigurationBuilder.class.getResource("/" + WHIRR_HADOOP_DEFAULT_PROPERTIES)));
     return HadoopConfigurationConverter.asCreateEnvironmentVariablesFileStatement(path, config);
   }
   

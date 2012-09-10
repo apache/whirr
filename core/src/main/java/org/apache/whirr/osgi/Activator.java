@@ -24,6 +24,9 @@ import org.apache.whirr.ClusterControllerFactory;
 import org.apache.whirr.DynamicClusterControllerFactory;
 import org.apache.whirr.DynamicHandlerMapFactory;
 import org.apache.whirr.service.ClusterActionHandler;
+import org.apache.whirr.service.DynamicComputeCache;
+import org.apache.whirr.state.ClusterStateStoreFactory;
+import org.jclouds.compute.ComputeService;
 import org.jclouds.scriptbuilder.functionloader.osgi.BundleFunctionLoader;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
@@ -36,6 +39,11 @@ import java.util.Properties;
 
 public class Activator implements BundleActivator {
 
+  private ClusterStateStoreFactory clusterStateStoreFactory = new ClusterStateStoreFactory();
+
+  private DynamicComputeCache dynamicComputeCache = new DynamicComputeCache();
+  private ServiceTracker computeServiceTracker;
+
   private DynamicHandlerMapFactory handlerMapFactory = new DynamicHandlerMapFactory();
   private ServiceRegistration handlerMapFactoryRegistration;
   private ServiceTracker handlerTracker;
@@ -44,11 +52,12 @@ public class Activator implements BundleActivator {
   private ServiceRegistration clusterControllerFactoryRegistration;
   private ServiceTracker clusterControllerTracker;
 
-  private ClusterController defaultClusterController = new ClusterController();
+  private ClusterController defaultClusterController = new ClusterController(dynamicComputeCache, clusterStateStoreFactory);
   private ServiceRegistration defaultClusterControllerRegistration;
 
-  private ClusterController byonClusterController = new ByonClusterController();
+  private ClusterController byonClusterController = new ByonClusterController(dynamicComputeCache, clusterStateStoreFactory);
   private ServiceRegistration byonClusterControllerRegistration;
+
 
   private BundleFunctionLoader functionLoader;
 
@@ -73,7 +82,10 @@ public class Activator implements BundleActivator {
     functionLoader = new BundleFunctionLoader(context);
     functionLoader.start();
 
-    //Register services
+    defaultClusterController.setHandlerMapFactory(handlerMapFactory);
+    byonClusterController.setHandlerMapFactory(handlerMapFactory);
+
+        //Register services
     clusterControllerFactoryRegistration = context.registerService(ClusterControllerFactory.class.getName(), clusterControllerFactory, null);
     handlerMapFactoryRegistration = context.registerService(DynamicHandlerMapFactory.class.getName(), handlerMapFactory, null);
 
@@ -96,12 +108,30 @@ public class Activator implements BundleActivator {
 
     clusterControllerTracker.open();
 
+    computeServiceTracker = new ServiceTracker(context, ComputeService.class.getName(), null) {
+
+      @Override
+      public Object addingService(ServiceReference reference) {
+        Object service = context.getService(reference);
+        dynamicComputeCache.bind((ComputeService) service);
+        return service;
+      }
+
+      @Override
+      public void removedService(ServiceReference reference, Object service) {
+        dynamicComputeCache.unbind((ComputeService) service);
+        super.removedService(reference, service);
+      }
+    };
+
+    computeServiceTracker.open();
+
 
     handlerTracker = new ServiceTracker(context, ClusterActionHandler.class.getName(), null) {
 
       @Override
       public Object addingService(ServiceReference reference) {
-        Object service = super.addingService(reference);
+        Object service = context.getService(reference);
         handlerMapFactory.bind((ClusterActionHandler) service);
         return service;
       }

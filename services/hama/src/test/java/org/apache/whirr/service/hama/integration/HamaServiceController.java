@@ -69,7 +69,7 @@ public class HamaServiceController {
     if (System.getProperty("config") != null) {
       config.addConfiguration(new PropertiesConfiguration(System.getProperty("config")));
     }
-    config.addConfiguration(new PropertiesConfiguration("whirr-hama-test.properties"));
+    config.addConfiguration(new PropertiesConfiguration(HamaServiceController.class.getResource("/whirr-hama-test.properties")));
     clusterSpec = ClusterSpec.withTemporaryKeys(config);
     controller = new ClusterController();
     

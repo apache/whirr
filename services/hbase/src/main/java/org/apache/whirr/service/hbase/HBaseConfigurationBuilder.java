@@ -36,7 +36,7 @@ public class HBaseConfigurationBuilder {
   public static Statement buildHBaseSite(String path, ClusterSpec clusterSpec, Cluster cluster)
       throws ConfigurationException, IOException {
     Configuration config = buildHBaseSiteConfiguration(clusterSpec, cluster,
-        new PropertiesConfiguration(HBaseConstants.FILE_HBASE_DEFAULT_PROPERTIES));
+        new PropertiesConfiguration(HBaseConfigurationBuilder.class.getResource("/" + HBaseConstants.FILE_HBASE_DEFAULT_PROPERTIES)));
     return HadoopConfigurationConverter.asCreateXmlConfigurationFileStatement(path, config);
   }
 
@@ -57,7 +57,7 @@ public class HBaseConfigurationBuilder {
   public static Statement buildHBaseEnv(String path, ClusterSpec clusterSpec, Cluster cluster)
       throws ConfigurationException, IOException {
     Configuration config = buildHBaseEnvConfiguration(clusterSpec, cluster,
-        new PropertiesConfiguration(HBaseConstants.FILE_HBASE_DEFAULT_PROPERTIES));
+            new PropertiesConfiguration(HBaseConfigurationBuilder.class.getResource("/" + HBaseConstants.FILE_HBASE_DEFAULT_PROPERTIES)));
     return HadoopConfigurationConverter.asCreateEnvironmentVariablesFileStatement(path, config);
   }
 
