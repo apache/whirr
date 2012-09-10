@@ -53,7 +53,7 @@ public class YarnConfigurationBuilder {
   public static Statement build(String path, ClusterSpec clusterSpec,
       Cluster cluster, String role) throws ConfigurationException, IOException {
     Configuration config = buildConfiguration(clusterSpec, cluster, role,
-        new PropertiesConfiguration(WHIRR_YARN_DEFAULT_PROPERTIES));
+        new PropertiesConfiguration(YarnConfigurationBuilder.class.getResource("/" + WHIRR_YARN_DEFAULT_PROPERTIES)));
     return HadoopConfigurationConverter.asCreateXmlConfigurationFileStatement(path, config);
   }
   

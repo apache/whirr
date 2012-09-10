@@ -86,7 +86,11 @@ public class HBaseRegionServerClusterActionHandler extends HBaseClusterActionHan
         .ports(REGIONSERVER_WEB_UI_PORT, REGIONSERVER_PORT)
     );
 
+    //Velocity is assuming flat classloaders or TCCL to load templates.
+    //This doesn't work in OSGi unless we set the TCCL to the bundle classloader before invocation
+    ClassLoader oldTccl = Thread.currentThread().getContextClassLoader();
     try {
+      Thread.currentThread().setContextClassLoader(getClass().getClassLoader());
       event.getStatementBuilder().addStatements(
           buildHBaseSite("/tmp/hbase-site.xml", clusterSpec, cluster),
           buildHBaseEnv("/tmp/hbase-env.sh", clusterSpec, cluster),
@@ -94,6 +98,8 @@ public class HBaseRegionServerClusterActionHandler extends HBaseClusterActionHan
       );
     } catch (ConfigurationException e) {
       throw new IOException(e);
+    } finally {
+      Thread.currentThread().setContextClassLoader(oldTccl);
     }
 
     String master = masterPublicAddress.getHostName();

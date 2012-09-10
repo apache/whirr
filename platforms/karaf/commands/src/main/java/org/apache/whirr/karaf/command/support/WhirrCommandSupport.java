@@ -23,10 +23,14 @@ import org.apache.felix.gogo.commands.Option;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
 import org.apache.whirr.ClusterControllerFactory;
 import org.apache.whirr.ClusterSpec;
+import org.apache.whirr.InstanceTemplate;
 import org.jclouds.compute.ComputeService;
+import org.jclouds.compute.domain.TemplateBuilderSpec;
 import org.osgi.service.cm.ConfigurationAdmin;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public abstract class WhirrCommandSupport extends OsgiCommandSupport {
 
@@ -35,6 +39,24 @@ public abstract class WhirrCommandSupport extends OsgiCommandSupport {
 
   @Option(required = false, name = "--pid", description = "The PID of the configuration")
   protected String pid;
+
+  @Option(required = false, name = "--provider", description = "The compute provider")
+  protected String provider;
+
+  @Option(required = false, name = "--endpoint", description = "The compute endpoint")
+  protected String endpoint;
+
+  @Option(required = false, name = "--templates", description = "The templates to use")
+  protected String templates;
+
+  @Option(required = false, name = "--imageId", description = "The image id")
+  protected String imageId;
+
+  @Option(required = false, name = "--locationId", description = "The location")
+  protected String locationId;
+
+  @Option(required = false, name = "--hardwareId", description = "The hardware")
+  protected String hardwareId;
 
   @Option(required = false, name = "--cluster-name", description = "The name of the cluster")
   protected String clusterName;
@@ -46,6 +68,31 @@ public abstract class WhirrCommandSupport extends OsgiCommandSupport {
   protected ConfigurationAdmin configurationAdmin;
   protected List<ComputeService> computeServices;
 
+
+  public void validateInput() throws Exception {
+    if (pid != null || fileName != null) {
+       return;
+    } else {
+      if (provider == null || getComputeService(provider) == null) {
+        throw new Exception("A proper configuration or a valid provider should be provided.");
+      }
+      if (templates == null) {
+        throw new Exception("A proper configuration or a valid template should be specified");
+      }
+    }
+  }
+
+  public ComputeService getComputeService(String provider) {
+    if (computeServices != null && !computeServices.isEmpty()) {
+      for (ComputeService computeService : computeServices) {
+        if (computeService.getContext().unwrap().getId().equals(provider)) {
+          return computeService;
+        }
+      }
+    }
+    return null;
+  }
+
   /**
    * Returns the {@link ClusterSpec}
    *
@@ -54,17 +101,64 @@ public abstract class WhirrCommandSupport extends OsgiCommandSupport {
    */
   protected ClusterSpec getClusterSpec() throws Exception {
     ClusterSpec clusterSpec = null;
-    PropertiesConfiguration properties = getConfiguration(pid, fileName);
-    if (properties != null) {
+    if (pid != null || fileName != null) {
+      PropertiesConfiguration properties = getConfiguration(pid, fileName);
       clusterSpec = new ClusterSpec(properties);
-      if (privateKey != null) {
-        clusterSpec.setPrivateKey(privateKey);
-      }
-      if (clusterName != null) {
-        clusterSpec.setClusterName(clusterName);
-      }
+    } else {
+      clusterSpec = new ClusterSpec();
     }
+
+
+
+    if (provider != null) {
+      clusterSpec.setProvider(provider);
+    }
+
+    if (endpoint != null) {
+      clusterSpec.setEndpoint(endpoint);
+    }
+
+    if (templates != null) {
+      clusterSpec.setInstanceTemplates(getTemplate(templates, imageId, hardwareId));
+    }
+
+
+    if (privateKey != null) {
+      clusterSpec.setPrivateKey(privateKey);
+    }
+    if (clusterName != null) {
+      clusterSpec.setClusterName(clusterName);
+    }
+
     return clusterSpec;
+  }
+
+  protected InstanceTemplate.Builder getTemplateBuilder(String imageId, String hardwareId) {
+    InstanceTemplate.Builder instanceBuilder = InstanceTemplate.builder();
+    StringBuilder sb = new StringBuilder();
+    String separator = "";
+    if (imageId != null) {
+      sb.append(separator).append("imageId=").append(imageId);
+      separator = ",";
+    }
+
+    if (hardwareId != null) {
+      sb.append(separator).append("hardwareId=").append(hardwareId);
+    }
+    instanceBuilder = instanceBuilder.template(TemplateBuilderSpec.parse(sb.toString()));
+    return instanceBuilder;
+  }
+
+  protected List<InstanceTemplate> getTemplate(String templates, String imageId, String hardwareId) {
+    List<InstanceTemplate> templateList = new ArrayList<InstanceTemplate>();
+    Map<String, String> roleMap = InstanceTemplate.parse(templates.replaceAll("\\["," ").replaceAll("\\]"," ").split(","));
+    for (Map.Entry<String, String> entry : roleMap.entrySet()) {
+      InstanceTemplate.Builder builder = getTemplateBuilder(imageId, hardwareId);
+      Integer numberOfInstances = Integer.parseInt(entry.getValue());
+      String roles = entry.getKey();
+      templateList.add(builder.numberOfInstance(numberOfInstances).roles(roles.split("\\+")).build());
+    }
+    return templateList;
   }
 
   /**
@@ -101,12 +195,7 @@ public abstract class WhirrCommandSupport extends OsgiCommandSupport {
     this.configurationAdmin = configurationAdmin;
   }
 
-  public List<ComputeService> getComputeServices() {
-    return computeServices;
-  }
-
   public void setComputeServices(List<ComputeService> computeServices) {
     this.computeServices = computeServices;
   }
-
 }

@@ -113,7 +113,6 @@ public class Activator implements BundleActivator {
     if (masterRegistration != null) {
       masterRegistration.unregister();
     }
-
     if (regionServerRegistration != null) {
       regionServerRegistration.unregister();
     }
@@ -126,9 +125,6 @@ public class Activator implements BundleActivator {
     }
     if (thriftServerRegistration != null) {
       thriftServerRegistration.unregister();
-    }
-    if (masterRegistration != null) {
-      masterRegistration.unregister();
     }
     if (functionLoader != null) {
       functionLoader.stop();

@@ -66,7 +66,7 @@ public class ElasticSearchConfigurationBuilder {
     config.addConfiguration(spec.getConfiguration());
     try {
       config.addConfiguration(
-        new PropertiesConfiguration("whirr-elasticsearch-default.properties"));
+        new PropertiesConfiguration(ElasticSearchConfigurationBuilder.class.getResource("/whirr-elasticsearch-default.properties")));
     } catch (ConfigurationException e) {
       LOG.error("Configuration error", e); // this should never happen
     }

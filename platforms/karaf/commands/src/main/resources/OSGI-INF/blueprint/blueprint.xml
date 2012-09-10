@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements.  See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership.  The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+  -->
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
+
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.1.0">
+    <command name="whirr/launch-cluster">
+      <action class="org.apache.whirr.karaf.command.LaunchCluster">
+        <property name="clusterControllerFactory" ref="clusterControllerFactory"/>
+        <property name="configurationAdmin" ref="configurationAdmin"/>
+        <property name="computeServices" ref="computeServices"/>
+      </action>
+        <optional-completers>
+          <entry key="--provider" value-ref="computeProviderCompleter"/>
+          <entry key="--imageId" value-ref="imageCompleter"/>
+          <entry key="--locationId" value-ref="locationCompleter"/>
+          <entry key="--hardwareId" value-ref="hardwareCompleter"/>
+          <entry key="--templates" value-ref="templateCompleter"/>
+        </optional-completers>
+    </command>
+    <command name="whirr/list-cluster">
+      <action class="org.apache.whirr.karaf.command.ListCluster">
+        <property name="clusterControllerFactory" ref="clusterControllerFactory"/>
+        <property name="configurationAdmin" ref="configurationAdmin"/>
+        <property name="computeServices" ref="computeServices"/>
+      </action>
+    </command>
+    <command name="whirr/destroy-cluster">
+      <action class="org.apache.whirr.karaf.command.DestroyCluster">
+        <property name="clusterControllerFactory" ref="clusterControllerFactory"/>
+        <property name="configurationAdmin" ref="configurationAdmin"/>
+        <property name="computeServices" ref="computeServices"/>
+      </action>
+    </command>
+    <command name="whirr/destroy-instance">
+      <action class="org.apache.whirr.karaf.command.DestroyInstance">
+        <property name="clusterControllerFactory" ref="clusterControllerFactory"/>
+        <property name="configurationAdmin" ref="configurationAdmin"/>
+        <property name="computeServices" ref="computeServices"/>
+      </action>
+    </command>
+    <command name="whirr/run-script">
+      <action class="org.apache.whirr.karaf.command.RunScript">
+        <property name="clusterControllerFactory" ref="clusterControllerFactory"/>
+        <property name="configurationAdmin" ref="configurationAdmin"/>
+        <property name="computeServices" ref="computeServices"/>
+      </action>
+    </command>
+  </command-bundle>
+
+  <bean id="roleCompleter" class="org.apache.whirr.karaf.command.completers.RoleCompleter">
+    <property name="clusterActionHandlers" ref="clusterActionHandlers"/>
+  </bean>
+
+  <bean id="templateCompleter" class="org.apache.whirr.karaf.command.completers.TemplateCompleter">
+    <property name="roleCompleter" ref="roleCompleter"/>
+  </bean>
+
+  <reference id="imageCompleter" interface="org.apache.karaf.shell.console.Completer" filter="(completer-type=image)"/>
+  <reference id="locationCompleter" interface="org.apache.karaf.shell.console.Completer" filter="(completer-type=location)"/>
+  <reference id="hardwareCompleter" interface="org.apache.karaf.shell.console.Completer" filter="(completer-type=hardware)"/>
+  <reference id="computeProviderCompleter" interface="org.apache.karaf.shell.console.Completer" filter="(completer-type=compute-provider)"/>
+
+  <reference id="clusterControllerFactory" interface="org.apache.whirr.ClusterControllerFactory"/>
+  <reference id="configurationAdmin" interface="org.osgi.service.cm.ConfigurationAdmin"/>
+
+  <reference-list id="computeServices" interface="org.jclouds.compute.ComputeService" availability="optional"/>
+  <reference-list id="clusterActionHandlers" interface="org.apache.whirr.service.ClusterActionHandler" availability="optional"/>
+
+</blueprint>
