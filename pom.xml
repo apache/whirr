@@ -434,6 +434,7 @@
             <exclude>**/.settings/**</exclude>
             <exclude>**/.checkstyle</exclude>
             <exclude>**/target/**</exclude>
+            <exclude>**/atlassian-ide-plugin.xml</exclude>
             <exclude>src/site/resources/images/whirr-logo.ai</exclude>
             <!-- binary -->
           </excludes>
