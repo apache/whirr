@@ -7,6 +7,9 @@ Release 0.8.1 (unreleased changes)
   IMPROVEMENTS
 
     WHIRR-638. Parameterize OAB Java install. (Graham Gear via abayer)
+
+    WHIRR-548. Whirr can now reuse existing compute services. 
+    Misc osgi/karaf integration improvements. (Ioannis Canellos)
   
   BUG FIXES
 
