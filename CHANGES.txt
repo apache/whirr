@@ -22,6 +22,9 @@ Release 0.8.1 (unreleased changes)
     WHIRR-654. Tell RAT to avoid checking atlassian-idex.xml
     (Steve Loughran via asavu)
 
+    WHIRR-648. CDH repo install removes other repos with same prefix.
+    (Graham Gear via tomwhite)
+
 Release 0.8.0 - 2012-08-17
 
   NEW FEATURES

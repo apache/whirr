@@ -33,7 +33,6 @@ EOF
     fi
     retry_apt_get -y update
   elif which rpm &> /dev/null; then
-    rm -f /etc/yum.repos.d/cloudera*.repo
     if [ $CDH_MAJOR_VERSION = "4" ]; then
       cat > /etc/yum.repos.d/cloudera-cdh4.repo <<EOF
 [cloudera-cdh4]
