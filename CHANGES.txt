@@ -10,6 +10,9 @@ Release 0.8.1 (unreleased changes)
 
     WHIRR-548. Whirr can now reuse existing compute services. 
     Misc osgi/karaf integration improvements. (Ioannis Canellos)
+
+    WHIRR-649. Make install_cdh_hadoop.sh idempotent, fast failing if already
+    run. (Graham Gear via tomwhite)
   
   BUG FIXES
 
