@@ -62,6 +62,9 @@ Release 0.7.2
 
     WHIRR-601. Cassandra 1.0.8 download URL no longer valid (Andrew Bayer via asavu)
 
+    WHIRR-642. Whirr writes the AWS Secret key to the stdout.
+    (Steve Loughran via tomwhite)
+
 Release 0.7.1 - 2012-02-23
 
   IMPROVEMENTS
