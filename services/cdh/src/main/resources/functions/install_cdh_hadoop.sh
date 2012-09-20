@@ -60,6 +60,11 @@ function install_cdh_hadoop() {
   local OPTIND
   local OPTARG
 
+  if [ "$INSTALL_HADOOP_DONE" == "1" ]; then
+    echo "Hadoop is already installed."
+    return;
+  fi
+
   REPO=${REPO:-cdh4}
   REPO_HOST=${REPO_HOST:-archive.cloudera.com}
   MAPREDUCE_VERSION=${MAPREDUCE_VERSION:-1}
