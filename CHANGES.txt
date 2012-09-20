@@ -1,6 +1,6 @@
 Apache Whirr Change Log
 
-Trunk (unreleased changes)
+Release 0.8.1 (unreleased changes)
 
   NEW FEATURES
 
