@@ -197,7 +197,6 @@ public class Cluster {
   public String toString() {
     return Objects.toStringHelper(this)
       .add("instances", instances)
-      .add("configuration", configuration)
       .toString();
   }
 

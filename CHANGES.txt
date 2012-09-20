@@ -31,6 +31,9 @@ Release 0.8.1 (unreleased changes)
     WHIRR-646. Integration tests should have failsafe timeouts.
     (abayer via tomwhite)
 
+    WHIRR-642. Whirr writes the AWS Secret key to the stdout.
+    (Steve Loughran via tomwhite)
+
 Release 0.8.0 - 2012-08-17
 
   NEW FEATURES
