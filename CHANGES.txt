@@ -28,6 +28,9 @@ Release 0.8.1 (unreleased changes)
     WHIRR-648. CDH repo install removes other repos with same prefix.
     (Graham Gear via tomwhite)
 
+    WHIRR-646. Integration tests should have failsafe timeouts.
+    (abayer via tomwhite)
+
 Release 0.8.0 - 2012-08-17
 
   NEW FEATURES
