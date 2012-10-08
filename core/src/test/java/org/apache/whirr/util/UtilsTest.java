@@ -36,13 +36,14 @@ import com.google.common.collect.ImmutableSet;
 public class UtilsTest {
 
   public static final String EXPECTED_SSH_COMMAND = "\nYou can log into instances using the following ssh commands:\n"
-      + "'ssh -i /test/key/path -o \"UserKnownHostsFile /dev/null\" -o StrictHostKeyChecking=no test-identity@test-public-ip'\n";
+      + "[test-role]: ssh -i /test/key/path -o \"UserKnownHostsFile /dev/null\" -o StrictHostKeyChecking=no test-identity@test-public-ip\n";
 
   @Test
   public void testPrintAccess() {
     final Instance instance = mock(Instance.class);
 
     when(instance.getPublicIp()).thenReturn("test-public-ip");
+    when(instance.getRoles()).thenReturn(ImmutableSet.of("test-role"));
 
     Cluster cluster = mock(Cluster.class);
 
