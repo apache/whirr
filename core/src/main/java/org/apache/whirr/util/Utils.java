@@ -57,9 +57,19 @@ public class Utils {
     int counter = 0;
     for (Instance instance : cluster.getInstances()) {
 
+      StringBuilder roles = new StringBuilder();
+      for (String role : instance.getRoles()) {
+        if (roles.length() != 0) {
+          roles.append('+');
+        }
+        roles.append(role);
+      }
       out.printf(
-        "'ssh -i %s -o \"UserKnownHostsFile /dev/null\" -o StrictHostKeyChecking=no %s@%s'\n",
-        pkFile, user, instance.getPublicIp());
+        "[%s]: ssh -i %s -o \"UserKnownHostsFile /dev/null\" -o StrictHostKeyChecking=no %s@%s\n",
+        roles.toString(),
+        pkFile, 
+        user, 
+        instance.getPublicIp());
 
       if (counter > maxPrint) {
         out.println("... Too many instances, truncating.");
