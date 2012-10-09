@@ -17,6 +17,8 @@ Release 0.8.1 (unreleased changes)
     WHIRR-665. list of SSH commands should also identify host roles.
     (Steve Loughran via tomwhite)
 
+    WHIRR-666. Upgrade to jclouds 1.5.1. (tomwhite)
+
   BUG FIXES
 
     WHIRR-641. Improved parsing of config ->
