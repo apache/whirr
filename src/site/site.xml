@@ -45,7 +45,7 @@
     <breadcrumbs position="left">
       <item name="Apache" href="http://www.apache.org/" />
       <item name="Whirr" href="http://whirr.apache.org/"/>
-      <item name="0.8.1-SNAPSHOT" href="http://whirr.apache.org/docs/0.8.1-SNAPSHOT/"/>
+      <item name="0.8.1" href="http://whirr.apache.org/docs/0.8.1/"/>
     </breadcrumbs>
 
     <menu name="Whirr">
