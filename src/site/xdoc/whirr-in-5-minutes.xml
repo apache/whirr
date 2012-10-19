@@ -35,14 +35,14 @@ curl -O http://www.apache.org/dist/whirr/whirr-0.9.0/whirr-0.9.0.tar.gz
 tar zxf whirr-0.9.0.tar.gz; cd whirr-0.9.0 
 
 ssh-keygen -t rsa -P '' -f ~/.ssh/id_rsa_whirr 
-bin/whirr launch-cluster --config recipes/zookeeper-ec2.properties --private-key-file ~/.ssh/id_rsa_whirr 
+bin/whirr launch-cluster --config recipes/zookeeper.properties --private-key-file ~/.ssh/id_rsa_whirr 
 
 echo "ruok" | nc $(awk '{print $3}' ~/.whirr/zookeeper/instances | head -1) 2181; echo
 </source>
     <p>Upon success you should see 
     <tt>imok</tt>echoed to the console, indicating that ZooKeeper is running.</p>
     <p>You can shut down the cluster with</p>
-    <source>bin/whirr destroy-cluster --config recipes/zookeeper-ec2.properties --private-key-file ~/.ssh/id_rsa_whirr</source>
+    <source>bin/whirr destroy-cluster --config recipes/zookeeper.properties --private-key-file ~/.ssh/id_rsa_whirr</source>
     <p>The various options are explained in more detail in the 
     <a href="quick-start-guide.html">Quick Start Guide</a>.</p>
   </body>
