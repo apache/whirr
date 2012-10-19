@@ -24,6 +24,40 @@
     <body>
     <!-- Paste release notes from https://issues.apache.org/jira/browse/WHIRR here. -->
 
+    <h1>Release Notes - Whirr - Version 0.8.1</h1>
+
+<h2>        Bug
+</h2>
+<ul>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-641'>WHIRR-641</a>] -         No longer possible to hardcode password for bootstrap user
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-642'>WHIRR-642</a>] -         Whirr writes the AWS Secret key to the stdout. is it an unforeseen byproduct or intended behavior?
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-645'>WHIRR-645</a>] -         Race condition between collocated namenode and jobtracker start/init services
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-646'>WHIRR-646</a>] -         Integration tests should have failsafe timeouts
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-648'>WHIRR-648</a>] -         CDH repo install removes other repos with same prefix
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-666'>WHIRR-666</a>] -         Upgrade to jclouds 1.5.1
+</li>
+</ul>
+
+<h2>        Improvement
+</h2>
+<ul>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-593'>WHIRR-593</a>] -         Upgrade to jclouds 1.5.0
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-638'>WHIRR-638</a>] -         Paramaterize OAB Java install
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-649'>WHIRR-649</a>] -         Make install_cdh_hadoop.sh idempotent, fast failing if already run
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-654'>WHIRR-654</a>] -         Tell RAT to avoid checking atlassian-idex.xml
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-659'>WHIRR-659</a>] -         Upgrade to jclouds 1.5.0
+</li>
+</ul>
+
         <h1>Release Notes - Whirr - Version 0.8.0</h1>
 
 <h2>        Sub-task
