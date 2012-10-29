@@ -20,6 +20,7 @@ package org.apache.whirr.service.jclouds;
 
 import java.io.IOException;
 import java.util.Iterator;
+import java.util.Locale;
 import java.util.Map;
 
 import org.apache.whirr.Cluster.Instance;
@@ -107,7 +108,7 @@ class VariablesToExport implements Supplier<Map<String, String>> {
     for (Iterator<?> it = clusterSpec.getConfiguration().getKeys("whirr.env"); it.hasNext(); ) {
       String key = (String) it.next();
       String value = clusterSpec.getConfiguration().getString(key);
-      metadataMap.put(key.substring("whirr.env.".length()), value);
+      metadataMap.put(key.substring("whirr.env.".length()).toUpperCase(Locale.US), value);
     }
   }
 }
