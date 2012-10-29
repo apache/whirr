@@ -30,6 +30,7 @@ import org.apache.whirr.net.DnsResolver;
 import org.apache.whirr.net.FastDnsResolver;
 import org.jclouds.compute.domain.NodeMetadata;
 import org.jclouds.domain.Credentials;
+import org.jclouds.domain.internal.ResourceMetadataImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -117,12 +118,23 @@ public class Cluster {
 
     public synchronized String getPublicHostName() throws IOException {
       if (publicHostName == null) {
-        LOG.debug("resolving public hostname of {} (public {}, private {})", new Object[] { this, publicIp, privateIp });
-        publicHostName = dnsResolver.apply(publicIp);
-        LOG.debug("resolved public hostname of {} as {}", this, publicHostName);
-        if (publicHostName.matches("[0-9\\.]+") && nodeMetadata.getHostname()!=null && !nodeMetadata.getHostname().isEmpty()) {
-            LOG.debug("overriding public hostname of {} from {} (unresolved) to {}", new Object[] { this, publicHostName, nodeMetadata.getHostname() });
-            publicHostName = nodeMetadata.getHostname();
+        if ((nodeMetadata instanceof ResourceMetadataImpl)
+          && ((ResourceMetadataImpl) nodeMetadata).getLocation() != null
+          && "stub".equals(((ResourceMetadataImpl) nodeMetadata).getLocation().getId())
+          && nodeMetadata.getName() != null && !nodeMetadata.getName().isEmpty()) {
+          LOG.debug("assuming stub public hostname of {} to {}", new Object[] { this, nodeMetadata.getName() });
+          publicHostName = nodeMetadata.getName();
+        } else {
+          LOG.debug("resolving public hostname of {} (public {}, private {})",
+            new Object[] { this, publicIp, privateIp });
+          publicHostName = dnsResolver.apply(publicIp);
+          LOG.debug("resolved public hostname of {} as {}", this, publicHostName);
+          if (publicHostName.matches("[0-9\\.]+") && nodeMetadata.getName() != null
+            && !nodeMetadata.getName().isEmpty()) {
+            LOG.debug("overriding public hostname of {} from {} (unresolved) to {}", new Object[] { this,
+              publicHostName, nodeMetadata.getName() });
+            publicHostName = nodeMetadata.getName();
+          }
         }
       }
       return publicHostName;
