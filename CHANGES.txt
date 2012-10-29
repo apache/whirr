@@ -1,6 +1,13 @@
 Apache Whirr Change Log
 
-Release 0.8.1 (unreleased changes)
+Release 0.8.2 (unreleased changes)
+
+  IMPROVEMENTS
+
+    WHIRR-672 - Allow eager caching of instance hostname based on pre-provision
+    instance metadata. (Graham Gear via tomwhite)
+
+Release 0.8.1 - 2012-10-19
 
   NEW FEATURES
 
