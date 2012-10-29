@@ -7,6 +7,9 @@ Release 0.8.2 (unreleased changes)
     WHIRR-672 - Allow eager caching of instance hostname based on pre-provision
     instance metadata. (Graham Gear via tomwhite)
 
+    WHIRR-675 - Convert all whirr.env.* environment variable labels to upper
+    case. (Graham Gear via tomwhite)
+
 Release 0.8.1 - 2012-10-19
 
   NEW FEATURES
