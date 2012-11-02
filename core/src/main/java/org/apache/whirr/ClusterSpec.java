@@ -184,6 +184,8 @@ public class ClusterSpec {
                              "the hostname for the instances."),
 
     JDK_INSTALL_URL(String.class, false, "JDK install URL"),
+    
+    KERBEROS_REALM(String.class, false, "Kerberos realm to use in security configuration"),
                              
     AWS_EC2_PLACEMENT_GROUP(String.class, false, "If given, use this existing EC2 placement group. (aws-ec2 specific option)");
     
@@ -309,6 +311,8 @@ public class ClusterSpec {
   
   private String jdkInstallUrl;
   
+  private String kerberosRealm;
+  
   private Configuration config;
   
   public ClusterSpec() throws ConfigurationException {
@@ -343,6 +347,8 @@ public class ClusterSpec {
     setAutoHostnameSuffix(getString(Property.AUTO_HOSTNAME_SUFFIX));
 
     setJdkInstallUrl(getString(Property.JDK_INSTALL_URL));
+    
+    setKerberosRealm(getString(Property.KERBEROS_REALM));
     
     setProvider(getString(Property.PROVIDER));
     setEndpoint(getString(Property.ENDPOINT));
@@ -439,6 +445,8 @@ public class ClusterSpec {
     r.setAutoHostnameSuffix(getAutoHostnameSuffix());
 
     r.setJdkInstallUrl(getJdkInstallUrl());
+    
+    r.setKerberosRealm(getKerberosRealm());
     
     return r;
   }
@@ -824,6 +832,14 @@ public class ClusterSpec {
     this.jdkInstallUrl = jdkInstallUrl;
   }
 
+  public String getKerberosRealm() {
+    return kerberosRealm;
+  }
+
+  public void setKerberosRealm(String kerberosRealm) {
+    this.kerberosRealm = kerberosRealm;
+  }
+
 /**
    * The rsa public key which is authorized to login to your on the cloud nodes.
    * 
@@ -977,6 +993,7 @@ public class ClusterSpec {
         && Objects.equal(getAutoHostnamePrefix(), that.getAutoHostnamePrefix())
         && Objects.equal(getAutoHostnameSuffix(), that.getAutoHostnameSuffix())
         && Objects.equal(getJdkInstallUrl(), that.getJdkInstallUrl())
+        && Objects.equal(getKerberosRealm(), that.getKerberosRealm())
         ;
     }
     return false;
@@ -1012,7 +1029,8 @@ public class ClusterSpec {
         getAwsEc2PlacementGroup(),
         getAutoHostnamePrefix(),
         getAutoHostnameSuffix(),
-        getJdkInstallUrl()
+        getJdkInstallUrl(),
+        getKerberosRealm()
     );
   }
   
@@ -1048,6 +1066,7 @@ public class ClusterSpec {
       .add("autoHostnamePrefix",getAutoHostnamePrefix())
       .add("autoHostnameSuffix",getAutoHostnameSuffix())
       .add("jdkInstallUrl", getJdkInstallUrl())
+      .add("kerberosRealm", getKerberosRealm())
       .toString();
   }
 }

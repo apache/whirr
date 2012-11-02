@@ -72,6 +72,8 @@ class VariablesToExport implements Supplier<Map<String, String>> {
   private void addDefaultEnvironmentVariablesForInstance(Map<String, String> metadataMap, Instance instance) {
     if (clusterSpec.getClusterName() != null)
       metadataMap.put("CLUSTER_NAME", clusterSpec.getClusterName());
+    if (clusterSpec.getClusterUser() != null)
+      metadataMap.put("CLUSTER_USER", clusterSpec.getClusterUser());
     if (clusterSpec.getProvider() != null)
       metadataMap.put("CLOUD_PROVIDER", clusterSpec.getProvider());
     if (clusterSpec.getAutoHostnameSuffix() != null
@@ -85,6 +87,8 @@ class VariablesToExport implements Supplier<Map<String, String>> {
     if(clusterSpec.getJdkInstallUrl() != null) {
       metadataMap.put("JDK_INSTALL_URL", clusterSpec.getJdkInstallUrl());
     }
+    metadataMap.put("KERBEROS_REALM",
+      clusterSpec.getKerberosRealm() == null ? "HADOOPCLUSTER.COM" : clusterSpec.getKerberosRealm());
     if (instance != null) {
       metadataMap.put("ROLES", Joiner.on(",").join(instance.getRoles()));
       if (instance.getPublicIp() != null)
