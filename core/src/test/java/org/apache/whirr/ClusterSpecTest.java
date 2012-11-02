@@ -375,7 +375,20 @@ public class ClusterSpecTest {
       assertEquals("http://whirr-third-party.s3.amazonaws.com/jdk-6u21-linux-i586-rpm.bin", cloudServersSpec.getJdkInstallUrl());
   }  
   
+  @Test
+  public void testKerberosRealm() throws Exception {
+      Configuration cloudServersConfig = new PropertiesConfiguration();
 
+      ClusterSpec cloudServersSpec = ClusterSpec.withTemporaryKeys(cloudServersConfig);
+      assertEquals(null, cloudServersSpec.getKerberosRealm());
+
+      cloudServersConfig = new PropertiesConfiguration();
+      cloudServersConfig.addProperty("whirr.kerberos-realm", "CDHCLUSTER.COM");
+
+      cloudServersSpec = ClusterSpec.withTemporaryKeys(cloudServersConfig);
+      assertEquals("CDHCLUSTER.COM", cloudServersSpec.getKerberosRealm());
+  }
+  
   @Test
   public void testApplySubroleAliases() throws ConfigurationException {
     CompositeConfiguration c = new CompositeConfiguration();

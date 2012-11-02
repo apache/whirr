@@ -146,7 +146,7 @@ public class BootstrapTemplate {
       interpret(
         "USER_HOME=$DEFAULT_HOME/$NEW_USER",
         "mkdir -p $USER_HOME/.ssh",
-        "useradd --shell /bin/bash -d $USER_HOME $NEW_USER",
+        "useradd -u 2000 --shell /bin/bash -d $USER_HOME $NEW_USER",
         "[ $? -ne 0 ] && USER_HOME=$(grep $NEW_USER /etc/passwd | cut -d \":\" -f6)\n"),
       appendFile(
         "$USER_HOME/.ssh/authorized_keys",
