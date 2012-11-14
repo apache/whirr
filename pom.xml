@@ -71,7 +71,7 @@
     <hadoop.version>0.20.205.0</hadoop.version>
     <hamcrest.version>1.1</hamcrest.version>
     <hama.version>0.4.0-incubating</hama.version>
-    <hbase.version>0.92.0</hbase.version>
+    <hbase.version>0.94.1</hbase.version>
     <jackson.version>1.5.2</jackson.version>
     <jclouds.version>1.5.1</jclouds.version>
     <jdom.version>1.1</jdom.version>

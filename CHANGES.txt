@@ -12,6 +12,8 @@ Release 0.8.2 (unreleased changes)
 
     WHIRR-671. Create Kerberos Service. (Graham Gear via tomwhite)
 
+    WHIRR-679. Switch to HBase 0.94.2. (abayer via tomwhite)
+
 Release 0.8.1 - 2012-10-19
 
   NEW FEATURES
