@@ -145,7 +145,7 @@ public class HBaseServiceController {
     TProtocol protocol = new TBinaryProtocol(transport, true, true);
     Hbase.Client client = new Hbase.Client(protocol);
     int scannerId = client.scannerOpen(ByteBuffer.wrap(HConstants.META_TABLE_NAME),
-        ByteBuffer.wrap(Bytes.toBytes("")), null);
+                                       ByteBuffer.wrap(Bytes.toBytes("")), null, null);
     client.scannerClose(scannerId);
     thriftClient = client;
   }
