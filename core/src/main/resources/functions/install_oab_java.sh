@@ -19,10 +19,10 @@ function install_oab_java_deb() {
   # TODO: check that it is not already enabled
   sed -i -e 's/universe$/universe multiverse/' /etc/apt/sources.list
   
-  DISTRO=`lsb_release -s -c`
-  
   apt-get update
-  
+  apt-get -y install lsb-release pciutils
+  DISTRO=`lsb_release -s -c`
+    
   wget https://raw.github.com/flexiondotorg/oab-java6/master/oab-java.sh -O oab-java.sh
   chmod +x oab-java.sh
   ./oab-java.sh
