@@ -18,6 +18,8 @@ Release 0.8.2 (unreleased changes)
     (Steve Loughran via tomwhite)
     
     WHIRR-691. Java install to support Debian. (Graham Gear via tomwhite)
+    
+    WHIRR-673. Upgrade CDH Repos for RHEL/CentOS 6. (Graham Gear via tomwhite)
 
 Release 0.8.1 - 2012-10-19
 
