@@ -53,8 +53,9 @@ xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 http://maven.apache.org/xsd
 
     <h4>Setup your Credentials</h4>
 
-    <source>% mkdir -p ~/.whirr
-    % cp conf/credentials.sample ~/.whirr/credentials
+    <source>
+% mkdir -p ~/.whirr
+% cp conf/credentials.sample ~/.whirr/credentials
     </source>
 
     <p>Edit ~/.whirr/credentials using your editor of choice and add the API
@@ -64,11 +65,11 @@ xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 http://maven.apache.org/xsd
 
     <p>First, create a properties file to define the cluster. The name doesn't matter, but here we
     will assume it is called 
-    <i>hadoop.properties</i>and located in your home directory. This file defines a cluster with a
+    <i>hadoop.properties</i> and located in your home directory. This file defines a cluster with a
     single machine for the namenode and jobtracker, and a further machine for a datanode and
     tasktracker. You can see how to launch other services by consulting the sample configurations
     in the 
-    <i>recipes</i>directory of the distribution.</p>
+    <i>recipes</i> directory of the distribution.</p>
     <source>
 whirr.cluster-name=myhadoopcluster 
 whirr.instance-templates=1 hadoop-jobtracker+hadoop-namenode,1 hadoop-datanode+hadoop-tasktracker 
@@ -79,7 +80,7 @@ whirr.public-key-file=${sys:user.home}/.ssh/id_rsa.pub
     <p>Note that we haven't specified a particular cloud image, since Whirr provides a default for
     each provider which should work well enough. However, for larger clusters you will likely use
     larger hardware sizes or particular images. See the 
-    <i>recipes</i>files and the 
+    <i>recipes</i> files and the 
     <a href="configuration-guide.html">Configuration Guide</a> for details.</p>
     <p>In this configuration file the cloud identity and credential are read from environment
     variables - you can equally well put them in the configuration file if you wish.</p>
@@ -92,7 +93,7 @@ whirr.public-key-file=${sys:user.home}/.ssh/id_rsa.pub
     <b>Note</b>: the keypair specified by these properties is not the same as the AWS keypair
     generated with the 
     <tt>ec2-add-keypair</tt> command or the AWS Management Console (since these don't place 
-    <i>both</i>of the keys on your local machine). The PEM-encoded X.509 Certificate and Private
+    <i>both</i> of the keys on your local machine). The PEM-encoded X.509 Certificate and Private
     Key (e.g. pk-XXXXXX.pem) cannot be used as a keypair either.</p>
     
     <h4>Launch a Hadoop cluster</h4>
@@ -101,8 +102,8 @@ whirr.public-key-file=${sys:user.home}/.ssh/id_rsa.pub
     <source>% bin/whirr launch-cluster --config hadoop.properties</source>
     <p>Messages will be logged to the console as the cluster starts. You can see debug-level
     logging in a file named 
-    <i>whirr.log</i>in the directory you ran the 
-    <i>whirr</i>command from.</p>
+    <i>whirr.log</i> in the directory you ran the 
+    <i>whirr</i> command from.</p>
     <p>A message will be printed out when the cluster has started, with a URL that you can use to
     access the web UI.</p>
     
@@ -127,7 +128,7 @@ whirr.public-key-file=${sys:user.home}/.ssh/id_rsa.pub
     <h4>Run a MapReduce job</h4>
 
     <p>After you launch a cluster, a 
-    <i>hadoop-site.xml</i>file is created in the directory 
+    <i>hadoop-site.xml</i> file is created in the directory 
     <i>~/.whirr/&lt;cluster-name&gt;</i>. You can use this to connect to the cluster by setting the
     
     <tt>HADOOP_CONF_DIR</tt> environment variable. (It is also possible to set the configuration

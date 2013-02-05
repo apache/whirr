@@ -21,6 +21,9 @@ Release 0.8.2 (unreleased changes)
     
     WHIRR-673. Upgrade CDH Repos for RHEL/CentOS 6. (Graham Gear via tomwhite)
 
+    WHIRR-699. Fix indentation and formatting on "Getting Started" page.
+    (Mark Grover via tomwhite)
+
 Release 0.8.1 - 2012-10-19
 
   NEW FEATURES
