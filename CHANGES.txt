@@ -21,8 +21,13 @@ Release 0.8.2 (unreleased changes)
     
     WHIRR-673. Upgrade CDH Repos for RHEL/CentOS 6. (Graham Gear via tomwhite)
 
+  BUG FIXES
+
     WHIRR-699. Fix indentation and formatting on "Getting Started" page.
     (Mark Grover via tomwhite)
+
+    WHIRR-696. Whirr script for Hadoop MRv2 YARN installs that supports
+    Hadoop-2.0.x and Hadoop 3.x (trunk) branches. (Eli Reisman via tomwhite)
 
 Release 0.8.1 - 2012-10-19
 
