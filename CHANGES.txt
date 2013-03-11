@@ -4,6 +4,9 @@ Release 0.8.2 (unreleased changes)
 
   IMPROVEMENTS
 
+    WHIRR-660. Provide useful message if whirr.instance-templates is
+    empty or not provided. (abayer)
+  
     WHIRR-672. Allow eager caching of instance hostname based on pre-provision
     instance metadata. (Graham Gear via tomwhite)
 

@@ -117,6 +117,27 @@ public abstract class ScriptBasedClusterActionTest<T extends ScriptBasedClusterA
     return InstanceTemplate.builder().numberOfInstance(1).roles(roles).build();
   }
 
+  @Test(expected = IllegalArgumentException.class)
+  public void testEmptyInstanceTemplates() throws Exception {
+    T action = newClusterActionInstance(EMPTYSET, EMPTYSET);
+    DryRun dryRun = getDryRunForAction(action).reset();
+
+    ClusterSpec tempSpec = ClusterSpec.withTemporaryKeys();
+
+    tempSpec.setClusterName("test-cluster-for-script-exection");
+    tempSpec.setProvider("stub");
+    tempSpec.setIdentity("dummy");
+    tempSpec.setStateStore("none");
+
+    ClusterController controller = new ClusterController();
+    Cluster tempCluster = controller.launchCluster(tempSpec);
+
+    
+    action.execute(tempSpec, tempCluster);
+    
+    List<StatementOnNode> executions = dryRun.getTotallyOrderedExecutions();
+  }
+
   @Test
   public void testActionIsExecutedOnAllRelevantNodes() throws Exception {
     T action = newClusterActionInstance(EMPTYSET, EMPTYSET);
