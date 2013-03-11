@@ -105,7 +105,7 @@ public class PuppetClusterActionHandler extends PuppetInstallClusterActionHandle
     if (isLastPuppetRoleIn(event.getInstanceTemplate().getRoles()).apply(getRole())) {
       Configuration config = event.getClusterSpec().getConfiguration();
       Iterable<String> roles = RolesManagedByPuppet.INSTANCE.apply(event.getInstanceTemplate().getRoles());
-      addStatement(event, new CreateSitePpAndApplyRoles(roles, config));
+      addStatement(event, new CreateSitePpAndApplyRoles(roles, event.getCluster().getInstances(), config));
     }
 
   }

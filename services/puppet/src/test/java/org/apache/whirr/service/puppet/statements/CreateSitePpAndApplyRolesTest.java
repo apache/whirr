@@ -22,8 +22,11 @@ import static junit.framework.Assert.assertEquals;
 
 import java.io.IOException;
 
+import com.google.common.collect.Sets;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.PropertiesConfiguration;
+import org.apache.whirr.Cluster;
+import org.jclouds.domain.Credentials;
 import org.jclouds.scriptbuilder.domain.OsFamily;
 import org.junit.Test;
 
@@ -40,7 +43,15 @@ public class CreateSitePpAndApplyRolesTest {
     conf.setProperty("puppet.nginx.module", "git://github.com/puppetlabs/puppetlabs-nginx.git");
     conf.setProperty("nginx.server.hostname", "foohost");
 
-    CreateSitePpAndApplyRoles nginx = new CreateSitePpAndApplyRoles(ImmutableSet.of("nginx::server"), conf);
+    CreateSitePpAndApplyRoles nginx = new CreateSitePpAndApplyRoles(ImmutableSet.of("nginx::server"),
+                                                                    ImmutableSet.of(new Cluster.Instance(
+                                                                                          new Credentials("dummy", "dummy"),
+                                                                                          Sets.newHashSet("puppet:nginx::server"),
+                                                                                          "127.0.0.1",
+                                                                                          "127.0.0.1",
+                                                                                          "id-1",
+                                                                                          null)),
+                                                                    conf);
 
     assertEquals(CharStreams.toString(Resources.newReaderSupplier(Resources.getResource("nginx-with-attribs.txt"),
           Charsets.UTF_8)), nginx.render(OsFamily.UNIX));
