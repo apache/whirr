@@ -4,6 +4,8 @@ Release 0.8.2 (unreleased changes)
 
   IMPROVEMENTS
 
+    WHIRR-661. Upgrade to Hadoop 1.0.3. (Steve Loughran via abayer)
+  
     WHIRR-634. Update private IP host file entry when required by
     AUTO_HOSTNAME_SUFFIX. (Graham Gear via abayer)
   

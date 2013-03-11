@@ -29,7 +29,7 @@
   <version>0.9.0-SNAPSHOT</version>
   <name>Apache Whirr YARN</name>
   <properties>
-    <hadoop.version>0.20.2</hadoop.version>
+    <hadoop.version>1.0.3</hadoop.version>
     <osgi.import>
       !org.apache.whirr.service.yarn*,
       org.apache.commons.configuration*;version="[1.6,2)",
