@@ -20,15 +20,23 @@
 package org.apache.whirr.service.puppet.statements;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static org.apache.whirr.service.puppet.PuppetConstants.PUPPET;
 import static org.apache.whirr.service.puppet.PuppetConstants.SITE_PP_FILE_LOCATION;
+import static org.apache.whirr.service.puppet.PuppetConstants.CONF_PP_FILE_LOCATION;
 import static org.jclouds.scriptbuilder.domain.Statements.appendFile;
 import static org.jclouds.scriptbuilder.domain.Statements.exec;
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
+import com.google.common.base.Joiner;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.PropertiesConfiguration;
+import org.apache.whirr.Cluster;
 import org.apache.whirr.service.puppet.Manifest;
 import org.jclouds.scriptbuilder.domain.OsFamily;
 import org.jclouds.scriptbuilder.domain.Statement;
@@ -44,10 +52,12 @@ import com.google.common.collect.ImmutableList.Builder;
 
 public class CreateSitePpAndApplyRoles implements Statement {
   private Iterable<String> roles;
+  private Iterable<Cluster.Instance> instances;
   private Configuration config;
 
-  public CreateSitePpAndApplyRoles(Iterable<String> roles, Configuration config) {
+  public CreateSitePpAndApplyRoles(Iterable<String> roles, Iterable<Cluster.Instance> instances, Configuration config) {
     this.roles = checkNotNull(roles, "roles");
+    this.instances = checkNotNull(instances, "instances");
     this.config = checkNotNull(config, "config");
   }
 
@@ -64,8 +74,30 @@ public class CreateSitePpAndApplyRoles implements Statement {
     Builder<Statement> statements = ImmutableList.<Statement> builder();
 
     statements.add(Statements.rm(SITE_PP_FILE_LOCATION));
+    statements.add(Statements.rm(CONF_PP_FILE_LOCATION));
     Builder<String> sitePp = ImmutableList.<String> builder();
 
+    Map<String, Set<String>> puppetRoles = Maps.newHashMap();
+    for (Cluster.Instance instance : instances) {
+      for (String role : instance.getRoles()) {
+        int firstColon = role.indexOf(':');
+        if (firstColon != -1 && role.substring(0, firstColon).equals(PUPPET)) {
+          String puppetClass = role.substring(firstColon + 1);
+          if (!puppetRoles.containsKey(puppetClass)) {
+            puppetRoles.put(puppetClass, Sets.<String>newHashSet());
+          }
+          puppetRoles.get(puppetClass).add(instance.getPrivateIp());
+        }
+      }
+    }
+
+    Builder<String> confPp = ImmutableList.<String> builder();
+    for (String puppetClass : puppetRoles.keySet()) {
+      confPp.add(puppetClass + "," + Joiner.on(',').join(puppetRoles.get(puppetClass)));
+    }
+
+    sitePp.add("$extlookup_datadir='/etc/puppet/manifests/extdata'");
+    sitePp.add("$extlookup_precedence = ['common']");
     sitePp.add("node default {");
     for (String role : roles) {
       String manifestAttribPrefix = role.replaceAll(":+", ".");
@@ -79,6 +111,7 @@ public class CreateSitePpAndApplyRoles implements Statement {
     }
     sitePp.add("}");
 
+    statements.add(appendFile(CONF_PP_FILE_LOCATION, confPp.build()));
     statements.add(appendFile(SITE_PP_FILE_LOCATION, sitePp.build()));
     statements.add(exec("puppet apply " + SITE_PP_FILE_LOCATION));
 

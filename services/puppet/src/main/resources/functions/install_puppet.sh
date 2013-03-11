@@ -27,7 +27,7 @@ function install_puppet_forced() {
   # Setup the default module/fact path locations so we can populate them
   # elsewhere
   mkdir -p /etc/puppet/modules
-  mkdir -p /etc/puppet/manifests
+  mkdir -p /etc/puppet/manifests/extdata
   mkdir -p /usr/share/puppet/modules
   mkdir -p /var/lib/puppet/lib/facter
 

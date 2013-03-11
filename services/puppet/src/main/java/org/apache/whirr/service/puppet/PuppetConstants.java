@@ -30,6 +30,7 @@ public class PuppetConstants {
 
   public static final String MODULES_DIR = "/etc/puppet/modules/";
   public static final String SITE_PP_FILE_LOCATION = "/etc/puppet/manifests/site.pp";
+  public static final String CONF_PP_FILE_LOCATION = "/etc/puppet/manifests/extdata/common.csv";
 
   public static final Pattern MODULE_KEY_PATTERN = Pattern.compile("^" + PUPPET + "\\.([^.]+)\\."
         + MODULE_SOURCE_SUBKEY + "$");
