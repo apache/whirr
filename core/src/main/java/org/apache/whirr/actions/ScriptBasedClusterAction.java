@@ -95,6 +95,10 @@ public abstract class ScriptBasedClusterAction extends ClusterAction {
   public Cluster execute(ClusterSpec clusterSpec, Cluster cluster)
       throws IOException, InterruptedException {
 
+    if (clusterSpec.getInstanceTemplates().size() == 0) {
+        throw new IllegalArgumentException("No instance templates specified.");
+    }
+    
     Map<InstanceTemplate, ClusterActionEvent> eventMap = Maps.newHashMap();
     Cluster newCluster = cluster;
     for (InstanceTemplate instanceTemplate : clusterSpec.getInstanceTemplates()) {
