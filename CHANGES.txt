@@ -4,6 +4,8 @@ Release 0.8.2 (unreleased changes)
 
   IMPROVEMENTS
 
+    WHIRR-711. Add security group support for OpenStack. (abayer)
+
     WHIRR-681. Enhance puppet service with an ability to export
     cluster topology to the puppet code. (Roman Shaposhnik via abayer)
   
