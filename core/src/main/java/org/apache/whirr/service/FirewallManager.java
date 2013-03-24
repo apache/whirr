@@ -34,11 +34,16 @@ import org.jclouds.compute.ComputeServiceContext;
 import org.jclouds.ec2.EC2ApiMetadata;
 import org.jclouds.ec2.EC2Client;
 import org.jclouds.ec2.domain.IpProtocol;
+import org.jclouds.openstack.nova.v2_0.NovaApiMetadata;
+import org.jclouds.openstack.nova.v2_0.domain.Ingress;
+import org.jclouds.openstack.nova.v2_0.domain.SecurityGroup;
+import org.jclouds.openstack.nova.v2_0.extensions.SecurityGroupApi;
 import org.jclouds.javax.annotation.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Function;
+import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -219,6 +224,45 @@ public class FirewallManager {
             /* ignore, it means that this permission was already granted */
           }
         }
+      }
+    } else if (NovaApiMetadata.CONTEXT_TOKEN.isAssignableFrom(computeServiceContext.getBackendType())) {
+      // This code (or something like it) may be added to jclouds (see
+      // http://code.google.com/p/jclouds/issues/detail?id=336).
+      // Until then we need this temporary workaround.
+      Optional<? extends SecurityGroupApi> securityGroupApi = computeServiceContext.unwrap(NovaApiMetadata.CONTEXT_TOKEN)
+        .getApi()
+        .getSecurityGroupExtensionForZone(clusterSpec.getTemplate().getLocationId());
+
+      if (securityGroupApi.isPresent()) {
+        final String groupName = "jclouds-" + clusterSpec.getClusterName();
+        Optional<? extends SecurityGroup> group = securityGroupApi.get().list().firstMatch(new Predicate<SecurityGroup>() {
+            @Override
+            public boolean apply(SecurityGroup secGrp) {
+              return secGrp.getName().equals(groupName);
+            }
+          });
+
+        if (group.isPresent()) {
+          for (String cidr : cidrs) {
+            for (int port : ports) {
+              try {
+                securityGroupApi.get().createRuleAllowingCidrBlock(group.get().getId(),
+                                                                   Ingress.builder()
+                                                                   .ipProtocol(org.jclouds.openstack.nova.v2_0.domain.IpProtocol.TCP)
+                                                                   .fromPort(port).toPort(port).build(),
+                                                                   cidr);
+                        
+              } catch(IllegalStateException e) {
+                LOG.warn(e.getMessage());
+                /* ignore, it means that this permission was already granted */
+              }
+            }
+          }
+        } else {
+          LOG.warn("Expected security group " + groupName + " does not exist.");
+        }
+      } else {
+        LOG.warn("OpenStack security group extension not available for this cloud.");
       }
     }
   }
