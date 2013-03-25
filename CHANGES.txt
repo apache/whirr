@@ -4,6 +4,9 @@ Release 0.8.2 (unreleased changes)
 
   IMPROVEMENTS
 
+    WHIRR-546. Add destroy instructions to stdout for all create
+    actions. (abayer)
+    
     WHIRR-712. prepare_all_disks.sh should cover xvdX as well as sdX. (abayer)
     
     WHIRR-711. Add security group support for OpenStack. (abayer)

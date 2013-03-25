@@ -73,6 +73,7 @@ public class LaunchClusterCommand extends AbstractClusterCommand {
 
     Utils.printSSHConnectionDetails(out, clusterSpec, cluster, 20);
 
+    out.println("To destroy cluster, run 'whirr destroy-cluster' with the same options used to launch it.");
     return 0;
   }
 }
