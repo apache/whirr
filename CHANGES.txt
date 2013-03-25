@@ -4,6 +4,8 @@ Release 0.8.2 (unreleased changes)
 
   IMPROVEMENTS
 
+    WHIRR-712. prepare_all_disks.sh should cover xvdX as well as sdX. (abayer)
+    
     WHIRR-711. Add security group support for OpenStack. (abayer)
 
     WHIRR-681. Enhance puppet service with an ability to export
