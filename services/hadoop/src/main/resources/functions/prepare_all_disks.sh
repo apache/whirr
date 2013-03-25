@@ -51,6 +51,10 @@ function prep_disk() {
   device=$2
   automount=${3:-false}
 
+  if [ ! -e $device ]; then
+      device=$(echo "$device"|sed -e 's/\/sd/\/xvd/')
+  fi
+
   # is device formatted?
   if [ $(mountpoint -q -x $device) ]; then
     echo "$device is formatted"
