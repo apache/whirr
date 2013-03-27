@@ -4,6 +4,9 @@ Release 0.8.2 (unreleased changes)
 
   IMPROVEMENTS
 
+    WHIRR-709. Bump Hadoop to latest available version (1.0.4) at
+    osuosl. (abayer)
+    
     WHIRR-546. Add destroy instructions to stdout for all create
     actions. (abayer)
     
