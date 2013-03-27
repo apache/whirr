@@ -68,7 +68,7 @@
     <common-ssl.version>0.3.11</common-ssl.version>
     <dnsjava.version>2.1.1</dnsjava.version>
     <guava.version>13.0</guava.version>
-    <hadoop.version>1.0.3</hadoop.version>
+    <hadoop.version>1.0.4</hadoop.version>
     <hamcrest.version>1.1</hamcrest.version>
     <hama.version>0.4.0-incubating</hama.version>
     <hbase.version>0.94.1</hbase.version>
