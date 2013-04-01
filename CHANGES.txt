@@ -4,6 +4,9 @@ Release 0.8.2 (unreleased changes)
 
   IMPROVEMENTS
 
+    WHIRR-694. Install puppet from puppetlabs repo instead of ruby
+    gem. (Roman Shaposhnik via abayer)
+    
     WHIRR-709. Bump Hadoop to latest available version (1.0.4) at
     osuosl. (abayer)
     

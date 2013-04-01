@@ -25,6 +25,7 @@ import java.util.regex.Pattern;
  */
 public class PuppetConstants {
   public static final String PUPPET = "puppet";
+  public static final String PUPPET_ORIGIN = PUPPET + ".repourl";
   public static final String PUPPET_ROLE_PREFIX = PUPPET + ":";
   public static final String MODULE_SOURCE_SUBKEY = "module";
 
