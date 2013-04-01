@@ -4,6 +4,8 @@ Release 0.8.2 (unreleased changes)
 
   IMPROVEMENTS
 
+    WHIRR-708. Upgrade to jclouds 1.5.8. (abayer)
+      
     WHIRR-705. Provide better integration between parameterized
     classes and Hiera. (Roman Shaposhnik via abayer)
     
