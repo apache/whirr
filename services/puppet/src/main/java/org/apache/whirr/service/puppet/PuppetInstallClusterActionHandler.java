@@ -24,6 +24,7 @@ import java.io.IOException;
 
 import org.apache.whirr.service.ClusterActionEvent;
 import org.apache.whirr.service.ClusterActionHandlerSupport;
+import static org.apache.whirr.service.puppet.PuppetConstants.PUPPET_ORIGIN;
 
 /**
  * Installs puppet (and ruby).
@@ -53,6 +54,7 @@ public class PuppetInstallClusterActionHandler extends ClusterActionHandlerSuppo
     addStatement(event, call("install_git"));
 
     // install puppet
-    addStatement(event, call("install_puppet"));
+    addStatement(event, call("install_puppet", event.getClusterSpec().getConfiguration().
+                                               getString(PUPPET_ORIGIN, "")));
   }
 }
