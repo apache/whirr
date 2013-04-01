@@ -83,6 +83,10 @@ public enum ComputeCache implements Function<ClusterSpec, ComputeServiceContext>
     return cache.getUnchecked(new Key(arg0));
   }
   
+  public void invalidate(ClusterSpec arg0) {
+    return cache.invalidate(new Key(arg0));
+  }
+  
   // this should prevent recreating the same compute context twice
   @VisibleForTesting
   final LoadingCache<Key, ComputeServiceContext> cache = CacheBuilder.newBuilder().build(
