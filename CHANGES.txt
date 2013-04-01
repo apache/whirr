@@ -4,6 +4,9 @@ Release 0.8.2 (unreleased changes)
 
   IMPROVEMENTS
 
+    WHIRR-705. Provide better integration between parameterized
+    classes and Hiera. (Roman Shaposhnik via abayer)
+    
     WHIRR-694. Install puppet from puppetlabs repo instead of ruby
     gem. (Roman Shaposhnik via abayer)
     

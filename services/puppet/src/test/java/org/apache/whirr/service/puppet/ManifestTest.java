@@ -27,6 +27,8 @@ public class ManifestTest {
   private static final String NGINX_PUPPET = "class { 'nginx':\n}";
   private static final String POSTGRES_PUPPET = "class { 'postgresql::server':\n}";
   private static final String NTP_PUPPET = "class { 'ntp':\n  servers => \"10.0.0.1\",\n}";
+  private static final String NTP_PUPPET_HIERA = "\nntp::servers: \"10.0.0.1\"";
+  private static final String POSTGRES_PUPPET_NAME = "postgresql::server";
 
   // private static final String PUPPET_COMMAND =
   // "echo 'class { 'ntp::client':\n  servers => [\"10.0.0.1\"],\n}' >> /tmp/test.pp\nsudo -i puppet apply /tmp/test.pp\n";
@@ -60,5 +62,24 @@ public class ManifestTest {
       ntp.toString());
 
   }
+
+  @Test
+  public void testPuppetConversionWithAttribsHiera() {
+
+    Manifest ntp = new Manifest("ntp");
+    ntp.attribs.put("servers", "\"10.0.0.1\"");
+
+    assertEquals("Puppet/Hiera representation is incorrect.", NTP_PUPPET_HIERA,
+       ntp.getHiera());
+  }
+
+  @Test
+  public void testPuppetConversionHiera() {
+
+    Manifest postgress = new Manifest("postgresql", "server");
+
+    assertEquals("Puppet/Name representation is incorrect.", POSTGRES_PUPPET_NAME,
+              postgress.getName());
+    }
 }
 
