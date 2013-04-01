@@ -23,7 +23,10 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static org.apache.whirr.service.puppet.PuppetConstants.PUPPET;
 import static org.apache.whirr.service.puppet.PuppetConstants.SITE_PP_FILE_LOCATION;
 import static org.apache.whirr.service.puppet.PuppetConstants.CONF_PP_FILE_LOCATION;
-import static org.jclouds.scriptbuilder.domain.Statements.appendFile;
+import static org.apache.whirr.service.puppet.PuppetConstants.HIERA_COMMON_FILE_LOCATION;
+import static org.apache.whirr.service.puppet.PuppetConstants.HIERA_CONF_FILE_LOCATION;
+import static org.apache.whirr.service.puppet.PuppetConstants.PUPPET_HIERA_CLASSES;
+import static org.jclouds.scriptbuilder.domain.Statements.createOrOverwriteFile;
 import static org.jclouds.scriptbuilder.domain.Statements.exec;
 
 import java.util.Collection;
@@ -68,6 +71,7 @@ public class CreateSitePpAndApplyRoles implements Statement {
 
   @Override
   public String render(OsFamily arg0) {
+    Boolean isHiera = config.getBoolean(PUPPET_HIERA_CLASSES, false);
 
     // when we get to the last role, let's cat all the manifests we made together inside a
     // node default site.pp
@@ -75,6 +79,7 @@ public class CreateSitePpAndApplyRoles implements Statement {
 
     statements.add(Statements.rm(SITE_PP_FILE_LOCATION));
     statements.add(Statements.rm(CONF_PP_FILE_LOCATION));
+    statements.add(Statements.rm(HIERA_COMMON_FILE_LOCATION));
     Builder<String> sitePp = ImmutableList.<String> builder();
 
     Map<String, Set<String>> puppetRoles = Maps.newHashMap();
@@ -96,6 +101,11 @@ public class CreateSitePpAndApplyRoles implements Statement {
       confPp.add(puppetClass + "," + Joiner.on(',').join(puppetRoles.get(puppetClass)));
     }
 
+    Builder<String> confHiera = ImmutableList.<String> builder();
+    for (String puppetClass : puppetRoles.keySet()) {
+      confHiera.add(puppetClass + ":\n   - " + Joiner.on("\n   - ").join(puppetRoles.get(puppetClass)));
+    }
+
     sitePp.add("$extlookup_datadir='/etc/puppet/manifests/extdata'");
     sitePp.add("$extlookup_precedence = ['common']");
     sitePp.add("node default {");
@@ -107,12 +117,31 @@ public class CreateSitePpAndApplyRoles implements Statement {
         String key = it.next();
         manifestProps.setProperty(key, config.getProperty(key));
       }
-      sitePp.add(getManifestForClusterSpecAndRole(role, manifestProps).toString());
+      Manifest roleManifest = getManifestForClusterSpecAndRole(role, manifestProps);
+      if (isHiera) {
+        sitePp.add("include " + roleManifest.getName());
+        confHiera.add(roleManifest.getHiera());
+      } else {
+        sitePp.add(roleManifest.toString());
+      }
     }
     sitePp.add("}");
 
-    statements.add(appendFile(CONF_PP_FILE_LOCATION, confPp.build()));
-    statements.add(appendFile(SITE_PP_FILE_LOCATION, sitePp.build()));
+    if (isHiera) {
+      Builder<String> confPuppetHiera = ImmutableList.<String> builder();
+      confPuppetHiera.add("---",
+                    ":backends:",
+                    "  - yaml",
+                    ":yaml:",
+                    "  :datadir: /etc/puppet/hieradata",
+                    ":hierarchy:",
+                    "  - common");
+      statements.add(createOrOverwriteFile(HIERA_CONF_FILE_LOCATION, confPuppetHiera.build()));
+      statements.add(exec("mkdir -p /etc/puppet/hieradata"));
+    }
+    statements.add(createOrOverwriteFile(HIERA_COMMON_FILE_LOCATION, confHiera.build()));
+    statements.add(createOrOverwriteFile(CONF_PP_FILE_LOCATION, confPp.build()));
+    statements.add(createOrOverwriteFile(SITE_PP_FILE_LOCATION, sitePp.build()));
     statements.add(exec("puppet apply " + SITE_PP_FILE_LOCATION));
 
     return new StatementList(statements.build()).render(arg0);

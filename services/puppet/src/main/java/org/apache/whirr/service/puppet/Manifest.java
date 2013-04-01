@@ -117,12 +117,25 @@ public class Manifest {
     return resource.toString();
   }
 
+  public String getName() {
+    return module + (className != null ? "::" + className : "");
+  }
+
+  public String getHiera() {
+    String name = getName();
+    StringBuilder result = new StringBuilder();
+    for (Map.Entry<String, String> entry : attribs.entrySet()) {
+      result.append("\n" + name + "::" + entry.getKey() + ": " + entry.getValue());
+    }
+    return result.toString();
+  }
+
   List<String> toStringList() {
     List<String> result = new ArrayList<String>();
 
     // First part of the the resource
     // class { 'module::className':
-    result.add("class { '" + module + (className != null ? "::" + className : "") + "':");
+    result.add("class { '" + getName() + "':");
 
     // If we have attribs they go in as key => value pairs
     // These go in _unquoted_; user is responsible for supplying the quotes
