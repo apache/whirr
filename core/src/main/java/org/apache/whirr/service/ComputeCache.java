@@ -35,6 +35,10 @@ import org.jclouds.Context;
 import org.jclouds.ContextBuilder;
 import org.jclouds.apis.ApiMetadata;
 import org.jclouds.apis.Apis;
+import org.jclouds.byon.BYONApiMetadata;
+import org.jclouds.byon.Node;
+import org.jclouds.byon.config.BYONComputeServiceContextModule;
+import org.jclouds.byon.config.CacheNodeStoreModule;
 import org.jclouds.compute.ComputeService;
 import org.jclouds.compute.ComputeServiceContext;
 import org.jclouds.compute.Utils;
@@ -60,6 +64,7 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.collect.ForwardingObject;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
@@ -84,7 +89,7 @@ public enum ComputeCache implements Function<ClusterSpec, ComputeServiceContext>
   }
   
   public void invalidate(ClusterSpec arg0) {
-    return cache.invalidate(new Key(arg0));
+    cache.invalidate(new Key(arg0));
   }
   
   // this should prevent recreating the same compute context twice
@@ -95,10 +100,20 @@ public enum ComputeCache implements Function<ClusterSpec, ComputeServiceContext>
         @Override
         public ComputeServiceContext load(Key arg0) {
           LOG.debug("creating new ComputeServiceContext {}", arg0);
-          ContextBuilder builder = ContextBuilder.newBuilder(arg0.provider)
-                                                 .credentials(arg0.identity, arg0.credential)
-                                                 .overrides(arg0.overrides)
-                                                 .modules(arg0.modules);
+          ContextBuilder builder;
+
+          if (arg0.overrideApiMetadata != null) {
+            builder = ContextBuilder.newBuilder(arg0.overrideApiMetadata)
+              .credentials(arg0.identity, arg0.credential)
+              .overrides(arg0.overrides)
+              .modules(arg0.modules);
+          } else {
+            builder = ContextBuilder.newBuilder(arg0.provider)
+            .credentials(arg0.identity, arg0.credential)
+            .overrides(arg0.overrides)
+            .modules(arg0.modules);
+          }
+          
           if (arg0.endpoint != null)
             builder.endpoint(arg0.endpoint);
           ComputeServiceContext context = new IgnoreCloseComputeServiceContext(
@@ -245,7 +260,9 @@ public enum ComputeCache implements Function<ClusterSpec, ComputeServiceContext>
     private String endpoint;
     private String identity;
     private String credential;
-
+    private String clusterName;
+    private ApiMetadata overrideApiMetadata;
+    
     private final String key;
     private final Properties overrides;
     private final Set<Module> modules;
@@ -256,11 +273,13 @@ public enum ComputeCache implements Function<ClusterSpec, ComputeServiceContext>
       endpoint = spec.getEndpoint();
       identity = spec.getIdentity();
       credential = spec.getCredential();
+      clusterName = spec.getClusterName();
 
       key = Objects.toStringHelper("").omitNullValues()
             .add("provider", provider)
             .add("endpoint", endpoint)
-            .add("identity", identity).toString();
+            .add("identity", identity)
+            .add("clusterName", clusterName).toString();
       Configuration jcloudsConfig = spec.getConfigurationForKeysWithPrefix("jclouds");
       
       // jclouds configuration for providers are not prefixed with jclouds.
@@ -282,6 +301,16 @@ public enum ComputeCache implements Function<ClusterSpec, ComputeServiceContext>
 
       if ("stub".equals(spec.getProvider())) {
         modules = ImmutableSet.<Module>of(new SLF4JLoggingModule(), new DryRunModule());
+      } else if ("byon".equals(spec.getProvider()) && !spec.getByonNodes().isEmpty()) {
+        overrideApiMetadata = new BYONApiMetadata()
+          .toBuilder()
+          .defaultModule(BYONComputeServiceContextModule.class)
+          .build();
+
+        modules = ImmutableSet.<Module>of(new SLF4JLoggingModule(), 
+                                          new EnterpriseConfigurationModule(),
+                                          new SshjSshClientModule(),
+                                          new CacheNodeStoreModule(ImmutableMap.<String,Node>copyOf(spec.getByonNodes())));
       } else {
         modules = ImmutableSet.<Module>of(new SLF4JLoggingModule(), 
             new EnterpriseConfigurationModule(), new SshjSshClientModule());
@@ -324,6 +353,7 @@ public enum ComputeCache implements Function<ClusterSpec, ComputeServiceContext>
         .add("provider", provider)
         .add("identity", identity)
         .add("overrides", overrides)
+        .add("clusterName", clusterName)
         .toString();
     }
   }
