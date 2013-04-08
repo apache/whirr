@@ -40,6 +40,7 @@ import org.apache.commons.configuration.ConfigurationUtils;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.io.IOUtils;
 import org.apache.whirr.internal.ConfigToTemplateBuilderSpec;
+import org.jclouds.byon.Node;
 import org.jclouds.compute.domain.TemplateBuilderSpec;
 import org.jclouds.javax.annotation.Nullable;
 import org.jclouds.predicates.validators.DnsNameValidator;
@@ -318,6 +319,8 @@ public class ClusterSpec {
   private String kerberosRealm;
   
   private Configuration config;
+
+  private Map<String,Node> byonNodes;
   
   public ClusterSpec() throws ConfigurationException {
     this(new PropertiesConfiguration());
@@ -327,10 +330,14 @@ public class ClusterSpec {
       this(config, true); // load default configs
   }
 
+  public ClusterSpec(Configuration userConfig, boolean loadDefaults) {
+    this(userConfig, loadDefaults, new HashMap<String,Node>());
+  }
+  
   /**
    * @throws ConfigurationException if something is wrong
    */
-  public ClusterSpec(Configuration userConfig, boolean loadDefaults)
+  public ClusterSpec(Configuration userConfig, boolean loadDefaults, Map<String,Node> byonNodes)
       throws ConfigurationException {
 
     if (loadDefaults) {
@@ -386,6 +393,8 @@ public class ClusterSpec {
 
     setAwsEc2PlacementGroup(getString(Property.AWS_EC2_PLACEMENT_GROUP));
 
+    setByonNodes(byonNodes);
+    
     Map<String, List<String>> fr = new HashMap<String, List<String>>();
     String firewallPrefix = Property.FIREWALL_RULES.getConfigName();
     Pattern firewallRuleKeyPattern = Pattern.compile("^".concat(Pattern.quote(firewallPrefix).concat("(?:\\.(.+))?$")));
@@ -455,6 +464,8 @@ public class ClusterSpec {
     r.setJdkInstallUrl(getJdkInstallUrl());
     
     r.setKerberosRealm(getKerberosRealm());
+
+    r.setByonNodes(getByonNodes());
     
     return r;
   }
@@ -683,6 +694,10 @@ public class ClusterSpec {
 
   public Map<String, List<String>> getFirewallRules() {
     return firewallRules;
+  }
+
+  public Map<String, Node> getByonNodes() {
+    return byonNodes;
   }
 
   public String getVersion() {
@@ -926,6 +941,18 @@ public class ClusterSpec {
   public void setFirewallRules(Map<String,List<String>> firewallRules) {
     this.firewallRules = firewallRules;
   }
+
+  /**
+   * Sets the list of BYON nodes. Optional. Once the Cluster has been initialized from the ClusterSpec,
+   *   further calls to setByonNodes will not result in changes in the Cluster. Generally, byonNodes
+   *   should be initialized via the full constructor rather than this setter.
+   *
+   * @param byonNodes
+   */
+  @VisibleForTesting
+  public void setByonNodes(Map<String,Node> byonNodes) {
+    this.byonNodes = byonNodes;
+  }
   
   public void setVersion(String version) {
     this.version = version;
@@ -1009,6 +1036,8 @@ public class ClusterSpec {
         && Objects.equal(getAutoHostnameSuffix(), that.getAutoHostnameSuffix())
         && Objects.equal(getJdkInstallUrl(), that.getJdkInstallUrl())
         && Objects.equal(getKerberosRealm(), that.getKerberosRealm())
+        && Objects.equal(getFirewallRules(), that.getFirewallRules())
+        && Objects.equal(getByonNodes(), that.getByonNodes())
         ;
     }
     return false;
@@ -1045,7 +1074,9 @@ public class ClusterSpec {
         getAutoHostnamePrefix(),
         getAutoHostnameSuffix(),
         getJdkInstallUrl(),
-        getKerberosRealm()
+        getKerberosRealm(),
+        getFirewallRules(),
+        getByonNodes()
     );
   }
   
@@ -1083,6 +1114,8 @@ public class ClusterSpec {
       .add("autoHostnameSuffix",getAutoHostnameSuffix())
       .add("jdkInstallUrl", getJdkInstallUrl())
       .add("kerberosRealm", getKerberosRealm())
+      .add("firewallRules", getByonNodes())
+      .add("byonNodes", getByonNodes())
       .toString();
   }
 }
