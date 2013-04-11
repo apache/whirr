@@ -55,6 +55,9 @@ Release 0.8.2 (unreleased changes)
 
   BUG FIXES
 
+    WHIRR-120. Add option to populate /etc/hosts, and translate
+    security groups to iptables rules. (abayer)
+    
     WHIRR-706. Add invalidate method to ComputeCache. (abayer)
     
     WHIRR-699. Fix indentation and formatting on "Getting Started" page.
