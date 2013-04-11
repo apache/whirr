@@ -1,9 +1,14 @@
 rm /etc/puppet/manifests/site.pp
 rm /etc/puppet/manifests/extdata/common.csv
-cat >> /etc/puppet/manifests/extdata/common.csv <<-'END_OF_JCLOUDS_FILE'
+rm /etc/puppet/hieradata/common.yaml
+cat > /etc/puppet/hieradata/common.yaml <<-'END_OF_JCLOUDS_FILE'
+	nginx::server:
+   - 127.0.0.1
+END_OF_JCLOUDS_FILE
+cat > /etc/puppet/manifests/extdata/common.csv <<-'END_OF_JCLOUDS_FILE'
 	nginx::server,127.0.0.1
 END_OF_JCLOUDS_FILE
-cat >> /etc/puppet/manifests/site.pp <<-'END_OF_JCLOUDS_FILE'
+cat > /etc/puppet/manifests/site.pp <<-'END_OF_JCLOUDS_FILE'
 	$extlookup_datadir='/etc/puppet/manifests/extdata'
 	$extlookup_precedence = ['common']
 	node default {
