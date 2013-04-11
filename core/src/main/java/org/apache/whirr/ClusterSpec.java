@@ -330,7 +330,7 @@ public class ClusterSpec {
       this(config, true); // load default configs
   }
 
-  public ClusterSpec(Configuration userConfig, boolean loadDefaults) {
+  public ClusterSpec(Configuration userConfig, boolean loadDefaults) throws ConfigurationException {
     this(userConfig, loadDefaults, new HashMap<String,Node>());
   }
   
