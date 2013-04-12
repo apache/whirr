@@ -19,6 +19,7 @@
 package org.apache.whirr.karaf.command.support;
 
 import org.apache.commons.configuration.PropertiesConfiguration;
+import org.apache.felix.gogo.commands.Argument;
 import org.apache.felix.gogo.commands.Option;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
 import org.apache.whirr.ClusterControllerFactory;
@@ -40,6 +41,9 @@ public abstract class WhirrCommandSupport extends OsgiCommandSupport {
   @Option(required = false, name = "--pid", description = "The PID of the configuration")
   protected String pid;
 
+  @Option(required = false, name = "--name", description = "The compute context name")
+  protected String name;
+
   @Option(required = false, name = "--provider", description = "The compute provider")
   protected String provider;
 
@@ -58,11 +62,12 @@ public abstract class WhirrCommandSupport extends OsgiCommandSupport {
   @Option(required = false, name = "--hardwareId", description = "The hardware")
   protected String hardwareId;
 
-  @Option(required = false, name = "--cluster-name", description = "The name of the cluster")
-  protected String clusterName;
-
   @Option(required = false, name = "--private-key-file", description = "The private ssh key")
   protected String privateKey;
+
+  @Argument(name = "clusterName", index = 0 ,required = true, multiValued = false, description = "The name of the cluster")
+  protected String clusterName;
+
 
   protected ClusterControllerFactory clusterControllerFactory;
   protected ConfigurationAdmin configurationAdmin;
@@ -70,11 +75,12 @@ public abstract class WhirrCommandSupport extends OsgiCommandSupport {
 
 
   public void validateInput() throws Exception {
+
     if (pid != null || fileName != null) {
        return;
     } else {
-      if (provider == null || getComputeService(provider) == null) {
-        throw new Exception("A proper configuration or a valid provider should be provided.");
+      if ((name == null || getComputeServiceByName(name) == null) && (provider == null || getComputeServiceByProvider(provider) == null)) {
+        throw new Exception("A proper configuration or a valid compute name / provider should be provided.");
       }
       if (templates == null) {
         throw new Exception("A proper configuration or a valid template should be specified");
@@ -82,7 +88,28 @@ public abstract class WhirrCommandSupport extends OsgiCommandSupport {
     }
   }
 
-  public ComputeService getComputeService(String provider) {
+  /**
+   * Returns the first {@link ComputeService} that matches the name.
+   * @param name
+   * @return
+   */
+  public ComputeService getComputeServiceByName(String name) {
+    if (computeServices != null && !computeServices.isEmpty()) {
+      for (ComputeService computeService : computeServices) {
+        if (computeService.getContext().unwrap().getName().equals(name)) {
+          return computeService;
+        }
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Returns the first {@link ComputeService} that matches the provider.
+   * @param provider
+   * @return
+   */
+  public ComputeService getComputeServiceByProvider(String provider) {
     if (computeServices != null && !computeServices.isEmpty()) {
       for (ComputeService computeService : computeServices) {
         if (computeService.getContext().unwrap().getId().equals(provider)) {
@@ -108,7 +135,9 @@ public abstract class WhirrCommandSupport extends OsgiCommandSupport {
       clusterSpec = new ClusterSpec();
     }
 
-
+    if (name != null) {
+      clusterSpec.setContextName(name);
+    }
 
     if (provider != null) {
       clusterSpec.setProvider(provider);

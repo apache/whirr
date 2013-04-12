@@ -28,11 +28,22 @@ public class DestroyCluster extends WhirrCommandSupport {
 
   @Override
   protected Object doExecute() throws Exception {
+    validateInput();
     DestroyClusterCommand command = new DestroyClusterCommand(clusterControllerFactory);
     ClusterSpec clusterSpec = getClusterSpec();
     if (clusterSpec != null) {
       command.run(System.in, System.out, System.err, clusterSpec);
     }
     return null;
+  }
+
+  public void validateInput() throws Exception {
+    if (pid != null || fileName != null) {
+      return;
+    } else {
+      if ((name == null || getComputeServiceByName(name) == null) && (provider == null || getComputeServiceByProvider(provider) == null)) {
+        throw new Exception("A proper configuration or a valid compute name / provider should be provided.");
+      }
+    }
   }
 }

@@ -17,7 +17,8 @@
   See the License for the specific language governing permissions and
   limitations under the License.
   -->
-<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+           xmlns:ext="http://aries.apache.org/blueprint/xmlns/blueprint-ext/v1.0.0">
 
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.1.0">
     <command name="whirr/launch-cluster">
@@ -27,6 +28,7 @@
         <property name="computeServices" ref="computeServices"/>
       </action>
         <optional-completers>
+          <entry key="--name" value-ref="nameCompleter"/>
           <entry key="--provider" value-ref="computeProviderCompleter"/>
           <entry key="--imageId" value-ref="imageCompleter"/>
           <entry key="--locationId" value-ref="locationCompleter"/>
@@ -40,6 +42,10 @@
         <property name="configurationAdmin" ref="configurationAdmin"/>
         <property name="computeServices" ref="computeServices"/>
       </action>
+      <optional-completers>
+        <entry key="--name" value-ref="nameCompleter"/>
+        <entry key="--provider" value-ref="computeProviderCompleter"/>
+      </optional-completers>
     </command>
     <command name="whirr/destroy-cluster">
       <action class="org.apache.whirr.karaf.command.DestroyCluster">
@@ -47,6 +53,10 @@
         <property name="configurationAdmin" ref="configurationAdmin"/>
         <property name="computeServices" ref="computeServices"/>
       </action>
+      <optional-completers>
+        <entry key="--name" value-ref="nameCompleter"/>
+        <entry key="--provider" value-ref="computeProviderCompleter"/>
+      </optional-completers>
     </command>
     <command name="whirr/destroy-instance">
       <action class="org.apache.whirr.karaf.command.DestroyInstance">
@@ -54,6 +64,10 @@
         <property name="configurationAdmin" ref="configurationAdmin"/>
         <property name="computeServices" ref="computeServices"/>
       </action>
+      <optional-completers>
+        <entry key="--name" value-ref="nameCompleter"/>
+        <entry key="--provider" value-ref="computeProviderCompleter"/>
+      </optional-completers>
     </command>
     <command name="whirr/run-script">
       <action class="org.apache.whirr.karaf.command.RunScript">
@@ -61,6 +75,10 @@
         <property name="configurationAdmin" ref="configurationAdmin"/>
         <property name="computeServices" ref="computeServices"/>
       </action>
+      <optional-completers>
+        <entry key="--name" value-ref="nameCompleter"/>
+        <entry key="--provider" value-ref="computeProviderCompleter"/>
+      </optional-completers>
     </command>
   </command-bundle>
 
@@ -72,12 +90,13 @@
     <property name="roleCompleter" ref="roleCompleter"/>
   </bean>
 
+  <reference id="nameCompleter" interface="org.apache.karaf.shell.console.Completer" filter="(completer-type=compute-service-id)"/>
   <reference id="imageCompleter" interface="org.apache.karaf.shell.console.Completer" filter="(completer-type=image)"/>
   <reference id="locationCompleter" interface="org.apache.karaf.shell.console.Completer" filter="(completer-type=location)"/>
   <reference id="hardwareCompleter" interface="org.apache.karaf.shell.console.Completer" filter="(completer-type=hardware)"/>
   <reference id="computeProviderCompleter" interface="org.apache.karaf.shell.console.Completer" filter="(completer-type=compute-provider)"/>
 
-  <reference id="clusterControllerFactory" interface="org.apache.whirr.ClusterControllerFactory"/>
+  <reference id="clusterControllerFactory" ext:proxy-method="classes" interface="org.apache.whirr.ClusterControllerFactory"/>
   <reference id="configurationAdmin" interface="org.osgi.service.cm.ConfigurationAdmin"/>
 
   <reference-list id="computeServices" interface="org.jclouds.compute.ComputeService" availability="optional"/>

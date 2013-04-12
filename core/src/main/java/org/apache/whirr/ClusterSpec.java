@@ -95,7 +95,9 @@ public class ClusterSpec {
 
     MAX_STARTUP_RETRIES(Integer.class, false, "The number of retries in case of insufficient " + 
         "successfully started instances. Default value is 1."),
-    
+
+    CONTEXT_NAME(String.class, false, "The name of an existing compute service context. "),
+
     PROVIDER(String.class, false, "The name of the cloud provider. " + 
       "E.g. aws-ec2, cloudservers-uk"),
 
@@ -112,6 +114,9 @@ public class ClusterSpec {
       
     PRIVATE_KEY_FILE(String.class, false, "The filename of the " + 
       "private RSA key used to connect to instances."),
+
+
+    BLOBSTORE_CONTEXT_NAME(String.class, false, "The name of an existing blob store context. "),
 
     BLOBSTORE_PROVIDER(String.class, false, "The blob store provider. " +
       "E.g. aws-s3, cloudfiles-us, cloudfiles-uk"),
@@ -274,11 +279,13 @@ public class ClusterSpec {
   private List<InstanceTemplate> instanceTemplates;
   private int maxStartupRetries;
 
+  private String contextName;
   private String provider;
   private String endpoint;
   private String identity;
   private String credential;
 
+  private String blobStoreContextName;
   private String blobStoreProvider;
   private String blobStoreIdentity;
   private String blobStoreEndpoint;
@@ -360,12 +367,14 @@ public class ClusterSpec {
     setJdkInstallUrl(getString(Property.JDK_INSTALL_URL));
     
     setKerberosRealm(getString(Property.KERBEROS_REALM));
-    
+
+    setContextName(getString(Property.CONTEXT_NAME));
     setProvider(getString(Property.PROVIDER));
     setEndpoint(getString(Property.ENDPOINT));
     setIdentity(getString(Property.IDENTITY));
     setCredential(getString(Property.CREDENTIAL));
 
+    setBlobStoreContextName(getString(Property.BLOBSTORE_CONTEXT_NAME));
     setBlobStoreProvider(getString(Property.BLOBSTORE_PROVIDER));
     setBlobStoreEndpoint(getString(Property.BLOBSTORE_ENDPOINT));
     setBlobStoreIdentity(getString(Property.BLOBSTORE_IDENTITY));
@@ -427,10 +436,12 @@ public class ClusterSpec {
     r.setInstanceTemplates(Lists.newLinkedList(getInstanceTemplates()));
     r.setMaxStartupRetries(getMaxStartupRetries());
 
+    r.setContextName(getContextName());
     r.setProvider(getProvider());
     r.setIdentity(getIdentity());
     r.setCredential(getCredential());
 
+    r.setBlobStoreContextName(getBlobStoreContextName());
     r.setBlobStoreProvider(getBlobStoreProvider());
     r.setBlobStoreIdentity(getBlobStoreIdentity());
     r.setBlobStoreCredential(getBlobStoreCredential());
@@ -555,6 +566,10 @@ public class ClusterSpec {
     return maxStartupRetries;
   }
 
+  public String getContextName() {
+    return contextName;
+  }
+
   public String getProvider() {
     return provider;
   }
@@ -582,6 +597,10 @@ public class ClusterSpec {
 
   public String getClusterName() {
     return clusterName;
+  }
+
+  public String getBlobStoreContextName() {
+    return blobStoreContextName;
   }
 
   public String getBlobStoreProvider() {
@@ -720,6 +739,10 @@ public class ClusterSpec {
     this.maxStartupRetries = maxStartupRetries;
   }
 
+  public void setContextName(String contextName) {
+    this.contextName = contextName;
+  }
+
   public void setProvider(String provider) {
     if ("ec2".equals(provider)) {
       LOG.warn("Please use provider \"aws-ec2\" instead of \"ec2\"");
@@ -755,6 +778,10 @@ public class ClusterSpec {
 
   public void setCredential(String credential) {
     this.credential = credential;
+  }
+
+  public void setBlobStoreContextName(String blobStoreContextName) {
+    this.blobStoreContextName = blobStoreContextName;
   }
 
   public void setBlobStoreProvider(String provider) {
