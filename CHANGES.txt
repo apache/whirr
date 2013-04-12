@@ -4,6 +4,8 @@ Release 0.8.2 (unreleased changes)
 
   IMPROVEMENTS
 
+    WHIRR-717 Use the context name in the dynamic compute cache. (iocanel)
+
     WHIRR-713. Enable programmatic use of BYON via
     CacheNodeStoreModule. (abayer)
     
