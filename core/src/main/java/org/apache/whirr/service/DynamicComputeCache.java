@@ -19,12 +19,10 @@
 package org.apache.whirr.service;
 
 import com.google.common.base.Function;
-import com.google.common.base.Objects;
+import com.google.common.base.Strings;
 import org.apache.whirr.ClusterSpec;
 import org.jclouds.compute.ComputeService;
 import org.jclouds.compute.ComputeServiceContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -33,67 +31,28 @@ import java.util.Map;
  * A class for adding {@link ComputeServiceContext} on runtime.
  */
 public class DynamicComputeCache implements Function<ClusterSpec, ComputeServiceContext> {
-   
-  private static final Logger LOG = LoggerFactory.getLogger(DynamicComputeCache.class);
 
-  private final Map<Key, ComputeServiceContext> serviceContextMap = new HashMap<Key, ComputeServiceContext>();
+  private final Map<String, ComputeServiceContext> serviceContextMap = new HashMap<String, ComputeServiceContext>();
 
   @Override
   public ComputeServiceContext apply(ClusterSpec arg0) {
-    return serviceContextMap.get(new Key(arg0));
+    String name = arg0.getContextName();
+    if (!Strings.isNullOrEmpty(name)) {
+      return serviceContextMap.get(name);
+    } else {
+      return ComputeCache.INSTANCE.apply(arg0);
+    }
   }
 
-  public void bind(ComputeService computeService) {
+  public synchronized void bind(ComputeService computeService) {
     if (computeService != null) {
-      serviceContextMap.put(new Key(computeService), computeService.getContext());
+      serviceContextMap.put(computeService.getContext().unwrap().getName(), computeService.getContext());
     }
   }
 
-  public void unbind(ComputeService computeService) {
+  public synchronized void unbind(ComputeService computeService) {
     if (computeService != null) {
-      serviceContextMap.remove(new Key(computeService));
-    }
-  }
-
-  /**
-   * Key class for the compute context cache
-   */
-  private static class Key {
-    private String provider;
-    private final String key;
-
-    public Key(ClusterSpec spec) {
-      provider = spec.getProvider();
-
-      key = Objects.toStringHelper("").omitNullValues()
-              .add("provider", provider).toString();
-    }
-
-    public Key(ComputeService computeService) {
-      provider = computeService.getContext().unwrap().getId();
-
-      key = Objects.toStringHelper("").omitNullValues()
-              .add("provider", provider).toString();
-    }
-
-    @Override
-    public boolean equals(Object that) {
-      if (that instanceof Key) {
-        return Objects.equal(this.key, ((Key)that).key);
-      }
-      return false;
-    }
-
-    @Override
-    public int hashCode() {
-      return Objects.hashCode(key);
-    }
-
-    @Override
-    public String toString() {
-      return Objects.toStringHelper(this)
-              .add("provider", provider)
-              .toString();
+      serviceContextMap.remove(computeService.getContext().unwrap().getName());
     }
   }
 }

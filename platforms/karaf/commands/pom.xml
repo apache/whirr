@@ -36,6 +36,11 @@
     <osgi.import>
       !org.apache.whirr.karaf.command*,
       org.apache.commons.configuration*;version="[1.6,2)",
+      org.apache.felix.service.command,
+      org.apache.felix.gogo.commands,
+      org.apache.karaf.shell.console;version="[2.2,4)",
+      org.apache.karaf.shell.console.commands;version="[2.2,4)",
+      org.apache.karaf.shell.console.completer;version="[2.2,4)",
       *
     </osgi.import>
     <osgi.export>org.apache.whirr.karaf.command*;version="${project.version}"

@@ -31,6 +31,7 @@
   <artifactId>apache-whirr</artifactId>
   <packaging>pom</packaging>
   <name>Apache Whirr Karaf Feature</name>
+
   <properties>
     <activation.spec.version>1.1</activation.spec.version>
     <ant.bundle.version>1.7.0_5</ant.bundle.version>
