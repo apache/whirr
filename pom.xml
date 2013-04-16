@@ -28,7 +28,7 @@
 
   <groupId>org.apache.whirr</groupId>
   <artifactId>whirr</artifactId>
-  <version>0.8.2-SNAPSHOT</version>
+  <version>0.8.2</version>
   <packaging>pom</packaging>
 
   <name>Whirr</name>

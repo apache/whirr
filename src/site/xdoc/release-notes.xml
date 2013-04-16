@@ -24,6 +24,83 @@
     <body>
     <!-- Paste release notes from https://issues.apache.org/jira/browse/WHIRR here. -->
 
+        Release Notes - Whirr - Version 0.8.2
+                
+<h2>        Bug
+</h2>
+<ul>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-677'>WHIRR-677</a>] -         Whirr fails to install CDH4 nodemanager properly
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-678'>WHIRR-678</a>] -         Apache Whirr is not using my whirr.location-id parameter on EC2
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-679'>WHIRR-679</a>] -         Switch to HBase 0.94.2
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-693'>WHIRR-693</a>] -         Control order of actions with waves of whirr.instance-templates
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-705'>WHIRR-705</a>] -         provide better integration between parameterized classes and Hiera
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-707'>WHIRR-707</a>] -         RunUrlStatementTest fails due to missing URL
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-709'>WHIRR-709</a>] -         Hadoop defaults fail to install due to version bump @ osuosl.org 
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-712'>WHIRR-712</a>] -         prepare_all_disks.sh should cover xvdX as well as sdX.
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-715'>WHIRR-715</a>] -         Unit test failure in whirr-puppet
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-716'>WHIRR-716</a>] -         Karaf itests fail
+</li>
+</ul>
+                
+<h2>        Improvement
+</h2>
+<ul>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-546'>WHIRR-546</a>] -         Add destroy instructions to stdout for all create actions
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-634'>WHIRR-634</a>] -         Update private IP host file entry when required by AUTO_HOSTNAME_SUFFIX
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-660'>WHIRR-660</a>] -         provide a useful error message if whirr.instance-templates is not in a cluster spec
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-661'>WHIRR-661</a>] -         Upgrade to Hadoop 1.0.3
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-669'>WHIRR-669</a>] -         The whirr karaf feature should use feature version range on jclouds.
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-670'>WHIRR-670</a>] -         Upgrade to jclouds 1.5.3
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-672'>WHIRR-672</a>] -         Allow eager caching of instance hostname based on pre-provision instance metadata 
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-673'>WHIRR-673</a>] -         Upgrade CDH Repos for RHEL/CentOS 6
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-675'>WHIRR-675</a>] -         Convert all whirr.env.* environment variable labels to upper case
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-681'>WHIRR-681</a>] -         enhance puppet service with an ability to export cluster topology to the puppet code
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-691'>WHIRR-691</a>] -         Java install to support Debian
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-694'>WHIRR-694</a>] -         install puppet from puppetlabs repos instead of the ruby gem
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-699'>WHIRR-699</a>] -         Fix indentation and formatting on &quot;Getting Started&quot; page
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-711'>WHIRR-711</a>] -         Add security group support for OpenStack
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-713'>WHIRR-713</a>] -         Enable programmatic use of BYON via CacheNodeStoreModule
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-717'>WHIRR-717</a>] -         Make use of the context name in the dynamic compute cache.
+</li>
+</ul>
+    
+<h2>        New Feature
+</h2>
+<ul>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-118'>WHIRR-118</a>] -         Adaptor for OpenStack Clouds
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-671'>WHIRR-671</a>] -         Create Kerberos Service
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-680'>WHIRR-680</a>] -         add python scripts to aid ssh/scp in to VMs
+</li>
+<li>[<a href='https://issues.apache.org/jira/browse/WHIRR-696'>WHIRR-696</a>] -         Whirr script for Hadoop MRv2 YARN installs that supports Hadoop-2.0.x and Hadoop 3.x (trunk) branches
+</li>
+</ul>
+
     <h1>Release Notes - Whirr - Version 0.8.1</h1>
 
 <h2>        Bug
