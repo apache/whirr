@@ -1,6 +1,14 @@
 Apache Whirr Change Log
 
-Release 0.8.2 - 2013-04-11
+Release 0.8.3 (Unreleased Changes)
+
+  NEW FEATURES
+
+  IMPROVEMENTS
+
+  BUG FIXES
+
+Release 0.8.2 - 2013-04-23
 
   IMPROVEMENTS
 

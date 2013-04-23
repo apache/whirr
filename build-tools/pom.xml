@@ -20,7 +20,7 @@
   <groupId>org.apache.whirr</groupId>
   <artifactId>whirr-build-tools</artifactId>
   <packaging>jar</packaging>
-  <version>0.8.2</version>
+  <version>0.8.3-SNAPSHOT</version>
   <name>Apache Whirr Build Tools</name>
   <distributionManagement>
     <repository>
