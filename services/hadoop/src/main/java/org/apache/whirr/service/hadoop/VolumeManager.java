@@ -18,15 +18,17 @@
 
 package org.apache.whirr.service.hadoop;
 
-import com.google.common.collect.Maps;
-
 import java.util.List;
 import java.util.Map;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import org.apache.whirr.Cluster.Instance;
 import org.apache.whirr.ClusterSpec;
 import org.jclouds.compute.domain.Hardware;
 import org.jclouds.compute.domain.Volume;
+
+import com.google.common.collect.Maps;
 
 public class VolumeManager {
   
@@ -41,12 +43,22 @@ public class VolumeManager {
     if (hardware != null) {
         List<? extends Volume> volumes =
             instance.getNodeMetadata().getHardware().getVolumes();
+        boolean foundBootDevice = false;
+        SortedSet<String> volumeDevicesSansBoot = new TreeSet<String>();
         for (Volume volume : volumes) {
-            if (volume.isBootDevice()) {
-                continue;
+            if (!volume.isBootDevice()) {
+              volumeDevicesSansBoot.add(volume.getDevice());
+            } else {
+              foundBootDevice = true;
             }
-            
-            mappings.put(MOUNT_PREFIX + number++, volume.getDevice());
+        }
+        // if no boot device is reported from the cloud provider (as is sometimes the case)
+        // assume it is the first in the natural order list of devices
+        if (!foundBootDevice && !volumeDevicesSansBoot.isEmpty()) {
+          volumeDevicesSansBoot.remove(volumeDevicesSansBoot.iterator().next());
+        }
+        for (String device : volumeDevicesSansBoot) {            
+            mappings.put(MOUNT_PREFIX + number++, device);
         }
     }
     return mappings;

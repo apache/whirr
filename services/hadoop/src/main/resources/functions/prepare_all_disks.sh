@@ -55,34 +55,46 @@ function prep_disk() {
       device=$(echo "$device"|sed -e 's/\/sd/\/xvd/')
   fi
 
-  # is device formatted?
-  if [ $(mountpoint -q -x $device) ]; then
-    echo "$device is formatted"
-  else
-    if which dpkg &> /dev/null; then
-      apt-get install -y xfsprogs
-    elif which rpm &> /dev/null; then
-      yum install -y xfsprogs
-    fi
-    echo "warning: ERASING CONTENTS OF $device"
-    mkfs.xfs -f $device
+  # match /dev/sd* devices to their Xen VPS equivalents and set device if found
+  deviceXen=$(echo "$device"|sed -e 's/\/sd/\/xvd/')
+  if [ ! -e $deviceXen ]; then
+    # match /dev/sd(.) to a new RHEL 6.1 Xen VPS naming scheme - https://bugzilla.redhat.com/show_bug.cgi?id=729586
+    deviceXen=$(echo "$device"|sed -e 's/\/sd./\/xvd/'|xargs -I £ echo "£"$(printf \\$(printf '%03o' $(($(printf "%d\n" \'${device:${#device} - 1})+4)) )))
   fi
-  # is device mounted?
-  mount | grep -q $device
-  if [ $? == 0 ]; then 
-    echo "$device is mounted"
-    if [ ! -d $mount ]; then
-      echo "Symlinking to $mount"
-      ln -s $(grep $device /proc/mounts | awk '{print $2}') $mount
+  if [ -e $deviceXen ]; then
+    device=$deviceXen
+  fi
+
+  if [ -e $device ]; then
+    # is device formatted?
+    if [ $(mountpoint -q -x $device) ]; then
+      echo "$device is formatted"
+    else
+      if which dpkg &> /dev/null; then
+        apt-get install -y xfsprogs
+      elif which rpm &> /dev/null; then
+        yum install -y xfsprogs
+      fi
+      echo "warning: ERASING CONTENTS OF $device"
+      mkfs.xfs -f $device
     fi
-  else
-    echo "Mounting $device on $mount"
-    if [ ! -e $mount ]; then
-      mkdir $mount
-    fi
-    mount -o defaults,noatime $device $mount
-    if $automount ; then
-      echo "$device $mount xfs defaults,noatime 0 0" >> /etc/fstab
+    # is device mounted?
+    mount | grep -q $device
+    if [ $? == 0 ]; then 
+      echo "$device is mounted"
+      if [ ! -d $mount ]; then
+        echo "Symlinking to $mount"
+        ln -s $(grep $device /proc/mounts | awk '{print $2}') $mount
+      fi
+    else
+      echo "Mounting $device on $mount"
+      if [ ! -e $mount ]; then
+        mkdir $mount
+      fi
+      mount -o defaults,noatime $device $mount
+      if $automount ; then
+        echo "$device $mount xfs defaults,noatime 0 0" >> /etc/fstab
+      fi
     fi
   fi
 }
