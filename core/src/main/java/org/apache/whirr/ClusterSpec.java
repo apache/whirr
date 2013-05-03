@@ -196,7 +196,9 @@ public class ClusterSpec {
     
     KERBEROS_REALM(String.class, false, "Kerberos realm to use in security configuration"),
                              
-    AWS_EC2_PLACEMENT_GROUP(String.class, false, "If given, use this existing EC2 placement group. (aws-ec2 specific option)");
+    AWS_EC2_PLACEMENT_GROUP(String.class, false, "If given, use this existing EC2 placement group. (aws-ec2 specific option)"),
+    
+    QUIET(Boolean.class, false,  "Adjust user level, console logging verbosity.");
     
     private Class<?> type;
     private boolean multipleArguments;
@@ -329,6 +331,8 @@ public class ClusterSpec {
 
   private Map<String,Node> byonNodes;
   
+  private boolean isQuiet;
+  
   public ClusterSpec() throws ConfigurationException {
     this(new PropertiesConfiguration());
   }
@@ -403,6 +407,8 @@ public class ClusterSpec {
     setAwsEc2PlacementGroup(getString(Property.AWS_EC2_PLACEMENT_GROUP));
 
     setByonNodes(byonNodes);
+    
+    setQuiet(config.getBoolean(Property.QUIET.getConfigName(), Boolean.FALSE));
     
     Map<String, List<String>> fr = new HashMap<String, List<String>>();
     String firewallPrefix = Property.FIREWALL_RULES.getConfigName();
@@ -608,6 +614,10 @@ public class ClusterSpec {
       return getDefaultBlobStoreForComputeProvider();
     }
     return blobStoreProvider;
+  }
+  
+  public boolean isQuiet() {
+    return isQuiet;
   }
 
   /**
@@ -981,6 +991,10 @@ public class ClusterSpec {
     this.byonNodes = byonNodes;
   }
   
+  public void setQuiet(boolean isQuiet) {
+    this.isQuiet = isQuiet;
+  }
+
   public void setVersion(String version) {
     this.version = version;
   }
@@ -1106,7 +1120,7 @@ public class ClusterSpec {
         getByonNodes()
     );
   }
-  
+    
   public String toString() {
     return Objects.toStringHelper(this).omitNullValues()
       .add("instanceTemplates", getInstanceTemplates())

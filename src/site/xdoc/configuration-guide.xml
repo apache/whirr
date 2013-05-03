@@ -88,6 +88,16 @@ xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 http://maven.apache.org/xsd
         <td>Whether or not to automatically terminate all nodes when cluster
          launch fails for some reason.</td>
       </tr>
+      <tr valign="top">
+        <td>
+          <tt>whirr.quiet</tt>
+        </td>
+        <td>
+          <tt>--quiet</tt>
+        </td>
+        <td>false</td>
+        <td>Adjust user level, console logging verbosity. System level logs controlled via <tt>conf/log4j-cli.xml</tt>.</td>
+      </tr>
     </table>
     <subsection name="Instance Templates Options"></subsection>
     <table border="0">

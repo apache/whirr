@@ -23,13 +23,6 @@
 -->
 <log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/"
     debug="false">
-    
-  <appender name="CONSOLE" class="org.apache.log4j.ConsoleAppender"> 
-    <param name="Threshold" value="INFO" />
-    <layout class="org.apache.log4j.PatternLayout"> 
-      <param name="ConversionPattern" value="%m%n"/> 
-    </layout> 
-  </appender>
   
   <appender name="ROLLINGFILE" class="org.apache.log4j.DailyRollingFileAppender">
     <param name="File" value="whirr.log" />
@@ -41,10 +34,8 @@
     </layout>
   </appender>
 
-  <logger name="org.apache.whirr" additivity="false">
-    <level value="DEBUG" />
-    <appender-ref ref="CONSOLE" />
-    <appender-ref ref="ROLLINGFILE" />
+  <logger name="org.apache.whirr">
+    <level value="INFO" />
   </logger>
 
   <logger name="jclouds.compute">
@@ -60,7 +51,6 @@
   </logger>
 
   <root>
-    <priority value="INFO" />
     <appender-ref ref="ROLLINGFILE" />
   </root>
 

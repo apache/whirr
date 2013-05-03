@@ -48,14 +48,61 @@ public class AbstractClusterCommandTest {
     };
 
     Map<String, File> keys = KeyPair.generateTemporaryFiles();
-    OptionSet optionSet = clusterCommand.parser.parse(
+    OptionSet optionSet = clusterCommand.parser.parse("--quiet",
         "--service-name", "overridden-test-service",
         "--config", "whirr-override-test.properties",
         "--private-key-file", keys.get("private").getAbsolutePath()
     );
     ClusterSpec clusterSpec = clusterCommand.getClusterSpec(optionSet);
+    assertThat(optionSet.has("quiet"), is(true));
+    assertThat(clusterSpec.isQuiet(), is(true));
     assertThat(clusterSpec.getServiceName(), is("overridden-test-service"));
     assertThat(clusterSpec.getClusterName(), is("test-cluster"));
+    
+    optionSet = clusterCommand.parser.parse("--quiet", "true",
+        "--service-name", "overridden-test-service",
+        "--config", "whirr-override-test.properties",
+        "--private-key-file", keys.get("private").getAbsolutePath()
+    );
+     clusterSpec = clusterCommand.getClusterSpec(optionSet);
+    assertThat(optionSet.has("quiet"), is(true));
+    assertThat(clusterSpec.isQuiet(), is(true));
+    assertThat(clusterSpec.getServiceName(), is("overridden-test-service"));
+    assertThat(clusterSpec.getClusterName(), is("test-cluster"));
+
+    optionSet = clusterCommand.parser.parse("--quiet", "false",
+        "--service-name", "overridden-test-service",
+        "--config", "whirr-override-test.properties",
+        "--private-key-file", keys.get("private").getAbsolutePath()
+    );
+     clusterSpec = clusterCommand.getClusterSpec(optionSet);
+    assertThat(optionSet.has("quiet"), is(true));
+    assertThat(clusterSpec.isQuiet(), is(false));
+    assertThat(clusterSpec.getServiceName(), is("overridden-test-service"));
+    assertThat(clusterSpec.getClusterName(), is("test-cluster"));  
+  
+    optionSet = clusterCommand.parser.parse("--quiet", "some-value",
+        "--service-name", "overridden-test-service",
+        "--config", "whirr-override-test.properties",
+        "--private-key-file", keys.get("private").getAbsolutePath()
+    );
+     clusterSpec = clusterCommand.getClusterSpec(optionSet);
+    assertThat(optionSet.has("quiet"), is(true));
+    assertThat(clusterSpec.isQuiet(), is(false));
+    assertThat(clusterSpec.getServiceName(), is("overridden-test-service"));
+    assertThat(clusterSpec.getClusterName(), is("test-cluster"));
+    
+    optionSet = clusterCommand.parser.parse(
+        "--service-name", "overridden-test-service",
+        "--config", "whirr-override-test.properties",
+        "--private-key-file", keys.get("private").getAbsolutePath()
+    );
+     clusterSpec = clusterCommand.getClusterSpec(optionSet);
+    assertThat(optionSet.has("quiet"), is(false));
+    assertThat(clusterSpec.isQuiet(), is(false));
+    assertThat(clusterSpec.getServiceName(), is("overridden-test-service"));
+    assertThat(clusterSpec.getClusterName(), is("test-cluster"));
+    
   }
 
   /**

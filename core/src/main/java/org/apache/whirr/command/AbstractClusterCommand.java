@@ -80,17 +80,19 @@ public abstract class AbstractClusterCommand extends Command {
         .describedAs("config.properties")
         .ofType(String.class);
 
-    parser.accepts("quiet", "Be less verbose");
-
     this.factory = factory;
     this.stateStoreFactory = stateStoreFactory;
 
     optionSpecs = Maps.newHashMap();
     for (Property property : EnumSet.allOf(Property.class)) {
-      ArgumentAcceptingOptionSpec<?> spec = parser
-        .accepts(property.getSimpleName(), property.getDescription())
-        .withRequiredArg()
-        .ofType(property.getType());
+      ArgumentAcceptingOptionSpec<?> spec = null;
+      if (property.getType().equals(Boolean.class)) {
+        spec = parser.accepts(property.getSimpleName(), property.getDescription()).withOptionalArg()
+            .ofType(property.getType());
+      } else {
+        spec = parser.accepts(property.getSimpleName(), property.getDescription()).withRequiredArg()
+            .ofType(property.getType());
+      }   
       if (property.hasMultipleArguments()) {
         spec.withValuesSeparatedBy(',');
       }
@@ -111,6 +113,9 @@ public abstract class AbstractClusterCommand extends Command {
         value = optionSet.valuesOf(option);
       } else {
         value = optionSet.valueOf(option);
+      }
+      if (value == null && property.getType().equals(Boolean.class) && optionSet.has(property.getSimpleName())) {
+        value = Boolean.TRUE.toString();
       }
       if (value != null) {
         optionsConfig.setProperty(property.getConfigName(), value);
@@ -165,7 +170,7 @@ public abstract class AbstractClusterCommand extends Command {
 
   protected void printProviderInfo(PrintStream out, PrintStream err,
       ClusterSpec clusterSpec, OptionSet optionSet) {
-    if (!optionSet.has("quiet")) {
+    if (!clusterSpec.isQuiet()) {
       out.println(String.format("Running on provider %s using identity %s", clusterSpec.getProvider(), clusterSpec.getIdentity()));
     }
   }
