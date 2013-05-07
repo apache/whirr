@@ -115,6 +115,29 @@ public class DryRunModuleTest {
     }
   }
 
+  public static class MockClusterActionHandlerListener extends ClusterActionHandlerListener {
+    public MockClusterActionHandlerListener() {
+    }
+
+    public int beforeCalls = 0;
+    public int afterCalls = 0;
+    
+    @Override
+    public void beforeEvent(Class clazz, ClusterActionEvent event) {
+      assertEquals("ClusterActionHandler class should be NoopClusterActionHandler",
+                   clazz.getSimpleName(), "NoopClusterActionHandler");
+      beforeCalls++;
+    }
+
+    @Override
+    public void afterEvent(Class clazz, ClusterActionEvent event) {
+      assertEquals("ClusterActionHandler class should be NoopClusterActionHandler",
+                   clazz.getSimpleName(), "NoopClusterActionHandler");
+      afterCalls++;
+    }
+  }
+      
+    
   @Test
   public void testExecuteOnlyBootstrapForNoop() throws Exception {
     CompositeConfiguration config = new CompositeConfiguration();
@@ -139,6 +162,39 @@ public class DryRunModuleTest {
       assertSame("An incorrect number of scripts was executed in the node " + entry,
           entry.getValue().size(), 1);
     }
+  }
+
+  @Test
+  public void testExecuteOnlyBootstrapForNoopWithListener() throws Exception {
+    CompositeConfiguration config = new CompositeConfiguration();
+    config.setProperty("whirr.provider", "stub");
+    config.setProperty("whirr.cluster-name", "stub-test");
+    config.setProperty("whirr.instance-templates", "1 noop");
+    config.setProperty("whirr.state-store", "memory");
+
+    ClusterSpec clusterSpec = ClusterSpec.withTemporaryKeys(config);
+    MockClusterActionHandlerListener listener = new MockClusterActionHandlerListener();
+    clusterSpec.setHandlerListener(listener);
+    
+    ClusterController controller = new ClusterController();
+
+    DryRun dryRun = getDryRunInControllerForCluster(controller, clusterSpec);
+    dryRun.reset();
+    
+    controller.launchCluster(clusterSpec);
+    controller.destroyCluster(clusterSpec);
+
+    ListMultimap<NodeMetadata, Statement> perNodeExecutions = dryRun.getExecutions();
+
+    for (Entry<NodeMetadata, Collection<Statement>> entry : perNodeExecutions
+        .asMap().entrySet()) {
+      assertSame("An incorrect number of scripts was executed in the node " + entry,
+          entry.getValue().size(), 1);
+    }
+
+    assertEquals("beforeCalls should be 4", listener.beforeCalls, 4);
+    assertEquals("afterCalls should be 4", listener.afterCalls, 4);
+    
   }
 
   /**

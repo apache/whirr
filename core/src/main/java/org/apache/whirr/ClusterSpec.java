@@ -40,6 +40,7 @@ import org.apache.commons.configuration.ConfigurationUtils;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.io.IOUtils;
 import org.apache.whirr.internal.ConfigToTemplateBuilderSpec;
+import org.apache.whirr.service.ClusterActionHandlerListener;
 import org.jclouds.byon.Node;
 import org.jclouds.compute.domain.TemplateBuilderSpec;
 import org.jclouds.javax.annotation.Nullable;
@@ -330,6 +331,8 @@ public class ClusterSpec {
   private Configuration config;
 
   private Map<String,Node> byonNodes;
+
+  private ClusterActionHandlerListener handlerListener;
   
   private boolean isQuiet;
   
@@ -424,6 +427,8 @@ public class ClusterSpec {
     
     setVersion(getString(Property.VERSION));
     setRunUrlBase(getString(Property.RUN_URL_BASE));
+
+    setHandlerListener(new ClusterActionHandlerListener.NoopClusterActionHandlerListener());
   }
   
   /**
@@ -483,6 +488,8 @@ public class ClusterSpec {
     r.setKerberosRealm(getKerberosRealm());
 
     r.setByonNodes(getByonNodes());
+
+    r.setHandlerListener(getHandlerListener());
     
     return r;
   }
@@ -729,6 +736,10 @@ public class ClusterSpec {
     return byonNodes;
   }
 
+  public ClusterActionHandlerListener getHandlerListener() {
+    return handlerListener;
+  }
+    
   public String getVersion() {
     return version;
   }
@@ -993,6 +1004,10 @@ public class ClusterSpec {
   
   public void setQuiet(boolean isQuiet) {
     this.isQuiet = isQuiet;
+  }
+
+  public void setHandlerListener(ClusterActionHandlerListener handlerListener) {
+    this.handlerListener = handlerListener;
   }
 
   public void setVersion(String version) {

@@ -51,6 +51,7 @@ public abstract class ClusterActionHandlerSupport implements ClusterActionHandle
 
   public void beforeAction(ClusterActionEvent event)
     throws IOException, InterruptedException{
+    event.getClusterSpec().getHandlerListener().beforeEvent(getClass(), event);
     if (event.getAction().equals(BOOTSTRAP_ACTION)) {
       beforeBootstrap(event);
     } else if (event.getAction().equals(CONFIGURE_ACTION)) {
@@ -71,6 +72,7 @@ public abstract class ClusterActionHandlerSupport implements ClusterActionHandle
 
   public void afterAction(ClusterActionEvent event)
     throws IOException, InterruptedException {
+    event.getClusterSpec().getHandlerListener().afterEvent(getClass(), event);
     if (event.getAction().equals(BOOTSTRAP_ACTION)) {
       afterBootstrap(event);
     } else if (event.getAction().equals(CONFIGURE_ACTION)) {
