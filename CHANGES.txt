@@ -6,6 +6,9 @@ Release 0.9.0 (Unreleased Changes)
 
   IMPROVEMENTS
 
+    WHIRR-726. Allow specifying a Kerberos user other than
+    $CLUSTER_USER (abayer)
+    
     WHIRR-722. Improve user and system level logging capability. (graham)
 
     WHIRR-721. Improve robustness of volume device detection. (graham)

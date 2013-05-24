@@ -18,6 +18,7 @@
 set -x
 
 function configure_kerberos_server() {
+  KERBEROS_USER=${KERBEROS_USER:-$CLUSTER_USER}
   KERBEROS_REALM_REGEX=$(echo $KERBEROS_REALM | sed s/\\\./\\\\\./g)
   service krb5kdc stop
   service kadmin stop
@@ -47,8 +48,8 @@ expect -re {Re-enter password for principal .* } { send "\$principal_primary\r" 
 expect EOF
 END
   chmod +x run_addpinc
-  ./run_addpinc $CLUSTER_USER $CLUSTER_USER/admin $KERBEROS_REALM
-  ./run_addpinc $CLUSTER_USER $CLUSTER_USER $KERBEROS_REALM
+  ./run_addpinc $KERBEROS_USER $KERBEROS_USER/admin $KERBEROS_REALM
+  ./run_addpinc $KERBEROS_USER $KERBEROS_USER $KERBEROS_REALM
   ./run_addpinc hdfs hdfs $KERBEROS_REALM
   rm -rf ./run_addpinc
   service krb5kdc start
