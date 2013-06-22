@@ -95,7 +95,7 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.jclouds</groupId>
+      <groupId>org.apache.jclouds</groupId>
       <artifactId>jclouds-scriptbuilder</artifactId>
       <version>${jclouds.version}</version>
       <scope>test</scope>

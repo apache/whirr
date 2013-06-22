@@ -18,14 +18,15 @@
 
 package org.apache.whirr.service;
 
+import static com.google.common.base.Charsets.UTF_8;
 import static com.google.common.collect.Iterables.concat;
 import static com.google.common.collect.Iterables.contains;
 import static com.google.common.collect.Iterables.find;
 import static com.google.common.collect.Multimaps.synchronizedListMultimap;
-import static com.google.common.io.ByteStreams.newInputStreamSupplier;
+import static com.google.common.hash.Hashing.md5;
+import static com.google.common.io.BaseEncoding.base16;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -41,13 +42,13 @@ import org.jclouds.compute.domain.ExecResponse;
 import org.jclouds.compute.domain.NodeMetadata;
 import org.jclouds.compute.events.StatementOnNode;
 import org.jclouds.compute.events.StatementOnNodeSubmission;
-import org.jclouds.crypto.CryptoStreams;
 import org.jclouds.domain.Credentials;
 import org.jclouds.domain.LoginCredentials;
 import org.jclouds.io.Payload;
 import org.jclouds.io.payloads.StringPayload;
 import org.jclouds.scriptbuilder.domain.Statement;
 import org.jclouds.ssh.SshClient;
+import org.jclouds.util.Strings2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,7 +64,6 @@ import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Maps;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
-import com.google.common.io.InputSupplier;
 import com.google.common.net.HostAndPort;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
@@ -202,7 +202,6 @@ public class DryRunModule extends AbstractModule {
         this.nodes = nodes;
       }
 
-      @Override
       public SshClient create(final HostAndPort socket, Credentials loginCreds) {
         return clientMap.getUnchecked(new Key(socket, loginCreds, find(nodes.values(),
             new NodeHasAddress(socket.getHostText()))));
@@ -265,7 +264,11 @@ public class DryRunModule extends AbstractModule {
     public Payload get(String path) {
       LOG.info(toString() + " >> get(" + path + ")");
       Payload returnVal = contents.get(path);
-      LOG.info(toString() + " << md5[" + md5Hex(returnVal) + "]");
+      try {
+        LOG.info(toString() + " << md5[" + md5Hex(Strings2.toString(returnVal)) + "]");
+      } catch (IOException e) {
+        throw new RuntimeException(e);
+      }
       return returnVal;
     }
 
@@ -281,8 +284,13 @@ public class DryRunModule extends AbstractModule {
 
     @Override
     public void put(String path, Payload payload) {
-      LOG.info(toString() + " >> put(" + path + ", md5[" + md5Hex(payload)
-          + "])");
+      try {
+        LOG.info(toString() + " >> put(" + path + ", md5[" + md5Hex(Strings2.toString(payload))
+               + "])");
+      } catch (IOException e) {
+        throw new RuntimeException(e);
+      }
+
       contents.put(path, payload);
     }
 
@@ -315,15 +323,7 @@ public class DryRunModule extends AbstractModule {
   }
 
   public static String md5Hex(String in) {
-    return md5Hex(newInputStreamSupplier(in.getBytes()));
-  }
-
-  public static String md5Hex(InputSupplier<? extends InputStream> supplier) {
-    try {
-      return CryptoStreams.md5Hex(supplier);
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
+    return base16().lowerCase().encode(md5().hashString(in, UTF_8).asBytes());
   }
 
 }

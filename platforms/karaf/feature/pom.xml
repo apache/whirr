@@ -48,7 +48,7 @@
     <dnsjava.version>2.0.8</dnsjava.version>
     <javax.mail.bundle.version>1.4.1_4</javax.mail.bundle.version>
     <junit.bundle.version>4.9_1</junit.bundle.version>
-    <jclouds.karaf.version>1.5.8</jclouds.karaf.version>
+    <jclouds.karaf.version>${jclouds.version}</jclouds.karaf.version>
     <jopt.simple.bundle.version>4.3_1</jopt.simple.bundle.version>
     <jsch.bundle.version>0.1.44_2</jsch.bundle.version>
     <not-yet-commons-ssl.bundle.version>0.3.11_1

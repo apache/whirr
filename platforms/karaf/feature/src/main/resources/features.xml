@@ -17,7 +17,7 @@
 -->
 <features name="whirr-${project.version}" xmlns="http://karaf.apache.org/xmlns/features/v1.0.0">
 
- <repository>mvn:org.jclouds.karaf/jclouds-karaf/${jclouds.karaf.version}/xml/features</repository>
+ <repository>mvn:org.apache.jclouds.karaf/jclouds-karaf/${jclouds.karaf.version}/xml/features</repository>
 
   <feature name="whirr" version="${project.version}" description="Apache Whirr Core" resolver="(obr)">
     <feature version="${jclouds.karaf.version}">jclouds-commands</feature>

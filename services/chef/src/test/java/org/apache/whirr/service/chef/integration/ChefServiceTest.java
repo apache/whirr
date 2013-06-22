@@ -18,6 +18,8 @@
 
 package org.apache.whirr.service.chef.integration;
 
+import static org.jclouds.util.Predicates2.retry;
+
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import org.apache.commons.configuration.CompositeConfiguration;
@@ -32,7 +34,6 @@ import org.apache.whirr.service.chef.Recipe;
 import org.jclouds.compute.RunScriptOnNodesException;
 import org.jclouds.compute.domain.ExecResponse;
 import org.jclouds.compute.domain.NodeMetadata;
-import org.jclouds.predicates.RetryablePredicate;
 import org.jclouds.scriptbuilder.domain.Statement;
 import org.jclouds.scriptbuilder.domain.Statements;
 import org.junit.AfterClass;
@@ -121,7 +122,7 @@ public class ChefServiceTest {
             .next()));
 
     assertTrue("Could not connect with nginx server",
-        new RetryablePredicate<HttpClient>(new Predicate<HttpClient>() {
+               retry(new Predicate<HttpClient>() {
 
           @Override
           public boolean apply(HttpClient input) {

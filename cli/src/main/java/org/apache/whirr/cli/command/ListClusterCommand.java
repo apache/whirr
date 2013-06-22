@@ -82,7 +82,7 @@ public class ListClusterCommand extends AbstractClusterCommand {
         instance.getNodeMetadata().getImageId(),
         instance.getPublicIp(),
         instance.getPrivateIp(),
-        instance.getNodeMetadata().getState(),
+        instance.getNodeMetadata().getStatus(),
         instance.getNodeMetadata().getLocation().getId(),
         Joiner.on(",").join(instance.getRoles())
       )

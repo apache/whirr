@@ -17,6 +17,8 @@
  */
 package org.apache.whirr.service.puppet.integration;
 
+import static org.jclouds.util.Predicates2.retry;
+
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.whirr.Cluster;
@@ -25,12 +27,12 @@ import org.apache.whirr.ClusterController;
 import org.apache.whirr.ClusterSpec;
 import org.apache.whirr.TestConstants;
 import org.jclouds.predicates.InetSocketAddressConnect;
-import org.jclouds.predicates.RetryablePredicate;
 import org.jclouds.util.Strings2;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.google.common.base.Predicate;
 import com.google.common.net.HostAndPort;
 
 import java.io.IOException;
@@ -45,7 +47,7 @@ public class PuppetServiceTest {
   private ClusterSpec clusterSpec;
   private ClusterController controller;
   private Cluster cluster;
-  private RetryablePredicate<HostAndPort> socketTester;
+  private Predicate<HostAndPort> socketTester;
 
   @Before
   public void setUp() throws Exception {
@@ -58,8 +60,8 @@ public class PuppetServiceTest {
     clusterSpec = ClusterSpec.withTemporaryKeys(config);
     controller = new ClusterController();
     cluster = controller.launchCluster(clusterSpec);
-    socketTester = new RetryablePredicate<HostAndPort>(new InetSocketAddressConnect(), 60, 1, TimeUnit.SECONDS);
-
+    socketTester = retry(controller.getCompute().apply(clusterSpec).utils().injector().getInstance(InetSocketAddressConnect.class),
+                         60, 1, TimeUnit.SECONDS);
   }
 
   @Test(timeout = TestConstants.ITEST_TIMEOUT)

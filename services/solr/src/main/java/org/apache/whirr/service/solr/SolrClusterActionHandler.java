@@ -18,7 +18,9 @@
 
 package org.apache.whirr.service.solr;
 
-import static com.google.common.io.ByteStreams.newInputStreamSupplier;
+import static com.google.common.base.Charsets.UTF_8;
+import static com.google.common.hash.Hashing.md5;
+import static com.google.common.io.BaseEncoding.base16;
 import static org.apache.whirr.RolePredicates.role;
 import static org.jclouds.scriptbuilder.domain.Statements.call;
 
@@ -35,7 +37,6 @@ import org.apache.whirr.service.ClusterActionEvent;
 import org.apache.whirr.service.ClusterActionHandlerSupport;
 import org.apache.whirr.service.FirewallManager.Rule;
 
-import org.jclouds.crypto.CryptoStreams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -174,7 +175,7 @@ public class SolrClusterActionHandler extends ClusterActionHandlerSupport {
   }
 
   static String safeSecretString(String value) throws IOException {
-    return CryptoStreams.md5Hex(newInputStreamSupplier(("NaCl#" + value).getBytes()));
+    return md5Hex("NaCl#" + value);
   }
 
   private static class GetPublicIpFunction implements Function<Instance, String> {
@@ -193,5 +194,9 @@ public class SolrClusterActionHandler extends ClusterActionHandlerSupport {
         throw new IllegalArgumentException(e);
       }
     }
+  }
+
+  public static String md5Hex(String in) {
+    return base16().lowerCase().encode(md5().hashString(in, UTF_8).asBytes());
   }
 }

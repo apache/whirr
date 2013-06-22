@@ -46,12 +46,10 @@ import org.jclouds.compute.domain.ExecResponse;
 import org.jclouds.compute.events.StatementOnNodeCompletion;
 import org.jclouds.compute.events.StatementOnNodeFailure;
 import org.jclouds.compute.events.StatementOnNodeSubmission;
-import org.jclouds.domain.Credentials;
 import org.jclouds.enterprise.config.EnterpriseConfigurationModule;
 import org.jclouds.logging.slf4j.config.SLF4JLoggingModule;
 import org.jclouds.providers.ProviderMetadata;
 import org.jclouds.providers.Providers;
-import org.jclouds.rest.RestContext;
 import org.jclouds.scriptbuilder.domain.OsFamily;
 import org.jclouds.sshj.config.SshjSshClientModule;
 import org.slf4j.Logger;
@@ -184,24 +182,6 @@ public enum ComputeCache implements Function<ClusterSpec, ComputeServiceContext>
     }
 
     @Override
-    @Deprecated
-    public <S, A> RestContext<S, A> getProviderSpecificContext() {
-      return delegate().<S, A>getProviderSpecificContext();
-    }
-
-    @Override
-    @Deprecated
-    public Map<String, Credentials> getCredentialStore() {
-      return delegate().getCredentialStore();
-    }
-
-    @Override
-    @Deprecated
-    public Map<String, Credentials> credentialStore() {
-      return delegate().credentialStore();
-    }
-
-    @Override
     public Utils getUtils() {
       return delegate().getUtils();
     }
@@ -224,11 +204,6 @@ public enum ComputeCache implements Function<ClusterSpec, ComputeServiceContext>
     @Override
     public <C extends Context> C unwrap(TypeToken<C> type) {
       return delegate().<C>unwrap(type);
-    }
-
-    @Override
-    public <C extends Context> C unwrap(Class<C> clazz) {
-      return delegate().<C>unwrap(clazz);
     }
 
     @Override

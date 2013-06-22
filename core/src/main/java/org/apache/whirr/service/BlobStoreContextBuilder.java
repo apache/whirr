@@ -41,7 +41,6 @@ import org.jclouds.enterprise.config.EnterpriseConfigurationModule;
 import org.jclouds.logging.slf4j.config.SLF4JLoggingModule;
 import org.jclouds.providers.ProviderMetadata;
 import org.jclouds.providers.Providers;
-import org.jclouds.rest.RestContext;
 import org.jclouds.rest.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -163,12 +162,6 @@ public class BlobStoreContextBuilder {
     }
 
     @Override
-    @Deprecated
-    public <S, A> RestContext<S, A> getProviderSpecificContext() {
-      return delegate().<S, A>getProviderSpecificContext();
-    }
-
-    @Override
     public Utils getUtils() {
       return delegate().getUtils();
     }
@@ -191,11 +184,6 @@ public class BlobStoreContextBuilder {
     @Override
     public <C extends Context> C unwrap(TypeToken<C> type) {
       return delegate().<C>unwrap(type);
-    }
-
-    @Override
-    public <C extends Context> C unwrap(Class<C> clazz) {
-      return delegate().<C>unwrap(clazz);
     }
 
     @Override

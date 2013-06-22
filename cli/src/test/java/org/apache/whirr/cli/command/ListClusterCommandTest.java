@@ -44,7 +44,6 @@ import org.apache.whirr.state.MemoryClusterStateStore;
 import org.apache.whirr.util.KeyPair;
 import org.jclouds.compute.domain.NodeMetadata;
 import org.jclouds.compute.domain.NodeMetadataBuilder;
-import org.jclouds.compute.domain.NodeState;
 import org.jclouds.domain.Credentials;
 import org.jclouds.domain.LocationBuilder;
 import org.jclouds.domain.LocationScope;
@@ -73,14 +72,14 @@ public class ListClusterCommandTest extends BaseCommandTest {
     NodeMetadata node1 = new NodeMetadataBuilder().name("name1").ids("id1")
         .location(new LocationBuilder().scope(LocationScope.PROVIDER)
           .id("location-id1").description("location-desc1").build())
-        .imageId("image-id").state(NodeState.RUNNING)
+        .imageId("image-id").status(NodeMetadata.Status.RUNNING)
         .publicAddresses(Lists.newArrayList("127.0.0.1"))
         .privateAddresses(Lists.newArrayList("127.0.0.1")).build();
 
     NodeMetadata node2 = new NodeMetadataBuilder().name("name2").ids("id2")
         .location(new LocationBuilder().scope(LocationScope.PROVIDER)
           .id("location-id2").description("location-desc2").build())
-        .imageId("image-id").state(NodeState.RUNNING)
+        .imageId("image-id").status(NodeMetadata.Status.RUNNING)
         .publicAddresses(Lists.newArrayList("127.0.0.2"))
         .privateAddresses(Lists.newArrayList("127.0.0.2")).build();
 

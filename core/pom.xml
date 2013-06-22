@@ -49,36 +49,36 @@
       <artifactId>guava</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.jclouds</groupId>
+      <groupId>org.apache.jclouds</groupId>
       <artifactId>jclouds-compute</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.jclouds.api</groupId>
+      <groupId>org.apache.jclouds.api</groupId>
       <artifactId>byon</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.jclouds.driver</groupId>
+      <groupId>org.apache.jclouds.driver</groupId>
       <artifactId>jclouds-enterprise</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.jclouds.driver</groupId>
+      <groupId>org.apache.jclouds.driver</groupId>
       <artifactId>jclouds-sshj</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.jclouds.driver</groupId>
+      <groupId>org.apache.jclouds.driver</groupId>
       <artifactId>jclouds-jsch</artifactId>
       <version>${jclouds.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.jclouds.driver</groupId>
+      <groupId>org.apache.jclouds.driver</groupId>
       <artifactId>jclouds-slf4j</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.jclouds</groupId>
+      <groupId>org.apache.jclouds</groupId>
       <artifactId>jclouds-allcompute</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.jclouds</groupId>
+      <groupId>org.apache.jclouds</groupId>
       <artifactId>jclouds-allblobstore</artifactId>
     </dependency>
     <dependency>
