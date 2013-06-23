@@ -24,7 +24,7 @@ function register_cloudera_repo() {
 	OS_DISTID=$(lsb_release -si | tr '[A-Z]' '[a-z]')
     if [ $CDH_MAJOR_VERSION -gt 3 ]; then
       cat > /etc/apt/sources.list.d/cloudera-$REPO.list <<EOF
-deb http://$REPO_HOST/cdh$CDH_MAJOR_VERSION/$OS_DISTID/$OS_CODENAME/amd64/cdh $OS_CODENAME-$REPO contrib
+deb [arch=amd64] http://$REPO_HOST/cdh$CDH_MAJOR_VERSION/$OS_DISTID/$OS_CODENAME/amd64/cdh $OS_CODENAME-$REPO contrib
 deb-src http://$REPO_HOST/cdh$CDH_MAJOR_VERSION/$OS_DISTID/$OS_CODENAME/amd64/cdh $OS_CODENAME-$REPO contrib
 EOF
       curl -s http://$REPO_HOST/cdh$CDH_MAJOR_VERSION/$OS_DISTID/$OS_CODENAME/amd64/cdh/archive.key | apt-key add -
