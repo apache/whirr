@@ -13,9 +13,20 @@ Release 0.9.0 (Unreleased Changes)
 
     WHIRR-721. Improve robustness of volume device detection. (graham)
 
+    WHIRR-731. Move to jclouds 1.6.1-incubating. (abayer)
+
+    WHIRR-724. Add a listener to calls to
+    ClusterActionHandlerSupport.beforeAction and .afterAction (abayer)
+    
   BUG FIXES
 
     WHIRR-732. Fix CDH repo for Ubuntu 12.04. (sebastien goasguen via abayer)
+
+    WHIRR-735. Update maven-javadoc-plugin to 2.9.1 to fix security
+    bug. (tomwhite)
+
+    WHIRR-747. Moving to a separate parent POM from the root-level
+    POM. (abayer)
 
 Release 0.8.2 - 2013-04-23
 
