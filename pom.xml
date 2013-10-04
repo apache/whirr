@@ -58,6 +58,7 @@
     <module>services/pig</module>
     <module>services/solr</module>
     <module>services/kerberos</module>
+    <module>services/druid</module>
   </modules>
 
 
