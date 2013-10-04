@@ -50,7 +50,7 @@
     <hama.version>0.4.0-incubating</hama.version>
     <hbase.version>0.94.1</hbase.version>
     <jackson.version>1.5.2</jackson.version>
-    <jclouds.version>1.6.1-incubating</jclouds.version>
+    <jclouds.version>1.6.2-incubating</jclouds.version>
     <jdom.version>1.1</jdom.version>
     <jopt.simple.version>4.3</jopt.simple.version>
     <jsch.version>0.1.48</jsch.version>

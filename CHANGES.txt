@@ -8,6 +8,8 @@ Release 0.9.0 (Unreleased Changes)
 
   IMPROVEMENTS
 
+    WHIRR-748. Move to jclouds 1.6.2-incubating. (abayer)
+    
     WHIRR-726. Allow specifying a Kerberos user other than
     $CLUSTER_USER (abayer)
     
