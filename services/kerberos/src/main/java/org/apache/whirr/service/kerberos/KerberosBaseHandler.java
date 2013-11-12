@@ -39,7 +39,12 @@ public abstract class KerberosBaseHandler extends ClusterActionHandlerSupport {
   protected void beforeBootstrap(ClusterActionEvent event) throws IOException {
     addStatement(event, call("configure_hostnames"));
     addStatement(event, call("retry_helpers"));
-    addStatement(event, call(getInstallFunction(event.getClusterSpec().getConfiguration(), "java", "install_openjdk")));
+    if (!(event.getClusterSpec().getConfiguration().containsKey("whirr.env.jdk_installed")
+        && event.getClusterSpec()
+        .getConfiguration().getBoolean("whirr.env.jdk_installed"))) {
+      addStatement(event,
+          call(getInstallFunction(event.getClusterSpec().getConfiguration(), "java", "install_openjdk")));
+    }
     addStatement(event, call("install_kerberos_client"));
   }
 

@@ -23,8 +23,11 @@ import static com.google.common.base.Predicates.containsPattern;
 
 import java.util.Set;
 
+import junit.framework.AssertionFailedError;
+
 import org.apache.whirr.service.BaseServiceDryRunTest;
 import org.apache.whirr.service.DryRunModule.DryRun;
+import org.junit.Assert;
 import org.junit.Test;
 
 import com.google.common.base.Predicate;
@@ -55,6 +58,36 @@ public class KerberosServerDryRunTest extends BaseServiceDryRunTest {
       + KerberosServerHandler.ROLE)));
     assertScriptPredicateOnPhase(dryRun, "bootstrap", bootstrapPredicate());
     assertScriptPredicateOnPhase(dryRun, "configure", configurePredicate());
+  }
+
+  @Test
+  public void testJavaInstalled() throws Exception {
+    DryRun dryRun = launchWithClusterSpec(newClusterSpecForProperties(ImmutableMap.of("whirr.instance-templates", "1 "
+        + KerberosServerHandler.ROLE + "+" + KerberosClientHandler.ROLE)));
+    assertScriptPredicateOnPhase(dryRun, "bootstrap", bootstrapPredicate());
+    assertScriptPredicateOnPhase(dryRun, "bootstrap", containsPattern("install_openjdk"));
+  }
+
+  @Test
+  public void testJavaInstalledFalse() throws Exception {
+    DryRun dryRun = launchWithClusterSpec(newClusterSpecForProperties(ImmutableMap.of("whirr.instance-templates", "1 "
+        + KerberosServerHandler.ROLE + "+" + KerberosClientHandler.ROLE, "whirr.env.jdk_installed", "false")));
+    assertScriptPredicateOnPhase(dryRun, "bootstrap", bootstrapPredicate());
+    assertScriptPredicateOnPhase(dryRun, "bootstrap", containsPattern("install_openjdk"));
+  }
+
+  @Test
+  public void testJavaInstalledTrue() throws Exception {
+    DryRun dryRun = launchWithClusterSpec(newClusterSpecForProperties(ImmutableMap.of("whirr.instance-templates", "1 "
+        + KerberosServerHandler.ROLE + "+" + KerberosClientHandler.ROLE, "whirr.env.jdk_installed", "true")));
+    assertScriptPredicateOnPhase(dryRun, "bootstrap", bootstrapPredicate());
+    boolean assertFailed = false;
+    try {
+      assertScriptPredicateOnPhase(dryRun, "bootstrap", containsPattern("install_openjdk"));
+    } catch (AssertionFailedError assertionFailedError) {
+      assertFailed = true;
+    }
+    Assert.assertTrue(assertFailed);
   }
 
 }

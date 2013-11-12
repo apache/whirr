@@ -19,7 +19,9 @@ set -x
 
 function install_kerberos_server() {
   if which dpkg &> /dev/null; then
-    retry_apt_get -y install krb5-server
+    export DEBIAN_FRONTEND=noninteractive
+    retry_apt_get update
+    retry_apt_get -q -y install krb5-kdc krb5-admin-server
   elif which rpm &> /dev/null; then
     retry_yum install -y krb5-server
   fi

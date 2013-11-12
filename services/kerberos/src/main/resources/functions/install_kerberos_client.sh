@@ -19,18 +19,32 @@ set -x
 
 function install_kerberos_client() {
   if which dpkg &> /dev/null; then
-    retry_apt_get -y install krb5-libs krb5-workstation unzip
+    export DEBIAN_FRONTEND=noninteractive
+    retry_apt_get update
+    retry_apt_get -q -y install krb5-user krb5-config unzip
   elif which rpm &> /dev/null; then
     retry_yum install -y krb5-libs krb5-workstation unzip
   fi
-  if [ ! -z "${JDK_INSTALL_URL+xxx}" ]; then
-    JCE_POLICY_URL=$(dirname $JDK_INSTALL_URL)"/jce_policy-6.zip"
-    wget $JCE_POLICY_URL
-    if [ -f jce_policy-6.zip ]; then
-	    unzip jce_policy-6.zip
-	    mkdir -p /tmp/java_security_old
-	    mv /usr/java/default/jre/lib/security/US_export_policy.jar /usr/java/default/jre/lib/security/local_policy.jar /tmp/java_security_old
-	    mv jce/*.jar /usr/java/default/jre/lib/security
+  if [ -z "${JAVA_HOME+xxx}" ]; then
+    if which java &> /dev/null; then
+      JAVA_HOME=$(readlink -f $(which java) | sed "s:/bin/java::")
+    fi
+  fi
+  if [ ! -z "${JAVA_HOME+xxx}" ]; then
+    JAVA_VERSION_MAJOR=$($JAVA_HOME/bin/java -version 2>&1 | grep "java version" | sed 's/java version \"1\.\([0-9]*\)\..*/\1/')
+    if [ "$JAVA_VERSION_MAJOR" == "6" ]; then
+        JAVA_JCE=jce_policy-6.zip
+    elif [ "$JAVA_VERSION_MAJOR" == "7" ]; then
+        JAVA_JCE=UnlimitedJCEPolicyJDK7.zip
+    fi
+    if [ ! -z "${JAVA_JCE+xxx}" ]; then
+      if [ ! -z "${JDK_INSTALL_URL+xxx}" ]; then
+        wget -nv $(dirname $JDK_INSTALL_URL)"/"$JAVA_JCE
+        if [ -f $JAVA_JCE ]; then
+        unzip -q -o -j $JAVA_JCE -d $JAVA_HOME/jre/lib/security
+          rm $JAVA_JCE
+        fi
+      fi
     fi
   fi
 }

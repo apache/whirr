@@ -20,10 +20,22 @@ set -x
 function configure_kerberos_server() {
   KERBEROS_USER=${KERBEROS_USER:-$CLUSTER_USER}
   KERBEROS_REALM_REGEX=$(echo $KERBEROS_REALM | sed s/\\\./\\\\\./g)
-  service krb5kdc stop
-  service kadmin stop
-  sed -i -e "s/EXAMPLE\.COM/$KERBEROS_REALM_REGEX/" /var/kerberos/krb5kdc/kdc.conf
-  yum install -y expect
+  if which dpkg &> /dev/null; then
+    KERBEROS_HOME=/etc/krb5kdc
+    KERBEROS_SERVICE_KDC=krb5-kdc
+    KERBEROS_SERVICE_ADMIN=krb5-admin-server
+    export DEBIAN_FRONTEND=noninteractive
+    retry_apt_get update
+    retry_apt_get -q -y install expect
+  elif which rpm &> /dev/null; then
+    KERBEROS_HOME=/var/kerberos/krb5kdc
+    KERBEROS_SERVICE_KDC=krb5kdc
+    KERBEROS_SERVICE_ADMIN=kadmin
+    retry_yum install -y expect
+  fi
+  service $KERBEROS_SERVICE_KDC stop
+  service $KERBEROS_SERVICE_ADMIN stop
+  sed -i -e "s/EXAMPLE\.COM/$KERBEROS_REALM_REGEX/" $KERBEROS_HOME/kdc.conf
   cat >> run_kdb5_util <<END
 #!/usr/bin/expect -f
 set timeout 5000
@@ -35,7 +47,11 @@ END
   chmod +x run_kdb5_util
   ./run_kdb5_util
   rm -rf run_kdb5_util
-  sed -i -e "s/EXAMPLE\.COM/$KERBEROS_REALM_REGEX/" /var/kerberos/krb5kdc/kadm5.acl
+  if [ -f $KERBEROS_HOME/kadm5.acl ]; then
+    sed -i -e "s/EXAMPLE\.COM/$KERBEROS_REALM_REGEX/" $KERBEROS_HOME/kadm5.acl
+  else
+    echo "*/admin@$KERBEROS_REALM	*" > $KERBEROS_HOME/kadm5.acl
+  fi
   cat >> run_addpinc <<END
 #!/usr/bin/expect -f
 set timeout 5000
@@ -52,9 +68,7 @@ END
   ./run_addpinc $KERBEROS_USER $KERBEROS_USER $KERBEROS_REALM
   ./run_addpinc hdfs hdfs $KERBEROS_REALM
   rm -rf ./run_addpinc
-  service krb5kdc start
-  service kadmin start
-  chkconfig krb5kdc on
-  chkconfig kadmin on
+  service $KERBEROS_SERVICE_KDC start
+  service $KERBEROS_SERVICE_ADMIN start
   CONFIGURE_KERBEROS_DONE=1
 }
