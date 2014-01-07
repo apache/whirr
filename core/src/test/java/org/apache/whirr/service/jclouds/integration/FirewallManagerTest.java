@@ -21,6 +21,7 @@ package org.apache.whirr.service.jclouds.integration;
 import java.io.IOException;
 import java.util.Set;
 
+import com.google.common.collect.Sets;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.whirr.Cluster;
 import org.apache.whirr.ClusterSpec;
@@ -30,12 +31,10 @@ import org.apache.whirr.service.FirewallManager;
 import org.apache.whirr.service.FirewallManager.Rule;
 import org.jclouds.compute.ComputeServiceContext;
 import org.jclouds.domain.Credentials;
-import org.jclouds.ec2.EC2ApiMetadata;
-import org.jclouds.ec2.EC2Client;
+import org.jclouds.ec2.EC2Api;
+import org.jclouds.ec2.compute.EC2ComputeService;
 import org.junit.Before;
 import org.junit.Test;
-
-import com.google.common.collect.Sets;
 
 public class FirewallManagerTest {
 
@@ -72,13 +71,12 @@ public class FirewallManagerTest {
 
   @Test(timeout = TestConstants.ITEST_TIMEOUT)
   public void testFirewallAuthorizationIsIdempotent() throws IOException {
-    if (EC2ApiMetadata.CONTEXT_TOKEN.isAssignableFrom(context.getBackendType())) {
-      EC2Client ec2Client = context.unwrap(EC2ApiMetadata.CONTEXT_TOKEN).getApi();
+    if (EC2ComputeService.class.isInstance(context.getComputeService())) {
+      EC2Api api = context.unwrapApi(EC2Api.class);
 
       String groupName = "jclouds#" + clusterSpec.getClusterName();
 
-      ec2Client.getSecurityGroupServices()
-          .createSecurityGroupInRegion(region, groupName, "group description");
+      api.getSecurityGroupApi().get().createSecurityGroupInRegion(region, groupName, "group description");
       try {
         manager.addRule(
           Rule.create().destination(instances).port(23344)
@@ -91,7 +89,7 @@ public class FirewallManagerTest {
 
         manager.authorizeAllRules();
       } finally {
-        ec2Client.getSecurityGroupServices()
+        api.getSecurityGroupApi().get()
             .deleteSecurityGroupInRegion(region, groupName);
       }
     }

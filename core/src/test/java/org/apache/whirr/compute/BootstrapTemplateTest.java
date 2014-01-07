@@ -28,11 +28,13 @@ import static org.mockito.Mockito.when;
 import java.net.MalformedURLException;
 import java.util.Map;
 
+import com.google.common.base.Joiner;
+import com.google.common.base.Predicate;
+import com.google.common.collect.ImmutableMap;
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.whirr.ClusterSpec;
 import org.apache.whirr.InstanceTemplate;
 import org.apache.whirr.service.jclouds.StatementBuilder;
-import org.jclouds.aws.ec2.AWSEC2ApiMetadata;
 import org.jclouds.aws.ec2.compute.AWSEC2ComputeService;
 import org.jclouds.aws.ec2.compute.AWSEC2TemplateOptions;
 import org.jclouds.compute.ComputeService;
@@ -44,11 +46,6 @@ import org.jclouds.compute.domain.TemplateBuilderSpec;
 import org.jclouds.compute.options.TemplateOptions;
 import org.junit.Before;
 import org.junit.Test;
-
-import com.google.common.base.Joiner;
-import com.google.common.base.Predicate;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.reflect.TypeToken;
 
 public class BootstrapTemplateTest {
 
@@ -117,8 +114,7 @@ private void assertSpotPriceIs(
     ComputeService computeService = mock(AWSEC2ComputeService.class);
     ComputeServiceContext context = mock(ComputeServiceContext.class);
     when(computeService.getContext()).thenReturn(context);
-
-    when(context.getBackendType()).thenReturn(TypeToken.class.cast(AWSEC2ApiMetadata.CONTEXT_TOKEN));
+    when(context.getComputeService()).thenReturn(computeService);
 
     TemplateBuilder templateBuilder = mock(TemplateBuilder.class);
     when(computeService.templateBuilder()).thenReturn(templateBuilder);

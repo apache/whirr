@@ -23,10 +23,26 @@ import static org.jclouds.aws.ec2.reference.AWSEC2Constants.PROPERTY_EC2_AMI_QUE
 import static org.jclouds.aws.ec2.reference.AWSEC2Constants.PROPERTY_EC2_CC_AMI_QUERY;
 import static org.jclouds.location.reference.LocationConstants.PROPERTY_REGION;
 
+import java.io.Closeable;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Function;
+import com.google.common.base.Objects;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
+import com.google.common.collect.ForwardingObject;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Maps;
+import com.google.common.eventbus.AllowConcurrentEvents;
+import com.google.common.eventbus.Subscribe;
+import com.google.common.reflect.TypeToken;
+import com.google.inject.Module;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationConverter;
 import org.apache.commons.lang.StringUtils;
@@ -54,22 +70,6 @@ import org.jclouds.scriptbuilder.domain.OsFamily;
 import org.jclouds.sshj.config.SshjSshClientModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Function;
-import com.google.common.base.Objects;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
-import com.google.common.collect.ForwardingObject;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Maps;
-import com.google.common.eventbus.AllowConcurrentEvents;
-import com.google.common.eventbus.Subscribe;
-import com.google.common.reflect.TypeToken;
-import com.google.inject.Module;
 
 /**
  * A convenience class for building jclouds {@link ComputeServiceContext} objects.
@@ -182,11 +182,6 @@ public enum ComputeCache implements Function<ClusterSpec, ComputeServiceContext>
     }
 
     @Override
-    public Utils getUtils() {
-      return delegate().getUtils();
-    }
-
-    @Override
     public Utils utils() {
       return delegate().utils();
     }
@@ -199,6 +194,11 @@ public enum ComputeCache implements Function<ClusterSpec, ComputeServiceContext>
     @Override
     public TypeToken<?> getBackendType() {
       return delegate().getBackendType();
+    }
+
+    @Override
+    public <A extends Closeable> A unwrapApi(Class<A> apiClass) {
+      return delegate().unwrapApi(apiClass);
     }
 
     @Override

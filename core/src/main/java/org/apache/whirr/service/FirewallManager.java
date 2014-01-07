@@ -27,30 +27,24 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.io.IOUtils;
-import org.apache.whirr.Cluster;
-import org.apache.whirr.Cluster.Instance;
-import org.apache.whirr.ClusterSpec;
-import org.jclouds.aws.util.AWSUtils;
-import org.jclouds.compute.ComputeServiceContext;
-import org.jclouds.ec2.EC2ApiMetadata;
-import org.jclouds.ec2.EC2Client;
-import org.jclouds.ec2.domain.IpProtocol;
-import org.jclouds.openstack.nova.v2_0.NovaApiMetadata;
-import org.jclouds.openstack.nova.v2_0.domain.Ingress;
-import org.jclouds.openstack.nova.v2_0.domain.SecurityGroup;
-import org.jclouds.openstack.nova.v2_0.extensions.SecurityGroupApi;
-import org.jclouds.javax.annotation.Nullable;
-import org.jclouds.scriptbuilder.domain.Statement;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.google.common.base.Function;
-import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import org.apache.commons.io.IOUtils;
+import org.apache.whirr.Cluster;
+import org.apache.whirr.Cluster.Instance;
+import org.apache.whirr.ClusterSpec;
+import org.jclouds.compute.ComputeServiceContext;
+import org.jclouds.compute.domain.SecurityGroup;
+import org.jclouds.compute.extensions.SecurityGroupExtension;
+import org.jclouds.javax.annotation.Nullable;
+import org.jclouds.net.domain.IpPermission;
+import org.jclouds.net.domain.IpProtocol;
+import org.jclouds.scriptbuilder.domain.Statement;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class FirewallManager {
 
@@ -282,66 +276,46 @@ public class FirewallManager {
   }
 
   public static void authorizeIngress(ComputeServiceContext computeServiceContext,
-                                      Set<Instance> instances, ClusterSpec clusterSpec, List<String> cidrs, int... ports) {
+                                      Set<Instance> instances, final ClusterSpec clusterSpec, List<String> cidrs, int... ports) {
 
-    if (EC2ApiMetadata.CONTEXT_TOKEN.isAssignableFrom(computeServiceContext.getBackendType())) {
-      // This code (or something like it) may be added to jclouds (see
-      // http://code.google.com/p/jclouds/issues/detail?id=336).
-      // Until then we need this temporary workaround.
-      String region = AWSUtils.parseHandle(Iterables.get(instances, 0).getId())[0];
-      EC2Client ec2Client = computeServiceContext.unwrap(EC2ApiMetadata.CONTEXT_TOKEN).getApi();
-      String groupName = "jclouds#" + clusterSpec.getClusterName();
-      for (String cidr : cidrs) {
-        for (int port : ports) {
-          try {
-            ec2Client.getSecurityGroupServices()
-              .authorizeSecurityGroupIngressInRegion(region, groupName,
-                                                     IpProtocol.TCP, port, port, cidr);
-          } catch(IllegalStateException e) {
-            LOG.warn(e.getMessage());
-            /* ignore, it means that this permission was already granted */
+    try {
+      if (computeServiceContext.getComputeService().getSecurityGroupExtension().isPresent()) {
+        SecurityGroupExtension securityGroupExtension = computeServiceContext.getComputeService().getSecurityGroupExtension().get();
+        Instance instance = Iterables.getFirst(instances, null);
+        if (instance != null) {
+          SecurityGroup group = Iterables.find(securityGroupExtension.listSecurityGroupsForNode(instance.getNodeMetadata().getId()),
+              new Predicate<SecurityGroup>() {
+                @Override
+                public boolean apply(SecurityGroup input) {
+                  if (input.getName().contains(clusterSpec.getClusterName()) ||
+                      input.getId().contains(clusterSpec.getClusterName())) {
+                    return true;
+                  }
+                  return false;  //To change body of implemented methods use File | Settings | File Templates.
+                }
+              });
+
+          if (group == null) {
+            group = securityGroupExtension.createSecurityGroup(clusterSpec.getClusterName(),
+                instance.getNodeMetadata().getLocation());
           }
-        }
-      }
-    } else if (NovaApiMetadata.CONTEXT_TOKEN.isAssignableFrom(computeServiceContext.getBackendType())) {
-      // This code (or something like it) may be added to jclouds (see
-      // http://code.google.com/p/jclouds/issues/detail?id=336).
-      // Until then we need this temporary workaround.
-      Optional<? extends SecurityGroupApi> securityGroupApi = computeServiceContext.unwrap(NovaApiMetadata.CONTEXT_TOKEN)
-        .getApi()
-        .getSecurityGroupExtensionForZone(clusterSpec.getTemplate().getLocationId());
 
-      if (securityGroupApi.isPresent()) {
-        final String groupName = "jclouds-" + clusterSpec.getClusterName();
-        Optional<? extends SecurityGroup> group = securityGroupApi.get().list().firstMatch(new Predicate<SecurityGroup>() {
-            @Override
-            public boolean apply(SecurityGroup secGrp) {
-              return secGrp.getName().equals(groupName);
-            }
-          });
-
-        if (group.isPresent()) {
-          for (String cidr : cidrs) {
-            for (int port : ports) {
-              try {
-                securityGroupApi.get().createRuleAllowingCidrBlock(group.get().getId(),
-                                                                   Ingress.builder()
-                                                                   .ipProtocol(org.jclouds.openstack.nova.v2_0.domain.IpProtocol.TCP)
-                                                                   .fromPort(port).toPort(port).build(),
-                                                                   cidr);
-                        
-              } catch(IllegalStateException e) {
-                LOG.warn(e.getMessage());
-                /* ignore, it means that this permission was already granted */
-              }
-            }
+          for (int port : ports) {
+            IpPermission.Builder builder = IpPermission.builder();
+            builder.cidrBlocks(cidrs);
+            builder.ipProtocol(IpProtocol.TCP);
+            builder.fromPort(port);
+            builder.toPort(port);
+            securityGroupExtension.addIpPermission(builder.build(), group);
           }
         } else {
-          LOG.warn("Expected security group " + groupName + " does not exist.");
+          LOG.warn("Cannot find any instance for group, so cannot determine security group.");
         }
       } else {
-        LOG.warn("OpenStack security group extension not available for this cloud.");
+        LOG.warn("No security group extension present for provider, so cannot set up security group.");
       }
+    } catch (Exception e) {
+      LOG.error("Error setting up security groups: {}", e);
     }
   }
 }

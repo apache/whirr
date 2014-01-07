@@ -25,27 +25,26 @@ import static org.jclouds.scriptbuilder.domain.Statements.interpret;
 import static org.jclouds.scriptbuilder.domain.Statements.newStatementList;
 import static org.jclouds.scriptbuilder.statements.ssh.SshStatements.sshdConfig;
 
-import org.apache.whirr.ClusterSpec;
-import org.apache.whirr.InstanceTemplate;
-import org.apache.whirr.service.jclouds.StatementBuilder;
-import org.jclouds.aws.ec2.AWSEC2ApiMetadata;
-import org.jclouds.aws.ec2.compute.AWSEC2TemplateOptions;
-import org.jclouds.ec2.EC2ApiMetadata;
-import org.jclouds.ec2.compute.options.EC2TemplateOptions;
-import org.jclouds.ec2.compute.predicates.EC2ImagePredicates;
-import org.jclouds.compute.ComputeService;
-import org.jclouds.compute.ComputeServiceContext;
-import org.jclouds.compute.domain.Template;
-import org.jclouds.compute.domain.TemplateBuilder;
-import org.jclouds.scriptbuilder.domain.OsFamily;
-import org.jclouds.scriptbuilder.domain.Statement;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import org.apache.whirr.ClusterSpec;
+import org.apache.whirr.InstanceTemplate;
+import org.apache.whirr.service.jclouds.StatementBuilder;
+import org.jclouds.aws.ec2.compute.AWSEC2ComputeService;
+import org.jclouds.aws.ec2.compute.AWSEC2TemplateOptions;
+import org.jclouds.compute.ComputeService;
+import org.jclouds.compute.ComputeServiceContext;
+import org.jclouds.compute.domain.Template;
+import org.jclouds.compute.domain.TemplateBuilder;
+import org.jclouds.ec2.compute.EC2ComputeService;
+import org.jclouds.ec2.compute.options.EC2TemplateOptions;
+import org.jclouds.ec2.compute.predicates.EC2ImagePredicates;
+import org.jclouds.scriptbuilder.domain.OsFamily;
+import org.jclouds.scriptbuilder.domain.Statement;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class BootstrapTemplate {
 
@@ -100,7 +99,7 @@ public class BootstrapTemplate {
       ComputeServiceContext context, ClusterSpec spec, Template template, InstanceTemplate instanceTemplate
   ) {
 
-    if (AWSEC2ApiMetadata.CONTEXT_TOKEN.isAssignableFrom(context.getBackendType())) {
+    if (AWSEC2ComputeService.class.isInstance(context.getComputeService())) {
       template.getOptions().as(AWSEC2TemplateOptions.class)
             .spotPrice(instanceTemplate.getAwsEc2SpotPrice() != null ? instanceTemplate.getAwsEc2SpotPrice() :
                                                                        spec.getAwsEc2SpotPrice());
@@ -116,12 +115,12 @@ public class BootstrapTemplate {
                                                            ClusterSpec spec,
                                                            Template template,
                                                            InstanceTemplate instanceTemplate) {
-        if (EC2ApiMetadata.CONTEXT_TOKEN.isAssignableFrom(context.getBackendType())) {
-            if (EC2ImagePredicates.rootDeviceType(EBS).apply(template.getImage())) {
-                template.getOptions().as(EC2TemplateOptions.class).mapEphemeralDeviceToDeviceName("/dev/sdc", "ephemeral1");
-            }
+      if (EC2ComputeService.class.isInstance(context.getComputeService())) {
+        if (EC2ImagePredicates.rootDeviceType(EBS).apply(template.getImage())) {
+          template.getOptions().as(EC2TemplateOptions.class).mapEphemeralDeviceToDeviceName("/dev/sdc", "ephemeral1");
         }
-        return setPlacementGroup(context, spec, template, instanceTemplate);
+      }
+      return setPlacementGroup(context, spec, template, instanceTemplate);
     }
     
     /**
@@ -129,13 +128,13 @@ public class BootstrapTemplate {
      */
     private static Template setPlacementGroup(ComputeServiceContext context, ClusterSpec spec,
                                               Template template, InstanceTemplate instanceTemplate) {
-        if (AWSEC2ApiMetadata.CONTEXT_TOKEN.isAssignableFrom(context.getBackendType())) {
-            if (spec.getAwsEc2PlacementGroup() != null) {
-                template.getOptions().as(AWSEC2TemplateOptions.class).placementGroup(spec.getAwsEc2PlacementGroup());
-            }
+      if (AWSEC2ComputeService.class.isInstance(context.getComputeService())) {
+        if (spec.getAwsEc2PlacementGroup() != null) {
+          template.getOptions().as(AWSEC2TemplateOptions.class).placementGroup(spec.getAwsEc2PlacementGroup());
         }
+      }
 
-        return template;
+      return template;
     }
 
   // must be used inside InitBuilder, as this sets the shell variables used in this statement

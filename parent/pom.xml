@@ -44,13 +44,13 @@
     <commons.io.version>1.4</commons.io.version>
     <common-ssl.version>0.3.11</common-ssl.version>
     <dnsjava.version>2.1.1</dnsjava.version>
-    <guava.version>14.0.1</guava.version>
+    <guava.version>15.0</guava.version>
     <hadoop.version>1.0.4</hadoop.version>
     <hamcrest.version>1.1</hamcrest.version>
     <hama.version>0.4.0-incubating</hama.version>
     <hbase.version>0.94.1</hbase.version>
     <jackson.version>1.5.2</jackson.version>
-    <jclouds.version>1.6.2-incubating</jclouds.version>
+    <jclouds.version>1.7.0</jclouds.version>
     <jdom.version>1.1</jdom.version>
     <jopt.simple.version>4.3</jopt.simple.version>
     <jsch.version>0.1.48</jsch.version>

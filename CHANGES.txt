@@ -8,6 +8,9 @@ Release 0.9.0 (Unreleased Changes)
 
   IMPROVEMENTS
 
+    WHIRR-753. Move to jclouds 1.7.0, use new SecurityGroup
+    abstractions. (abayer)
+
     WHIRR-751. Improve Kerberos service (graham)
 
     WHIRR-748. Move to jclouds 1.6.2-incubating. (abayer)

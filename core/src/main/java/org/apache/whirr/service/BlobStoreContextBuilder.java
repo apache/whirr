@@ -18,32 +18,10 @@
 
 package org.apache.whirr.service;
 
+import java.io.Closeable;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.configuration.ConfigurationConverter;
-import org.apache.whirr.ClusterSpec;
-import org.jclouds.Context;
-import org.jclouds.ContextBuilder;
-import org.jclouds.apis.ApiMetadata;
-import org.jclouds.apis.Apis;
-import org.jclouds.blobstore.AsyncBlobStore;
-import org.jclouds.blobstore.BlobMap;
-import org.jclouds.blobstore.BlobRequestSigner;
-import org.jclouds.blobstore.BlobStore;
-import org.jclouds.blobstore.BlobStoreContext;
-import org.jclouds.blobstore.InputStreamMap;
-import org.jclouds.blobstore.attr.ConsistencyModel;
-import org.jclouds.blobstore.options.ListContainerOptions;
-import org.jclouds.enterprise.config.EnterpriseConfigurationModule;
-import org.jclouds.logging.slf4j.config.SLF4JLoggingModule;
-import org.jclouds.providers.ProviderMetadata;
-import org.jclouds.providers.Providers;
-import org.jclouds.rest.Utils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Function;
@@ -57,6 +35,25 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 import com.google.common.reflect.TypeToken;
 import com.google.inject.Module;
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration.ConfigurationConverter;
+import org.apache.whirr.ClusterSpec;
+import org.jclouds.Context;
+import org.jclouds.ContextBuilder;
+import org.jclouds.apis.ApiMetadata;
+import org.jclouds.apis.Apis;
+import org.jclouds.blobstore.AsyncBlobStore;
+import org.jclouds.blobstore.BlobRequestSigner;
+import org.jclouds.blobstore.BlobStore;
+import org.jclouds.blobstore.BlobStoreContext;
+import org.jclouds.blobstore.attr.ConsistencyModel;
+import org.jclouds.enterprise.config.EnterpriseConfigurationModule;
+import org.jclouds.logging.slf4j.config.SLF4JLoggingModule;
+import org.jclouds.providers.ProviderMetadata;
+import org.jclouds.providers.Providers;
+import org.jclouds.rest.Utils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class BlobStoreContextBuilder {
 
@@ -126,25 +123,7 @@ public class BlobStoreContextBuilder {
       return delegate().getSigner();
     }
 
-    @Override
-    public InputStreamMap createInputStreamMap(String container, ListContainerOptions options) {
-      return delegate().createInputStreamMap(container, options);
-    }
 
-    @Override
-    public InputStreamMap createInputStreamMap(String container) {
-      return delegate().createInputStreamMap(container);
-    }
-
-    @Override
-    public BlobMap createBlobMap(String container, ListContainerOptions options) {
-      return delegate().createBlobMap(container, options);
-    }
-
-    @Override
-    public BlobMap createBlobMap(String container) {
-      return delegate().createBlobMap(container);
-    }
 
     @Override
     public AsyncBlobStore getAsyncBlobStore() {
@@ -162,11 +141,6 @@ public class BlobStoreContextBuilder {
     }
 
     @Override
-    public Utils getUtils() {
-      return delegate().getUtils();
-    }
-
-    @Override
     public Utils utils() {
       return delegate().utils();
     }
@@ -179,6 +153,11 @@ public class BlobStoreContextBuilder {
     @Override
     public TypeToken<?> getBackendType() {
       return delegate().getBackendType();
+    }
+
+    @Override
+    public <A extends Closeable> A unwrapApi(Class<A> apiClass) {
+      return delegate().unwrapApi(apiClass);
     }
 
     @Override
