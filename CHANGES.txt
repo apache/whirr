@@ -1,6 +1,6 @@
 Apache Whirr Change Log
 
-Release 0.9.0 (Unreleased Changes)
+Release 0.9.0 - 2014-02-18
 
   NEW FEATURES
 
