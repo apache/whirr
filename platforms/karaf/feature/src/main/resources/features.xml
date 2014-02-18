@@ -37,6 +37,7 @@
     <bundle dependency='true'>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.ant/${ant.bundle.version}</bundle>
     <!--bundle dependency='true'>mvn:org.apache.commons/commons-vfs2/${commons.vfs2.version}</bundle-->
     <bundle dependency='true'>mvn:org.apache.commons/commons-compress/${commons.compress.version}</bundle>
+    <bundle dependency='true'>mvn:commons-io/commons-io/${commons.io.version}</bundle>
     <bundle dependency='true'>mvn:commons-digester/commons-digester/${commons.digester.version}</bundle>
     <bundle dependency='true'>mvn:commons-beanutils/commons-beanutils/${commons.beanutils.version}</bundle>
     <bundle dependency='true'>mvn:commons-collections/commons-collections/${commons.collections.version}</bundle>
