@@ -20,7 +20,7 @@
   <parent>
     <groupId>org.apache.whirr</groupId>
     <artifactId>whirr-parent</artifactId>
-    <version>0.9.0-SNAPSHOT</version>
+    <version>0.9.0</version>
     <relativePath>../../parent/pom.xml</relativePath>
   </parent>
   <artifactId>whirr-puppet</artifactId>
