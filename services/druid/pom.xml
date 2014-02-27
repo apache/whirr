@@ -20,13 +20,13 @@
     <parent>
         <groupId>org.apache.whirr</groupId>
         <artifactId>whirr</artifactId>
-        <version>0.9.0-SNAPSHOT</version>
+        <version>0.10.0-SNAPSHOT</version>
         <relativePath>../../parent/pom.xml</relativePath>
     </parent>
     <groupId>org.apache.whirr</groupId>
     <artifactId>whirr-druid</artifactId>
     <packaging>bundle</packaging>
-    <version>0.9.0-SNAPSHOT</version>
+    <version>0.10.0-SNAPSHOT</version>
     <name>Apache Whirr Druid</name>
     <properties>
         <osgi.import>
@@ -50,19 +50,19 @@
         <dependency>
             <groupId>org.apache.whirr</groupId>
             <artifactId>whirr-core</artifactId>
-            <version>0.9.0-SNAPSHOT</version>
+            <version>0.10.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.apache.whirr</groupId>
             <artifactId>whirr-core</artifactId>
-            <version>0.9.0-SNAPSHOT</version>
+            <version>0.10.0-SNAPSHOT</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.whirr</groupId>
             <artifactId>whirr-zookeeper</artifactId>
-            <version>0.9.0-SNAPSHOT</version>
+            <version>0.10.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
