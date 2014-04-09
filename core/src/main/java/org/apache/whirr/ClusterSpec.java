@@ -199,7 +199,13 @@ public class ClusterSpec {
                              
     AWS_EC2_PLACEMENT_GROUP(String.class, false, "If given, use this existing EC2 placement group. (aws-ec2 specific option)"),
     
-    QUIET(Boolean.class, false,  "Adjust user level, console logging verbosity.");
+    QUIET(Boolean.class, false,  "Adjust user level, console logging verbosity."),
+    
+    SSH_ALLOW_PASSWORD(Boolean.class, false,  "If password login is allowed"),
+    
+    USE_INTERNAL_IP(Boolean.class, false,  "If it should use in internal ip for its setup instead of the external"),
+    
+    ALLOW_OTHER_SUDOERS(Boolean.class, false,  "If we should only add to the sudoers file");
     
     private Class<?> type;
     private boolean multipleArguments;
@@ -336,6 +342,12 @@ public class ClusterSpec {
   
   private boolean isQuiet;
   
+  private boolean isAllowPassword;
+  
+  private boolean isInternalIp;
+  
+  private boolean isAllowOtherSudoers;
+  
   public ClusterSpec() throws ConfigurationException {
     this(new PropertiesConfiguration());
   }
@@ -412,6 +424,12 @@ public class ClusterSpec {
     setByonNodes(byonNodes);
     
     setQuiet(config.getBoolean(Property.QUIET.getConfigName(), Boolean.FALSE));
+    
+    setAllowPassword(config.getBoolean(Property.SSH_ALLOW_PASSWORD.getConfigName(), Boolean.FALSE));
+    
+    setInternalIp(config.getBoolean(Property.USE_INTERNAL_IP.getConfigName(), Boolean.FALSE));
+    
+    setAllowOtherSudoers(config.getBoolean(Property.ALLOW_OTHER_SUDOERS.getConfigName(), Boolean.FALSE));
     
     Map<String, List<String>> fr = new HashMap<String, List<String>>();
     String firewallPrefix = Property.FIREWALL_RULES.getConfigName();
@@ -625,6 +643,18 @@ public class ClusterSpec {
   
   public boolean isQuiet() {
     return isQuiet;
+  }
+  
+  public boolean isAllowPassword() {
+    return isAllowPassword;
+  }
+  
+  public boolean isInternalIp() {
+    return isInternalIp;
+  }
+
+  public boolean isAllowOtherSudoers() {
+    return isAllowOtherSudoers;
   }
 
   /**
@@ -1005,7 +1035,19 @@ public class ClusterSpec {
   public void setQuiet(boolean isQuiet) {
     this.isQuiet = isQuiet;
   }
-
+  
+  public void setAllowPassword(boolean isAllowPassword) {
+    this.isAllowPassword = isAllowPassword;
+  }
+  
+  public void setInternalIp(boolean isInternalIp) {
+    this.isInternalIp = isInternalIp;
+  }
+  
+  public void setAllowOtherSudoers(boolean isAllowOtherSudoers) {
+    this.isAllowOtherSudoers = isAllowOtherSudoers;
+  }
+  
   public void setHandlerListener(ClusterActionHandlerListener handlerListener) {
     this.handlerListener = handlerListener;
   }

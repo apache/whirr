@@ -85,12 +85,14 @@ public class BootstrapClusterAction extends ScriptBasedClusterAction {
     
     ExecutorService executorService = Executors.newCachedThreadPool();    
     Map<InstanceTemplate, Future<Set<? extends NodeMetadata>>> futures = Maps.newHashMap();
-    
+    boolean isInternalIp = false;
     // initialize startup processes per InstanceTemplates
     for (Entry<InstanceTemplate, ClusterActionEvent> entry : eventMap.entrySet()) {
       final InstanceTemplate instanceTemplate = entry.getKey();
       final ClusterSpec clusterSpec = entry.getValue().getClusterSpec();
-
+      if(clusterSpec.isInternalIp()){
+        isInternalIp = true;
+      }
       final int maxNumberOfRetries = clusterSpec.getMaxStartupRetries();
       StatementBuilder statementBuilder = entry.getValue().getStatementBuilder();
 
@@ -111,7 +113,6 @@ public class BootstrapClusterAction extends ScriptBasedClusterAction {
               computeService, template, executorService, nodeStarterFactory));
       futures.put(instanceTemplate, nodesFuture);
     }
-    
     Set<Instance> instances = Sets.newLinkedHashSet();
     for (Entry<InstanceTemplate, Future<Set<? extends NodeMetadata>>> entry :
         futures.entrySet()) {
@@ -125,7 +126,7 @@ public class BootstrapClusterAction extends ScriptBasedClusterAction {
         throw new IOException(e);
       }
       Set<String> roles = entry.getKey().getRoles();
-      instances.addAll(getInstances(roles, nodes));
+      instances.addAll(getInstances(roles, nodes, isInternalIp));
     }
     Cluster cluster = new Cluster(instances);
     for (ClusterActionEvent event : eventMap.values()) {
@@ -134,13 +135,17 @@ public class BootstrapClusterAction extends ScriptBasedClusterAction {
   }
 
   private Set<Instance> getInstances(final Set<String> roles,
-      Set<? extends NodeMetadata> nodes) {
+      Set<? extends NodeMetadata> nodes, final boolean isInternal) {
     return Sets.newLinkedHashSet(Collections2.transform(Sets.newLinkedHashSet(nodes),
         new Function<NodeMetadata, Instance>() {
       @Override
       public Instance apply(NodeMetadata node) {
+        Set<String> publicIp = node.getPublicAddresses();
+        if(isInternal){
+          publicIp = node.getPrivateAddresses();
+        }
         return new Instance(node.getCredentials(), roles,
-                            Iterables.get(node.getPublicAddresses().size() > 0 ? node.getPublicAddresses() : node.getPrivateAddresses(), 0),
+                            Iterables.get(publicIp.size() > 0 ? publicIp: node.getPrivateAddresses(), 0),
                             Iterables.get(node.getPrivateAddresses().size() > 0 ? node.getPrivateAddresses() : node.getPublicAddresses(), 0),
             node.getId(), node);
       }

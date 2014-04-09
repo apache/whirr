@@ -25,10 +25,14 @@ import static org.jclouds.scriptbuilder.domain.Statements.interpret;
 import static org.jclouds.scriptbuilder.domain.Statements.newStatementList;
 import static org.jclouds.scriptbuilder.statements.ssh.SshStatements.sshdConfig;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+
 import org.apache.whirr.ClusterSpec;
 import org.apache.whirr.InstanceTemplate;
 import org.apache.whirr.service.jclouds.StatementBuilder;
@@ -43,6 +47,7 @@ import org.jclouds.ec2.compute.options.EC2TemplateOptions;
 import org.jclouds.ec2.compute.predicates.EC2ImagePredicates;
 import org.jclouds.scriptbuilder.domain.OsFamily;
 import org.jclouds.scriptbuilder.domain.Statement;
+import org.jclouds.scriptbuilder.domain.StatementList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,7 +68,8 @@ public class BootstrapTemplate {
 
     statementBuilder.name(name);
     ensureUserExistsAndAuthorizeSudo(statementBuilder, clusterSpec.getClusterUser(),
-        clusterSpec.getPublicKey(), clusterSpec.getPrivateKey());
+        clusterSpec.getPublicKey(), clusterSpec.getPrivateKey(), clusterSpec.isAllowPassword(),
+        clusterSpec.isAllowOtherSudoers());
     Statement bootstrap = statementBuilder.build(clusterSpec);
 
     if (LOG.isDebugEnabled()) {
@@ -81,15 +87,24 @@ public class BootstrapTemplate {
   }
 
   private static void ensureUserExistsAndAuthorizeSudo(
-      StatementBuilder builder, String user, String publicKey, String privateKey
+      StatementBuilder builder, String user, String publicKey, String privateKey, boolean isAllowedPassword,
+      boolean isAllowOtherSudoers
   ) {
     builder.addExport("NEW_USER", user);
     builder.addExport("DEFAULT_HOME", "/home/users");
-    builder.addStatement(0, newStatementList(
-        ensureUserExistsWithPublicAndPrivateKey(user, publicKey, privateKey),
-        makeSudoersOnlyPermitting(user),
-        disablePasswordBasedAuth())
-    );
+    
+    List<Statement> statements = new ArrayList<Statement>();
+    statements.add(ensureUserExistsWithPublicAndPrivateKey(user, publicKey, privateKey));
+    if(isAllowOtherSudoers){
+      statements.add(addSudoersUser(user));
+    }else{
+      statements.add(makeSudoersOnlyPermitting(user));  
+    }
+    
+    if(!isAllowedPassword){
+      statements.add(disablePasswordBasedAuth());
+    }
+    builder.addStatement(0, new StatementList(statements));
   }
 
   /**
@@ -174,6 +189,20 @@ public class BootstrapTemplate {
         ImmutableSet.of(
           "root ALL = (ALL) ALL",
           "%adm ALL = (ALL) ALL",
+          username + " ALL = (ALL) NOPASSWD: ALL")
+        )
+    );
+  }
+  // must be used inside InitBuilder, as this sets the shell variables used in this statement
+  private static Statement addSudoersUser(String username) {
+    return newStatementList(
+  interpret(
+        "touch /etc/sudoers.d/whirr",
+        "chmod 0440 /etc/sudoers.d/whirr",
+        "chown root /etc/sudoers.d/whirr\n"),
+      appendFile(
+        "/etc/sudoers.d/whirr",
+        ImmutableSet.of(
           username + " ALL = (ALL) NOPASSWD: ALL")
         )
     );
