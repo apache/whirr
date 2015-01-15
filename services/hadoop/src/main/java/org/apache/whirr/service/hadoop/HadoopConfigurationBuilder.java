@@ -124,10 +124,14 @@ public class HadoopConfigurationBuilder {
     
     setIfAbsent(config, "mapred.local.dir",
         appendToDataDirectories(dataDirectories, "/hadoop/mapred/local"));
-    
+
+    String host = cluster.getInstanceMatching(role(HadoopNameNodeClusterActionHandler.ROLE)).getPublicHostName();
+    setIfAbsent(config, "mapreduce.jobhistory.webapp.address", host + ":19888");
+    setIfAbsent(config, "mapreduce.jobhistory.address", host + ":10020");
+
     Set<Instance> taskTrackers = cluster
       .getInstancesMatching(role(HadoopTaskTrackerClusterActionHandler.ROLE));
-    
+
     if (!taskTrackers.isEmpty()) {
       
       Hardware hardware = Iterables.getFirst(taskTrackers, null)
