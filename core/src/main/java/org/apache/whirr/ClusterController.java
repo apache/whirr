@@ -329,9 +329,15 @@ public class ClusterController {
       }
     } catch (NoSuchElementException e) {
     }
-
+    
+    Set<String> publicAddresses = metadata.getPublicAddresses();
+    //If we want the cluster to configure against the private address we set it as both
+    if(spec.isInternalIp()){
+      publicAddresses = metadata.getPrivateAddresses();
+    }
+    
     return new Cluster.Instance(credentials, roles,
-      Iterables.getFirst(metadata.getPublicAddresses().size() > 0 ? metadata.getPublicAddresses() : metadata.getPrivateAddresses(), null),
+      Iterables.getFirst(publicAddresses.size() > 0 ? publicAddresses : metadata.getPrivateAddresses(), null),
       Iterables.getFirst(metadata.getPrivateAddresses(), null),
       metadata.getId(), metadata);
   }

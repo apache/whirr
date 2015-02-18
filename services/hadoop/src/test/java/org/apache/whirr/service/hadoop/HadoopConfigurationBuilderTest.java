@@ -45,6 +45,7 @@ import org.junit.Test;
 
 import java.util.List;
 
+import static org.apache.whirr.RolePredicates.role;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
@@ -165,6 +166,11 @@ public class HadoopConfigurationBuilderTest {
     assertThat(conf.getString("mapred.reduce.tasks"), is("15"));
     assertThat(conf.getString("mapred.local.dir"),
         is("/data0/hadoop/mapred/local,/data1/hadoop/mapred/local"));
+
+    String host = cluster.getInstanceMatching(
+        role(HadoopNameNodeClusterActionHandler.ROLE)).getPublicHostName();
+    assertThat(conf.getString("mapreduce.jobhistory.webapp.address"), is(host + ":19888"));
+    assertThat(conf.getString("mapreduce.jobhistory.address"), is(host + ":10020"));
   }
 
   @Test
