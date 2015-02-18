@@ -205,7 +205,9 @@ public class ClusterSpec {
     
     USE_INTERNAL_IP(Boolean.class, false,  "If it should use in internal ip for its setup instead of the external"),
     
-    ALLOW_OTHER_SUDOERS(Boolean.class, false,  "If we should only add to the sudoers file");
+    ALLOW_OTHER_SUDOERS(Boolean.class, false,  "If we should only add to the sudoers file"),
+    
+    NETWORKS(String.class, false,  "What network to use");
     
     private Class<?> type;
     private boolean multipleArguments;
@@ -347,6 +349,7 @@ public class ClusterSpec {
   private boolean isInternalIp;
   
   private boolean isAllowOtherSudoers;
+  private String networks;
   
   public ClusterSpec() throws ConfigurationException {
     this(new PropertiesConfiguration());
@@ -430,6 +433,9 @@ public class ClusterSpec {
     setInternalIp(config.getBoolean(Property.USE_INTERNAL_IP.getConfigName(), Boolean.FALSE));
     
     setAllowOtherSudoers(config.getBoolean(Property.ALLOW_OTHER_SUDOERS.getConfigName(), Boolean.FALSE));
+    
+    setNetworks(config.getString(Property.NETWORKS.getConfigName()));
+    
     
     Map<String, List<String>> fr = new HashMap<String, List<String>>();
     String firewallPrefix = Property.FIREWALL_RULES.getConfigName();
@@ -652,6 +658,10 @@ public class ClusterSpec {
   public boolean isInternalIp() {
     return isInternalIp;
   }
+  
+  public String getNetworks() {
+	  return networks;
+	}
 
   public boolean isAllowOtherSudoers() {
     return isAllowOtherSudoers;
@@ -1048,6 +1058,11 @@ public class ClusterSpec {
     this.isAllowOtherSudoers = isAllowOtherSudoers;
   }
   
+  
+  public void setNetworks(String networks) {
+	  this.networks = networks;
+  }
+  
   public void setHandlerListener(ClusterActionHandlerListener handlerListener) {
     this.handlerListener = handlerListener;
   }
@@ -1216,4 +1231,5 @@ public class ClusterSpec {
       .add("byonNodes", getByonNodes())
       .toString();
   }
+
 }

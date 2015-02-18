@@ -30,6 +30,7 @@ import java.util.List;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
+import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
@@ -38,6 +39,7 @@ import org.apache.whirr.InstanceTemplate;
 import org.apache.whirr.service.jclouds.StatementBuilder;
 import org.jclouds.aws.ec2.compute.AWSEC2ComputeService;
 import org.jclouds.aws.ec2.compute.AWSEC2TemplateOptions;
+import org.jclouds.cloudstack.compute.options.CloudStackTemplateOptions;
 import org.jclouds.compute.ComputeService;
 import org.jclouds.compute.ComputeServiceContext;
 import org.jclouds.compute.domain.Template;
@@ -79,7 +81,12 @@ public class BootstrapTemplate {
     TemplateBuilder templateBuilder = computeService.templateBuilder().from(
         instanceTemplate.getTemplate() != null ? instanceTemplate.getTemplate() :
         clusterSpec.getTemplate());
+    
     Template template = templateBuilder.build();
+    String networks = clusterSpec.getNetworks();
+    if(!Strings.isNullOrEmpty(networks)) {
+    	template.getOptions().networks(networks);
+    }
     template.getOptions().runScript(bootstrap);
     return setSpotInstancePriceIfSpecified(
       computeService.getContext(), clusterSpec, template, instanceTemplate
