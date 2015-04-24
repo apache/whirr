@@ -26,7 +26,7 @@
     <license rdf:resource="http://usefulinc.com/doap/licenses/asl20" />
     <name>Apache Whirr</name>
     <homepage rdf:resource="http://whirr.apache.org" />
-    <asfext:pmc rdf:resource="http://whirr.apache.org" />
+    <asfext:pmc rdf:resource="http://attic.apache.org" />
     <shortdesc>Apache Whirr is a set of libraries for running cloud services</shortdesc>
     <description>Apache Whirr is a set of libraries for running cloud services
 
@@ -42,6 +42,7 @@ You can also use Whirr as a command line tool for deploying clusters.</descripti
     <programming-language>Java</programming-language>
     <programming-language>Bash</programming-language>
     <category rdf:resource="http://projects.apache.org/category/network-server" />
+    <category rdf:resource="http://projects.apache.org/category/retired" />
     <release>
       <Version>
         <name>Whirr 0.7.0</name>
